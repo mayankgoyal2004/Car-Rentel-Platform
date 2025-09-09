@@ -1,0 +1,41 @@
+@import url(../Font/css2);
+@import url(../Font/css2-1);
+@import url(../Font/css2-2);
+
+
+@font-face {
+  font-family: "Poppins";
+  src: url("/assets/fonts/poppins/Poppins-Light.woff2") format("woff2"),
+    url("/assets/fonts/poppins/Poppins-Light.woff") format("woff"),
+    url("/assets/fonts/poppins/Poppins-Light.ttf") format("truetype"),
+    url("/assets/fonts/poppins/Poppins-Light.eot") format("embedded-opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+
+.btn-outline-light {
+  background-color: #000 !important;   /* Black background */
+  color: #fff !important;             /* White text */
+  border: 1px solid #000 !important;  /* Black border */
+  transition: all 0.3s ease-in-out !important;
+}
+
+
+
+button.btn.btn-outline-light:hover,
+a.btn.btn-outline-light:hover {
+  background-color: #fff !important;
+  color: #000 !important;
+  border: 1px solid #000 !important;
+}
+
+.contact-btn {
+    background-color: black !important;
+    color: #fff !important;
+}
+.contact-btn:hover {
+    background-color: #fff !important;
+    color: #000000 !important;
+}

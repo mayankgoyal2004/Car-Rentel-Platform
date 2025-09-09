@@ -1,0 +1,44 @@
+
+ .header-four {
+  background: #171717 !important;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-left: -250px;
+  /* or */
+  min-height: 80px; /* fixed height */
+
+  
+}
+
+
+@media (min-width: 991px) {
+  .header-four {
+    margin-left: -250px;
+  }
+}
+
+/* On small screens, reset */
+@media (max-width: 991px) {
+  .header-four {
+    margin-left: 0;
+  }
+}
+
+
+
+/* Ensure content is not hidden behind the fixed navbar */
+.main-wrapper,
+.banner-section,
+.banner-section-four,
+.banner-section.banner-slider {
+  padding-top: 70px; /* Adjust to your header height */
+}
+
+@media (max-width: 991.96px) {
+  .header .main-menu-wrapper .main-nav .has-submenu.submenu-open > .submenu {
+    display: block !important; /* override the mobile "display:none" */
+  }
+}

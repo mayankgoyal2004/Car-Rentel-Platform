@@ -1,0 +1,28 @@
+/* Target the select inside your form */
+.banner-section-four .form-block .select {
+  background-color: transparent !important; /* make it transparent */
+  border: none; /* keep border if needed */
+  color: #fff; /* text color (adjust as needed) */
+  padding: 8px 12px;
+  border-radius: 6px;
+  appearance: none; /* removes default arrow */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Optional: custom dropdown arrow */
+.banner-section-four .form-block .select::after {
+  content: "▼";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #fff;
+}
+
+/* To style the options dropdown */
+.banner-section-four .form-block .select option {
+  background-color: #222; /* dropdown bg */
+  color: #fff; /* dropdown text */
+}

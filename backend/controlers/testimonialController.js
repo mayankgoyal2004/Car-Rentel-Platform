@@ -17,7 +17,14 @@ const addTestimonial = async (req, res) => {
         .json({ success: false, message: "image is required" });
     }
 
-    const testimonial = new Testimonial({ customer, rating, review, image ,createdBy:req.user._id});
+    const testimonial = new Testimonial({
+      customer,
+      rating,
+      review,
+      image,
+      createdBy: req.user._id,
+      admin: req.user.admin,
+    });
     await testimonial.save();
 
     res.status(201).json({ success: true, testimonial });
@@ -65,21 +72,26 @@ const getAllTestimonialsAdmin = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const { _id } = req.user;
-    if (!_id) {
+     const adminId = req.user.admin;
+    const search = req.query.search || ""; 
+    if (!adminId) {
       return res.status(400).json({
         success: false,
         status: 400,
         message: "Id is required",
       });
     }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" }; 
+    }
 
-    const testimonials = await Testimonial.find({ createdBy: _id })
+    const testimonials = await Testimonial.find(filter)
       .skip(skip)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    const total = await Testimonial.countDocuments({ createdBy: _id });
+    const total = await Testimonial.countDocuments(filter);
 
     res.json({
       success: true,

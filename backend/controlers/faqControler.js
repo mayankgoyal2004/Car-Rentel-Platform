@@ -3,7 +3,7 @@ const Faq = require("../models/faqModel");
 const addFaq = async (req, res) => {
   try {
     const { category_id, question, answer } = req.body;
-    const { _id } = req.user;
+    const { _id, admin } = req.user;
 
     if (!category_id || !question || !answer) {
       return res.status(400).json({
@@ -18,6 +18,7 @@ const addFaq = async (req, res) => {
       question,
       answer,
       createdBy: _id,
+      admin,
     });
     await faq.save();
 
@@ -64,15 +65,28 @@ const getAllFaqsAdmin = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search;
 
-    const faqs = await Faq.find({ createdBy: _id })
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" };
+    }
+
+    const faqs = await Faq.find(filter)
       .populate("category", "categoryName")
       .skip(skip)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    const total = await Faq.countDocuments({ createdBy: _id });
+    const total = await Faq.countDocuments(filter);
 
     res.json({
       success: true,
@@ -90,21 +104,15 @@ const getActiveFaqs = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
 
-    const faqs = await Faq.find({
-      createdBy: _id,
-      status: true,
-    })
+    const faqs = await Faq.find({ admin: adminId, status: true })
       .populate("category", "name")
       .skip(skip)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    const total = await Faq.countDocuments({
-      createdBy: _id,
-      status: true,
-    });
+    const total = await Faq.countDocuments({ admin: adminId, status: true });
 
     res.json({
       success: true,

@@ -13,11 +13,20 @@ const userSchema = new mongoose.Schema(
     otp: { type: String, default: null },
     otpExpiration: { type: Date, default: null },
     status: { type: Boolean, default: false },
-    userType: { type: Number, default: 3 }, // 1 = Admin, 2 = teamMembers 3 = user default
-
+    userType: { type: Number, default: 4 }, // 1 = superAdmin, 2 = admin 3 = teamMembers 4 = user default
     role: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Role",
+      default: null,
+    },
+    package: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Package",
+      default: null,
+    },
+    packageExpiration: {
+      type: Date,
+      default: null,
     },
     admin: {
       type: mongoose.Schema.Types.ObjectId,

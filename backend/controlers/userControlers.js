@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const customer = require("../models/customerModel");
-
+const Package = require("../models/packageModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const saltround = 15;
@@ -525,25 +525,74 @@ const updateUserByadmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "User not exist " });
     }
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, saltround);
 
     let imagePath = null;
     if (req.file) {
       imagePath = req.file.path.replace(/\\/g, "/");
     }
-    const newUser = new User({
+    const updatedUser = await User.findByIdAndUpdate(
+      existingUser._id,
+      {
+        userName: name,
+        email,
+        contact,
+        password: hashedPassword,
+        role: role_id,
+        userType: 2,
+        status,
+        image: imagePath,
+      },
+      { new: true }
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: "User added successfully by admin",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Add user by admin error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const registerAdmin = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    let validator = "";
+    if (!name) validator += "Name is required. ";
+    if (!email) validator += "Email is required. ";
+    if (!password) validator += "Password is required. ";
+
+    if (validator) {
+      return res.status(400).json({ success: false, message: validator });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ success: false, message: "User already exists" });
+    }
+    const hashedPassword = await bcrypt.hash(password, saltround);
+
+    let imagePath = null;
+    if (req.file) {
+      imagePath = req.file.path.replace(/\\/g, "/");
+    }
+    let newUser = new User({
       userName: name,
       email,
-      contact,
       password: hashedPassword,
-      role: role_id,
       userType: 2,
-      status,
+      status: true,
       image: imagePath,
     });
 
+    newUser = await newUser.save();
+    newUser.admin = newUser._id;
     await newUser.save();
 
     return res.status(201).json({
@@ -557,6 +606,57 @@ const updateUserByadmin = async (req, res) => {
   }
 };
 
+const updateAdmin = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { name, email, contact, password, packageId } = req.body;
+    const admin = await User.findById(_id);
+    if (!admin || admin.userType !== 2) {
+      return res.status(404).json({
+        success: false,
+        message: "Admin not found",
+      });
+    }
+    if (name) admin.userName = name;
+    if (email) admin.email = email;
+    if (contact) admin.contact = contact;
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, saltround);
+      admin.password = hashedPassword;
+    }
+    if (req.file) {
+      admin.image = req.file.path.replace(/\\/g, "/");
+    }
+    if (packageId) {
+      const pkg = await Package.findById(packageId);
+      if (!pkg) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid package ID",
+        });
+      }
+
+      admin.package = pkg._id;
+      admin.packageExpiration = new Date(
+        Date.now() + pkg.duration * 24 * 60 * 60 * 1000 // duration in days
+      );
+    }
+
+    await admin.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Admin updated successfully",
+      admin,
+    });
+  } catch (error) {
+    console.error("Update Admin Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
 module.exports = {
   register,
   login,
@@ -568,4 +668,6 @@ module.exports = {
   updateUserDetails,
   adduserByadmin,
   updateUserByadmin,
+  registerAdmin,
+  updateAdmin,
 };

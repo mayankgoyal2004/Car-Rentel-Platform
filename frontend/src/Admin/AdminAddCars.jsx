@@ -12,7 +12,7 @@ const AdminAddCars = () => {
       </div>
       <div className="card mb-0">
         <div className="card-body">
-          <div className="add-wizard car-steps">
+          <div className="add-wizard car-steps">  
             <ul className="nav d-flex align-items-center flex-wrap gap-3">
               <li className="nav-item active">
                 <a href="javascript:void(0);" className="nav-link d-flex align-items-center"><i className="ti ti-info-circle me-1" />Basic</a>

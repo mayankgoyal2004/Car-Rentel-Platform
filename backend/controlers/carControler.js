@@ -2,14 +2,256 @@ const Car = require("../models/CarModule");
 
 const addCar = async (req, res) => {
   try {
-    const data = req.body;
+    const {
+      carName,
+      permalink,
+      carType_id,
+      carBrand_id,
+      carModel_id,
+      category,
+      plateNumber,
+      vinNumber,
+      mainLocation,
+      otherLocations,
+      fuel_id,
+      odometer,
+      color_id,
+      year,
+      transmission_id,
+      mileage,
+      passengers,
+      NoofSeats,
+      airbags,
+      noOfDoors,
+    } = req.body;
 
-    const car = new Car(data);
+    if (
+      !carName ||
+      !permalink ||
+      !carType_id ||
+      !carBrand_id ||
+      !carModel_id ||
+      !category ||
+      !plateNumber ||
+      !vinNumber ||
+      !mainLocation ||
+      !fuel_id ||
+      !odometer ||
+      !color_id ||
+      !year ||
+      !transmission_id ||
+      !mileage ||
+      !passengers ||
+      !NoofSeats ||
+      !airbags ||
+      !noOfDoors
+    ) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "All required fields must be provided",
+        });
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Car image is required" });
+    }
+
+    const imagePath = req.file.path.replace(/\\/g, "/");
+
+    const car = new Car({
+      carName,
+      permalink,
+      carType: carType_id,
+      carBrand: carBrand_id,
+      carModel: carModel_id,
+      category,
+      plateNumber,
+      vinNumber,
+      mainLocation,
+      otherLocations: otherLocations ? JSON.parse(otherLocations) : [],
+      carFuel: fuel_id,
+      odometer,
+      carColor: color_id,
+      year,
+      carTransmission: transmission_id,
+      mileage,
+      passengers,
+      carSeats: NoofSeats,
+      airbags,
+      noOfDoors,
+      image: imagePath,
+
+      createdBy: req.user._id,
+      admin: req.user.admin,
+      status: false,
+      isAvailable: false,
+      inRent: false,
+    });
+
     await car.save();
 
-    res.status(201).json({ message: "Car added successfully", car });
+    res.status(201).json({
+      success: true,
+      message: "Car added successfully. Pending SuperAdmin approval.",
+      car,
+    });
   } catch (error) {
-    res.status(400).json({ message: "Error adding car", error: error.message });
+    console.error("Add Car Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error adding car",
+      error: error.message,
+    });
+  }
+};
+
+const updateCarFeatures = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { features } = req.body;
+
+    if (!Array.isArray(features) || features.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Features must be an array of IDs" });
+    }
+
+    const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ success: false, message: "Car not found" });
+    }
+
+    car.carFeatures = features;
+    await car.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Car features updated successfully",
+      car,
+    });
+  } catch (error) {
+    console.error("Update Car Features Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating features",
+      error: error.message,
+    });
+  }
+};
+
+const updateCarExtraService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { extraService } = req.body;
+
+    if (!Array.isArray(features) || features.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Features must be an array of IDs" });
+    }
+
+    const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ success: false, message: "Car not found" });
+    }
+
+    car.extraService = extraService;
+    await car.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Car extraServe updated successfully",
+      car,
+    });
+  } catch (error) {
+    console.error("Update Car extraService Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating ExtraService",
+      error: error.message,
+    });
+  }
+};
+
+
+const uploadCarFiles = async (req, res) => {
+  try {
+    const { carId } = req.params;
+    const car = await Car.findById(carId);
+    if (!car) return res.status(404).json({ success: false, message: "Car not found" });
+
+    const type = req.body.type; // 'documents', 'policies', or 'videos'
+
+    if (!req.files || req.files.length === 0)
+      return res.status(400).json({ success: false, message: "No files uploaded" });
+
+    req.files.forEach(file => {
+      if (type === "documents") car.carDocuments.push({ name: file.originalname, path: file.path });
+      if (type === "policies") car.carPolicies.push({ name: file.originalname, path: file.path });
+      if (type === "videos") car.carVideo.push({ name: file.originalname, path: file.path });
+    });
+
+    if (req.body.videoLink) car.videoLink = req.body.videoLink;
+
+    await car.save();
+
+    res.status(200).json({ success: true, message: "Files uploaded", car });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { uploadCarFiles };
+
+
+
+
+const updateCarStatusByAdmin = async (req, res) => {
+  try {
+    if (req.user.userType !== 1)
+      return res.status(403).json({ message: "SuperAdmin only" });
+
+    const {status} = req.body
+    const car = await Car.findById(req.params.id);
+    car.status = status;
+    await car.save();
+    res.json({ success: true, message: "Car approved", car });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+const toggleAvailability = async (req, res) => {
+  try {
+
+    const car = await Car.findById(req.params.id);
+    if (!car.status) return res.status(400).json({ message: "Not approved" });
+
+    car.isAvailable = req.body.isAvailable;
+    await car.save();
+    res.json({ success: true, car });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// Public list
+const getAllCars = async (req, res) => {
+  try {
+    const cars = await Car.find({
+      status: true,
+      isAvailable: true,
+      inRent: false,
+    }).populate("carType carBrand carModel createdBy");
+    res.json({ success: true, count: cars.length, cars });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -59,7 +301,7 @@ const carDelete = async (req, res) => {
 // GET /cars/created-by/:userId
 const getCar = async (req, res) => {
   try {
-    const cars = await Car.find({ createdBy: req.user._id });
+    const cars = await Car.find({ admin: req.user.admin });
     res.status(200).json(cars);
   } catch (error) {
     res
@@ -168,9 +410,10 @@ const quickSearchCar = async (req, res) => {
 
 module.exports = {
   addCar,
-  updateCar,
-  getAllCar,
+  updateCarFeatures,
+  updateCarExtraService,
   getCar,
   quickSearchCar,
   getCarById,
+  uploadCarFiles
 };

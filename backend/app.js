@@ -21,7 +21,7 @@ const seeder = require("./Config/sedder.js");
 
 connectDb()
   .then(() => {
-    seeder.adminSeeder();
+    seeder.superAdmin();
 
     app.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`);

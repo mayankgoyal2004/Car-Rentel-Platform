@@ -39,13 +39,13 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
         sessionStorage.setItem("_id", res.data.data._id);
         sessionStorage.setItem("authenticate", true);
         sessionStorage.setItem("status", res.data.data.status);
-        if (res.data.data.userType === 1 || res.data.data.userType ===2) {
+        if (res.data.data.userType === 1 || res.data.data.userType ===2 ||res.data.data.userType ===3) {
           toast.success(res.data.message);
           setTimeout(() => {
             navigate("/admin-dashboard");
           }, 1000);
         } else if (
-          res.data.data.userType === 3 &&
+          res.data.data.userType === 4 &&
           res.data.data.status === true
         ) {
           navigate("/user-dashboard");

@@ -11,6 +11,10 @@ const faqSchema = new mongoose.Schema(
     answer: { type: String, required: true },
     status: { type: Boolean, default: true },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
   },
   { timestamps: true }
 );

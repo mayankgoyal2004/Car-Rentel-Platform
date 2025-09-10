@@ -157,7 +157,7 @@ try {
       .limit(limit);
     const totalTag = await Tag.countDocuments({ admin:adminId , status : true});
 
-    res.json({
+    res.json({ 
       success: true,
       data: tag,
       pagination: {
@@ -218,5 +218,42 @@ const deleteBlogTag = async (req, res) => {
   }
 };
 
+const getAllBlogTagSuperAdmin = async(req,res)=>{
+    try {
+      if (req.user.userType !== 1)
+      return res.status(403).json({ message: "SuperAdmin only" });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || ""; 
+    let filter = {};
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" }; 
+    }
 
-module.exports = { addBlogTag, updateBlogTag, getAllBlogTag, deleteBlogTag ,getAllActiveBlogTag };
+    const tag = await Tag.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalTag = await Tag.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: tag,
+      pagination: {
+        totalTag,
+        currentPage: page,
+        totalPages: Math.ceil(totalTag / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+}
+
+
+module.exports = { addBlogTag, updateBlogTag, getAllBlogTag, deleteBlogTag ,getAllActiveBlogTag ,getAllBlogTagSuperAdmin};

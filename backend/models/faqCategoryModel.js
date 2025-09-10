@@ -6,6 +6,10 @@ const faqCategory = new mongoose.Schema(
 
     categoryName: { type: String, required: true },
     status: { type: Boolean, default: true },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

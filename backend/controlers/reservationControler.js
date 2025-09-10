@@ -30,7 +30,6 @@ const addReservation = async (req, res) => {
       totalPrice,
     } = req.body;
 
-    const { _id } = req.user;
 
     if (!car_id || !customer_id || !pickupDate || !dropDate) {
       return res
@@ -42,8 +41,8 @@ const addReservation = async (req, res) => {
     if (!car) {
       return res.status(404).json({ success: false, message: "Car not found" });
     }
-    Car.status = false;
-    await Car.save();
+    car.inRent = true;
+    await car.save();
 
     let assignedDriver = null;
     if (driverType === "withDriver") {
@@ -65,7 +64,6 @@ const addReservation = async (req, res) => {
       }
     }
 
-    // ✅ Generate orderId
     const orderId = "#" + Math.floor(100000 + Math.random() * 900000);
 
     const reservation = new Reservation({
@@ -92,7 +90,8 @@ const addReservation = async (req, res) => {
       driverType,
       couponCode,
       totalPrice,
-      createdBy: _id,
+      createdBy: req.user._id,
+      admin: req.user.admin
     });
 
     await reservation.save();
@@ -196,7 +195,7 @@ const updateReservation = async (req, res) => {
       reservation.status === "completed"
     ) {
       if (reservation.car) {
-        await Car.findByIdAndUpdate(reservation.car, { status: true });
+        await Car.findByIdAndUpdate(reservation.car, { inRent: false });
       }
       if (reservation.driver) {
         await Driver.findByIdAndUpdate(reservation.driver, {
@@ -242,7 +241,7 @@ const deleteReservation = async (req, res) => {
 
 const getAllReservationByCustomer = async (req, res) => {
   try {
-    const { customerId } = req.params;
+    const { _id } = req.user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
@@ -252,7 +251,7 @@ const getAllReservationByCustomer = async (req, res) => {
         .json({ success: false, message: "Customer ID is required" });
     }
 
-    const reservations = await Reservation.find({ customer: customerId })
+    const reservations = await Reservation.find({ createdAt: _id })
       .populate("car")
       .populate("user")
       .populate("driver")
@@ -261,9 +260,7 @@ const getAllReservationByCustomer = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalReservations = await Reservation.countDocuments({
-      user: customerId,
-    });
+    const totalReservations = await Reservation.countDocuments({ createdAt: _id });
 
     res.status(200).json({
       success: true,
@@ -285,11 +282,10 @@ const getAllReservationByCustomer = async (req, res) => {
 
 const getAllReservationsForAdmin = async (req, res) => {
   try {
-    const { _id } = req.user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    const cars = await Car.find({ createdBy: _id }).select("_id");
+    const cars = await Car.find({ admin: req.user.admin }).select("_id");
 
     const carIds = cars.map((c) => c._id);
 
@@ -336,4 +332,5 @@ module.exports = {
   updateReservation,
   deleteReservation,
   getAllReservationByCustomer,
+  getAllReservationsForAdmin
 };

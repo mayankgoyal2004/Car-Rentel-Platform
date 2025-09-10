@@ -5,6 +5,8 @@ const secretKey = "Protect@@@@";
 const authUser = async (req, res, next) => {
   try {
     const token = req.headers["authorization"];
+    // const { token } = req.cookies;
+
     if (!token) {
       return res.status(403).json({ message: "No Token Found!" });
     }
@@ -27,10 +29,14 @@ const authUser = async (req, res, next) => {
       .json({ message: "Unauthorized Access!", error: err.message });
   }
 };
-const checkPermission = (module, action) => {
+const checkPermission = (module, action, superAdminOnly = false) => {
   return (req, res, next) => {
     try {
-      if (req.user.userType === 1 ) {
+      if (superAdminOnly && req.user.userType !== 1) {
+        return res.status(403).json({ message: "SuperAdmin access only" });
+      }
+
+      if (req.user.userType === 1 || req.user.userType === 2) {
         return next();
       }
 

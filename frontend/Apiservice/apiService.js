@@ -15,6 +15,9 @@ class apiServices {
   register(data) {
     return axios.post(BASE_URL + "register", data);
   }
+   adminRegister(data) {
+    return axios.post(BASE_URL + "register-admin", data);
+  }
   login(data) {
     return axios.post(BASE_URL + "login", data);
   }
@@ -29,10 +32,13 @@ class apiServices {
   }
   getAllBlogTag({ search = "", page } = {}) {
     return axios.get(
-      BASE_URL +
-        `blogs/get-all-blog-tag?search=${encodeURIComponent(
-          search
-        )}&page=${page}`,
+      BASE_URL + `blogs/get-all-blog-tag?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllBlogTagSuperAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `blog-all-tags-superadmin?search=${search}&page=${page}`,
       { headers: getAuthHeaders() }
     );
   }
@@ -46,14 +52,15 @@ class apiServices {
     return axios.post(BASE_URL + "blogs/tag", TagName, { headers: header });
   }
   updateblogtag(data) {
-    return axios.post(BASE_URL + "blogs/update-tag", data , { headers: getAuthHeaders() });
+    return axios.post(BASE_URL + "blogs/update-tag", data, {
+      headers: getAuthHeaders(),
+    });
   }
 
   deleteblogtag(data) {
-
-
-
-    return axios.delete(BASE_URL + `blogs/tag-delete/${data}` , { headers: getAuthHeaders() });
+    return axios.delete(BASE_URL + `blogs/tag-delete/${data}`, {
+      headers: getAuthHeaders(),
+    });
   }
 }
 

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminBlogsTags = () => {
   const [tags, setTags] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [ setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -14,14 +16,18 @@ const AdminBlogsTags = () => {
   const [editTag, setEditTag] = useState(null);
   const [deleteTag, setDeleteTag] = useState(null);
 
-  // Fetch tags from API
   const fetchTags = async (searchQuery = "", page = 1) => {
     setLoading(true);
     try {
       const res = await apiService.getAllBlogTag({ search: searchQuery, page });
       setTags(res.data.data || []);
-      setCurrentPage(res.data.pagination?.currentPage || page);
       setTotalPages(res.data.pagination?.totalPages || 1);
+      if (
+        res.data.pagination?.currentPage &&
+        res.data.pagination.currentPage !== currentPage
+      ) {
+        setCurrentPage(res.data.pagination.currentPage);
+      }
     } catch (err) {
       console.error("Error fetching tags:", err);
     } finally {
@@ -31,43 +37,72 @@ const AdminBlogsTags = () => {
 
   useEffect(() => {
     fetchTags(search, currentPage);
-  }, [currentPage, search]);
+  }, [currentPage,search]);
 
   // Add new tag
   const handleCreateTag = async () => {
     if (!newTag.trim()) return;
+
     try {
-      await apiService.addblogstag({ TagName: newTag.trim() });
+      // Axios call
+      const res = await apiService.addblogstag({ TagName: newTag.trim() });
+
+      // Success response (HTTP 2xx)
+      toast.success(res.data.message); // e.g., "New Tag Created"
       setNewTag("");
       fetchTags();
     } catch (err) {
-      console.error("Error adding tag:", err);
+      // Error response (HTTP 4xx/5xx)
+      if (err.response && err.response.data) {
+        // Use backend message like "Tag already exists"
+        toast.error(err.response.data.message);
+      } else {
+        // Network or unexpected error
+        toast.error("Something went wrong!");
+      }
     }
   };
 
   const handleUpdateTag = async () => {
     if (!editTag || !editTag.TagName.trim()) return;
     try {
-      await apiService.updateblogtag({
+      const res = await apiService.updateblogtag({
         _id: editTag._id,
         TagName: editTag.TagName.trim(),
         status: editTag.status,
       });
+      toast.success(res.data.message);
       setEditTag(null);
       fetchTags();
     } catch (err) {
-      console.error("Error updating tag:", err);
+      // Error response (HTTP 4xx/5xx)
+      if (err.response && err.response.data) {
+        // Use backend message like "Tag already exists"
+        toast.error(err.response.data.message);
+      } else {
+        // Network or unexpected error
+        toast.error("Something went wrong!");
+      }
     }
   };
 
   const handleDeleteTag = async () => {
     if (!deleteTag) return;
     try {
-      await apiService.deleteblogtag(deleteTag._id);
+      const res = await apiService.deleteblogtag(deleteTag._id);
+      toast.success(res.data.message);
+
       setDeleteTag(null);
       fetchTags();
     } catch (err) {
-      console.error("Error deleting tag:", err);
+      // Error response (HTTP 4xx/5xx)
+      if (err.response && err.response.data) {
+        // Use backend message like "Tag already exists"
+        toast.error(err.response.data.message);
+      } else {
+        // Network or unexpected error
+        toast.error("Something went wrong!");
+      }
     }
   };
   const handlePageChange = (page) => {
@@ -78,7 +113,7 @@ const AdminBlogsTags = () => {
   // Search input
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1);
+    setCurrentPage(1); // ✅ good
   };
 
   return (
@@ -156,11 +191,11 @@ const AdminBlogsTags = () => {
                     </td>
                     <td>
                       <span
-                        className={`badge ${
+                        className={`badge  ${
                           tag.status ? "bg-success" : "bg-danger"
                         }`}
                       >
-                        {tag.status ? "Active" : "Inactive"}
+                        {tag.status ? "Published" : "Unpublish"}
                       </span>
                     </td>
                     <td>
@@ -294,7 +329,7 @@ const AdminBlogsTags = () => {
       </div>
 
       {/* Edit Tag Modal */}
-      <div className="modal fade" id="edit_Category">
+      <div className="modal fad  " id="edit_Category">
         <div className="modal-dialog modal-dialog-centered modal-md">
           <div className="modal-content">
             <div className="modal-header">
@@ -307,7 +342,7 @@ const AdminBlogsTags = () => {
                 <i className="ti ti-x fs-16" />
               </button>
             </div>
-            <div className="modal-body">
+            <div className="modal-body ">
               <div className="mb-3">
                 <label className="form-label">
                   Tag <span className="text-danger">*</span>
@@ -323,7 +358,7 @@ const AdminBlogsTags = () => {
                 />
               </div>
 
-              <div className="form-check">
+              <div className="form-check form-switch mt-3">
                 <input
                   className="form-check-input"
                   type="checkbox"
@@ -335,7 +370,7 @@ const AdminBlogsTags = () => {
                 <label className="form-check-label">Active</label>
               </div>
             </div>
-            <div className="modal-footer">
+            <div className="modal-footer p-1">
               <button className="btn btn-light me-3" data-bs-dismiss="modal">
                 Cancel
               </button>
@@ -382,6 +417,21 @@ const AdminBlogsTags = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        {/* Your existing JSX */}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

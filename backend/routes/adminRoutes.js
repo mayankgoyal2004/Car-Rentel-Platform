@@ -38,6 +38,7 @@ const role = require("../controlers/RoleControler");
 const testimonial = require("../controlers/testimonialController");
 const faqCategory = require("../controlers/faqCategoryControler");
 const faq = require("../controlers/faqControler");
+const checkSubscription = require("../middlewares/checkPermission");
 
 const route = express.Router();
 
@@ -45,12 +46,30 @@ route.post("/register", userRoute.register);
 route.post("/login", userRoute.login);
 route.post("/forgot-password", userRoute.forgotPassword);
 route.post("/reset-password", userRoute.resetPassword);
+route.post("/register-admin", userRoute.registerAdmin);
+
+//!! get testimonial for public without authentication
+route.get("/get-all-testimonial-user", testimonial.getTestimonialsPublic);
+route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
+
+//!! get all faq for public without authentication
+route.get("/get-all-active-faq", faq.getActiveFaqs);
+route.get("/get-all-active-faq-homepage", faq.getHomepageFaqs);
 
 route.use(authUser);
 route.post("/logout", userRoute.logout);
 route.post("/verify-email", userRoute.verifyEmail);
 route.post("/change-password", userRoute.changePassword);
-route.post("/update-user", userRoute.updateUserDetails);
+route.post(
+  "/update-user",
+  upload.userImageUpload.single("image"),
+  userRoute.updateUserDetails
+);
+route.post(
+  "./update-admin",
+  upload.userImageUpload.single("image"),
+  userRoute.updateAdmin
+);
 route.post(
   "/add-user-admin",
   authUser,
@@ -102,29 +121,39 @@ route.get(
 // !!teg route for blog
 route.post(
   "/blogs/tag",
-  authUser,
+
   checkPermission("tag", "create"),
   blogTags.addBlogTag
 );
 route.post(
   "/blogs/update-tag",
-  authUser,
+
   checkPermission("tag", "edit"),
   blogTags.updateBlogTag
 );
 route.get(
   "/blogs/get-all-blog-tag",
-  authUser,
+
   checkPermission("tag", "view"),
   blogTags.getAllBlogTag
 );
 route.delete(
   "/blogs/tag-delete/:id",
-  authUser,
+
   checkPermission("tag", "delete"),
   blogTags.deleteBlogTag
 );
-route.get("/blog-all-active-tags", authUser, checkPermission("tag", "view"));
+route.get(
+  "/blog-all-active-tags",
+  checkPermission("tag", "view"),
+  blogTags.getAllActiveBlogTag
+);
+route.get(
+  "/blog-all-tags-superadmin",
+  checkPermission("admin", "assignPackage", true),
+  blogTags.getAllBlogTagSuperAdmin
+);
+
 //!!blog routes
 route.post(
   "/blogs/add",
@@ -431,23 +460,30 @@ route.get(
   seasonalPricing.getAllSeasonalPricing
 );
 
-//!!pricing module
-route.post("/add-pricing", authUser, pricing.addPricing);
-
-//!damage route
-route.post("/add-damage", authUser, damage.addDamage);
-route.get("/get-all-damages", authUser, damage.getAllDamages);
-route.delete("/get-damages/:id", authUser, damage.deleteDamage);
-
-//! car Faq
-route.post("/add-carFaq", authUser, carFaq.addCarFaq);
-route.get("/get-all-carFaq", authUser, carFaq.getCarFaqs);
-
 //!! car controler
-route.post("/add-Car", authUser, car.addCar);
-route.get("/get-quick-car", car.quickSearchCar);
-route.get("/get-all-car", car.getAllCar);
-route.get("/get-car-by/:id", car.getCarById);
+route.post("/add-Car", checkPermission("car", "create"), car.addCar);
+route.post("cars/:id/pricing", pricing.updateCarPricing);
+route.put("/cars/:id/pricing", pricing.editCarPricing);
+route.put("/update-car/:id/features", car.updateCarFeatures);
+route.put("/update-car/:id/extraService", car.updateCarExtraService);
+route.post("/update-car/:id/damage", damage.addDamage);
+route.get("/get-car/:id/damage", damage.getDamagesByCar);
+route.delete("/delete-car/:id/damage", damage.deleteDamage);
+route.put("/edit-car/:id/damage", damage.editDamage);
+route.post("/update-car/:id/faq", carFaq.addCarFaq);
+route.get("/get-car/:id/faq", carFaq.getCarFaqs);
+route.delete("/delete-car/:id/faq", carFaq.deleteFaq);
+route.put("/edit-car/:id/faq", carFaq.editFaq);
+
+route.post(
+  "/cars/:carId/upload",
+  upload.carFilesUpload.array("files"),
+  car.uploadCarFiles
+);
+
+// route.get("/get-quick-car", car.quickSearchCar);
+// route.get("/get-all-car", car.getAllCar);
+// route.get("/get-car-by/:id", car.getCarById);
 
 //!! wishlist
 route.post("/toggle-wishlist", authUser, wishlist.toggleWishlist);
@@ -477,41 +513,77 @@ route.post("/assign-role", authUser, role.assignRole);
 route.post(
   "/add-testimonial",
   upload.testimonialUpload.single("image"),
+  checkPermission("admin", "assignPackage", true),
+
   testimonial.addTestimonial
 );
 route.post(
   "/update-testimonial/:id",
   upload.testimonialUpload.single("image"),
+  checkPermission("admin", "assignPackage", true),
+
   testimonial.updateTestimonial
 );
-route.delete("/delete/testimonial/:id", testimonial.deleteTestimonial);
-route.get("/get-all-testimonial-admin", testimonial.getAllTestimonialsAdmin);
-route.get("/get-all-testimonial-user", testimonial.getTestimonialsPublic);
-route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
+route.delete(
+  "/delete/testimonial/:id",
+  checkPermission("admin", "assignPackage", true),
+  testimonial.deleteTestimonial
+);
+route.get(
+  "/get-all-testimonial-admin",
+  checkPermission("admin", "assignPackage", true),
+  testimonial.getAllTestimonialsAdmin
+);
 
 //!! faq category
 
-route.post("/add-faq-category", authUser, faqCategory.addFaqCategory);
-route.post("/update-faq-category/:id", authUser, faqCategory.updateFaqCategory);
-route.get("/get-all-faq-category", authUser, faqCategory.getAllFaqCategory);
+route.post(
+  "/add-faq-category",
+  checkPermission("admin", "assignPackage", true),
+  faqCategory.addFaqCategory
+);
+route.post(
+  "/update-faq-category/:id",
+  checkPermission("admin", "assignPackage", true),
+  faqCategory.updateFaqCategory
+);
+route.get(
+  "/get-all-faq-category",
+  authUser,
+  checkPermission("admin", "assignPackage", true),
+  faqCategory.getAllFaqCategory
+);
 route.get(
   "/get-all-active-faq-category",
   authUser,
+  checkPermission("admin", "assignPackage", true),
   faqCategory.getAllActiveFaqCategory
 );
 route.delete(
   "/delete-faq-category/:id",
-  authUser,
+  checkPermission("faqCategory", "delete"),
   faqCategory.deleteFaqCategory
 );
 
 //!! faq router
 
-route.post("/add-faq", authUser, faq.addFaq);
-route.post("/update-faq/:id", authUser, faq.updateFaq);
-route.get("/get-all-faq", authUser, faq.getAllFaqsAdmin);
-route.get("/get-all-active-faq", authUser, faq.getActiveFaqs);
-route.get("/get-all-active-faq-homepage", authUser, faq.getHomepageFaqs);
-route.delete("/delete-faq-category/:id", authUser, faq.deleteFaq);
+route.post("/add-faq", checkPermission("faqCategory", "create"), faq.addFaq);
+route.post(
+  "/update-faq/:id",
+  checkPermission("admin", "assignPackage", true),
+  faq.updateFaq
+);
+route.get(
+  "/get-all-faq",
+  checkPermission("admin", "assignPackage", true),
+
+  faq.getAllFaqsAdmin
+);
+
+route.delete(
+  "/delete-faq-category/:id",
+  checkPermission("admin", "assignPackage", true),
+  faq.deleteFaq
+);
 
 module.exports = route;

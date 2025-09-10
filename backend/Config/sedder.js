@@ -3,24 +3,23 @@ const User = require("../models/userModel");
 
 let saltRound = 12;
 
-const adminSeeder = async () => {
+const superAdmin = async () => {
   try {
-    const admindata = await User.findOne({ email: "admin@gmail.com" });
-    if (!admindata) {
-      let adminobj = new User();
-      adminobj.email = "admin@gmail.com";
-      adminobj.password = await bcrypt.hash("admin123", saltRound);
-      adminobj.userName = "Admin";
-      adminobj.role = "68beb3b5dddeaf1d3e316889";
-      adminobj.userType = 1;
-      adminobj.status = true;
-      adminobj.admin = "68bec47a36a09e2b06277211"
-      await adminobj.save();
+    const superadmindata = await User.findOne({
+      email: "superAdmin@gmail.com",
+    });
+    if (!superadmindata) {
+      let superadminobj = new User();
+      superadminobj.email = "superadmin@gmail.com";
+      superadminobj.password = await bcrypt.hash("admin123", saltRound);
+      superadminobj.userName = "superAdmin";
+      superadminobj.userType = 1;
+      superadminobj.status = true;
+      await superadminobj.save();
     }
-    
   } catch (err) {
     console.error("Seeder Error:", err.message);
   }
 };
 
-module.exports = { adminSeeder };
+module.exports = { superAdmin };

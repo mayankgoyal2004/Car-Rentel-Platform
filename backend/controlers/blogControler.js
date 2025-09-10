@@ -39,7 +39,8 @@ const addBlog = async (req, res) => {
       image: imagePath,
       category: category_id,
       tags: tags_id,
-      userId: req.user._id,
+      createdBy: req.user._id,
+      admin: req.user.admin
     });
 
     await blog.save();
@@ -71,14 +72,11 @@ const getBlogs = async (req, res) => {
       ];
     }
 
-    // Filter by category
+   
     if (category) {
-      filter.category = category; // pass category _id from frontend
-    }
-
-    // Filter by tag
-    if (tag) {
-      filter.tags = tag; // pass tag _id from frontend
+      filter.category = category; 
+        }    if (tag) {
+      filter.tags = tag; 
     }
 
     const blogs = await Blog.find(filter)
@@ -113,6 +111,7 @@ const getAllBlog = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    
     const {_id} = req.user
     if(!_id){
    return res.status(400).json({
@@ -146,6 +145,38 @@ const getAllBlog = async (req, res) => {
       .json({ success: false, message: "Server Error", error: err.message });
   }
 };
+
+const getBlogAllBlogForSuperAdmin = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+  
+    const blogs = await Blog.find({})
+      .populate("category", "categoryName")
+      .populate("tags", "TagName")
+      .populate("userId", "name email")
+      .sort({  createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalBlogs = await Blog.countDocuments({});
+
+    res.status(200).json({
+      success: true,
+      data: blogs,
+      pagination: {
+        totalBlogs,
+        currentPage: page,
+        totalPages: Math.ceil(totalBlogs / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
 
 getsingleblog = async (req, res) => {
   try {

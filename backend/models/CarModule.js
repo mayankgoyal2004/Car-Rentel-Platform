@@ -15,6 +15,10 @@ const CarSchema = new mongoose.Schema(
     plateNumber: {
       type: String,
     },
+    NoofSeats: {
+      type: Number,
+    },
+
     vinNumber: {
       type: String,
     },
@@ -61,6 +65,9 @@ const CarSchema = new mongoose.Schema(
     airbags: {
       type: String,
     },
+    noOfDoors: {
+      type: Number,
+    },
     passengers: {
       type: Number,
     },
@@ -79,7 +86,9 @@ const CarSchema = new mongoose.Schema(
       ref: "Pricing",
     },
 
-    status: { type: Boolean, default: true },
+    status: { type: Boolean, default: false }, // superAdmin approves
+    isAvailable: { type: Boolean, default: false }, // admin toggle availability
+    inRent: { type: Boolean, default: false }, // when car is rented
     Damage: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -92,10 +101,14 @@ const CarSchema = new mongoose.Schema(
         ref: "CarFaq",
       },
     ],
-    carVideo: {
+    carVideo: [{
       type: String,
-    },
+    }],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
     carDocuments: [
       {
         type: String,

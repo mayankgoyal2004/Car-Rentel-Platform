@@ -3,7 +3,7 @@ const FaqCategory = require("../models/faqCategoryModel");
 const addFaqCategory = async (req, res) => {
   try {
     const { categoryName } = req.body;
-    const { _id } = req.user;
+    const { _id, admin } = req.user;
 
     if (!categoryName) {
       return res.status(400).json({
@@ -21,7 +21,7 @@ const addFaqCategory = async (req, res) => {
       });
     }
 
-    const category = new FaqCategory({ categoryName, createdBy: _id });
+    const category = new FaqCategory({ categoryName, createdBy: _id, admin });
     await category.save();
 
     return res.status(201).json({
@@ -43,13 +43,26 @@ const getAllFaqCategory = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search;
 
-    const category = await FaqCategory.find({ createdBy: _id })
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" };
+    }
+
+    const category = await FaqCategory.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalCategories = await FaqCategory.countDocuments();
+    const totalCategories = await FaqCategory.countDocuments(filter);
 
     res.json({
       success: true,
@@ -71,19 +84,12 @@ const getAllActiveFaqCategory = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
-
-    const activeCategory = await FaqCategory.find({
-      createdBy: _id,
-      status: true,
-    })
+    const adminId = req.user.admin;
+    const activeCategory = await FaqCategory.find({ admin:adminId , status : true})
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalActiveCategories = await FaqCategory.countDocuments({
-      createdBy: _id,
-      status: true,
-    });
+    const totalActiveCategories = await FaqCategory.countDocuments({ admin:adminId , status : true});
 
     res.json({
       success: true,

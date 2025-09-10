@@ -6,7 +6,14 @@ const BlogSchema = new mongoose.Schema(
     title: { type: String, required: true },
     description: { type: String, default: null },
     image: { type: String, default: "no-image.jpg" },
-    userId: { type: mongoose.SchemaTypes.ObjectId, ref: "User", default: null },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     category: { type: mongoose.Schema.Types.ObjectId, ref: "BlogCategory" },
     tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
     status: { type: Boolean, default: false },
@@ -21,13 +28,19 @@ BlogSchema.pre("save", async function (next) {
 
     // Check for duplicates and append number if needed
     const Blog = mongoose.model("Blog", BlogSchema);
-    let slugExists = await Blog.findOne({ slug: newSlug, _id: { $ne: this._id } });
+    let slugExists = await Blog.findOne({
+      slug: newSlug,
+      _id: { $ne: this._id },
+    });
 
     let counter = 1;
     let finalSlug = newSlug;
     while (slugExists) {
       finalSlug = `${newSlug}-${counter}`;
-      slugExists = await Blog.findOne({ slug: finalSlug, _id: { $ne: this._id } });
+      slugExists = await Blog.findOne({
+        slug: finalSlug,
+        _id: { $ne: this._id },
+      });
       counter++;
     }
 

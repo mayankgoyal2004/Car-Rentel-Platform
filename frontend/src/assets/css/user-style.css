@@ -20224,15 +20224,15 @@ Version      : 1.0
   margin-top: 5px !important;
 }
 .sort .dropdown .dropdown-menu .dropdown-item {
-  border-bottom: 1px solid 0;
-  border-radius: 0;
-  padding: 10px 10px;
-  font-size: 14px;
-  color: #737373;
-  font-weight: 400;
-  -webkit-transition: all 0.4s ease;
-  -ms-transition: all 0.4s ease;
-  transition: all 0.4s ease;
+  border-bottom: 1px solid 0  ;
+  border-radius: 0 ;
+  padding: 10px 10px ;
+  font-size: 14px ;
+  color: #737373 ;
+  font-weight: 400 ;
+  -webkit-transition: all 0.4s ease ;
+  -ms-transition: all 0.4s ease ;
+  transition: all 0.4s ease ;
 }
 .sort .dropdown .dropdown-menu .dropdown-item:hover {
   background-color: #F5F5F5;
@@ -20257,7 +20257,7 @@ Version      : 1.0
 }
 @media (max-width: 767.96px) {
   .sort .dropdown .dropdown-menu {
-    width: 100%;
+    width: 100% ;
   }
 }
 

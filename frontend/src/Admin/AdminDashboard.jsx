@@ -5,9 +5,7 @@ import { Link, Outlet } from "react-router-dom";
 import "./assets/logo.css";
 // import "./assets/css/admin-style.css"
 import "./assets/css/admin-style.css";
-import "./assets/plugins/tabler-icons/tabler-icons.min.css"
-
-
+import "./assets/plugins/tabler-icons/tabler-icons.min.css";
 
 const AdminDashboard = () => {
   const [open, setOpen] = useState(false);
@@ -15,6 +13,7 @@ const AdminDashboard = () => {
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
+const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="main-wrapper">
@@ -22,10 +21,10 @@ const AdminDashboard = () => {
       <div className="header">
         <div className="main-header">
           <div className="header-left">
-            <Link to="/admin-dashboard"  className="logo">
+            <Link to="/admin-dashboard" className="logo">
               <img src="/admin-assets/img/logo.svg" alt="Logo" />
             </Link>
-            <Link to="/admin-dashboard"className="dark-logo">
+            <Link to="/admin-dashboard" className="dark-logo">
               <img src="/admin-assets/img/logo-white.svg" alt="Logo" />
             </Link>
           </div>
@@ -42,9 +41,13 @@ const AdminDashboard = () => {
                 className="me-auto d-flex align-items-center"
                 id="header-search"
               >
-                <a id="toggle_btn" href="javascript:void(0);">
-                  <i className="ti ti-menu-deep" />
-                </a>
+               <a
+  id="toggle_btn"
+  href="#!"
+  onClick={() => setSidebarOpen(!sidebarOpen)}
+>
+  <i className="ti ti-menu-deep" />
+</a>
                 <div className="add-dropdown">
                   <Link
                     to="add-reservation"
@@ -56,404 +59,6 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div className="d-flex align-items-center header-icons">
-                {/* Flag */}
-                <div className="nav-item dropdown has-arrow flag-nav nav-item-box">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    data-bs-toggle="dropdown"
-                    href="javascript:void(0);"
-                    role="button"
-                  >
-                    <img
-                      src="/admin-assets/img/flags/gb.svg"
-                      alt="Language"
-                      className="img-fluid"
-                    />
-                  </a>
-                  <ul className="dropdown-menu p-2">
-                    <li>
-                      <a href="javascript:void(0);" className="dropdown-item">
-                        <img
-                          src="/admin-assets/img/flags/gb.svg"
-                          alt
-                          height={16}
-                        />
-                        English
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);" className="dropdown-item">
-                        <img
-                          src="/admin-assets/img/flags/sa.svg"
-                          alt
-                          height={16}
-                        />
-                        Arabic
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0);" className="dropdown-item">
-                        <img
-                          src="/admin-assets/img/flags/de.svg"
-                          alt
-                          height={16}
-                        />
-                        German
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                {/* /Flag */}
-                <div className="theme-item">
-                  <a
-                    href="javascript:void(0);"
-                    id="dark-mode-toggle"
-                    className="theme-toggle btn btn-menubar"
-                  >
-                    <i className="ti ti-moon" />
-                  </a>
-                  <a
-                    href="javascript:void(0);"
-                    id="light-mode-toggle"
-                    className="theme-toggle btn btn-menubar"
-                  >
-                    <i className="ti ti-sun-high" />
-                  </a>
-                </div>
-                <div className="notification_item">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-menubar position-relative"
-                    id="notification_popup"
-                    data-bs-toggle="dropdown"
-                    data-bs-auto-close="outside"
-                  >
-                    <i className="ti ti-bell" />
-                    <span className="badge bg-violet rounded-pill" />
-                  </a>
-                  <div className="dropdown-menu dropdown-menu-end notification-dropdown">
-                    <div className="topnav-dropdown-header pb-0">
-                      <h5 className="notification-title">Notifications</h5>
-                      <ul className="nav nav-tabs nav-tabs-bottom navouter">
-                        <li className="nav-item">
-                          <a
-                            className="nav-link active"
-                            href="#active-notification"
-                            data-bs-toggle="tab"
-                          >
-                            Active
-                            <span className="badge badge-xs rounded-pill bg-danger ms-2">
-                              5
-                            </span>
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a
-                            className="nav-link"
-                            href="#unread-notification"
-                            data-bs-toggle="tab"
-                          >
-                            Unread
-                          </a>
-                        </li>
-                        <li className="nav-item">
-                          <a
-                            className="nav-link"
-                            href="#archieve-notification"
-                            data-bs-toggle="tab"
-                          >
-                            Archieve
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="noti-content">
-                      <div className="tab-content">
-                        <div
-                          className="tab-pane fade show active"
-                          id="active-notification"
-                        >
-                          <div className="notification-list">
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="javascript:void(0);"
-                                className="avatar avatar-lg offline me-2 flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-02.jpg"
-                                  alt="Profile"
-                                  className="rounded-circle"
-                                />
-                              </a>
-                              <div className="flex-grow-1">
-                                <p className="mb-1">
-                                  <a href="javascript:void(0);">
-                                    <span className="text-gray-9">
-                                      Jerry Manas
-                                    </span>{" "}
-                                    Added New Task Creating{" "}
-                                    <span className="text-gray-9">
-                                      Login Pages
-                                    </span>
-                                  </a>
-                                </p>
-                                <span className="fs-12 noti-time">
-                                  <i className="ti ti-clock me-1" />4 Min Ago
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="notification-list">
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="javascript:void(0);"
-                                className="avatar avatar-lg offline me-2 flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-05.jpg"
-                                  alt="Profile"
-                                  className="rounded-circle"
-                                />
-                              </a>
-                              <div className="flex-grow-1">
-                                <p className="mb-1">
-                                  <a href="javascript:void(0);">
-                                    <span className="text-gray-9">
-                                      Robert Fox{" "}
-                                    </span>{" "}
-                                    Was Marked as Late Login{" "}
-                                    <span className="text-danger">
-                                      09:55 AM
-                                    </span>
-                                  </a>
-                                </p>
-                                <span className="fs-12 noti-time">
-                                  <i className="ti ti-clock me-1" />5 Min Ago
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="notification-list">
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="javascript:void(0);"
-                                className="avatar avatar-lg me-2 flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-04.jpg"
-                                  alt="Profile"
-                                  className="rounded-circle"
-                                />
-                              </a>
-                              <div className="flex-grow-1">
-                                <p className="mb-1">
-                                  <a href="javascript:void(0);">
-                                    <span className="text-gray-9">
-                                      Jenny Wilson{" "}
-                                    </span>{" "}
-                                    Completed{" "}
-                                    <span className="text-gray-9">
-                                      Created New Component
-                                    </span>
-                                  </a>
-                                </p>
-                                <div className="d-flex align-items-center">
-                                  <span className="fs-12 noti-time">
-                                    <i className="ti ti-clock me-1" />
-                                    15 Min Ago
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="notification-list">
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="javascript:void(0);"
-                                className="avatar avatar-lg me-2 flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-02.jpg"
-                                  alt="Profile"
-                                  className="rounded-circle"
-                                />
-                              </a>
-                              <div className="flex-grow-1">
-                                <p className="mb-1">
-                                  <a href="javascript:void(0);">
-                                    <span className="text-gray-9">
-                                      Jacob Johnson{" "}
-                                    </span>{" "}
-                                    Added Manual Time{" "}
-                                    <span className="text-gray-9">2 Hrs</span>
-                                  </a>
-                                </p>
-                                <div className="d-flex align-items-center">
-                                  <span className="fs-12 noti-time">
-                                    <i className="ti ti-clock me-1" />
-                                    20 Min Ago
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="notification-list">
-                            <div className="d-flex align-items-center">
-                              <a
-                                href="javascript:void(0);"
-                                className="avatar avatar-lg me-2 flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-01.jpg"
-                                  alt="Profile"
-                                  className="rounded-circle"
-                                />
-                              </a>
-                              <div className="flex-grow-1">
-                                <p className="mb-1">
-                                  <a href="javascript:void(0);">
-                                    <span className="text-gray-9">
-                                      Annete Black{" "}
-                                    </span>{" "}
-                                    Completed{" "}
-                                    <span className="text-gray-9">
-                                      Improved Workflow React
-                                    </span>
-                                  </a>
-                                </p>
-                                <div className="d-flex align-items-center">
-                                  <span className="fs-12 noti-time">
-                                    <i className="ti ti-clock me-1" />
-                                    22 Min Ago
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="tab-pane fade" id="unread-notification">
-                          <div className="notification-list">
-                            <a href="javascript:void(0);">
-                              <div className="d-flex align-items-center">
-                                <span className="avatar avatar-lg offline me-2 flex-shrink-0">
-                                  <img
-                                    src="/admin-assets/img/profiles/avatar-02.jpg"
-                                    alt="Profile"
-                                    className="rounded-circle"
-                                  />
-                                </span>
-                                <div className="flex-grow-1">
-                                  <p className="mb-1">
-                                    <span className="text-gray-9">
-                                      Jerry Manas
-                                    </span>{" "}
-                                    Added New Task Creating{" "}
-                                    <span className="text-gray-9">
-                                      Login Pages
-                                    </span>
-                                  </p>
-                                  <span className="fs-12 noti-time">
-                                    <i className="ti ti-clock me-1" />4 Min Ago
-                                  </span>
-                                </div>
-                              </div>
-                            </a>
-                          </div>
-                          <div className="notification-list">
-                            <a href="javascript:void(0);">
-                              <div className="d-flex align-items-center">
-                                <span className="avatar avatar-lg offline me-2 flex-shrink-0">
-                                  <img
-                                    src="/admin-assets/img/profiles/avatar-05.jpg"
-                                    alt="Profile"
-                                    className="rounded-circle"
-                                  />
-                                </span>
-                                <div className="flex-grow-1">
-                                  <p className="mb-1">
-                                    <span className="text-gray-9">
-                                      Robert Fox{" "}
-                                    </span>{" "}
-                                    Was Marked as Late Login{" "}
-                                    <span className="text-danger">
-                                      09:55 AM
-                                    </span>
-                                  </p>
-                                  <span className="fs-12 noti-time">
-                                    <i className="ti ti-clock me-1" />5 Min Ago
-                                  </span>
-                                </div>
-                              </div>
-                            </a>
-                          </div>
-                          <div className="notification-list">
-                            <a href="javascript:void(0);">
-                              <div className="d-flex align-items-center">
-                                <span className="avatar avatar-lg offline me-2 flex-shrink-0">
-                                  <img
-                                    src="/admin-assets/img/profiles/avatar-06.jpg"
-                                    alt="Profile"
-                                    className="rounded-circle"
-                                  />
-                                </span>
-                                <div className="flex-grow-1">
-                                  <p className="mb-1">
-                                    <span className="text-gray-9">
-                                      Robert Fox{" "}
-                                    </span>{" "}
-                                    Created New Component
-                                  </p>
-                                  <span className="fs-12 noti-time">
-                                    <i className="ti ti-clock me-1" />5 Min Ago
-                                  </span>
-                                </div>
-                              </div>
-                            </a>
-                          </div>
-                        </div>
-                        <div
-                          className="tab-pane fade"
-                          id="archieve-notification"
-                        >
-                          <div className="d-flex justify-content-center align-items-center p-3">
-                            <div className="text-center ">
-                              <img
-                                src="/admin-assets/img/icons/nodata.svg"
-                                className="mb-2"
-                                alt="nodata"
-                              />
-                              <p className="text-gray-5">No Data Available</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between topnav-dropdown-footer">
-                      <div className="d-flex align-items-center">
-                        <a
-                          href="javascript:void(0);"
-                          className="link-primary text-decoration-underline me-3"
-                        >
-                          Mark all as Read
-                        </a>
-                        <a
-                          href="javascript:void(0);"
-                          className="link-danger text-decoration-underline"
-                        >
-                          Clear All
-                        </a>
-                      </div>
-                      <a
-                        href="javascript:void(0);"
-                        className="btn btn-primary btn-sm d-inline-flex align-items-center"
-                      >
-                        View All Notifications
-                        <i className="ti ti-chevron-right ms-1" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="dropdown">
                   <a
                     href="javascript:void(0);"
@@ -466,23 +71,15 @@ const AdminDashboard = () => {
                   <div className="dropdown-menu p-3">
                     <ul>
                       <li>
-                        <Link to="add-car"
-                          
+                        <Link
+                          to="add-car"
                           className="dropdown-item d-inline-flex align-items-center"
                         >
                           <i className="ti ti-car me-2" />
                           car
                         </Link>
                       </li>
-                      <li>
-                        <a
-                          href="add-quotations.html"
-                          className="dropdown-item d-inline-flex align-items-center"
-                        >
-                          <i className="ti ti-file-symlink me-2" />
-                          Quotation
-                        </a>
-                      </li>
+
                       <li>
                         <a
                           href="pricing.html"
@@ -493,7 +90,8 @@ const AdminDashboard = () => {
                         </a>
                       </li>
                       <li>
-                        <Link to=""
+                        <Link
+                          to=""
                           href="extra-services.html"
                           className="dropdown-item d-inline-flex align-items-center"
                         >
@@ -510,16 +108,7 @@ const AdminDashboard = () => {
                           Inspection
                         </a>
                       </li>
-                      <li>
-                        <Link
-                          to=""
-                          href="maintenance.html"
-                          className="dropdown-item d-inline-flex align-items-center"
-                        >
-                          <i className="ti ti-color-filter me-2" />
-                          Maintenance
-                        </Link>
-                      </li>
+                      <li></li>
                     </ul>
                   </div>
                 </div>
@@ -647,7 +236,7 @@ const AdminDashboard = () => {
 
       {/* /Header */}
       {/* Sidebar */}
-      <div className="sidebar" id="sidebar">
+      <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`} id="sidebar">
         {/* Logo */}
         <div className="sidebar-logo navbar-1">
           <Link to="/admin-dashboard" className="logo logo-normal">
@@ -1049,37 +638,7 @@ const AdminDashboard = () => {
                     </li>
                   </ul>
                 </li>
-                <li className="menu-title">
-                  <span>AUTHENTICATION</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="admin-login">
-                        <i className="ti ti-login" />
-                        <span>Login</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-forgot-password">
-                        <i className="ti ti-help-triangle" />
-                        <span>Forgot Password</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-otp">
-                        <i className="ti ti-mail-exclamation" />
-                        <span>Email Verification</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-reset-password">
-                        <i className="ti ti-restore" />
-                        <span>Reset Password</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
+
                 <li className="menu-title">
                   <span>SETTINGS &amp; CONFIGURATION</span>
                 </li>
@@ -1130,8 +689,8 @@ const AdminDashboard = () => {
           </a>
         </p>
         <p>
-          &copy; 2025 Dreamsrent, Made with <span className="text-danger">❤</span>{" "}
-          by{" "}
+          &copy; 2025 Dreamsrent, Made with{" "}
+          <span className="text-danger">❤</span> by{" "}
           <a href="javascript:void(0);" className="text-secondary">
             Dreams
           </a>

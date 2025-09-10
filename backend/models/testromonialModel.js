@@ -8,6 +8,10 @@ const testimonialSchema = new mongoose.Schema(
     image: { type: String, default: "" },
     status: { type: Boolean, default: true },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );

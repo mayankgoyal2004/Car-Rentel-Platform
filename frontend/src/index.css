@@ -39,3 +39,43 @@ a.btn.btn-outline-light:hover {
     background-color: #fff !important;
     color: #000000 !important;
 }
+
+
+/* Wrap your table in a div with this class */
+.custom-table-wrapper {
+  overflow: visible !important; /* allow dropdowns to appear outside table */
+  position: relative; /* ensure positioning context for dropdowns */
+}
+
+/* Dropdown button inside table */
+.custom-dropdown-table .dropdown {
+  position: relative; /* needed for dropdown positioning */
+}
+
+/* Wrapper around table to allow dropdown to overflow */
+.custom-table-wrapper {
+  position: relative; /* positioning context for dropdowns */
+  overflow: visible !important; /* let dropdowns overflow */
+}
+
+/* Dropdown menu inside table */
+.custom-dropdown-table .dropdown-menu {
+  position: absolute !important;
+  top: 100%; /* below button */
+  left: auto; 
+  right: 0; /* align right */
+  z-index: 1050; /* above other content */
+  display: none; /* initially hidden */
+}
+
+/* Show dropdown when toggled */
+.custom-dropdown-table .dropdown.show .dropdown-menu {
+  display: block;
+}
+
+/* Optional: improve responsive scrolling */
+@media (max-width: 768px) {
+  .custom-table-wrapper {
+    overflow-x: auto !important;
+  }
+}

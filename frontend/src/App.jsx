@@ -212,10 +212,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-email" element={<EmailVerified />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-
+        <Route path="/admin-login" element={<AdminLogin />} />
 
         {/* adminroute */}
-        <Route element={<ProtectedRoute allowedRoles={[1,2]} />}>
+        <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />}>
             <Route index element={<AdminMain />} />
             <Route path="add-reservation" element={<AddAdminReservation />} />
@@ -288,7 +288,6 @@ function App() {
             <Route path="income-vs-expenses" element={<IncomeVsExpenses />} />
             <Route path="earning-reports" element={<EarningReports />} />
             <Route path="rental-report" element={<RentalReport />} />
-            <Route path="admin-login" element={<AdminLogin />} />
             <Route
               path="admin-forgot-password"
               element={<AdminForgotPassword />}

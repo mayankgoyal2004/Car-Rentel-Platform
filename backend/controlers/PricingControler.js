@@ -1,62 +1,111 @@
 const Pricing = require("../models/PricingModel");
+const Car = require("../models/CarModule");
 
-const addPricing = async (req, res) => {
+const updateCarPricing = async (req, res) => {
   try {
-    let {
-      dailyPrice,
-      weeklyPrice,
-      monthlyPrice,
-      yearlyPrice,
+    const { id } = req.params;
+
+    const {
+      daily,
+      weekly,
+      monthly,
+      yearly,
       baseKilometers,
       unlimitedKilometers,
       extraKilometerPrice,
-      seasonal_id,
-      insurance,
+
+      seasonal,
+      insurance, // array of { name, price, benefits }
     } = req.body;
 
-    if (baseKilometers === undefined || extraKilometerPrice === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be filled",
-      });
+    // validate required fields
+    if (!baseKilometers || !extraKilometerPrice) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Base km & Extra km price required" });
     }
 
-    if (insurance && typeof insurance === "string") {
-      try {
-        insurance = JSON.parse(insurance);
-      } catch {
-        return res
-          .status(400)
-          .json({ success: false, message: "Invalid insurance format" });
-      }
+    const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ success: false, message: "Car not found" });
     }
 
-    const newPricing = new Pricing({
-      prices: {
-        daily: dailyPrice,
-        weekly: weeklyPrice,
-        monthly: monthlyPrice,
-        yearly: yearlyPrice,
-      },
+    const pricing = new Pricing({
+      prices: { daily, weekly, monthly, yearly },
       baseKilometers,
-      unlimitedKilometers: !!unlimitedKilometers,
+      unlimitedKilometers,
       extraKilometerPrice,
-      seasonal: seasonal_id,
+      unlimitedKilometers,
+      seasonal,
       insurance,
     });
+    await pricing.save();
+    car.Pricing = pricing._id;
+    await car.save();
 
-    await newPricing.save();
-
-    res.status(201).json({
+    res.status(200).json({
       success: true,
-      message: "Pricing added successfully",
-      data: newPricing,
+      message: "Car pricing updated successfully",
+      pricing,
     });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error) {
+    console.error("Update Car Pricing Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating pricing",
+      error: error.message,
+    });
   }
 };
 
-module.exports = {
-  addPricing,
+const editCarPricing = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      daily,
+      weekly,
+      monthly,
+      yearly,
+      baseKilometers,
+      unlimitedKilometers,
+      extraKilometerPrice,
+      seasonal,
+      insurance,
+    } = req.body;
+
+  
+    const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({ success: false, message: "Car or pricing not found" });
+    }
+    const updateData = {
+      prices: { daily, weekly, monthly, yearly },
+      baseKilometers,
+      unlimitedKilometers,
+      extraKilometerPrice,
+      seasonal,
+      insurance,
+    };
+
+    const updatedPricing = await Pricing.findByIdAndUpdate(car.Pricing, updateData, {
+      new: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Car pricing updated successfully",
+      pricing: updatedPricing,
+    });
+  } catch (error) {
+    console.error("Edit Car Pricing Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating car pricing",
+      error: error.message,
+    });
+  }
 };
+
+
+
+module.exports = { updateCarPricing ,editCarPricing};

@@ -151,7 +151,6 @@ const userImageUpload = multer({
   fileFilter,
 });
 
-
 const testimonial = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/testimonials");
@@ -168,6 +167,23 @@ const testimonialUpload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter,
 });
+
+const bussinessLogo = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/businessImage");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/\s+/g, "_");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + "-" + baseName + ext);
+  },
+});
+const bussinessLogoUpload = multer({
+  storage: bussinessLogo,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter,
+});
 const carfiles = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/carFiles");
@@ -181,13 +197,19 @@ const carfiles = multer.diskStorage({
 });
 const carFileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|pdf|doc|docx|mp4|mov|avi|mkv|webm/;
-  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const extname = allowedTypes.test(
+    path.extname(file.originalname).toLowerCase()
+  );
   const mimetype = allowedTypes.test(file.mimetype.toLowerCase());
 
   if (extname && mimetype) {
     cb(null, true);
   } else {
-    cb(new Error("Only images, documents, and videos (mp4, mov, avi, mkv, webm) are allowed!"));
+    cb(
+      new Error(
+        "Only images, documents, and videos (mp4, mov, avi, mkv, webm) are allowed!"
+      )
+    );
   }
 };
 
@@ -196,7 +218,6 @@ const carFilesUpload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }, // 🚀 Allow up to 50MB
   fileFilter: carFileFilter,
 });
-
 
 module.exports = {
   carFilesUpload,
@@ -208,5 +229,6 @@ module.exports = {
   locationUpload,
   carImageUpload,
   userImageUpload,
-  testimonialUpload
+  testimonialUpload,
+  bussinessLogoUpload
 };

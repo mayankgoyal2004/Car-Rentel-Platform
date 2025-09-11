@@ -1,46 +1,43 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiServices from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { CornerDownLeft } from "react-feather";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Email and Password are required!");
-      return;
-    }
 
-    setError("");
     setLoading(true);
 
     try {
       const data = { email, password };
       const res = await apiServices.login(data);
+      toast.success(res.data.message);
 
       if (res.data.success) {
         dispatch(addUser(res.data.data));
 
         sessionStorage.setItem("role", res.data.data.role);
-sessionStorage.setItem("userType" ,res.data.data.userType)
+        sessionStorage.setItem("userType", res.data.data.userType);
         sessionStorage.setItem("token", res.data.token);
         sessionStorage.setItem("_id", res.data.data._id);
-        sessionStorage.setItem("authenticate", true);
-        sessionStorage.setItem("status", res.data.data.status);
-        if (res.data.data.userType === 1 || res.data.data.userType ===2 ||res.data.data.userType ===3) {
-          toast.success(res.data.message);
+        if (
+          res.data.data.userType === 1 ||
+          res.data.data.userType === 2 ||
+          res.data.data.userType === 3
+        ) {
           setTimeout(() => {
             navigate("/admin-dashboard");
           }, 1000);
@@ -50,11 +47,13 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
         ) {
           navigate("/user-dashboard");
         }
-      } else {
-        setError("Invalid login credentials. Please try again.");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong.");
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     } finally {
       setLoading(false);
     }
@@ -81,7 +80,7 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
               <div className="sign-group">
                 <Link to="/" className="btn sign-up">
                   <span>
-                    <CornerDownLeft size={24}  color="#000"/>
+                    <CornerDownLeft size={24} color="#000" />
                   </span>{" "}
                   Back To Home
                 </Link>
@@ -91,9 +90,6 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
               <p className="account-subtitle">
                 Enter your email & password to continue
               </p>
-
-              {/* Error Message */}
-              {error && <p className="text-danger">{error}</p>}
 
               {/* Login Form */}
               <form onSubmit={handleSubmit}>
@@ -140,14 +136,6 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
                   </Link>
                 </div>
 
-                <div className="input-block m-0">
-                  <label className="custom_check d-inline-flex">
-                    <span>Remember me</span>
-                    <input type="checkbox" name="remember" />
-                    <span className="checkmark" />
-                  </label>
-                </div>
-
                 <button
                   type="submit"
                   className="btn btn-outline-light w-100 btn-size mt-1"
@@ -158,7 +146,7 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
               </form>
 
               {/* Social Login */}
-              <div className="login-or">
+              {/* <div className="login-or">
                 <span className="or-line" />
                 <span className="span-or-log">Or, log in with</span>
               </div>
@@ -192,7 +180,7 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
                   </span>
                   Log in with Facebook
                 </a>
-              </div>
+              </div> */}
 
               {/* Register Link */}
               <div className="text-center dont-have">
@@ -213,6 +201,21 @@ sessionStorage.setItem("userType" ,res.data.data.userType)
           </div>
         </div>
       </footer>
+      <div>
+        {/* Your existing JSX */}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

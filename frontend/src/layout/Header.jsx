@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../assets/navbar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
@@ -9,6 +9,7 @@ const Header = () => {
   const [pageOpen, setPageOpen] = useState(false);
   const [user, setUser] = useState(null); // store logged in user
   const dispatch = useDispatch();
+  const navigate= useNavigate()
 
   useEffect(() => {
     const mobileBtn = document.getElementById("mobile_btn");
@@ -41,6 +42,7 @@ const Header = () => {
     sessionStorage.clear();
     dispatch(removeUser());
     setUser(null);
+    navigate("/")
   };
 
   return (

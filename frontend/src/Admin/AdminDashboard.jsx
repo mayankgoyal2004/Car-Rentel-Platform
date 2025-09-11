@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import "./assets/logo.css";
 // import "./assets/css/admin-style.css"
 import "./assets/css/admin-style.css";
 import "./assets/plugins/tabler-icons/tabler-icons.min.css";
+import { useDispatch, useSelector } from "react-redux";
+import { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { removeUser } from "../utils/userSlice";
 
 const AdminDashboard = () => {
   const [open, setOpen] = useState(false);
@@ -13,7 +16,17 @@ const AdminDashboard = () => {
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
-const [sidebarOpen, setSidebarOpen] = useState(false);
+  const userData = useSelector((store) => store.user);
+
+const dispatch = useDispatch()
+const navigete = useNavigate()
+
+  const handleLogout = () => {
+      sessionStorage.clear();
+      dispatch(removeUser());
+      navigete("/login")
+    };
+
 
   return (
     <div className="main-wrapper">
@@ -41,13 +54,9 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
                 className="me-auto d-flex align-items-center"
                 id="header-search"
               >
-               <a
-  id="toggle_btn"
-  href="#!"
-  onClick={() => setSidebarOpen(!sidebarOpen)}
->
-  <i className="ti ti-menu-deep" />
-</a>
+                <a id="toggle_btn" href="javascript:void(0);">
+                  <i className="ti ti-menu-deep" />
+                </a>
                 <div className="add-dropdown">
                   <Link
                     to="add-reservation"
@@ -121,7 +130,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
                   >
                     <span className="avatar avatar-sm">
                       <img
-                        src="/admin-assets/img/profiles/avatar-05.jpg"
+                        src={`${BASE_URL_IMG + userData.image}`}
                         alt="Img"
                         className="img-fluid rounded-circle"
                       />
@@ -143,7 +152,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
                             className="__cf_email__"
                             data-cfemail="f7969993859280b7928f969a879b92d994989a"
                           >
-                            [email&nbsp;protected]
+                           {userData.email}
                           </a>
                         </p>
                       </div>
@@ -155,28 +164,8 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
                       <i className="ti ti-user-edit me-2" />
                       Edit Profile
                     </Link>
-                    <Link
-                      to="account-payment"
-                      className="dropdown-item d-flex align-items-center"
-                    >
-                      <i className="ti ti-credit-card me-2" />
-                      Payments
-                    </Link>
                     <div className="dropdown-divider my-2" />
                     <div className="dropdown-item">
-                      <div className="form-check form-switch  form-check-reverse  d-flex align-items-center justify-content-between">
-                        <label className="form-check-label" htmlFor="notify">
-                          <i className="ti ti-bell me-2" />
-                          Notificaions
-                        </label>
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          role="switch"
-                          id="notify"
-                          defaultChecked
-                        />
-                      </div>
                     </div>
                     <Link
                       to="security-setting"
@@ -193,8 +182,8 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
                       Settings
                     </Link>
                     <div className="dropdown-divider my-2" />
-                    <Link
-                      to="/admin-login"
+                    <button
+                      onClick={handleLogout}
                       className="dropdown-item logout d-flex align-items-center justify-content-between"
                     >
                       <span>
@@ -202,7 +191,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
                         Logout Account
                       </span>{" "}
                       <i className="ti ti-chevron-right" />
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -236,7 +225,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
 
       {/* /Header */}
       {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`} id="sidebar">
+      <div className="sidebar" id="sidebar">
         {/* Logo */}
         <div className="sidebar-logo navbar-1">
           <Link to="/admin-dashboard" className="logo logo-normal">

@@ -16,7 +16,6 @@ const addBlogCategory = async (req, res) => {
     if (existingCategory) {
       return res.status(409).json({
         success: false,
-        status: 409,
         message: "Category already exists",
       });
     }
@@ -37,7 +36,6 @@ const addBlogCategory = async (req, res) => {
   } catch (err) {
     return res.status(500).json({
       success: false,
-      status: 500,
       message: err.message || "Server Error",
     });
   }
@@ -97,7 +95,13 @@ const getAllBlogCategory = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const adminId = req.user.admin;
     const search = req.query.search || "";
-
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
     let filter = { admin: adminId };
     if (search) {
       filter.categoryName = { $regex: search, $options: "i" };
@@ -138,8 +142,9 @@ const getAllActiveBlogCategory = async (req, res) => {
         message: "Id is required",
       });
     }
-    const blogCategory = await blogCategory
+    const BlogCategory = await blogCategory
       .find({ admin: adminId, status: true })
+
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -150,7 +155,7 @@ const getAllActiveBlogCategory = async (req, res) => {
 
     res.json({
       success: true,
-      data: blogCategory,
+      data: BlogCategory,
       pagination: {
         totalBlogComments,
         currentPage: page,
@@ -169,14 +174,10 @@ const deleteBlogCategory = async (req, res) => {
   const { id } = req.params;
 
   if (!id) {
-    validation += "Id is Required";
-  }
-
-  if (!!validation) {
-    res.json({
-      status: 409,
+    return res.status(400).json({
       success: false,
-      message: validation,
+      status: 400,
+      message: "Id is required",
     });
   }
   const category = await blogCategory.findById(id);
@@ -188,10 +189,48 @@ const deleteBlogCategory = async (req, res) => {
     });
   } else {
     await blogCategory.deleteOne({ _id: id });
-    res.json({
-      status: 200,
+    return res.status(200).json({
       success: true,
-      message: "Category Successfully Deleted",
+      status: 200,
+      message: "Category successfully deleted",
+    });
+  }
+};
+
+const getAllBlogTagSuperAdmin = async (req, res) => {
+  try {
+    if (req.user.userType !== 1)
+      return res.status(403).json({ message: "SuperAdmin only" });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+    let filter = {};
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" };
+    }
+
+    const category = await blogCategory
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalCategories = await blogCategory.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: category,
+      pagination: {
+        totalCategories,
+        currentPage: page,
+        totalPages: Math.ceil(totalCategories / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
     });
   }
 };
@@ -202,4 +241,5 @@ module.exports = {
   getAllBlogCategory,
   deleteBlogCategory,
   getAllActiveBlogCategory,
+  getAllBlogTagSuperAdmin,
 };

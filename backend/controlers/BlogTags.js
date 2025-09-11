@@ -7,7 +7,6 @@ const addBlogTag = async (req, res) => {
     if (!TagName) {
       return res.status(400).json({
         success: false,
-        status: 400,
         message: "Tag Name is required",
       });
     }
@@ -30,14 +29,12 @@ const addBlogTag = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      status: 201,
       message: "New Tag Created",
       data: tag,
     });
   } catch (err) {
     return res.status(500).json({
       success: false,
-      status: 500,
       message: err.message || "Server Error",
     });
   }
@@ -151,7 +148,7 @@ try {
         message: "Id is required",
       });
     }
-    const tag = await Tag.find({ admin:adminId , status : true})
+    const tag = await Tag.find({ admin:adminId , status : true}) 
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);

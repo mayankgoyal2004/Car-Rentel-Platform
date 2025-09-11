@@ -4,7 +4,7 @@ const customer = require("../models/customerModel");
 const Package = require("../models/packageModel");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const saltround = 15;
+const saltround = 12;
 const secretKey = "Protect@@@@";
 const emailSecret = "EmailVerifySecret@@@";
 const otpGenerator = require("otp-generator");
@@ -60,7 +60,7 @@ async function sendVerifyMail({ name, email, token }) {
 }
 const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     let validator = "";
     if (!name) validator += "Name is Required. ";
@@ -89,7 +89,6 @@ const register = async (req, res) => {
       userName: name,
       email,
       password: hashedPassword,
-      role: "user",
       status: false,
     });
 
@@ -102,6 +101,8 @@ const register = async (req, res) => {
       name,
       email,
       userId: newUser._id,
+      createdBy: newUser._id,
+      admin: null,
     });
 
     await customerobj.save();
@@ -142,10 +143,9 @@ const login = async (req, res) => {
     }
     const user = await User.findOne({ email });
     if (!user) {
-      return res.json({
-        status: 404,
+      return res.status(404).json({
         success: false,
-        message: "User with this Email Address/Phone Number not Exists!",
+        message: "Invalid Credentials",
       });
     }
 
@@ -161,7 +161,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid Password!",
+        message: "Invalid Credentials",
       });
     }
     const payload = {
@@ -559,15 +559,49 @@ const updateUserByadmin = async (req, res) => {
 
 const registerAdmin = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const {
+      ownerName,
+      email,
+      password,
+      businessName,
+      address,
+      confirmPassword,
+    } = req.body;
 
-    let validator = "";
-    if (!name) validator += "Name is required. ";
-    if (!email) validator += "Email is required. ";
-    if (!password) validator += "Password is required. ";
-
-    if (validator) {
-      return res.status(400).json({ success: false, message: validator });
+    if (!ownerName) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Name is required" });
+    }
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
+    }
+    if (!password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Password is required" });
+    }
+    if (!confirmPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Confirm password is required" });
+    }
+    if (password !== confirmPassword) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Passwords do not match" });
+    }
+    if (!businessName) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Business name is required" });
+    }
+    if (!address) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Business address is required" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -576,19 +610,22 @@ const registerAdmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "User already exists" });
     }
+
+    const imagePath = req.file
+      ? req.file.path.replace(/\\/g, "/")
+      : "/uploads/businessImage/default.jpg";
+
     const hashedPassword = await bcrypt.hash(password, saltround);
 
-    let imagePath = null;
-    if (req.file) {
-      imagePath = req.file.path.replace(/\\/g, "/");
-    }
     let newUser = new User({
-      userName: name,
+      userName: ownerName,
       email,
       password: hashedPassword,
       userType: 2,
       status: true,
-      image: imagePath,
+      businessName,
+      address,
+      logo: imagePath,
     });
 
     newUser = await newUser.save();
@@ -597,11 +634,11 @@ const registerAdmin = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "User added successfully by admin",
+      message: "Business added successfully",
       user: newUser,
     });
   } catch (error) {
-    console.error("Add user by admin error:", error);
+    console.error("Business added error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };

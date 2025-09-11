@@ -46,7 +46,12 @@ route.post("/register", userRoute.register);
 route.post("/login", userRoute.login);
 route.post("/forgot-password", userRoute.forgotPassword);
 route.post("/reset-password", userRoute.resetPassword);
-route.post("/register-admin", userRoute.registerAdmin);
+route.post(
+  "/register-admin",
+  upload.bussinessLogoUpload.single("logo"),
+  userRoute.registerAdmin
+);
+route.post("/verify-email", userRoute.verifyEmail);
 
 //!! get testimonial for public without authentication
 route.get("/get-all-testimonial-user", testimonial.getTestimonialsPublic);
@@ -56,9 +61,13 @@ route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
 route.get("/get-all-active-faq", faq.getActiveFaqs);
 route.get("/get-all-active-faq-homepage", faq.getHomepageFaqs);
 
+//!! blog
+route.get("/blogs/user", blog.getBlogForUser);
+route.get("/blogs/get-single-blog/:slug", blog.getsingleblog);
+
 route.use(authUser);
 route.post("/logout", userRoute.logout);
-route.post("/verify-email", userRoute.verifyEmail);
+
 route.post("/change-password", userRoute.changePassword);
 route.post(
   "/update-user",
@@ -92,7 +101,6 @@ route.delete("/blogs/comments/delete/:id", blogComments.deleteBlogComment);
 // !!Category route for blog
 route.post(
   "/blogs/category",
-  authUser,
   checkPermission("blogCategory", "create"),
   BlogCategory.addBlogCategory
 );
@@ -103,7 +111,6 @@ route.post(
 );
 route.get(
   "/blogs/get-all-blog-category",
-  authUser,
   checkPermission("blogCategory", "view"),
   BlogCategory.getAllBlogCategory
 );
@@ -116,6 +123,11 @@ route.get(
   "/blogs/all-active-category",
   checkPermission("blogCategory", "view"),
   BlogCategory.getAllActiveBlogCategory
+);
+route.get(
+  "/blog-all-category-superadmin",
+  checkPermission("admin", "assignPackage", true),
+  blogTags.getAllBlogTagSuperAdmin
 );
 
 // !!teg route for blog
@@ -157,21 +169,33 @@ route.get(
 //!!blog routes
 route.post(
   "/blogs/add",
-  authUser,
+  checkPermission("blog", "create"),
   upload.blogUpload.single("image"),
   blog.addBlog
 );
-route.get("/blogs/get-blogs", blog.getBlogs);
-route.get("/blogs/get-all-blogs", authUser, blog.getAllBlog);
-route.get("/blogs/get-single-blog", blog.getsingleblog);
+route.get(
+  "/blog-all-blogs-superadmin",
+  checkPermission("admin", "assignPackage", true),
+  blog.getBlogAllBlogForSuperAdmin
+);
+
+route.get(
+  "/blogs/get-all-blogs",
+  checkPermission("blog", "view"),
+  blog.getAllBlog
+);
+
 route.post(
   "/blogs/update-blog",
-  authUser,
+  checkPermission("blog", "update"),
   upload.blogUpload.single("image"),
   blog.updateblog
 );
-route.delete("/blogs/delete-blog/:id", authUser, blog.deleteblog);
-route.post("/blogs/update-blog-status", blog.updateBlogStatus);
+route.delete(
+  "/blogs/delete-blog/:id",
+  checkPermission("blog", "delete"),
+  blog.deleteblog
+);
 
 // !!driver route
 route.post(

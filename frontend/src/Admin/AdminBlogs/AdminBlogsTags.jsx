@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 const AdminBlogsTags = () => {
   const [tags, setTags] = useState([]);
-  const [ setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -16,10 +17,21 @@ const AdminBlogsTags = () => {
   const [editTag, setEditTag] = useState(null);
   const [deleteTag, setDeleteTag] = useState(null);
 
+  const userData = useSelector((store) => store.user);
+  const userType = userData?.userType; // superadmin = 1, admin/staff = 2/3
+
   const fetchTags = async (searchQuery = "", page = 1) => {
     setLoading(true);
     try {
-      const res = await apiService.getAllBlogTag({ search: searchQuery, page });
+      let res;
+      if (userType === 1) {
+        res = await apiService.getAllBlogTagSuperAdmin({
+          search: searchQuery,
+          page,
+        });
+      } else {
+        res = await apiService.getAllBlogTag({ search: searchQuery, page });
+      }
       setTags(res.data.data || []);
       setTotalPages(res.data.pagination?.totalPages || 1);
       if (
@@ -37,7 +49,7 @@ const AdminBlogsTags = () => {
 
   useEffect(() => {
     fetchTags(search, currentPage);
-  }, [currentPage,search]);
+  }, [currentPage, search]);
 
   // Add new tag
   const handleCreateTag = async () => {

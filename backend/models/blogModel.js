@@ -14,7 +14,7 @@ const BlogSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "BlogCategory" },
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "blogCategory" },
     tags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
     status: { type: Boolean, default: false },
     slug: { type: String, unique: true, trim: true },
@@ -27,7 +27,7 @@ BlogSchema.pre("save", async function (next) {
     let newSlug = slugify(this.title, { lower: true, strict: true });
 
     // Check for duplicates and append number if needed
-    const Blog = mongoose.model("Blog", BlogSchema);
+const Blog = mongoose.models.Blog || mongoose.model("Blog", BlogSchema);
     let slugExists = await Blog.findOne({
       slug: newSlug,
       _id: { $ne: this._id },

@@ -98,7 +98,6 @@ import AdminManageRolsAndPermissions from "./Admin/UserManegement/AdminManageRol
 import IncomeVsExpenses from "./Admin/AdminReports/IncomeVsExpenses";
 import EarningReports from "./Admin/AdminReports/EarningReports";
 import RentalReport from "./Admin/AdminReports/RentalReport";
-import AdminLogin from "./Admin/AdminAuthentication/AdminLogin";
 import AdminForgotPassword from "./Admin/AdminAuthentication/AdminForgotPassword";
 import AdminOtp from "./Admin/AdminAuthentication/AdminOtp";
 import AdminResetPassword from "./Admin/AdminAuthentication/AdminResetPassword";
@@ -132,6 +131,7 @@ import AdminPermissions from "./Admin/AdminPermissions";
 import ProtectedRoute from "./authentication/ProtectedRoute";
 import EmailVerified from "./authentication/emailVerified";
 import ResetPassword from "./authentication/ResetPassword";
+import AdminRegister from "./Admin/AdminAuthentication/adminRegister";
 
 function App() {
   return (
@@ -160,7 +160,7 @@ function App() {
           <Route path="/booking-success" element={<BookingSuccess />} />
           <Route path="/our-team" element={<Team />} />
           <Route path="/gallery" element={<Gallery />} />
-          <Route element={<ProtectedRoute allowedRoles={[3]} />}>
+          <Route element={<ProtectedRoute allowedRoles={[4]} />}>
             <Route path="/user-dashboard" element={<UserDashboard />}>
               <Route path="/user-dashboard" element={<UserMainDashboard />} />
               <Route path="user-review" element={<UserReview />} />
@@ -212,7 +212,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verify-email" element={<EmailVerified />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/business-register" element={<AdminRegister />} />
 
         {/* adminroute */}
         <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>

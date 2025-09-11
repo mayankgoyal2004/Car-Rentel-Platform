@@ -6,7 +6,7 @@ let saltRound = 12;
 const superAdmin = async () => {
   try {
     const superadmindata = await User.findOne({
-      email: "superAdmin@gmail.com",
+      email: "superadmin@gmail.com",
     });
     if (!superadmindata) {
       let superadminobj = new User();

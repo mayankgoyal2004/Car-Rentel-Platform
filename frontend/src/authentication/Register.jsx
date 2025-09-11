@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiServices from "../../Apiservice/apiService"; // 👈 your API helper
 import { CornerDownLeft } from "react-feather";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -14,9 +16,7 @@ const Register = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showPassword, setShowPassword] = useState(false); // 👈 state for toggle
+  const [showPassword, setShowPassword] = useState(false); 
 
   // handle input
   const handleChange = (e) => {
@@ -26,22 +26,21 @@ const Register = () => {
   // handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
     setLoading(true);
 
     try {
       const res = await apiServices.register(formData);
+      toast.success(res.data.message);
+
       if (res.data.success) {
-        setSuccess("Registration successful! Redirecting to login...");
         setTimeout(() => navigate("/login"), 2000);
-      } else {
-        setError(res.data.message || "Something went wrong");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Server error");
-    } finally {
-      setLoading(false);
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 
@@ -62,12 +61,18 @@ const Register = () => {
         <div className="loginbox">
           <div className="login-auth">
             <div className="login-auth-wrap">
-              <div className="sign-group">
+              <div className="sign-group  d-flex justify-content-between align-items-center">
                 <Link to="/" className="btn sign-up">
                   <span>
-                    <CornerDownLeft size={24}  color="#000"/>
+                    <CornerDownLeft size={24} color="#000" />
                   </span>{" "}
                   Back To Home
+                </Link>
+                <Link
+                  to="/business-register"
+                  className="btn btn-outline-primary ms-2"
+                >
+                  Business Owner Register
                 </Link>
               </div>
 
@@ -106,7 +111,7 @@ const Register = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                      autoComplete="email"
+                    autoComplete="email"
                   />
                 </div>
 
@@ -123,10 +128,12 @@ const Register = () => {
                       value={formData.password}
                       onChange={handleChange}
                       required
-                      autoComplete="new-password" 
+                      autoComplete="new-password"
                     />
                     <span
-                      className={`fas ${showPassword ? "fa-eye" : "fa-eye-slash"} toggle-password`}
+                      className={`fas ${
+                        showPassword ? "fa-eye" : "fa-eye-slash"
+                      } toggle-password`}
                       onClick={() => setShowPassword(!showPassword)} // 👈 toggle state
                       style={{
                         position: "absolute",
@@ -148,10 +155,6 @@ const Register = () => {
                 </button>
               </form>
 
-              {/* Feedback */}
-              {error && <p className="text-danger mt-2">{error}</p>}
-              {success && <p className="text-success mt-2">{success}</p>}
-
               <div className="login-or">
                 <span className="or-line" />
                 <span className="span-or">
@@ -160,7 +163,7 @@ const Register = () => {
               </div>
 
               {/* Social Login */}
-              <div className="social-login">
+              {/* <div className="social-login">
                 <a
                   href="#"
                   className="d-flex align-items-center justify-content-center input-block btn google-login w-100"
@@ -190,7 +193,7 @@ const Register = () => {
                   </span>
                   Log in with Facebook
                 </a>
-              </div>
+              </div> */}
 
               <div className="text-center dont-have">
                 Already have an Account? <Link to="/login">Sign In</Link>
@@ -210,6 +213,21 @@ const Register = () => {
           </div>
         </div>
       </footer>
+      <div>
+        {/* Your existing JSX */}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

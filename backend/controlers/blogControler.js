@@ -25,13 +25,12 @@ const addBlog = async (req, res) => {
         .json({ success: false, message: "Tags is required" });
     }
 
-    const imagePath = req.file
-      ? req.file.path.replace(/\\/g, "/")
-      : "no-image.jpg";
-    if (!imagePath)
+    if (!req.file) {
       return res
         .status(400)
         .json({ success: false, message: "Image is required" });
+    }
+    const imagePath = req.file.path.replace(/\\/g, "/");
 
     const blog = new Blog({
       title,
@@ -40,7 +39,7 @@ const addBlog = async (req, res) => {
       category: category_id,
       tags: tags_id,
       createdBy: req.user._id,
-      admin: req.user.admin
+      admin: req.user.admin,
     });
 
     await blog.save();
@@ -51,11 +50,71 @@ const addBlog = async (req, res) => {
       data: blog,
     });
   } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: err.message || "Server Error" });
+  }
+};
+
+const updateblog = async (req, res) => {
+  try {
+    const { _id, title, description, category_id, tags_id, status } = req.body;
+
+    if (!_id) {
+      res.json({
+        status: 409,
+        success: false,
+        message: "Id is required!",
+      });
+    }
+    if (!title || !description || !category_id || !tags_id) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "all fields are required",
+      });
+    }
+    if (status === undefined || status === null) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Status is required",
+      });
+    }
+
+    const blogUpdate = await Blog.findById(_id);
+    if (!blogUpdate) {
+      res.json({
+        status: 409,
+        success: false,
+        message: "Blog not Found!",
+      });
+    } else {
+      blogUpdate.title = title;
+      blogUpdate.description = description;
+      blogUpdate.category = category_id;
+      blogUpdate.tags = tags_id;
+
+      blogUpdate.status = status;
+
+      if (req.file) {
+        const imagePath = req.file.path.replace(/\\/g, "/");
+        blogUpdate.image = imagePath;
+      }
+      await blogUpdate.save();
+
+      res.json({
+        status: 200,
+        success: true,
+        message: "Blog Updated SuccessFully",
+      });
+    }
+  } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-const getBlogs = async (req, res) => {
+const getBlogForUser = async (req, res) => {
   try {
     const { search, category, tag, page, limit } = req.query;
 
@@ -72,17 +131,17 @@ const getBlogs = async (req, res) => {
       ];
     }
 
-   
     if (category) {
-      filter.category = category; 
-        }    if (tag) {
-      filter.tags = tag; 
+      filter.category = category;
+    }
+    if (tag) {
+      filter.tags = tag;
     }
 
     const blogs = await Blog.find(filter)
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("userId", "name email")
+      .populate("admin", "name email")
       .sort({ createdAt: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
@@ -111,24 +170,29 @@ const getAllBlog = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    
-    const {_id} = req.user
-    if(!_id){
-   return res.status(400).json({
+
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
         success: false,
         status: 400,
         message: "Id is required",
-      });}
-
-    const blogs = await Blog.find({userId:_id})
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" };
+    }
+    const blogs = await Blog.find(filter)
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("userId", "name email")
-      .sort({  createdAt: -1 })
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalBlogs = await Blog.countDocuments({userId:_id});
+    const totalBlogs = await Blog.countDocuments(filter);
 
     res.status(200).json({
       success: true,
@@ -148,18 +212,26 @@ const getAllBlog = async (req, res) => {
 
 const getBlogAllBlogForSuperAdmin = async (req, res) => {
   try {
+    if (req.user.userType !== 1)
+      return res.status(403).json({ message: "SuperAdmin only" });
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-  
-    const blogs = await Blog.find({})
+
+    const search = req.query.search || "";
+    let filter = {};
+    if (search) {
+      filter.TagName = { $regex: search, $options: "i" };
+    }
+
+    const blogs = await Blog.find(filter)
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("userId", "name email")
-      .sort({  createdAt: -1 })
+      .populate("createdBy", "name email")
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalBlogs = await Blog.countDocuments({});
+    const totalBlogs = await Blog.countDocuments(filter);
 
     res.status(200).json({
       success: true,
@@ -177,23 +249,22 @@ const getBlogAllBlogForSuperAdmin = async (req, res) => {
   }
 };
 
-
 getsingleblog = async (req, res) => {
   try {
-    const { _id } = req.body;
+    const { slug } = req.params;
 
-    if (!_id) {
+    if (!slug) {
       res.json({
         status: 409,
         success: false,
-        message: "Id is Required!",
+        message: "slug is Required!",
       });
     }
 
-    const bdata = await Blog.findOne({ _id })
+    const bdata = await Blog.findOne({ slug, status: true })
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("userId", "name email")
+      .populate("admin", "name email")
       .exec();
     if (!bdata) {
       return res.status(404).json({
@@ -219,50 +290,6 @@ getsingleblog = async (req, res) => {
   }
 };
 
-const updateblog = async (req, res) => {
-  try {
-    const { _id, title, description, category_id, tags_id, image } = req.body;
-
-    if (!_id) {
-      res.json({
-        status: 409,
-        success: false,
-        message: "Id is required!",
-      });
-    }
-
-    const blogUpdate = await Blog.findOne({ _id });
-    if (!blogUpdate) {
-      res.json({
-        status: 409,
-        success: false,
-        message: "Data not Found!",
-      });
-    } else {
-      blogUpdate.title = title;
-      blogUpdate.description = description;
-      blogUpdate.category = category_id;
-      blogUpdate.tags = tags_id;
-      blogUpdate.userId =  req.user._id;
-;
-
-      if (req.file) {
-      const imagePath = req.file.path.replace(/\\/g, "/");
-      blogUpdate.image = imagePath;
-    }
-      await blogUpdate.save();
-
-      res.json({
-        status: 200,
-        success: true,
-        message: "Record Updated!",
-      });
-    }
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
 const deleteblog = async (req, res) => {
   try {
     const { id } = req.params;
@@ -275,20 +302,20 @@ const deleteblog = async (req, res) => {
       });
     }
 
-    const deleteBlog = await Blog.findById(id );
+    const deleteBlog = await Blog.findById(id);
     if (!deleteBlog) {
       res.json({
         status: 409,
         success: false,
-        message: "Data not Found",
+        message: "Blog not Found",
       });
     } else {
-      await Blog.deleteOne({ _id : id });
+      await Blog.deleteOne({ _id: id });
 
       res.json({
         status: 200,
         success: true,
-        message: "Record Deleted!",
+        message: "Blog successfully Deleted!",
       });
     }
   } catch (err) {
@@ -296,49 +323,17 @@ const deleteblog = async (req, res) => {
       status: 500,
       success: false,
       message: "Server Error!",
-      error: err.message
+      error: err.message,
     });
   }
 };
 
-const updateBlogStatus = async (req, res) => {
-  try {
-    const { _id, isActive } = req.body;
-
-    if (!_id ||  typeof isActive === "undefined") {
-      return res.status(422).json({
-        success: false,
-        status: 422,
-        message: "Both Comment Id and Status (isActive) are required",
-      });
-    }
-
-    const blog = await Blog.findOne({ _id });
-
-    if (!blog) {
-      return res.status(404).json({
-        success: false,
-        status: 404,
-        message: "No blog Found!",
-      });
-    }
-
-    blog.isActive = isActive;
-    await blog.save();
-
-    return res.status(200).json({
-      success: true,
-      status: 200,
-      message: "blog status changed successfully!",
-      data: blog,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      status: 500,
-      message: err.message || "Server Error",
-    });
-  }
+module.exports = {
+  addBlog,
+  getBlogForUser,
+  getAllBlog,
+  getsingleblog,
+  updateblog,
+  deleteblog,
+  getBlogAllBlogForSuperAdmin,
 };
-
-module.exports = { addBlog, getBlogs, getAllBlog, getsingleblog, updateblog , deleteblog , updateBlogStatus};

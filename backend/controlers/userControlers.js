@@ -483,7 +483,7 @@ const adduserByadmin = async (req, res) => {
       contact,
       password: hashedPassword,
       role: role_id,
-      userType: 2,
+      userType: 3,
       status: true,
       image: imagePath,
       admin: req.user.admin,
@@ -510,8 +510,6 @@ const updateUserByadmin = async (req, res) => {
     let validator = "";
     if (!name) validator += "Name is required. ";
     if (!email) validator += "Email is required. ";
-    if (!password) validator += "Password is required. ";
-    if (!confirmPassword) validator += "Confirm Password is required. ";
     if (!role_id) validator += "Role is required. ";
     if (password !== confirmPassword) validator += "Passwords do not match. ";
 
@@ -525,24 +523,29 @@ const updateUserByadmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "User not exist " });
     }
-    const hashedPassword = await bcrypt.hash(password, saltround);
+    let hashedPassword;
+    if (password) {
+      hashedPassword = await bcrypt.hash(password, saltround);
+    }
 
     let imagePath = null;
     if (req.file) {
       imagePath = req.file.path.replace(/\\/g, "/");
     }
+    const updateFields = {
+      userName: name,
+      email,
+      contact,
+      role: role_id,
+      userType: 2,
+      status,
+    };
+    if (password) updateFields.password = hashedPassword;
+    if (req.file) updateFields.image = imagePath;
+
     const updatedUser = await User.findByIdAndUpdate(
       existingUser._id,
-      {
-        userName: name,
-        email,
-        contact,
-        password: hashedPassword,
-        role: role_id,
-        userType: 2,
-        status,
-        image: imagePath,
-      },
+      updateFields,
       { new: true }
     );
 
@@ -554,6 +557,86 @@ const updateUserByadmin = async (req, res) => {
   } catch (error) {
     console.error("Add user by admin error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+const getUserByAdmin = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.userName = { $regex: search, $options: "i" };
+    }
+
+    const user = await User.find(filter)
+      .populate("role", "name")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalUser = await User.countDocuments(filter);
+    res.json({
+      success: true,
+      data: user,
+      pagination: {
+        totalUser,
+        currentPage: page,
+        totalPages: Math.ceil(totalUser / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const deleteUserByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        status: 404,
+        message: "user not found!",
+      });
+    }
+
+    await User.deleteOne({ _id: id });
+
+    return res.status(200).json({
+      success: true,
+      status: 200,
+      message: "user successfully deleted",
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      status: 500,
+      message: err.message || "Server Error",
+    });
   }
 };
 
@@ -707,4 +790,6 @@ module.exports = {
   updateUserByadmin,
   registerAdmin,
   updateAdmin,
+  getUserByAdmin,
+  deleteUserByAdmin,
 };

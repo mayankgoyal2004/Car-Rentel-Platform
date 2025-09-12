@@ -34,7 +34,7 @@ class apiServices {
     return axios.post(BASE_URL + "reset-password", data);
   }
 
-  //!! blog tags 
+  //!! blog tags
   getAllBlogTag({ search = "", page } = {}) {
     return axios.get(
       BASE_URL + `blogs/get-all-blog-tag?search=${search}&page=${page}`,
@@ -42,10 +42,9 @@ class apiServices {
     );
   }
   getAllActiveTags() {
-    return axios.get(
-      BASE_URL + `blog-all-active-tags`,
-      { headers: getAuthHeaders() }
-    );
+    return axios.get(BASE_URL + `blog-all-active-tags`, {
+      headers: getAuthHeaders(),
+    });
   }
   getAllBlogTagSuperAdmin({ search = "", page } = {}) {
     return axios.get(
@@ -73,7 +72,6 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
-
 
   //!!blog category
   addblogcategory(data) {
@@ -156,8 +154,71 @@ class apiServices {
         `blogs/user?search=${search}&category=${category}&tag=${tag}&page=${page}&limit=${limit}`
     );
   }
-  getSingleBlog(slug) {
-    return axios.get(BASE_URL + `blogs/get-single-blog/${slug}`);
+  getSingleBlogForAdmin(id) {
+    return axios.get(BASE_URL + `blogs/get-single-blog-admin/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!!! role api
+  addRole(data) {
+    return axios.post(BASE_URL + "add-roll", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  updateRole(data) {
+    return axios.post(BASE_URL + "update-role", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getAllRole({ search = "", page } = {}) {
+    return axios.get(BASE_URL + `get-role?search=${search}&page=${page}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteRole(data) {
+    return axios.delete(BASE_URL + `delete-role/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getroleById(id) {
+    return axios.get(BASE_URL + `get-role-id/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getAllActiveRole() {
+    return axios.get(BASE_URL + `get-all-active-role`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updatePermission(roleId, data) {
+    return axios.post(BASE_URL + `roles/${roleId}/permissions`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!! user by admin
+  getUserByAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-user-by-admin?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  addUserByAdmin(data) {
+    return axios.post(BASE_URL + "add-user-admin", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateUserByAdmin(data) {
+    return axios.post(BASE_URL + "update-user-by-admin", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteUserByAdmin(data) {
+    return axios.delete(BASE_URL + `user-delete/${data}`, {
+      headers: getAuthHeaders(),
+    });
   }
 }
 

@@ -1,98 +1,205 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
 
 export const AdminEditBlog = () => {
-  return (
-   <div className="page-wrapper">
-  <div className="content me-0 me-md-0 me-lg-4">
-    {/* Add Blogs */}
-    <div className="add-blog-content">
-      <div className="mb-4">
-        <Link to="all-blogs" className="d-inline-flex align-items-center fw-medium"><i className="ti ti-arrow-narrow-left me-1" />Blogs</Link>
-      </div>
-      <div className="card">
-        <div className="card-header">
-          <h5>Edit Blog</h5>
-        </div>
-        <div className="card-body">
-          <div className="row">
-            <div className="col-md-12">
-              <div className="mb-3">
-                <label className="form-label">Featured Image <span className="text-danger">*</span></label>
-                <div className="d-flex align-items-center flex-wrap row-gap-3 mb-3">                                                
-                  <div className="d-flex align-items-center justify-content-center avatar avatar-xxl border me-3 flex-shrink-0 text-dark frames p-2">
-                    <img src="/admin-assets/img/blog/blog-6.jpg" className="rounded-2 img-fluid" alt="brands" />
-                    <a href="javascript:void(0);" className="upload-img-trash btn btn-sm btn-danger-light rounded-circle">
-                      <i className="ti ti-trash fs-12" />
-                    </a>
-                  </div>                                              
-                  <div className="profile-upload">
-                    <div className="profile-uploader d-flex align-items-center">
-                      <div className="drag-upload-btn btn btn-md btn-dark">
-                        <i className="ti ti-photo-up fs-14" />
-                        Upload
-                        <input type="file" className="form-control image-sign" multiple />
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <p className="fs-14">Upload Image size 180*180, within 5MB</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Title <span className="text-danger">*</span></label>
-              <input type="text" className="form-control" defaultValue="How to Find the Best Car Rental Deals & Discounts" />
-            </div>
-            <div className="col-md-6">
-              <div className="mb-3">
-                <label className="form-label">Category <span className="text-danger">*</span></label>
-                <select className="select">
-                  <option>Select</option>
-                  <option selected>Discounts</option>
-                  <option>Car Reviews</option>
-                  <option>Rental Policies</option>
-                  <option>Insurance &amp; Coverage</option>
-                  <option>Budget Rentals</option>
-                </select>
-              </div>
-            </div>
-            <div className="col-md-6">
-              <div className="mb-3">
-                <label className="form-label">Tags</label>
-                <input className="input-tags form-control" id="inputBox" type="text" data-role="tagsinput" name="specialist" defaultValue="Book Car, Online" />
-              </div>
-            </div>
-            <div className="col-md-12">
-              <div className="mb-0">
-                <label className="form-label">Description</label>
-                <div className="editor">
-                  Discover expert tips on finding the best car rental deals and discounts. Learn how to use promo codes, book early, compare prices, and take advantage of loyalty programs for maximum savings.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="card-footer">
-          <div className="d-flex justify-content-between align-items-center w-100 flex-wrap gap-2">
-            <div className="form-check form-check-md form-switch me-2">
-              <label className="form-check-label form-label mt-0 mb-0">
-                <input className="form-check-input form-label me-2" type="checkbox" role="switch" defaultChecked />
-                Status
-              </label>
-            </div>
-            <div className="d-flex justify-content-center">
-              <a href="javascript:void(0);" className="btn btn-light me-3" data-bs-dismiss="modal">Cancel</a>
-              <Link to="all-blogs" className="btn btn-primary">Save Changes</Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    {/* Add Blogs */}
-  </div>			
-</div>
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [tagsId, setTagsId] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const fileInputRef = useRef(null);
+  const { id } = useParams();
 
-  )
-}
+  // 🔹 Fetch categories
+  const getAllActiveCategory = async () => {
+    try {
+      const res = await apiService.getAllActiveBlogCategory();
+      if (res.data.success) setCategories(res.data.data || []);
+    } catch {
+      toast.error("Failed to fetch categories");
+    }
+  };
+
+  // 🔹 Fetch tags
+  const getAllActiveTags = async () => {
+    try {
+      const res = await apiService.getAllActiveTags();
+      if (res.data.success) setTags(res.data.data || []);
+    } catch {
+      toast.error("Failed to fetch tags");
+    }
+  };
+
+  // 🔹 Fetch single blog details
+  const getBlogDetails = async () => {
+    try {
+      const res = await apiService.getSingleBlogForAdmin(id);
+      if (res.data.success) {
+        const blog = res.data.data;
+        setTitle(blog.title || "");
+        setDescription(blog.description || "");
+        setCategoryId(blog.category?._id || "");
+        setTagsId(blog.tags?.map((t) => t._id) || []);
+        setPreview(blog.image ? BASE_URL_IMG + blog.image : null); // show existing image
+      }
+    } catch {
+      toast.error("Failed to fetch blog details");
+    }
+  };
+
+  useEffect(() => {
+    getAllActiveCategory();
+    getAllActiveTags();
+    if (id) getBlogDetails();
+  }, [id]);
+
+  // 🔹 Handle image change
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // 🔹 Submit
+  const handleEditBlog = async () => {
+    if (!title.trim() || !categoryId) {
+      toast.error("Title and Category are required");
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("_id", id);
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("category_id", categoryId);
+      tagsId.forEach((tag) => formData.append("tags_id[]", tag));
+      if (image) formData.append("image", image);
+      formData.append("status", true);
+      const res = await apiService.updateblog(formData);
+      toast.success(res.data.message);
+    } catch (err) {
+      toast.error(err.response?.data?.message);
+    }
+  };
+
+  return (
+    <div className="blog-wrapper">
+      <div className="blog-card">
+        <div className="mb-4">
+          <Link
+            to="/admin-dashboard/all-blogs"
+            className="d-inline-flex align-items-center fw-medium"
+          >
+            <i className="ti ti-arrow-narrow-left me-1" />
+            All blogs
+          </Link>
+        </div>
+        <h2 className="blog-title">Edit Blog</h2>
+
+        {/* Upload Image */}
+        <div className="form-group">
+          <label>Featured Image</label>
+          {preview && (
+            <div style={{ marginBottom: "10px" }}>
+              <img
+                src={preview}
+                alt="Preview"
+                style={{ width: "150px", borderRadius: "8px" }}
+              />
+            </div>
+          )}
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+          />
+        </div>
+
+        {/* Title */}
+        <div className="form-group">
+          <label>Title *</label>
+          <input
+            type="text"
+            value={title}
+            placeholder="Enter blog title"
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        {/* Category */}
+        <div className="form-group">
+          <label>Category *</label>
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+          >
+            <option value="">Select Category</option>
+            {categories.map((cat) => (
+              <option key={cat._id} value={cat._id}>
+                {cat.categoryName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Tags */}
+        <div className="form-group">
+          <label>Tags</label>
+          <select
+            multiple
+            value={tagsId}
+            onChange={(e) =>
+              setTagsId(
+                Array.from(e.target.selectedOptions, (opt) => opt.value)
+              )
+            }
+          >
+            {tags.map((tag) => (
+              <option key={tag._id} value={tag._id}>
+                {tag.TagName}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Description */}
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            rows="6"
+            value={description}
+            placeholder="Write your blog content here..."
+            onChange={(e) => setDescription(e.target.value)}
+          ></textarea>
+        </div>
+
+        {/* Actions */}
+        <div className="button-group">
+          <button
+            type="button"
+            className="btn-cancel"
+            onClick={() => {
+              getBlogDetails(); // reset to original data
+            }}
+          >
+            Reset
+          </button>
+          <button type="button" className="btn-submit" onClick={handleEditBlog}>
+            Save Changes
+          </button>
+        </div>
+      </div>
+      <ToastContainer />
+    </div>
+  );
+};

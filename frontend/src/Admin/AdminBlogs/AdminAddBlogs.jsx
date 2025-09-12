@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import apiService from "../../../Apiservice/apiService";
+import { useRef } from "react";
+import { Link } from "react-router-dom";
 
 const AdminAddBlogs = () => {
   const [title, setTitle] = useState("");
@@ -12,6 +14,7 @@ const AdminAddBlogs = () => {
   const [tags, setTags] = useState([]);
   const [image, setImage] = useState(null);
 
+    const fileInputRef = useRef(null); 
   // Fetch Categories
   const getAllActiveCategory = async () => {
     try {
@@ -62,6 +65,9 @@ const AdminAddBlogs = () => {
       setCategoryId("");
       setTagsId([]);
       setImage(null);
+      if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // ✅ clear file input
+    }
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -70,6 +76,9 @@ const AdminAddBlogs = () => {
   return (
     <div className="blog-wrapper">
       <div className="blog-card">
+         <div className="mb-4">
+        <Link to="/admin-dashboard/all-blogs" className="d-inline-flex align-items-center fw-medium"><i className="ti ti-arrow-narrow-left me-1" />Blogs</Link>
+      </div>
         <h2 className="blog-title">Add Blog</h2>
 
         {/* Upload Image */}
@@ -78,6 +87,7 @@ const AdminAddBlogs = () => {
           <input
             type="file"
             accept="image/*"
+             ref={fileInputRef}
             onChange={(e) => setImage(e.target.files[0])}
           />
         </div>
@@ -113,7 +123,6 @@ const AdminAddBlogs = () => {
         <div className="form-group">
           <label>Tags</label>
           <select
-            multiple
             value={tagsId}
             onChange={(e) =>
               setTagsId(

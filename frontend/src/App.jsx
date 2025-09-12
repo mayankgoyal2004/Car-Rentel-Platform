@@ -338,10 +338,10 @@ function App() {
             <Route path="edit-invoice" element={<AdminEditEnvoice />} />
             <Route path="add-invoice" element={<AddInvoice />} />
             <Route path="add-pages" element={<AdminAddPages />} />
-            <Route path="admin-blog-details" element={<AdminBlogDetails />} />
-            <Route path="edit-blog" element={<AdminEditBlog />} />
+            <Route path="admin-blog-details/:id" element={<AdminBlogDetails />} />
+            <Route path="edit-blog/:id" element={<AdminEditBlog />} />
             <Route path="add-blog" element={<AdminAddBlogs />} />
-            <Route path="admin-permissions" element={<AdminPermissions />} />
+            <Route path="admin-permissions/:roleId" element={<AdminPermissions />} />
           </Route>
         </Route>
       </Routes>

@@ -18,30 +18,32 @@ const AdminAllBlogs = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; // superadmin = 1, admin/staff = 2/3
 
-  const fetchBlog = async (searchQuery = "", page = 1) => {
-    setLoading(true);
-    try {
-      let res;
-      if (userType === 1) {
-        res = await apiService.getAllBlogSuperAdmin({
-          search: searchQuery,
-          page,
-        });
-      } else {
-        res = await apiService.getAllBlog({ search: searchQuery, page });
-      }
-      setBlogs(res.data.data || []);
-      setTotalPages(res.data.pagination?.totalPages || 1);
-      setCurrentPage(res.data.pagination?.currentPage || 1);
-    } catch (err) {
-      console.error("Error fetching tags:", err);
-    } finally {
-      setLoading(false);
+ const fetchBlog = async (searchQuery = "", page = 1, append = false) => {
+  setLoading(true);
+  try {
+    let res;
+    if (userType === 1) {
+      res = await apiService.getAllBlogSuperAdmin({ search: searchQuery, page });
+    } else {
+      res = await apiService.getAllBlog({ search: searchQuery, page });
     }
-  };
-  useEffect(() => {
-    fetchBlog(search, currentPage);
-  }, [currentPage, search]);
+
+    setBlogs((prev) =>
+      append ? [...prev, ...(res.data.data || [])] : res.data.data || []
+    );
+
+    setTotalPages(res.data.pagination?.totalPages || 1);
+    setCurrentPage(res.data.pagination?.currentPage || 1);
+  } catch (err) {
+    console.error("Error fetching blogs:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+ useEffect(() => {
+  fetchBlog();
+}, [search]);
 
   const handleDeleteBlog = async () => {
     if (!deleteId) return;
@@ -127,7 +129,7 @@ const AdminAllBlogs = () => {
                   <div className="card-body p-0">
                     <div className="blog-img">
                       <Link
-                        to={`/admin-dashboard/admin-blog-details/${blog.slug}`}
+                        to={`/admin-dashboard/admin-blog-details/${blog._id}`}
                       >
                         <img
                           src={
@@ -172,7 +174,7 @@ const AdminAllBlogs = () => {
                             className="avatar avatar-sm rounded-circle me-1"
                           />
                           <span className="fs-16">
-                            {blog.createdBy?.name || "Unknown"}
+                            {blog.createdBy?.userName}
                           </span>
                         </div>
                         <span className="d-flex align-items-center fs-16">
@@ -182,7 +184,7 @@ const AdminAllBlogs = () => {
                       </div>
                       <h5>
                         <Link
-                          to={`/admin-dashboard/admin-blog-details/${blog.slug}`}
+                          to={`/admin-dashboard/admin-blog-details/${blog._id}`}
                         >
                           {blog.title}
                         </Link>
@@ -196,11 +198,16 @@ const AdminAllBlogs = () => {
             <div className="d-flex align-items-center justify-content-center">
               {currentPage < totalPages && (
                 <button
-                  className="load-btn btn btn-light"
-                  onClick={() => setCurrentPage((p) => p + 1)}
-                >
-                  <i className="ti ti-loader me-1" /> Load More
-                </button>
+  className="load-btn btn btn-light"
+  onClick={() => {
+    const nextPage = currentPage + 1;
+    setCurrentPage(nextPage);
+    fetchBlog(search, nextPage, true); // ✅ append instead of replace
+  }}
+>
+  <i className="ti ti-loader me-1" /> Load More
+</button>
+
               )}
             </div>
           </div>

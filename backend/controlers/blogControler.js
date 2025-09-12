@@ -61,8 +61,7 @@ const updateblog = async (req, res) => {
     const { _id, title, description, category_id, tags_id, status } = req.body;
 
     if (!_id) {
-      res.json({
-        status: 409,
+      res.status(400).json({
         success: false,
         message: "Id is required!",
       });
@@ -169,7 +168,7 @@ const getBlogForUser = async (req, res) => {
 const getAllBlog = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 9;
 
     const adminId = req.user.admin;
     const search = req.query.search || "";
@@ -182,12 +181,12 @@ const getAllBlog = async (req, res) => {
     }
     let filter = { admin: adminId };
     if (search) {
-      filter.TagName = { $regex: search, $options: "i" };
+      filter.title = { $regex: search, $options: "i" };
     }
     const blogs = await Blog.find(filter)
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("createdBy", "name email")
+      .populate("createdBy", "userName email")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -249,7 +248,7 @@ const getBlogAllBlogForSuperAdmin = async (req, res) => {
   }
 };
 
-getsingleblog = async (req, res) => {
+const getsingleblogForUser = async (req, res) => {
   try {
     const { slug } = req.params;
 
@@ -260,11 +259,50 @@ getsingleblog = async (req, res) => {
         message: "slug is Required!",
       });
     }
-
+  
     const bdata = await Blog.findOne({ slug, status: true })
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("admin", "name email")
+      .populate("admin", "userName email")
+      .exec();
+    if (!bdata) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "Blog not found!",
+      });
+    }
+
+    res.json({
+      status: 200,
+      success: true,
+      message: "Blog Data Successfully Fetched!",
+      data: bdata,
+    });
+  } catch (err) {
+    res.json({
+      status: 500,
+      success: false,
+      message: "Server Error!",
+      error: err.message,
+    });
+  }
+};
+const getsingleblogForAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      res.json({
+        status: 409,
+        success: false,
+        message: "id is Required!",
+      });
+    }    
+    const bdata = await Blog.findById(id)
+      .populate("category", "categoryName")
+      .populate("tags", "TagName")
+      .populate("admin", "userName email")
       .exec();
     if (!bdata) {
       return res.status(404).json({
@@ -332,8 +370,9 @@ module.exports = {
   addBlog,
   getBlogForUser,
   getAllBlog,
-  getsingleblog,
+  getsingleblogForUser,
   updateblog,
   deleteblog,
   getBlogAllBlogForSuperAdmin,
+  getsingleblogForAdmin
 };

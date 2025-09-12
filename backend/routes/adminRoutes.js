@@ -63,7 +63,7 @@ route.get("/get-all-active-faq-homepage", faq.getHomepageFaqs);
 
 //!! blog
 route.get("/blogs/user", blog.getBlogForUser);
-route.get("/blogs/get-single-blog/:slug", blog.getsingleblog);
+route.get("/blogs/get-single-blog-user/:slug", blog.getsingleblogForUser);
 
 route.use(authUser);
 route.post("/logout", userRoute.logout);
@@ -75,25 +75,35 @@ route.post(
   userRoute.updateUserDetails
 );
 route.post(
-  "./update-admin",
+  "/update-admin",
   upload.userImageUpload.single("image"),
   userRoute.updateAdmin
 );
 route.post(
   "/add-user-admin",
-  authUser,
   upload.userImageUpload.single("image"),
   userRoute.adduserByadmin
 );
+route.get(
+  "/get-user-by-admin",
+  checkPermission("user", "view"),
+  userRoute.getUserByAdmin
+);
 route.post(
-  "/update-user-by admin",
-  authUser,
-  upload.userImageUpload.single("image", userRoute.updateUserByadmin)
+  "/update-user-by-admin",
+
+  upload.userImageUpload.single("image"),
+  userRoute.updateUserByadmin
+);
+route.delete(
+  "/user-delete/:id",
+  checkPermission("user", "delete"),
+  userRoute.deleteUserByAdmin
 );
 
 // !!comment route for blogs
-route.post("/blogs/comments/:blogId", authUser, blogComments.createComment);
-route.get("/blogs/get-all-comments", authUser, blogComments.getAllComments);
+route.post("/blogs/comments/:blogId", blogComments.createComment);
+route.get("/blogs/get-all-comments", blogComments.getAllComments);
 route.get("/blogs/get-comments/:blogId", blogComments.getCommentBlog);
 route.put("/blogs/comments/status", blogComments.updateCommentStatus);
 route.delete("/blogs/comments/delete/:id", blogComments.deleteBlogComment);
@@ -101,32 +111,32 @@ route.delete("/blogs/comments/delete/:id", blogComments.deleteBlogComment);
 // !!Category route for blog
 route.post(
   "/blogs/category",
-  checkPermission("blogCategory", "create"),
+  checkPermission("Blog", "create"),
   BlogCategory.addBlogCategory
 );
 route.post(
   "/blogs/update-category",
-  checkPermission("blogCategory", "edit"),
+  checkPermission("Blog", "edit"),
   BlogCategory.updateBlogCategory
 );
 route.get(
   "/blogs/get-all-blog-category",
-  checkPermission("blogCategory", "view"),
+  checkPermission("Blog", "view"),
   BlogCategory.getAllBlogCategory
 );
 route.delete(
   "/blogs/category-delete/:id",
-  checkPermission("blogCategory", "delete"),
+  checkPermission("Blog", "delete"),
   BlogCategory.deleteBlogCategory
 );
 route.get(
   "/blogs/all-active-category",
-  checkPermission("blogCategory", "view"),
+  checkPermission("Blog", "view"),
   BlogCategory.getAllActiveBlogCategory
 );
 route.get(
   "/blog-all-category-superadmin",
-  checkPermission("admin", "assignPackage", true),
+  checkPermission("Blog", "assignPackage", true),
   blogTags.getAllBlogTagSuperAdmin
 );
 
@@ -134,30 +144,30 @@ route.get(
 route.post(
   "/blogs/tag",
 
-  checkPermission("tag", "create"),
+  checkPermission("Blog", "create"),
   blogTags.addBlogTag
 );
 route.post(
   "/blogs/update-tag",
 
-  checkPermission("tag", "edit"),
+  checkPermission("Blog", "edit"),
   blogTags.updateBlogTag
 );
 route.get(
   "/blogs/get-all-blog-tag",
 
-  checkPermission("tag", "view"),
+  checkPermission("Blog", "view"),
   blogTags.getAllBlogTag
 );
 route.delete(
   "/blogs/tag-delete/:id",
 
-  checkPermission("tag", "delete"),
+  checkPermission("Blog", "delete"),
   blogTags.deleteBlogTag
 );
 route.get(
   "/blog-all-active-tags",
-  checkPermission("tag", "view"),
+  checkPermission("Blog", "view"),
   blogTags.getAllActiveBlogTag
 );
 route.get(
@@ -169,7 +179,7 @@ route.get(
 //!!blog routes
 route.post(
   "/blogs/add",
-  checkPermission("blog", "create"),
+  checkPermission("Blog", "create"),
   upload.blogUpload.single("image"),
   blog.addBlog
 );
@@ -181,19 +191,21 @@ route.get(
 
 route.get(
   "/blogs/get-all-blogs",
-  checkPermission("blog", "view"),
+  checkPermission("Blog", "view"),
   blog.getAllBlog
 );
 
 route.post(
   "/blogs/update-blog",
-  checkPermission("blog", "update"),
+  checkPermission("Blog", "update"),
   upload.blogUpload.single("image"),
   blog.updateblog
 );
+route.get("/blogs/get-single-blog-admin/:id", blog.getsingleblogForAdmin);
+
 route.delete(
   "/blogs/delete-blog/:id",
-  checkPermission("blog", "delete"),
+  checkPermission("Blog", "delete"),
   blog.deleteblog
 );
 
@@ -521,16 +533,38 @@ route.delete("/delete-enquiry/:id", authUser, enquiry.deleteEnquiry);
 
 //!! carReview
 
-route.post("/add-car-review", authUser, carReview.addCarReview);
-route.get("/get-all-review-admin", authUser, carReview.allReviewByAdmin);
-route.get("/get-all-review-user", authUser, carReview.allReviewByUser);
-route.delete("/delete-car-review/:id", authUser, carReview.deleteCarReview);
+route.post("/add-car-review", carReview.addCarReview);
+route.get("/get-all-review-admin", carReview.allReviewByAdmin);
+route.get("/get-all-review-user", carReview.allReviewByUser);
+route.delete("/delete-car-review/:id", carReview.deleteCarReview);
 
 //!! role route
 
-route.post("/add-roll", authUser, role.addRole);
-route.get("/get-role", authUser, role.getRole);
-route.post("/assign-role", authUser, role.assignRole);
+route.post("/add-roll", checkPermission("role", "create"), role.addRole);
+route.post(
+  "/roles/:roleId/permissions",
+  checkPermission("role", "create"),
+  role.updatePermissions
+);
+
+route.post("/update-role", checkPermission("role", "edit"), role.updateRole);
+route.get("/get-role", checkPermission("role", "view"), role.getAllRole);
+route.get(
+  "/get-all-active-role",
+  checkPermission("role", "view"),
+  role.getAllActiveRole
+);
+
+route.delete(
+  "/delete-role/:id",
+  checkPermission("role", "delete"),
+  role.deleteRole
+);
+route.get(
+  "/get-role-id/:id",
+  checkPermission("role", "view"),
+  role.getRoleById
+);
 
 //!! testimonial route
 

@@ -667,24 +667,10 @@ const navigete = useNavigate()
         </div>
       </div>
       {/* /Sidebar */}
+<div>  <Outlet /></div>
+     
 
-      <Outlet />
-
-      <div className="footer d-sm-flex align-items-center justify-content-between bg-white p-3">
-        <p className="mb-0">
-          <a href="javascript:void(0);">Privacy Policy</a>
-          <a href="javascript:void(0);" className="ms-4">
-            Terms of Use
-          </a>
-        </p>
-        <p>
-          &copy; 2025 Dreamsrent, Made with{" "}
-          <span className="text-danger">❤</span> by{" "}
-          <a href="javascript:void(0);" className="text-secondary">
-            Dreams
-          </a>
-        </p>
-      </div>
+    
     </div>
   );
 };

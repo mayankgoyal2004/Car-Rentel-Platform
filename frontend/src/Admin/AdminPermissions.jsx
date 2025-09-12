@@ -1,846 +1,167 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import apiService from "../../Apiservice/apiService";
+
+const MODULES = ["Reservations", "Calendar", "Blog","Quotations", "Enquiries", "Units"];
 
 const AdminPermissions = () => {
+  const { roleId } = useParams();
+  const [role, setRole] = useState(null);
+  const [permissions, setPermissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch role & permissions
+  const fetchRole = async () => {
+    try {
+      const res = await apiService.getroleById(roleId);
+      const roleData = res.data.data;
+
+      // if no permissions yet, init empty
+      if (!roleData.permissions || roleData.permissions.length === 0) {
+        roleData.permissions = MODULES.map((m) => ({
+          module: m,
+          actions: { create: false, edit: false, delete: false, view: false, allowAll: false },
+        }));
+      }
+
+      setRole(roleData);
+      setPermissions(roleData.permissions);
+    } catch (err) {
+      toast.error("Failed to fetch role");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRole();
+  }, [roleId]);
+
+  // Toggle a single checkbox
+  const toggleAction = (moduleIndex, action) => {
+    const updated = [...permissions];
+    updated[moduleIndex].actions[action] = !updated[moduleIndex].actions[action];
+
+    // if allowAll toggled → sync all actions
+    if (action === "allowAll") {
+      const newVal = updated[moduleIndex].actions.allowAll;
+      updated[moduleIndex].actions = {
+        create: newVal,
+        edit: newVal,
+        delete: newVal,
+        view: newVal,
+        allowAll: newVal,
+      };
+    }
+
+    setPermissions(updated);
+  };
+
+  // Save permissions
+  const handleSubmit = async () => {
+    try {
+      const res = await apiService.updatePermission(roleId, { permissions });
+      toast.success(res.data.message || "Permissions updated successfully!");
+      fetchRole();
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to update permissions");
+    }
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (!role) return <p>Role not found</p>;
+
   return (
-   <div>
-  {/* Page Wrapper */}
-  <div className="page-wrapper">
-    <div className="content me-4">
-      {/* Breadcrumb */}
-      <div className="my-auto mb-3 pb-1">
-        <Link to="roles-permissions"  className="mb-1 text-gray-9 fw-medium"><i className="ti ti-arrow-left me-1" />Back to List</Link>
-      </div>
-      {/* /Breadcrumb */}
-      <div className="filterbox mb-3 d-flex align-items-center mb-3">
-        <span className="avatar avatar-lg bg-white text-secondary rounded-2 me-2">
-          <i className="ti ti-user-shield fs-25 fw-normal" />
-        </span>
-        <div>
-          <p className="mb-0">Role</p>
-          <h6 className="fw-medium">Administrator</h6>
+    <div className="page-wrapper">
+      <div className="content me-4">
+        {/* Breadcrumb */}
+        <div className="my-auto mb-3 pb-1">
+          <Link to="/admin-dashboard/roles-permissions" className="mb-1 text-gray-9 fw-medium">
+            <i className="ti ti-arrow-left me-1" />
+            Back to List
+          </Link>
         </div>
-      </div>
-      {/* Custom Data Table */}
-      <div className="card mb-3">
-        <div className="card-header">
-          <div className="d-flex justify-content-between align-items-center">
-            <h6>BOOKINGS</h6>
-            <div className="no-sort">
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" id="select-all4" />
-                <label className="form-check-label" htmlFor="select-all4">Allow All</label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="card-body">
-          <div className="custom-datatable-filter table-responsive">
-            <table className="table">
-              <thead className="thead-light">
-                <tr>
-                  <th>MODULE</th>
-                  <th>CREATE</th>
-                  <th>EDIT</th>
-                  <th>DELETE</th>
-                  <th>VIEW</th>
-                  <th>ALLOW ALL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Reservations</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Calendar</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Quotations</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Enquiries</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Units</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">People</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Companies</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Drivers</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Locations</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check4">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>     
-              </tbody>	
-            </table>
-          </div>
-        </div>
-      </div>
-      <div className="card mb-3">
-        <div className="card-header">
-          <div className="d-flex justify-content-between align-items-center">
-            <h6>RENTALS</h6>
-            <div className="no-sort">
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" id="select-all2" />
-                <label className="form-check-label" htmlFor="select-all2">Allow All</label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="card-body">
-          <div className="custom-datatable-filter table-responsive">
-            <table className="table">
-              <thead className="thead-light">
-                <tr>
-                  <th>MODULE</th>
-                  <th>CREATE</th>
-                  <th>EDIT</th>
-                  <th>DELETE</th>
-                  <th>VIEW</th>
-                  <th>ALLOW ALL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Cars</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input " type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Car Attributes</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Inspections</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Issues</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Tracking</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Maintanence</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check2">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>  
-              </tbody>	
-            </table>
-          </div>
-        </div>
-      </div>
-      <div className="card mb-3">
-        <div className="card-header">
-          <div className="d-flex justify-content-between align-items-center">
-            <h6>OTHERS</h6>
-            <div className="no-sort">
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" id="select-all3" />
-                <label className="form-check-label" htmlFor="select-all3">Allow All</label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="card-body">
-          <div className="custom-datatable-filter table-responsive">
-            <table className="table">
-              <thead className="thead-light">
-                <tr>
-                  <th>MODULE</th>
-                  <th>CREATE</th>
-                  <th>EDIT</th>
-                  <th>DELETE</th>
-                  <th>VIEW</th>
-                  <th>ALLOW ALL</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Payments</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input " type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Reviews</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Messages</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Blogs</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Reports</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                </tr>                                          
-                <tr>
-                  <td>
-                    <p className="text-gray-9 fw-medium">Settings</p>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" defaultChecked />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="form-check form-check-md check3">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                </tr>  
-              </tbody>	
-            </table>
-          </div>
-        </div>
-      </div>
-      <div className="card mb-0">
-        <div className="card-body py-2 my-1">
-          <div className="d-flex justify-content-end align-items-center">
-            <a href="javascript:void(0);" className="btn btn-light me-2">Cancel</a>
-            <a href="javascript:void(0);" className="btn btn-primary me-2">Submit</a>
-          </div>
-        </div>
-      </div>
-      {/* Custom Data Table */}
-      <div className="table-footer" />			
-    </div>			
-  </div>
-  {/* /Page Wrapper */}
-  {/* /Main Wrapper */}
-  {/* Add User */}
-  <div className="modal fade" id="add_role">
-    <div className="modal-dialog modal-dialog-centered modal-md">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h5 className="mb-0">Add Role</h5>
-          <button type="button" className="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
-            <i className="ti ti-x fs-16" />
-          </button>
-        </div>
-        <div className="modal-body pb-1">
-          <div className="mb-3">
-            <label className="form-label">Role <span className="text-danger">*</span></label>
-            <input type="text" className="form-control" />
-          </div>
-        </div> 
-        <div className="modal-footer">
-          <div className="d-flex justify-content-center">
-            <a href="javascript:void(0);" className="btn btn-light me-3" data-bs-dismiss="modal">Cancel</a>
-            <button type="submit" className="btn btn-primary">Create New</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {/* /Add User */}
-  {/* Edit User */}
-  <div className="modal fade" id="edit_role">
-    <div className="modal-dialog modal-dialog-centered modal-md">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h5 className="mb-0">Edit Role</h5>
-          <button type="button" className="btn-close custom-btn-close" data-bs-dismiss="modal" aria-label="Close">
-            <i className="ti ti-x fs-16" />
-          </button>
-        </div>
-        <div className="modal-body pb-1">
-          <div className="mb-3">
-            <label className="form-label">Role <span className="text-danger">*</span></label>
-            <input type="text" className="form-control" defaultValue="Admin" />
-          </div>
-        </div> 
-        <div className="modal-footer">
-          <div className="d-flex justify-content-between align-items-center w-100">
-            <div className="form-check form-check-md form-switch me-2">
-              <label className="form-check-label form-label mt-0 mb-0">
-                <input className="form-check-input form-label me-2" type="checkbox" role="switch" defaultChecked />
-                Status
-              </label>
-            </div>
-            <div className="d-flex justify-content-center">
-              <a href="javascript:void(0);" className="btn btn-light me-3" data-bs-dismiss="modal">Cancel</a>
-              <a href="javascript:void(0);" className="btn btn-primary">Save Changes</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  {/* /Edit User */}
-  {/* Delete  */}
-  <div className="modal fade" id="delete_role">
-    <div className="modal-dialog modal-dialog-centered modal-sm">
-      <div className="modal-content">
-        <div className="modal-body text-center">
-          <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
-            <i className="ti ti-trash-x fs-26" />
+
+        {/* Role Info */}
+        <div className="filterbox mb-3 d-flex align-items-center mb-3">
+          <span className="avatar avatar-lg bg-white text-secondary rounded-2 me-2">
+            <i className="ti ti-user-shield fs-25 fw-normal" />
           </span>
-          <h4 className="mb-1">Delete Role</h4>
-          <p className="mb-3">Are you sure you want to delete role?</p>
-          <div className="d-flex justify-content-center">
-            <a href="javascript:void(0);" className="btn btn-light me-3" data-bs-dismiss="modal">Cancel</a>
-            <Link to="admin-permissions" className="btn btn-primary">Yes, Delete</Link>
+          <div>
+            <p className="mb-0">Role</p>
+            <h6 className="fw-medium">{role.name}</h6>
+          </div>
+        </div>
+
+        {/* Permissions Table */}
+        <div className="card mb-3">
+          <div className="card-body">
+            <div className="table-responsive">
+              <table className="table">
+                <thead className="thead-light">
+                  <tr>
+                    <th>MODULE</th>
+                    <th>CREATE</th>
+                    <th>EDIT</th>
+                    <th>DELETE</th>
+                    <th>VIEW</th>
+                    <th>ALLOW ALL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {permissions.map((perm, i) => (
+                    <tr key={i}>
+                      <td>
+                        <p className="text-gray-9 fw-medium">{perm.module}</p>
+                      </td>
+                      {["create", "edit", "delete", "view", "allowAll"].map((action) => (
+                        <td key={action}>
+                          <div className="form-check form-check-md">
+                            <input
+                              className="form-check-input"
+                              type="checkbox"
+                              checked={perm.actions[action]}
+                              onChange={() => toggleAction(i, action)}
+                            />
+                          </div>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="card mb-0">
+          <div className="card-body py-2 my-1">
+            <div className="d-flex justify-content-end align-items-center">
+             <div className="action-footer">
+  <button
+    type="button"
+    className="btn-cancel"
+    onClick={fetchRole}
+  >
+    Cancel
+  </button>
+  <button
+    type="button"
+    className="btn-submit"
+    onClick={handleSubmit}
+  >
+    Submit
+  </button>
+</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  {/* /Delete */}
-</div>
+  );
+};
 
-  )
-}
-
-export default AdminPermissions
+export default AdminPermissions;

@@ -11,29 +11,39 @@ const AdminPermissions = () => {
   const [permissions, setPermissions] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch role & permissions
-  const fetchRole = async () => {
-    try {
-      const res = await apiService.getroleById(roleId);
-      const roleData = res.data.data;
 
-      // if no permissions yet, init empty
-      if (!roleData.permissions || roleData.permissions.length === 0) {
-        roleData.permissions = MODULES.map((m) => ({
-          module: m,
-          actions: { create: false, edit: false, delete: false, view: false, allowAll: false },
-        }));
+
+  const normalizePermissions = (permissions = []) => {
+  return MODULES.map((m) => {
+    const existing = permissions.find((p) => p.module === m);
+    return (
+      existing || {
+        module: m,
+        actions: { create: false, edit: false, delete: false, view: false, allowAll: false },
       }
+    );
+  });
+};
 
-      setRole(roleData);
-      setPermissions(roleData.permissions);
-    } catch (err) {
-      toast.error("Failed to fetch role");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch role & permissions
+const fetchRole = async () => {
+  try {
+    const res = await apiService.getroleById(roleId);
+    const roleData = res.data.data;
+
+    // Normalize every time → ensures UI shows new modules
+    roleData.permissions = normalizePermissions(roleData.permissions);
+
+    setRole(roleData);
+    setPermissions(roleData.permissions);
+  } catch (err) {
+    toast.error("Failed to fetch role");
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchRole();
@@ -60,15 +70,18 @@ const AdminPermissions = () => {
   };
 
   // Save permissions
-  const handleSubmit = async () => {
-    try {
-      const res = await apiService.updatePermission(roleId, { permissions });
-      toast.success(res.data.message || "Permissions updated successfully!");
-      fetchRole();
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update permissions");
-    }
-  };
+const handleSubmit = async () => {
+  try {
+    const normalized = normalizePermissions(permissions); // ensure always full set
+    const res = await apiService.updatePermission(roleId, { permissions: normalized });
+
+    toast.success(res.data.message || "Permissions updated successfully!");
+    fetchRole();
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Failed to update permissions");
+  }
+};
+
 
   if (loading) return <p>Loading...</p>;
   if (!role) return <p>Role not found</p>;

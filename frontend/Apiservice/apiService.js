@@ -220,6 +220,63 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  //!!! Faq category api
+
+  getAllFaqCategory({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-faq-category?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+    getAllFaqCategoryActive() {
+    return axios.get(
+      BASE_URL + `get-all-active-faq-category`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+
+  addFaqCategory(data) {
+    return axios.post(BASE_URL + "add-faq-category", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateFaqCategory(id, data) {
+    return axios.post(BASE_URL + `update-faq-category/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteFaqCategory(data) {
+    return axios.delete(BASE_URL + `delete-faq-category/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!!! faq api
+
+  getAllFaq({ search = "", page } = {}) {
+    return axios.get(BASE_URL + `get-all-faq?search=${search}&page=${page}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addFaq(data) {
+    return axios.post(BASE_URL + "add-faq", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateFaq(id, data) {
+    return axios.post(BASE_URL + `update-faq/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteFaq(data) {
+    return axios.delete(BASE_URL + `delete-faq/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
 }
 
 export default new apiServices();

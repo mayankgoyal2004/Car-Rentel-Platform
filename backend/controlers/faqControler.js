@@ -3,7 +3,6 @@ const Faq = require("../models/faqModel");
 const addFaq = async (req, res) => {
   try {
     const { category_id, question, answer } = req.body;
-    const { _id, admin } = req.user;
 
     if (!category_id || !question || !answer) {
       return res.status(400).json({
@@ -17,8 +16,6 @@ const addFaq = async (req, res) => {
       category: category_id,
       question,
       answer,
-      createdBy: _id,
-      admin,
     });
     await faq.save();
 
@@ -68,14 +65,7 @@ const getAllFaqsAdmin = async (req, res) => {
     const adminId = req.user.admin;
     const search = req.query.search;
 
-    if (!adminId) {
-      return res.status(400).json({
-        success: false,
-        status: 400,
-        message: "Id is required",
-      });
-    }
-    let filter = { admin: adminId };
+    let filter = {};
     if (search) {
       filter.TagName = { $regex: search, $options: "i" };
     }
@@ -106,13 +96,13 @@ const getActiveFaqs = async (req, res) => {
     const skip = (page - 1) * limit;
     const adminId = req.user.admin;
 
-    const faqs = await Faq.find({ admin: adminId, status: true })
+    const faqs = await Faq.find({ status: true })
       .populate("category", "name")
       .skip(skip)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    const total = await Faq.countDocuments({ admin: adminId, status: true });
+    const total = await Faq.countDocuments({ status: true });
 
     res.json({
       success: true,

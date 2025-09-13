@@ -639,7 +639,7 @@ route.get(
 );
 
 route.delete(
-  "/delete-faq-category/:id",
+  "/delete-faq/:id",
   checkPermission("admin", "assignPackage", true),
   faq.deleteFaq
 );

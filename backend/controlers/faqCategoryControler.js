@@ -3,7 +3,6 @@ const FaqCategory = require("../models/faqCategoryModel");
 const addFaqCategory = async (req, res) => {
   try {
     const { categoryName } = req.body;
-    const { _id, admin } = req.user;
 
     if (!categoryName) {
       return res.status(400).json({
@@ -21,7 +20,7 @@ const addFaqCategory = async (req, res) => {
       });
     }
 
-    const category = new FaqCategory({ categoryName, createdBy: _id, admin });
+    const category = new FaqCategory({ categoryName });
     await category.save();
 
     return res.status(201).json({
@@ -43,17 +42,9 @@ const getAllFaqCategory = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const adminId = req.user.admin;
     const search = req.query.search;
 
-    if (!adminId) {
-      return res.status(400).json({
-        success: false,
-        status: 400,
-        message: "Id is required",
-      });
-    }
-    let filter = { admin: adminId };
+    let filter = {};
     if (search) {
       filter.TagName = { $regex: search, $options: "i" };
     }
@@ -84,12 +75,15 @@ const getAllActiveFaqCategory = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const adminId = req.user.admin;
-    const activeCategory = await FaqCategory.find({ admin:adminId , status : true})
+    const activeCategory = await FaqCategory.find({
+      status: true,
+    })
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalActiveCategories = await FaqCategory.countDocuments({ admin:adminId , status : true});
+    const totalActiveCategories = await FaqCategory.countDocuments({
+      status: true,
+    });
 
     res.json({
       success: true,

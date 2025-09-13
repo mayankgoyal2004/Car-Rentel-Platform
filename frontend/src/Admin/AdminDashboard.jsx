@@ -17,6 +17,9 @@ const AdminDashboard = () => {
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
   const userData = useSelector((store) => store.user);
+  const userType = userData?.userType; //
+
+
 
 const dispatch = useDispatch()
 const navigete = useNavigate()
@@ -539,7 +542,7 @@ const navigete = useNavigate()
                         <span>Testimonials</span>
                       </Link>
                     </li>
-                    <li>
+                  { userType ===1 &&( <li>
                       <a onClick={() => SetFaqOpen(!FaqOpen)}>
                         <i className="ti ti-question-mark" />
                         <span>FAQ’s</span>
@@ -555,7 +558,7 @@ const navigete = useNavigate()
                           </li>
                         </ul>
                       )}
-                    </li>
+                    </li>)}
                   </ul>
                 </li>
                 <li className="menu-title">

@@ -35,17 +35,16 @@ const addSeasonalPricing = async (req, res) => {
       monthlyRate,
       lateFees,
       createdBy: req.user?._id,
+      admin: req.user.admin,
     });
 
     await newSeason.save();
 
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Seasonal Pricing added successfully",
-        data: newSeason,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Seasonal Pricing added successfully",
+      data: newSeason,
+    });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -117,17 +116,25 @@ const getAllSeasonalPricing = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-
-    const seasonalPricing = await SeasonalPricing.find({
-      createdBy: req.user._id,
-    })
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.seasonName  = { $regex: search, $options: "i" };
+    }
+    const seasonalPricing = await SeasonalPricing.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const total = await SeasonalPricing.countDocuments({
-      createdBy: req.user._id,
-    });
+    const total = await SeasonalPricing.countDocuments(filter);
 
     res.json({
       success: true,

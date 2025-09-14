@@ -22,8 +22,6 @@ const addTestimonial = async (req, res) => {
       rating,
       review,
       image,
-      createdBy: req.user._id,
-      admin: req.user.admin,
     });
     await testimonial.save();
 
@@ -72,18 +70,11 @@ const getAllTestimonialsAdmin = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-     const adminId = req.user.admin;
-    const search = req.query.search || ""; 
-    if (!adminId) {
-      return res.status(400).json({
-        success: false,
-        status: 400,
-        message: "Id is required",
-      });
-    }
-    let filter = { admin: adminId };
+    const search = req.query.search || "";
+
+    let filter = {};
     if (search) {
-      filter.TagName = { $regex: search, $options: "i" }; 
+      filter.customer = { $regex: search, $options: "i" };
     }
 
     const testimonials = await Testimonial.find(filter)

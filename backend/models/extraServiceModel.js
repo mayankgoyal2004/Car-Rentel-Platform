@@ -5,7 +5,6 @@ const ExtraServiceSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      
     },
     quantity: {
       type: Number,
@@ -25,9 +24,9 @@ const ExtraServiceSchema = new mongoose.Schema(
     description: {
       type: String,
       default: "",
-      
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }

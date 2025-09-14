@@ -2,9 +2,16 @@ const mongoose = require("mongoose");
 
 const CountrySchema = new mongoose.Schema(
   {
-    countryName: { type: String, required: true, unique: true },
+    countryName: { type: String, required: true },
     countryCode: { type: String },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }

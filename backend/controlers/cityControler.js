@@ -4,32 +4,43 @@ const City = require("../models/citymodels");
 
 const addCity = async (req, res) => {
   try {
-    const { cityName, country_id, state_id } = req.body;
+    let { cityName, country, state } = req.body;
+    cityName = cityName?.trim();
 
     if (!cityName) {
       return res
         .status(400)
         .json({ success: false, message: "cityName is required" });
-        
     }
-    if (!country_id) {
-  return res.status(400).json({ success: false, message: "country_id is required" });
-}
+    if (!country) {
+      return res
+        .status(400)
+        .json({ success: false, message: "country is required" });
+    }
 
-const foundCountry = await Country.findById(country_id);
-if (!foundCountry) {
-  return res.status(404).json({ error: "Country not found" });
-}
-    
-    const stateFound = await State.findById(state_id);
+    const foundCountry = await Country.findById(country);
+    if (!foundCountry) {
+      return res.status(404).json({ error: "Country not found" });
+    }
+
+    const stateFound = await State.findById(state);
     if (!stateFound) {
       return res.status(404).json({ error: "State not found" });
     }
+    const existingCity = await City.findOne({ cityName });
+    if (existingCity) {
+      return res.status(409).json({
+        success: false,
+        status: 409,
+        message: "City already exists",
+      });
+    }
     const newCity = new City({
       cityName,
-      country: country_id,
-      state: state_id,
+      country,
+      state,
       createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     await newCity.save();
@@ -46,7 +57,8 @@ if (!foundCountry) {
 
 const updateCity = async (req, res) => {
   const { id } = req.params;
-  const { cityName, country_id, state_id, status } = req.body;
+  let { cityName, country, state, status } = req.body;
+  cityName = cityName?.trim();
 
   const city = await City.findById(id);
   try {
@@ -56,8 +68,8 @@ const updateCity = async (req, res) => {
         .json({ success: false, message: "city not found" });
     }
     city.stateName = cityName;
-    city.state = state_id;
-    city.country = country_id;
+    city.state = state;
+    city.country = country;
     city.status = status;
 
     await city.save();
@@ -95,13 +107,26 @@ const getAllCity = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
-
-    const city = await City.find({ createdBy: _id })
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.cityName = { $regex: search, $options: "i" };
+    }
+    const city = await City.find(filter)
+      .populate("country", "countryName")
+      .populate("state", "stateName")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalCity = await City.countDocuments({ createdBy: _id });
+    const totalCity = await City.countDocuments(filter);
 
     res.json({
       success: true,
@@ -134,4 +159,49 @@ const getCitiesByState = async (req, res) => {
   }
 };
 
-module.exports = { addCity, deleteCity, getAllCity, updateCity , getCitiesByState};
+const getAllActiveCity = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const city = await City.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalcity = await City.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: city,
+      pagination: {
+        totalcity,
+        currentPage: page,
+        totalPages: Math.ceil(totalcity / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
+module.exports = {
+  addCity,
+  deleteCity,
+  getAllCity,
+  updateCity,
+  getCitiesByState,
+  getAllActiveCity,
+};

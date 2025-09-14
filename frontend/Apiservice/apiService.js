@@ -230,13 +230,10 @@ class apiServices {
       }
     );
   }
-    getAllFaqCategoryActive() {
-    return axios.get(
-      BASE_URL + `get-all-active-faq-category`,
-      {
-        headers: getAuthHeaders(),
-      }
-    );
+  getAllFaqCategoryActive() {
+    return axios.get(BASE_URL + `get-all-active-faq-category`, {
+      headers: getAuthHeaders(),
+    });
   }
 
   addFaqCategory(data) {
@@ -274,6 +271,173 @@ class apiServices {
   }
   deleteFaq(data) {
     return axios.delete(BASE_URL + `delete-faq/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!!!! testimonial
+
+  getAlltestimonial({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-testimonial-admin?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  addtestimonial(data) {
+    return axios.post(BASE_URL + "add-testimonial", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deletetestimonial(data) {
+    return axios.delete(BASE_URL + `delete/testimonial/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updatetestimonial(id, data) {
+    return axios.post(BASE_URL + `update-testimonial/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!!!! location country api
+
+  getAllCountry({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-country?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  getAllActiveCountry() {
+    return axios.get(BASE_URL + `get-all-active-country`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addCountry(data) {
+    return axios.post(BASE_URL + "add-country", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCountry(data) {
+    return axios.delete(BASE_URL + `delete-country/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCountry(id, data) {
+    return axios.post(BASE_URL + `update-country/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!!! location state api
+  getAllState({ search = "", page } = {}) {
+    return axios.get(BASE_URL + `get-all-state?search=${search}&page=${page}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getAllActiveState() {
+    return axios.get(BASE_URL + `get-all-active-state`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addState(data) {
+    return axios.post(BASE_URL + "add-state", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteState(data) {
+    return axios.delete(BASE_URL + `delete-state/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateState(id, data) {
+    return axios.post(BASE_URL + `update-state/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!! location city api
+  getAllCity({ search = "", page } = {}) {
+    return axios.get(BASE_URL + `get-all-city?search=${search}&page=${page}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getAllActiveCity() {
+    return axios.get(BASE_URL + `get-all-active-city`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addCity(data) {
+    return axios.post(BASE_URL + "add-city", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCity(data) {
+    return axios.delete(BASE_URL + `delete-city/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCity(id, data) {
+    return axios.post(BASE_URL + `update-city/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!! seasional pricing
+
+  getAllSeasionalPricing({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-seasonal-pricing?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+
+  addSeasionalPricing(data) {
+    return axios.post(BASE_URL + "add-seasonal-pricing", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteSeasionalPricing(data) {
+    return axios.delete(BASE_URL + `delete-seasonal-pricing/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateSeasionalPricing(id, data) {
+    return axios.post(BASE_URL + `update-seasonal-pricing/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!! extra services
+  getAllExtraServices({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-extra-services?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+
+  addExtraService(data) {
+    return axios.post(BASE_URL + "add-extra-service", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteExtraService(data) {
+    return axios.delete(BASE_URL + `delete-extra-service/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  updateExtraService(id, data) {
+    return axios.post(BASE_URL + `update-extra-service/${id}`, data, {
       headers: getAuthHeaders(),
     });
   }

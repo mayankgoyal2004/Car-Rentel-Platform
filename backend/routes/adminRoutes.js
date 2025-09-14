@@ -275,60 +275,111 @@ route.get("/get-all-company", authUser, company.getAllCompany);
 
 // !! country routes
 
-route.post("/add-country", authUser, country.addCountry);
+route.post(
+  "/add-country",
+  checkPermission("location", "create"),
+  country.addCountry
+);
 route.post(
   "/update-country/:id",
-
+  checkPermission("location", "edit"),
   country.updateCountry
 );
-route.delete("/delete-country/:id", authUser, country.deleteCountry);
-route.get("/get-all-country", authUser, country.getAllCountry);
+route.delete(
+  "/delete-country/:id",
+  checkPermission("location", "delete"),
+  country.deleteCountry
+);
+route.get(
+  "/get-all-country",
+  checkPermission("location", "view"),
+  country.getAllCountry
+);
+route.get(
+  "/get-all-active-country",
+  checkPermission("location", "view"),
+  country.getAllActiveCountry
+);
 
 //!! state  routes
 
-route.post("/add-state", authUser, state.addState);
+route.post("/add-state", checkPermission("location", "create"), state.addState);
 route.post(
   "/update-state/:id",
-
+  checkPermission("location", "edit"),
   state.updateState
 );
-route.delete("/delete-state/:id", authUser, state.deleteState);
-route.get("/get-all-state", authUser, state.getAllState);
-route.get("/get-state-by-country", authUser, state.getStatesByCountry);
+route.delete(
+  "/delete-state/:id",
+  checkPermission("location", "delete"),
+  state.deleteState
+);
+route.get(
+  "/get-all-state",
+  checkPermission("location", "view"),
+  state.getAllState
+);
+route.get(
+  "/get-state-by-country",
+  checkPermission("location", "view"),
+  state.getStatesByCountry
+);
+route.get(
+  "/get-all-active-state",
+  checkPermission("location", "view"),
+  state.getAllActiveState
+);
 
 //!city routes
-route.post("/add-city", authUser, city.addCity);
+route.post("/add-city", checkPermission("location", "create"), city.addCity);
 route.post(
   "/update-city/:id",
-
+  checkPermission("location", "edit"),
   city.updateCity
 );
-route.delete("/delete-city/:id", authUser, city.deleteCity);
-route.get("/get-all-city", authUser, city.getAllCity);
-route.get("/get-city-by-state", authUser, city.getCitiesByState);
+route.delete(
+  "/delete-city/:id",
+  checkPermission("location", "delete"),
+  city.deleteCity
+);
+route.get(
+  "/get-all-city",
+  checkPermission("location", "view"),
+  city.getAllCity
+);
+route.get(
+  "/get-city-by-state",
+  checkPermission("location", "view"),
+  city.getCitiesByState
+);
+route.get(
+  "/get-all-active-city",
+  checkPermission("location", "view"),
+  city.getAllActiveCity
+);
 
 //!!location route
 route.post(
   "/add-location",
-  authUser,
+
   upload.locationUpload.single("image"),
   location.addLocation
 );
 route.post(
   "/add-update-location",
-  authUser,
+
   upload.locationUpload.single("image"),
   location.updateLocation
 );
 
-route.delete("/delete-location", authUser, location.deleteLocation);
+route.delete("/delete-location", location.deleteLocation);
 
 //!! car attributes router
 
 //!! car brand route
 route.post(
   "/add-car-brand",
-  authUser,
+
   upload.carBrandUpload.single("image"),
   carBrand.addCarBrand
 );
@@ -337,34 +388,34 @@ route.post(
 
   carBrand.updateCarBrand
 );
-route.delete("/delete-car-brand/:id", authUser, carBrand.deleteBrand);
-route.get("/get-all-car-brand", authUser, carBrand.getAllBrand);
+route.delete("/delete-car-brand/:id", carBrand.deleteBrand);
+route.get("/get-all-car-brand", carBrand.getAllBrand);
 
 //!! car type route
-route.post("/add-car-type", authUser, carType.addCarType);
+route.post("/add-car-type", carType.addCarType);
 route.post(
   "/update-car-type/:id",
 
   carType.updateCarType
 );
-route.delete("/delete-car-type/:id", authUser, carType.deleteCarType);
-route.get("/get-all-car-type", authUser, carType.getAllCarTypes);
+route.delete("/delete-car-type/:id", carType.deleteCarType);
+route.get("/get-all-car-type", carType.getAllCarTypes);
 
 //!! car model routes
 
-route.post("/add-car-model", authUser, carModel.addCarModel);
+route.post("/add-car-model", carModel.addCarModel);
 route.post(
   "/update-car-model/:id",
 
   carModel.updateCarModel
 );
-route.delete("/delete-car-model/:id", authUser, carModel.deleteCarModel);
-route.get("/get-all-car-model", authUser, carModel.getAllCarModel);
+route.delete("/delete-car-model/:id", carModel.deleteCarModel);
+route.get("/get-all-car-model", carModel.getAllCarModel);
 
 //!! car Transmission route
 route.post(
   "/add-car-transmission",
-  authUser,
+
   carTransmission.addCarTransmission
 );
 route.post(
@@ -374,125 +425,125 @@ route.post(
 );
 route.delete(
   "/delete-car-transmission/:id",
-  authUser,
+
   carTransmission.deleteCarTransmission
 );
 route.get(
   "/get-all-car-transmission",
-  authUser,
+
   carTransmission.getAllCarTransmission
 );
 
 //!! car fuel route
-route.post("/add-car-fuel", authUser, carFuel.addCarFuel);
+route.post("/add-car-fuel", carFuel.addCarFuel);
 route.post(
   "/update-car-fuel/:id",
 
   carFuel.updateCarFuel
 );
-route.delete("/delete-car-fuel/:id", authUser, carFuel.deleteCarFuel);
-route.get("/get-all-car-fuel", authUser, carFuel.getAllCarFuel);
+route.delete("/delete-car-fuel/:id", carFuel.deleteCarFuel);
+route.get("/get-all-car-fuel", carFuel.getAllCarFuel);
 
 //!! car color routes
-route.post("/add-car-color", authUser, carColor.addCarColor);
-route.post("/update-car-color/:id", authUser, carColor.updateCarColor);
-route.delete("/delete-car-color/:id", authUser, carColor.deleteCarColor);
-route.get("/get-all-car-color", authUser, carColor.getAllCarColor);
+route.post("/add-car-color", carColor.addCarColor);
+route.post("/update-car-color/:id", carColor.updateCarColor);
+route.delete("/delete-car-color/:id", carColor.deleteCarColor);
+route.get("/get-all-car-color", carColor.getAllCarColor);
 
 //!! car steering routes
-route.post("/add-car-steering", authUser, carSteering.addCarSteering);
-route.post("/update-car-steering/:id", authUser, carSteering.updateCarSteering);
+route.post("/add-car-steering", carSteering.addCarSteering);
+route.post("/update-car-steering/:id", carSteering.updateCarSteering);
 route.delete(
   "/delete-car-steering/:id",
-  authUser,
+
   carSteering.deleteCarSteering
 );
-route.get("/get-all-car-steering", authUser, carSteering.getAllCarSteering);
+route.get("/get-all-car-steering", carSteering.getAllCarSteering);
 
 //!! car seats routes
-route.post("/add-car-seats", authUser, carSeats.addCarSeats);
-route.post("/update-car-seats/:id", authUser, carSeats.updateCarSeats);
-route.delete("/delete-car-seats/:id", authUser, carSeats.deleteCarSeats);
-route.get("/get-all-car-seats", authUser, carSeats.getAllCarSeats);
+route.post("/add-car-seats", carSeats.addCarSeats);
+route.post("/update-car-seats/:id", carSeats.updateCarSeats);
+route.delete("/delete-car-seats/:id", carSeats.deleteCarSeats);
+route.get("/get-all-car-seats", carSeats.getAllCarSeats);
 
 //!! car cylinder routes
-route.post("/add-car-cylinder", authUser, carCylinder.addCarCylinder);
-route.post("/update-car-cylinder/:id", authUser, carCylinder.updateCarCylinder);
+route.post("/add-car-cylinder", carCylinder.addCarCylinder);
+route.post("/update-car-cylinder/:id", carCylinder.updateCarCylinder);
 route.delete(
   "/delete-car-cylinder/:id",
-  authUser,
+
   carCylinder.deleteCarCylinder
 );
-route.get("/get-all-car-cylinder", authUser, carCylinder.getAllCarCylinder);
+route.get("/get-all-car-cylinder", carCylinder.getAllCarCylinder);
 
 //!! car doors routes
-route.post("/add-car-doors", authUser, carDoors.addCarDoors);
-route.post("/update-car-doors/:id", authUser, carDoors.updateCarDoors);
-route.delete("/delete-car-doors/:id", authUser, carDoors.deleteCarDoors);
-route.get("/get-all-car-doors", authUser, carDoors.getAllCarDoors);
+route.post("/add-car-doors", carDoors.addCarDoors);
+route.post("/update-car-doors/:id", carDoors.updateCarDoors);
+route.delete("/delete-car-doors/:id", carDoors.deleteCarDoors);
+route.get("/get-all-car-doors", carDoors.getAllCarDoors);
 
 //!! car features routes
-route.post("/add-car-feature", authUser, carFeatures.addCarFeature);
-route.post("/update-car-feature/:id", authUser, carFeatures.updateCarFeature);
-route.delete("/delete-car-feature/:id", authUser, carFeatures.deleteCarFeature);
-route.get("/get-all-car-features", authUser, carFeatures.getAllCarFeatures);
+route.post("/add-car-feature", carFeatures.addCarFeature);
+route.post("/update-car-feature/:id", carFeatures.updateCarFeature);
+route.delete("/delete-car-feature/:id", carFeatures.deleteCarFeature);
+route.get("/get-all-car-features", carFeatures.getAllCarFeatures);
 
 //!! car safety features routes
-route.post("/add-safety-feature", authUser, carSafetyFeature.addSafetyFeature);
+route.post("/add-safety-feature", carSafetyFeature.addSafetyFeature);
 route.post(
   "/update-safety-feature/:id",
-  authUser,
+
   carSafetyFeature.updateSafetyFeature
 );
 route.delete(
   "/delete-safety-feature/:id",
-  authUser,
+
   carSafetyFeature.deleteSafetyFeature
 );
 route.get(
   "/get-all-safety-features",
-  authUser,
+
   carSafetyFeature.getAllSafetyFeatures
 );
 
 //!extra service
 
-route.post("/add-extra-service", authUser, extraService.addExtraService);
+route.post("/add-extra-service", extraService.addExtraService);
 route.post(
   "/update-extra-service/:id",
-  authUser,
+
   extraService.updateExtraService
 );
 route.delete(
   "/delete-extra-service/:id",
-  authUser,
+
   extraService.deleteExtraService
 );
 route.get(
   "/get-all-extra-services",
-  authUser,
+
   extraService.getAllExtraServices
 );
 
 //! seasional pricing route
 route.post(
   "/add-seasonal-pricing",
-  authUser,
+  checkPermission("Car", "create"),
   seasonalPricing.addSeasonalPricing
 );
 route.post(
   "/update-seasonal-pricing/:id",
-  authUser,
+  checkPermission("Car", "edit"),
   seasonalPricing.updateSeasonalPricing
 );
 route.delete(
   "/delete-seasonal-pricing/:id",
-  authUser,
+  checkPermission("Car", "delete"),
   seasonalPricing.deleteSeasonalPricing
 );
 route.get(
   "/get-all-seasonal-pricing",
-  authUser,
+  checkPermission("Car", "view"),
   seasonalPricing.getAllSeasonalPricing
 );
 

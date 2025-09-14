@@ -19,17 +19,14 @@ const AdminDashboard = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
 
-
-
-const dispatch = useDispatch()
-const navigete = useNavigate()
+  const dispatch = useDispatch();
+  const navigete = useNavigate();
 
   const handleLogout = () => {
-      sessionStorage.clear();
-      dispatch(removeUser());
-      navigete("/login")
-    };
-
+    sessionStorage.clear();
+    dispatch(removeUser());
+    navigete("/login");
+  };
 
   return (
     <div className="main-wrapper">
@@ -155,7 +152,7 @@ const navigete = useNavigate()
                             className="__cf_email__"
                             data-cfemail="f7969993859280b7928f969a879b92d994989a"
                           >
-                           {userData.email}
+                            {userData.email}
                           </a>
                         </p>
                       </div>
@@ -168,8 +165,7 @@ const navigete = useNavigate()
                       Edit Profile
                     </Link>
                     <div className="dropdown-divider my-2" />
-                    <div className="dropdown-item">
-                    </div>
+                    <div className="dropdown-item"></div>
                     <Link
                       to="security-setting"
                       className="dropdown-item d-flex align-items-center"
@@ -482,18 +478,6 @@ const navigete = useNavigate()
                 <li>
                   <ul>
                     <li>
-                      <Link to="admin-pages">
-                        <i className="ti ti-file-invoice" />
-                        <span>Pages</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-menu-management">
-                        <i className="ti ti-menu-2" />
-                        <span>Menu Management</span>
-                      </Link>
-                    </li>
-                    <li>
                       <a onClick={() => setblogOpen(!blogOpen)}>
                         <i className="ti ti-device-desktop-analytics" />
                         <span>Blogs</span>
@@ -536,29 +520,34 @@ const navigete = useNavigate()
                         </ul>
                       )}
                     </li>
-                    <li>
-                      <Link to="all-testimonials">
-                        <i className="ti ti-brand-hipchat" />
-                        <span>Testimonials</span>
-                      </Link>
-                    </li>
-                  { userType ===1 &&( <li>
-                      <a onClick={() => SetFaqOpen(!FaqOpen)}>
-                        <i className="ti ti-question-mark" />
-                        <span>FAQ’s</span>
-                        <span className="menu-arrow" />
-                      </a>
-                      {FaqOpen && (
-                        <ul>
-                          <li>
-                            <Link to="all-faq">FAQ's</Link>
-                          </li>
-                          <li>
-                            <Link to="all-faq-categories">FAQ Category</Link>
-                          </li>
-                        </ul>
-                      )}
-                    </li>)}
+
+                    {userType === 1 && (
+                      <li>
+                        <Link to="all-testimonials">
+                          <i className="ti ti-brand-hipchat" />
+                          <span>Testimonials</span>
+                        </Link>
+                      </li>
+                    )}
+                    {userType === 1 && (
+                      <li>
+                        <a onClick={() => SetFaqOpen(!FaqOpen)}>
+                          <i className="ti ti-question-mark" />
+                          <span>FAQ’s</span>
+                          <span className="menu-arrow" />
+                        </a>
+                        {FaqOpen && (
+                          <ul>
+                            <li>
+                              <Link to="all-faq">FAQ's</Link>
+                            </li>
+                            <li>
+                              <Link to="all-faq-categories">FAQ Category</Link>
+                            </li>
+                          </ul>
+                        )}
+                      </li>
+                    )}
                   </ul>
                 </li>
                 <li className="menu-title">
@@ -610,12 +599,6 @@ const navigete = useNavigate()
                 </li>
                 <li>
                   <ul>
-                    <li>
-                      <Link to="income-vs-expenses">
-                        <i className="ti ti-chart-histogram" />
-                        <span>Income vs Expense</span>
-                      </Link>
-                    </li>
                     <li>
                       <Link to="earning-reports">
                         <i className="ti ti-chart-line" />
@@ -670,10 +653,10 @@ const navigete = useNavigate()
         </div>
       </div>
       {/* /Sidebar */}
-<div>  <Outlet /></div>
-     
-
-    
+      <div>
+        {" "}
+        <Outlet />
+      </div>
     </div>
   );
 };

@@ -7,17 +7,24 @@ const citySchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-  country: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Country",
-        required: true,
-      },
+    country: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Country",
+      required: true,
+    },
     state: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "State",
       required: true,
     },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }

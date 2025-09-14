@@ -71,7 +71,7 @@ import AdminCarDoors from "./Admin/adminCarAttribute/AdminCarDoors";
 import AdminCarFeatures from "./Admin/adminCarAttribute/AdminCarFeatures";
 import AdminCarSafetyFeatures from "./Admin/adminCarAttribute/AdminCarSafetyFeatures";
 import AdminCarExtraFeatures from "./Admin/AdminCarExtraFeatures";
-import AdminCarPricing from "./Admin/AdminCarPricing";
+import AdminCarPricing from "./Admin/AdminSeasionalPricing";
 import AdminInspection from "./Admin/AdminInspection";
 import AdminTracking from "./Admin/AdminTracking";
 import AdminMaintenance from "./Admin/AdminMaintenance";
@@ -338,10 +338,16 @@ function App() {
             <Route path="edit-invoice" element={<AdminEditEnvoice />} />
             <Route path="add-invoice" element={<AddInvoice />} />
             <Route path="add-pages" element={<AdminAddPages />} />
-            <Route path="admin-blog-details/:id" element={<AdminBlogDetails />} />
+            <Route
+              path="admin-blog-details/:id"
+              element={<AdminBlogDetails />}
+            />
             <Route path="edit-blog/:id" element={<AdminEditBlog />} />
             <Route path="add-blog" element={<AdminAddBlogs />} />
-            <Route path="admin-permissions/:roleId" element={<AdminPermissions />} />
+            <Route
+              path="admin-permissions/:roleId"
+              element={<AdminPermissions />}
+            />
           </Route>
         </Route>
       </Routes>

@@ -5,7 +5,6 @@ const SeasonalPricingSchema = new mongoose.Schema(
     seasonName: {
       type: String,
       required: true,
-     
     },
     startDate: {
       type: Date,
@@ -31,7 +30,14 @@ const SeasonalPricingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    admin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }

@@ -7,12 +7,13 @@ const carModel = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    CarBrand: {
+    carBrand: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "CarBrand",
       required: true,
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }

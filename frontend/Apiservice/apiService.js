@@ -479,6 +479,342 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+
+  //!! car Safety features
+
+  getAllSafetyFeatures({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-safety-features?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveSafetyFeatures() {
+    return axios.get(BASE_URL + `get-all-active-safety-features`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addSafetyFeatures(data) {
+    return axios.post(BASE_URL + "add-safety-feature", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateSafetyFeature(id, data) {
+    return axios.post(BASE_URL + `update-safety-feature/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteSafetyFeatures(data) {
+    return axios.delete(BASE_URL + `delete-safety-feature/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car features
+  getAllCarFeatures({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-features?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarFeatures() {
+    return axios.get(BASE_URL + `get-all-acitve-car-features`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarFeature(data) {
+    return axios.post(BASE_URL + "add-car-feature", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarFeature(id, data) {
+    return axios.post(BASE_URL + `update-car-feature/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarFeature(data) {
+    return axios.delete(BASE_URL + `delete-car-feature/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car transmissions
+  getAllCarTransmissions({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-transmission?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarTransmissions() {
+    return axios.get(BASE_URL + `get-all-active-car-transmission`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarTransmission(data) {
+    return axios.post(BASE_URL + "add-car-transmission", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarTransmission(id, data) {
+    return axios.post(BASE_URL + `update-car-transmission/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarTransmission(data) {
+    return axios.delete(BASE_URL + `delete-car-transmission/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car cylinders
+  getAllCarCylinders({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-cylinder?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarCylinders() {
+    return axios.get(BASE_URL + `get-all-active-car-cylinder`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarCylinder(data) {
+    return axios.post(BASE_URL + "add-car-cylinder", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarCylinder(id, data) {
+    return axios.post(BASE_URL + `update-car-cylinder/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarCylinder(data) {
+    return axios.delete(BASE_URL + `delete-car-cylinder/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car seats
+  getAllCarSeats({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-seats?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarSeats() {
+    return axios.get(BASE_URL + `get-all-active-car-seats`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarSeats(data) {
+    return axios.post(BASE_URL + "add-car-seats", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarSeats(id, data) {
+    return axios.post(BASE_URL + `update-car-seats/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarSeats(data) {
+    return axios.delete(BASE_URL + `delete-car-seats/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car types
+  getAllCarTypes({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-types?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarTypes() {
+    return axios.get(BASE_URL + `get-all-active-car-type`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarType(data) {
+    return axios.post(BASE_URL + "add-car-type", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarType(id, data) {
+    return axios.post(BASE_URL + `update-car-type/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarType(data) {
+    return axios.delete(BASE_URL + `delete-car-type/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car models
+  getAllCarModel({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-model?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarModel() {
+    return axios.get(BASE_URL + `get-all-active-car-model`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarModel(data) {
+    return axios.post(BASE_URL + "add-car-model", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarModel(id, data) {
+    return axios.post(BASE_URL + `update-car-model/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarModel(data) {
+    return axios.delete(BASE_URL + `delete-car-model/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car fuel
+  getAllCarFuel({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-fuel?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarFuel() {
+    return axios.get(BASE_URL + `get-all-active-car-fuel`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarFuel(data) {
+    return axios.post(BASE_URL + "add-car-fuel", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarFuel(id, data) {
+    return axios.post(BASE_URL + `update-car-fuel/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarFuel(data) {
+    return axios.delete(BASE_URL + `delete-car-fuel/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car color
+  getAllCarColor({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-color?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarColor() {
+    return axios.get(BASE_URL + `get-all-active-car-color`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarColor(data) {
+    return axios.post(BASE_URL + "add-car-color", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarColor(id, data) {
+    return axios.post(BASE_URL + `update-car-color/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarColor(data) {
+    return axios.delete(BASE_URL + `delete-car-color/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! car steering
+  getAllCarSteering({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-steering?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarSteering() {
+    return axios.get(BASE_URL + `get-all-active-car-steering`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarSteering(data) {
+    return axios.post(BASE_URL + "add-car-steering", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarSteering(id, data) {
+    return axios.post(BASE_URL + `update-car-steering/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteCarSteering(data) {
+    return axios.delete(BASE_URL + `delete-car-steering/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!! car brands
+  getAllCarBrands({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-brand?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllActiveCarBrands() {
+    return axios.get(BASE_URL + `get-all-active-car-brand`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  addCarBrand(data) {
+    return axios.post(BASE_URL + "add-car-brand", data, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+  updateCarBrand(id, data) {
+    return axios.post(BASE_URL + `update-car-brand/${id}`, data, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
+  deleteCarBrand(data) {
+    return axios.delete(BASE_URL + `delete-car-brand/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
 }
 
 export default new apiServices();

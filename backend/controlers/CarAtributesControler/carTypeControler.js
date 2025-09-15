@@ -2,19 +2,23 @@ const CarType = require("../../models/caratributes/carTypeModel");
 
 const addCarType = async (req, res) => {
   try {
-    const { carType } = req.body;
-
+    let { carType } = req.body;
+    carType = carType.trim();
     if (!carType) {
       return res
         .status(400)
         .json({ success: false, message: "carType is required" });
     }
-    const foundCarType = await CarType.find({ carType });
+    const foundCarType = await CarType.findOne({
+      carType,
+      admin: req.user?.admin,
+    });
     if (foundCarType) {
       return res.status(404).json({ error: "carType  already exist " });
     }
     const newCarType = new CarType({
       carType,
+      admin: req.user.admin,
 
       createdBy: req.user?._id,
     });
@@ -33,7 +37,8 @@ const addCarType = async (req, res) => {
 
 const updateCarType = async (req, res) => {
   const { id } = req.params;
-  const { carType, status } = req.body;
+  let { carType, status } = req.body;
+  carType = carType.trim();
 
   const cartype = await CarType.findById(id);
   try {
@@ -45,7 +50,7 @@ const updateCarType = async (req, res) => {
     cartype.carType = carType;
     cartype.status = status;
 
-    await carType.save();
+    await cartype.save();
     res.json({
       success: true,
       message: "car type updated successfully",
@@ -80,13 +85,25 @@ const getAllCarTypes = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.carType = { $regex: search, $options: "i" };
+    }
 
-    const carType = await CarType.find({ createdBy: _id })
+    const carType = await CarType.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalCarType = await CarType.countDocuments({ createdBy: _id });
+    const totalCarType = await CarType.countDocuments(filter);
 
     res.json({
       success: true,
@@ -104,5 +121,48 @@ const getAllCarTypes = async (req, res) => {
   }
 };
 
-module.exports = { addCarType, updateCarType, deleteCarType, getAllCarTypes };
+const getAllActiveCarType = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
 
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const carType = await CarType.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalcarType = await CarType.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: carType,
+      pagination: {
+        totalcarType,
+        currentPage: page,
+        totalPages: Math.ceil(totalcarType / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
+module.exports = {
+  addCarType,
+  updateCarType,
+  deleteCarType,
+  getAllCarTypes,
+  getAllActiveCarType,
+};

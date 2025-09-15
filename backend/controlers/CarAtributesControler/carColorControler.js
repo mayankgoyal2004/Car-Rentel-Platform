@@ -2,7 +2,8 @@ const CarColor = require("../../models/caratributes/carColorModel");
 
 const addCarColor = async (req, res) => {
   try {
-    const { carColor } = req.body;
+    let { carColor } = req.body;
+    carColor = carColor.trim();
 
     if (!carColor) {
       return res
@@ -12,7 +13,7 @@ const addCarColor = async (req, res) => {
 
     const foundCarColor = await CarColor.findOne({
       carColor,
-      createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     if (foundCarColor) {
@@ -24,6 +25,7 @@ const addCarColor = async (req, res) => {
     const newCarColor = new CarColor({
       carColor,
       createdBy: req.user?._id,
+      admin: req.user.admin,
     });
 
     await newCarColor.save();
@@ -91,14 +93,26 @@ const getAllCarColor = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.carColor = { $regex: search, $options: "i" };
+    }
 
-    const colors = await CarColor.find({ createdBy: _id })
+    const colors = await CarColor.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalCarColor = await CarColor.countDocuments({ createdBy: _id });
+    const totalCarColor = await CarColor.countDocuments(filter);
 
     res.json({
       success: true,
@@ -117,10 +131,48 @@ const getAllCarColor = async (req, res) => {
     });
   }
 };
+const getAllActiveCarColor = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const carColor = await CarColor.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalCarColor = await CarColor.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: carColor,
+      pagination: {
+        totalCarColor,
+        currentPage: page,
+        totalPages: Math.ceil(totalCarColor / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 
 module.exports = {
   addCarColor,
   updateCarColor,
   deleteCarColor,
   getAllCarColor,
+  getAllActiveCarColor,
 };

@@ -2,19 +2,24 @@ const CarFuel = require("../../models/caratributes/carFuelModel");
 
 const addCarFuel = async (req, res) => {
   try {
-    const { carFuel } = req.body;
+    let { carFuel } = req.body;
+    carFuel = carFuel.trim();
 
     if (!carFuel) {
       return res
         .status(400)
         .json({ success: false, message: "carFuel is required" });
     }
-    const foundCarFuel = await CarFuel.find({ carFuel });
+    const foundCarFuel = await CarFuel.findOne({
+      carFuel,
+      admin: req.user?.admin,
+    });
     if (foundCarFuel) {
       return res.status(404).json({ error: "carFuel  already exist " });
     }
     const newCarFuel = new CarFuel({
       carFuel,
+      admin: req.user.admin,
 
       createdBy: req.user?._id,
     });
@@ -80,13 +85,24 @@ const getAllCarFuel = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
-
-    const carfuel = await CarFuel.find({ createdBy: _id })
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.carFuel = { $regex: search, $options: "i" };
+    }
+    const carfuel = await CarFuel.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalCarFuel = await CarFuel.countDocuments({ createdBy: _id });
+    const totalCarFuel = await CarFuel.countDocuments(filter);
 
     res.json({
       success: true,
@@ -103,5 +119,48 @@ const getAllCarFuel = async (req, res) => {
       .json({ success: false, message: "Server Error", error: err.message });
   }
 };
+const getAllActiveCarFuels = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
 
-module.exports = { addCarFuel, updateCarFuel, deleteCarFuel, getAllCarFuel };
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const carFuel = await CarFuel.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalCarFuel = await CarFuel.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: carFuel,
+      pagination: {
+        totalCarFuel,
+        currentPage: page,
+        totalPages: Math.ceil(totalCarFuel / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
+module.exports = {
+  addCarFuel,
+  updateCarFuel,
+  deleteCarFuel,
+  getAllCarFuel,
+  getAllActiveCarFuels,
+};

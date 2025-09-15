@@ -3,8 +3,8 @@ const CarSafetyFeature = require("../../models/caratributes/carSafetyFeatureMode
 // Add Safety Feature
 const addSafetyFeature = async (req, res) => {
   try {
-    const { safetyFeature } = req.body;
-
+    let { safetyFeature } = req.body;
+    safetyFeature = safetyFeature?.trim();
     if (!safetyFeature) {
       return res
         .status(400)
@@ -13,7 +13,7 @@ const addSafetyFeature = async (req, res) => {
 
     const foundFeature = await CarSafetyFeature.findOne({
       safetyFeature,
-      createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     if (foundFeature) {
@@ -25,6 +25,7 @@ const addSafetyFeature = async (req, res) => {
     const newFeature = new CarSafetyFeature({
       safetyFeature,
       createdBy: req.user?._id,
+      admin: req.user.admin,
     });
 
     await newFeature.save();
@@ -43,7 +44,8 @@ const addSafetyFeature = async (req, res) => {
 const updateSafetyFeature = async (req, res) => {
   try {
     const { id } = req.params;
-    const { safetyFeature, status } = req.body;
+    let { safetyFeature, status } = req.body;
+    safetyFeature = safetyFeature?.trim();
 
     const feature = await CarSafetyFeature.findById(id);
     if (!feature) {
@@ -95,16 +97,25 @@ const getAllSafetyFeatures = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
-
-    const features = await CarSafetyFeature.find({ createdBy: _id })
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.safetyFeature = { $regex: search, $options: "i" };
+    }
+    const features = await CarSafetyFeature.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalSafetyFeatures = await CarSafetyFeature.countDocuments({
-      createdBy: _id,
-    });
+    const totalSafetyFeatures = await CarSafetyFeature.countDocuments(filter);
 
     res.json({
       success: true,
@@ -124,9 +135,48 @@ const getAllSafetyFeatures = async (req, res) => {
   }
 };
 
+const getAllActiveSafetyFeatures = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const safety = await CarSafetyFeature.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalSafetyFeatures = await CarSafetyFeature.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: safety,
+      pagination: {
+        totalSafetyFeatures,
+        currentPage: page,
+        totalPages: Math.ceil(totalSafetyFeatures / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
 module.exports = {
   addSafetyFeature,
   updateSafetyFeature,
   deleteSafetyFeature,
   getAllSafetyFeatures,
+  getAllActiveSafetyFeatures,
 };

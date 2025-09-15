@@ -14,7 +14,7 @@ const addCarSeats = async (req, res) => {
     // Prevent duplicate seats entry by same user
     const foundSeats = await CarSeats.findOne({
       carSeats,
-      createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     if (foundSeats) {
@@ -26,6 +26,7 @@ const addCarSeats = async (req, res) => {
     const newSeats = new CarSeats({
       carSeats,
       createdBy: req.user?._id,
+      admin: req.user.admin,
     });
 
     await newSeats.save();
@@ -96,14 +97,25 @@ const getAllCarSeats = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
-
-    const seats = await CarSeats.find({ createdBy: _id })
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.carSeats = { $regex: search, $options: "i" };
+    }
+    const seats = await CarSeats.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalCarSeats = await CarSeats.countDocuments({ createdBy: _id });
+    const totalCarSeats = await CarSeats.countDocuments(filter);
 
     res.json({
       success: true,
@@ -122,10 +134,48 @@ const getAllCarSeats = async (req, res) => {
     });
   }
 };
+const getAllActiveCarSeats = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const carSeats = await CarSeats.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalCarSeats = await CarSeats.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: carSeats,
+      pagination: {
+        totalCarSeats,
+        currentPage: page,
+        totalPages: Math.ceil(totalCarSeats / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 
 module.exports = {
   addCarSeats,
   updateCarSeats,
   deleteCarSeats,
   getAllCarSeats,
+  getAllActiveCarSeats,
 };

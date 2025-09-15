@@ -67,7 +67,6 @@ import AdminCarColor from "./Admin/adminCarAttribute/AdminCarColor";
 import AdminCarSteering from "./Admin/adminCarAttribute/AdminCarStreaing";
 import AdminCarSeats from "./Admin/adminCarAttribute/AdminCarSeats";
 import AdminCarCylinders from "./Admin/adminCarAttribute/AdminCarCyllanders";
-import AdminCarDoors from "./Admin/adminCarAttribute/AdminCarDoors";
 import AdminCarFeatures from "./Admin/adminCarAttribute/AdminCarFeatures";
 import AdminCarSafetyFeatures from "./Admin/adminCarAttribute/AdminCarSafetyFeatures";
 import AdminCarExtraFeatures from "./Admin/AdminCarExtraFeatures";
@@ -239,7 +238,6 @@ function App() {
             <Route path="car-steering" element={<AdminCarSteering />} />
             <Route path="car-seats" element={<AdminCarSeats />} />
             <Route path="car-cylinders" element={<AdminCarCylinders />} />
-            <Route path="car-doors" element={<AdminCarDoors />} />
             <Route path="car-features" element={<AdminCarFeatures />} />
             <Route
               path="car-safety-features"

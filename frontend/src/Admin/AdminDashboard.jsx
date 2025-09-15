@@ -375,9 +375,7 @@ const AdminDashboard = () => {
                           <li>
                             <Link to="car-cylinders">Cylinders</Link>
                           </li>
-                          <li>
-                            <Link to="car-doors">Doors</Link>
-                          </li>
+
                           <li>
                             <Link to="car-features">Features</Link>
                           </li>

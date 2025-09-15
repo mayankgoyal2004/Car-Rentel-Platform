@@ -14,7 +14,7 @@ const addCarSteering = async (req, res) => {
     // Prevent duplicates for same user
     const foundSteering = await CarSteering.findOne({
       carSteering,
-      createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     if (foundSteering) {
@@ -26,6 +26,7 @@ const addCarSteering = async (req, res) => {
     const newSteering = new CarSteering({
       carSteering,
       createdBy: req.user?._id,
+      admin: req.user.admin,
     });
 
     await newSteering.save();
@@ -96,14 +97,26 @@ const getAllCarSteering = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.carSteering = { $regex: search, $options: "i" };
+    }
 
-    const steerings = await CarSteering.find({ createdBy: _id })
+    const steerings = await CarSteering.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalCarSteering = await CarSteering.countDocuments({ createdBy: _id });
+    const totalCarSteering = await CarSteering.countDocuments(filter);
 
     res.json({
       success: true,
@@ -122,10 +135,48 @@ const getAllCarSteering = async (req, res) => {
     });
   }
 };
+const getAllActiveCarSteering = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const carSteering = await CarSteering.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalCarSteering = await CarSteering.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: carSteering,
+      pagination: {
+        totalCarSteering,
+        currentPage: page,
+        totalPages: Math.ceil(totalCarSteering / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 
 module.exports = {
   addCarSteering,
   updateCarSteering,
   deleteCarSteering,
   getAllCarSteering,
+  getAllActiveCarSteering,
 };

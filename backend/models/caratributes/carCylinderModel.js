@@ -3,11 +3,12 @@ const mongoose = require("mongoose");
 const CarCylinderSchema = new mongoose.Schema(
   {
     carCylinder: {
-      type: String, 
+      type: String,
       required: true,
       trim: true,
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }

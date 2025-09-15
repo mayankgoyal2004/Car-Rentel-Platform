@@ -3,7 +3,8 @@ const CarFeatures = require("../../models/caratributes/carFeaturesModel");
 // Add Car Feature
 const addCarFeature = async (req, res) => {
   try {
-    const { carFeature } = req.body;
+    let { carFeature } = req.body;
+    carFeature = carFeature?.trim();
 
     if (!carFeature) {
       return res
@@ -13,7 +14,7 @@ const addCarFeature = async (req, res) => {
 
     const foundFeature = await CarFeatures.findOne({
       carFeature,
-      createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     if (foundFeature) {
@@ -25,6 +26,7 @@ const addCarFeature = async (req, res) => {
     const newFeature = new CarFeatures({
       carFeature,
       createdBy: req.user?._id,
+      admin: req.user.admin,
     });
 
     await newFeature.save();
@@ -43,7 +45,8 @@ const addCarFeature = async (req, res) => {
 const updateCarFeature = async (req, res) => {
   try {
     const { id } = req.params;
-    const { carFeature, status } = req.body;
+    let { carFeature, status } = req.body;
+    carFeature = carFeature?.trim();
 
     const feature = await CarFeatures.findById(id);
     if (!feature) {
@@ -95,14 +98,25 @@ const getAllCarFeatures = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
-
-    const features = await CarFeatures.find({ createdBy: _id })
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.carFeature = { $regex: search, $options: "i" };
+    }
+    const features = await CarFeatures.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalCarFeatures = await CarFeatures.countDocuments({ createdBy: _id });
+    const totalCarFeatures = await CarFeatures.countDocuments(filter);
 
     res.json({
       success: true,
@@ -122,9 +136,48 @@ const getAllCarFeatures = async (req, res) => {
   }
 };
 
+const getAllActiveCarFeatures = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const feature = await CarFeatures.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalFeature = await CarFeatures.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: feature,
+      pagination: {
+        totalFeature,
+        currentPage: page,
+        totalPages: Math.ceil(totalFeature / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
 module.exports = {
   addCarFeature,
   updateCarFeature,
   deleteCarFeature,
   getAllCarFeatures,
+  getAllActiveCarFeatures,
 };

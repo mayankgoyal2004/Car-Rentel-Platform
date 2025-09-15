@@ -388,102 +388,252 @@ route.get(
 //!! car brand route
 route.post(
   "/add-car-brand",
-
+  checkPermission("Car", "create"),
   upload.carBrandUpload.single("image"),
   carBrand.addCarBrand
 );
 route.post(
   "/update-car-brand/:id",
+  checkPermission("Car", "edit"),
+  upload.carBrandUpload.single("image"),
 
   carBrand.updateCarBrand
 );
-route.delete("/delete-car-brand/:id", carBrand.deleteBrand);
-route.get("/get-all-car-brand", carBrand.getAllBrand);
+route.delete(
+  "/delete-car-brand/:id",
+  checkPermission("Car", "delete"),
+  carBrand.deleteBrand
+);
+route.get(
+  "/get-all-car-brand",
+  checkPermission("Car", "view"),
+  carBrand.getAllBrand
+);
+route.get(
+  "/get-all-active-car-brand",
+  checkPermission("Car", "view"),
+  carBrand.getAllBrand
+);
 
 //!! car type route
-route.post("/add-car-type", carType.addCarType);
+route.post(
+  "/add-car-type",
+  checkPermission("Car", "create"),
+  carType.addCarType
+);
 route.post(
   "/update-car-type/:id",
+  checkPermission("Car", "edit"),
 
   carType.updateCarType
 );
-route.delete("/delete-car-type/:id", carType.deleteCarType);
-route.get("/get-all-car-type", carType.getAllCarTypes);
+route.delete(
+  "/delete-car-type/:id",
+  checkPermission("Car", "delete"),
+  carType.deleteCarType
+);
+route.get(
+  "/get-all-car-types",
+  checkPermission("Car", "view"),
+  carType.getAllCarTypes
+);
+route.get(
+  "/get-all-active-car-type",
+  checkPermission("Car", "view"),
+  carType.getAllActiveCarType
+);
 
 //!! car model routes
 
-route.post("/add-car-model", carModel.addCarModel);
+route.post(
+  "/add-car-model",
+  checkPermission("Car", "create"),
+  carModel.addCarModel
+);
 route.post(
   "/update-car-model/:id",
-
+  checkPermission("Car", "edit"),
   carModel.updateCarModel
 );
-route.delete("/delete-car-model/:id", carModel.deleteCarModel);
-route.get("/get-all-car-model", carModel.getAllCarModel);
+route.delete(
+  "/delete-car-model/:id",
+  checkPermission("Car", "view"),
+  carModel.deleteCarModel
+);
+route.get(
+  "/get-all-car-model",
+  checkPermission("Car", "view"),
+  carModel.getAllCarModel
+);
+route.get(
+  "/get-all-active-car-model",
+  checkPermission("Car", "view"),
+  carModel.getAllActiveCarModel
+);
 
 //!! car Transmission route
 route.post(
   "/add-car-transmission",
-
+  checkPermission("Car", "create"),
   carTransmission.addCarTransmission
 );
 route.post(
   "/update-car-transmission/:id",
-
+  checkPermission("Car", "edit"),
   carTransmission.updateCarTransmission
 );
 route.delete(
   "/delete-car-transmission/:id",
-
+  checkPermission("Car", "delete"),
   carTransmission.deleteCarTransmission
 );
 route.get(
   "/get-all-car-transmission",
-
+  checkPermission("Car", "view"),
   carTransmission.getAllCarTransmission
+);
+route.get(
+  "/get-all-active-car-transmission",
+  checkPermission("Car", "view"),
+  carTransmission.getAllActiveCarTransmission
 );
 
 //!! car fuel route
-route.post("/add-car-fuel", carFuel.addCarFuel);
+route.post(
+  "/add-car-fuel",
+  checkPermission("Car", "create"),
+  carFuel.addCarFuel
+);
 route.post(
   "/update-car-fuel/:id",
+  checkPermission("Car", "edit"),
 
   carFuel.updateCarFuel
 );
-route.delete("/delete-car-fuel/:id", carFuel.deleteCarFuel);
-route.get("/get-all-car-fuel", carFuel.getAllCarFuel);
+route.delete(
+  "/delete-car-fuel/:id",
+  checkPermission("Car", "delete"),
+  carFuel.deleteCarFuel
+);
+route.get(
+  "/get-all-car-fuel",
+  checkPermission("Car", "view"),
+  carFuel.getAllCarFuel
+);
+route.get(
+  "/get-all-active-car-fuel",
+  checkPermission("Car", "view"),
+  carFuel.getAllActiveCarFuels
+);
 
 //!! car color routes
-route.post("/add-car-color", carColor.addCarColor);
-route.post("/update-car-color/:id", carColor.updateCarColor);
-route.delete("/delete-car-color/:id", carColor.deleteCarColor);
-route.get("/get-all-car-color", carColor.getAllCarColor);
+route.post(
+  "/add-car-color",
+  checkPermission("Car", "create"),
+  carColor.addCarColor
+);
+route.post(
+  "/update-car-color/:id",
+  checkPermission("Car", "edit"),
+  carColor.updateCarColor
+);
+route.delete(
+  "/delete-car-color/:id",
+  checkPermission("Car", "delete"),
+  carColor.deleteCarColor
+);
+route.get(
+  "/get-all-car-color",
+  checkPermission("Car", "view"),
+  carColor.getAllCarColor
+);
+route.get(
+  "/get-all-active-car-color",
+  checkPermission("Car", "view"),
+  carColor.getAllActiveCarColor
+);
 
 //!! car steering routes
-route.post("/add-car-steering", carSteering.addCarSteering);
-route.post("/update-car-steering/:id", carSteering.updateCarSteering);
+route.post(
+  "/add-car-steering",
+  checkPermission("Car", "create"),
+  carSteering.addCarSteering
+);
+route.post(
+  "/update-car-steering/:id",
+  checkPermission("Car", "edit"),
+  carSteering.updateCarSteering
+);
 route.delete(
   "/delete-car-steering/:id",
+  checkPermission("Car", "delete"),
 
   carSteering.deleteCarSteering
 );
-route.get("/get-all-car-steering", carSteering.getAllCarSteering);
+route.get(
+  "/get-all-car-steering",
+  checkPermission("Car", "view"),
+  carSteering.getAllCarSteering
+);
+route.get(
+  "/get-all-active-car-steering",
+  checkPermission("Car", "view"),
+  carSteering.getAllActiveCarSteering
+);
 
 //!! car seats routes
-route.post("/add-car-seats", carSeats.addCarSeats);
-route.post("/update-car-seats/:id", carSeats.updateCarSeats);
-route.delete("/delete-car-seats/:id", carSeats.deleteCarSeats);
-route.get("/get-all-car-seats", carSeats.getAllCarSeats);
+route.post(
+  "/add-car-seats",
+  checkPermission("Car", "create"),
+  carSeats.addCarSeats
+);
+route.post(
+  "/update-car-seats/:id",
+  checkPermission("Car", "edit"),
+  carSeats.updateCarSeats
+);
+route.delete(
+  "/delete-car-seats/:id",
+  checkPermission("Car", "delete"),
+  carSeats.deleteCarSeats
+);
+route.get(
+  "/get-all-car-seats",
+  checkPermission("Car", "view"),
+  carSeats.getAllCarSeats
+);
+route.get(
+  "/get-all-active-car-seats",
+  checkPermission("Car", "view"),
+  carSeats.getAllActiveCarSeats
+);
 
 //!! car cylinder routes
-route.post("/add-car-cylinder", carCylinder.addCarCylinder);
-route.post("/update-car-cylinder/:id", carCylinder.updateCarCylinder);
+route.post(
+  "/add-car-cylinder",
+  checkPermission("Car", "create"),
+  carCylinder.addCarCylinder
+);
+route.post(
+  "/update-car-cylinder/:id",
+  checkPermission("Car", "edit"),
+  carCylinder.updateCarCylinder
+);
 route.delete(
   "/delete-car-cylinder/:id",
-
+  checkPermission("Car", "delete"),
   carCylinder.deleteCarCylinder
 );
-route.get("/get-all-car-cylinder", carCylinder.getAllCarCylinder);
+route.get(
+  "/get-all-car-cylinder",
+  checkPermission("Car", "view"),
+  carCylinder.getAllCarCylinder
+);
+route.get(
+  "/get-all-active-car-cylinder",
+  checkPermission("Car", "view"),
+  carCylinder.getAllActiveCarCylinder
+);
 
 //!! car doors routes
 route.post("/add-car-doors", carDoors.addCarDoors);
@@ -492,26 +642,56 @@ route.delete("/delete-car-doors/:id", carDoors.deleteCarDoors);
 route.get("/get-all-car-doors", carDoors.getAllCarDoors);
 
 //!! car features routes
-route.post("/add-car-feature", carFeatures.addCarFeature);
-route.post("/update-car-feature/:id", carFeatures.updateCarFeature);
-route.delete("/delete-car-feature/:id", carFeatures.deleteCarFeature);
-route.get("/get-all-car-features", carFeatures.getAllCarFeatures);
+route.post(
+  "/add-car-feature",
+  checkPermission("Car", "create"),
+  carFeatures.addCarFeature
+);
+route.post(
+  "/update-car-feature/:id",
+  checkPermission("Car", "edit"),
+  carFeatures.updateCarFeature
+);
+route.delete(
+  "/delete-car-feature/:id",
+  checkPermission("Car", "delete"),
+  carFeatures.deleteCarFeature
+);
+route.get(
+  "/get-all-car-features",
+  checkPermission("Car", "view"),
+  carFeatures.getAllCarFeatures
+);
+route.get(
+  "/get-all-acitve-car-features",
+  checkPermission("Car", "view"),
+  carFeatures.getAllActiveCarFeatures
+);
 
 //!! car safety features routes
-route.post("/add-safety-feature", carSafetyFeature.addSafetyFeature);
+route.post(
+  "/add-safety-feature",
+  checkPermission("Car", "create"),
+  carSafetyFeature.addSafetyFeature
+);
 route.post(
   "/update-safety-feature/:id",
-
+  checkPermission("Car", "edit"),
   carSafetyFeature.updateSafetyFeature
 );
 route.delete(
   "/delete-safety-feature/:id",
-
+  checkPermission("Car", "delete"),
   carSafetyFeature.deleteSafetyFeature
 );
 route.get(
   "/get-all-safety-features",
-
+  checkPermission("Car", "view"),
+  carSafetyFeature.getAllSafetyFeatures
+);
+route.get(
+  "/get-all-active-safety-features",
+  checkPermission("Car", "view"),
   carSafetyFeature.getAllSafetyFeatures
 );
 

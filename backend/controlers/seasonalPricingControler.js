@@ -70,6 +70,13 @@ const updateSeasonalPricing = async (req, res) => {
         .status(404)
         .json({ success: false, message: "Seasonal Pricing not found" });
     }
+    if (status === undefined || status === null) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Status is required",
+      });
+    }
 
     season.seasonName = seasonName;
     season.startDate = startDate;
@@ -78,7 +85,7 @@ const updateSeasonalPricing = async (req, res) => {
     season.weeklyRate = weeklyRate;
     season.monthlyRate = monthlyRate;
     season.lateFees = lateFees;
-    if (status !== undefined) season.status = status;
+    season.status = status;
 
     await season.save();
 
@@ -127,7 +134,7 @@ const getAllSeasonalPricing = async (req, res) => {
     }
     let filter = { admin: adminId };
     if (search) {
-      filter.seasonName  = { $regex: search, $options: "i" };
+      filter.seasonName = { $regex: search, $options: "i" };
     }
     const seasonalPricing = await SeasonalPricing.find(filter)
       .sort({ createdAt: -1 })

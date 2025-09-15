@@ -6,21 +6,23 @@ const addExtraService = async (req, res) => {
     const { name, quantity, price, type, description } = req.body;
 
     if (!name || !quantity || !price || !type) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All required fields must be provided" });
+      return res.status(400).json({
+        success: false,
+        message: "All required fields must be provided",
+      });
     }
 
     const foundService = await ExtraService.findOne({
       name,
       type,
-      createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     if (foundService) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Service with this name already exists" });
+      return res.status(400).json({
+        success: false,
+        error: "Service with this name already exists",
+      });
     }
 
     const newService = new ExtraService({
@@ -30,6 +32,7 @@ const addExtraService = async (req, res) => {
       type,
       description,
       createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     await newService.save();
@@ -52,15 +55,24 @@ const updateExtraService = async (req, res) => {
 
     const service = await ExtraService.findById(id);
     if (!service) {
-      return res.status(404).json({ success: false, message: "Service not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Service not found" });
+    }
+    if (status === undefined || status === null) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Status is required",
+      });
     }
 
-    if (name) service.name = name;
-    if (quantity !== undefined) service.quantity = quantity;
-    if (price !== undefined) service.price = price;
-    if (type) service.type = type;
-    if (description !== undefined) service.description = description;
-    if (status !== undefined) service.status = status;
+    service.name = name;
+    service.quantity = quantity;
+    service.price = price;
+    service.type = type;
+    service.description = description;
+    service.status = status;
 
     await service.save();
 
@@ -81,7 +93,9 @@ const deleteExtraService = async (req, res) => {
 
     const service = await ExtraService.findById(id);
     if (!service) {
-      return res.status(404).json({ success: false, message: "Service not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Service not found" });
     }
 
     await ExtraService.deleteOne({ _id: id });
@@ -100,14 +114,26 @@ const getAllExtraServices = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
 
-    const services = await ExtraService.find({ createdBy: _id })
+    const services = await ExtraService.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalServices = await ExtraService.countDocuments({ createdBy: _id });
+    const totalServices = await ExtraService.countDocuments(filter);
 
     res.json({
       success: true,

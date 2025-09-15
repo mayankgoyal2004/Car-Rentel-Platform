@@ -320,7 +320,7 @@ route.get(
   state.getAllState
 );
 route.get(
-  "/get-state-by-country",
+  "/get-state-by-country/:countryId",
   checkPermission("location", "view"),
   state.getStatesByCountry
 );
@@ -348,7 +348,7 @@ route.get(
   city.getAllCity
 );
 route.get(
-  "/get-city-by-state",
+  "/get-city-by-state/:stateId",
   checkPermission("location", "view"),
   city.getCitiesByState
 );
@@ -361,18 +361,27 @@ route.get(
 //!!location route
 route.post(
   "/add-location",
-
+  checkPermission("location", "create"),
   upload.locationUpload.single("image"),
   location.addLocation
 );
 route.post(
-  "/add-update-location",
-
+  "/update-location/:id",
+  checkPermission("location", "edit"),
   upload.locationUpload.single("image"),
   location.updateLocation
 );
 
-route.delete("/delete-location", location.deleteLocation);
+route.delete(
+  "/delete-location/:id",
+  checkPermission("location", "delete"),
+  location.deleteLocation
+);
+route.get(
+  "/get-all-location",
+  checkPermission("location", "view"),
+  location.getAllLocation
+);
 
 //!! car attributes router
 
@@ -508,20 +517,24 @@ route.get(
 
 //!extra service
 
-route.post("/add-extra-service", extraService.addExtraService);
+route.post(
+  "/add-extra-service",
+  checkPermission("Car", "create"),
+  extraService.addExtraService
+);
 route.post(
   "/update-extra-service/:id",
-
+  checkPermission("Car", "edit"),
   extraService.updateExtraService
 );
 route.delete(
   "/delete-extra-service/:id",
-
+  checkPermission("Car", "delete"),
   extraService.deleteExtraService
 );
 route.get(
   "/get-all-extra-services",
-
+  checkPermission("Car", "view"),
   extraService.getAllExtraServices
 );
 

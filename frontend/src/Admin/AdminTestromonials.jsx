@@ -258,7 +258,7 @@ const AdminTestimonials = () => {
                               data-bs-target="#edit_testimonial"
                               onClick={() => {
                                 setSelectedTestimonial(item);
-                                 console.log("Edit clicked, item:", item);
+                               
                                 setFormData({
                                   
                                   _id: item._id,

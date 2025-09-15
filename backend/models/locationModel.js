@@ -29,7 +29,9 @@ const locationSchema = new mongoose.Schema(
       sunday: { from: String, to: String, active: Boolean },
     },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     status: { type: Boolean, default: true },
+   
   },
   { timestamps: true }
 );

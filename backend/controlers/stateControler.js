@@ -171,7 +171,7 @@ const getStatesByCountry = async (req, res) => {
       country: countryId,
       status: true,
       admin: req.user.admin,
-    }).populate("country", "countryName");
+    })
 
     res.json({ success: true, data: states });
   } catch (err) {

@@ -150,8 +150,8 @@ const getCitiesByState = async (req, res) => {
     const cities = await City.find({
       state: stateId,
       status: true,
-      createdBy: req.user._id,
-    }).populate("State", "stateName");
+      admin: req.user.admin,
+    })
 
     res.json({ success: true, data: cities });
   } catch (err) {

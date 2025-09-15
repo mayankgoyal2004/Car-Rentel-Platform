@@ -342,6 +342,11 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  getStateByCountry(countryId) {
+    return axios.get(BASE_URL + `get-state-by-country/${countryId}`, {
+      headers: getAuthHeaders(),
+    });
+  }
   addState(data) {
     return axios.post(BASE_URL + "add-state", data, {
       headers: getAuthHeaders(),
@@ -367,6 +372,11 @@ class apiServices {
   }
   getAllActiveCity() {
     return axios.get(BASE_URL + `get-all-active-city`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getCityByState(stateId) {
+    return axios.get(BASE_URL + `get-city-by-state/${stateId}`, {
       headers: getAuthHeaders(),
     });
   }
@@ -438,6 +448,34 @@ class apiServices {
 
   updateExtraService(id, data) {
     return axios.post(BASE_URL + `update-extra-service/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!! location api
+  getAllLocation({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-location?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+
+  addLocation(data) {
+    return axios.post(BASE_URL + "add-location", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteLocation(data) {
+    return axios.delete(BASE_URL + `delete-location/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  updateLocation(id, data) {
+    return axios.post(BASE_URL + `update-location/${id}`, data, {
       headers: getAuthHeaders(),
     });
   }

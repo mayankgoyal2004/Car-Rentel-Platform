@@ -1,4 +1,4 @@
-const { findById } = require("../models/citymodels");
+const { City } = require("../models/citymodels");
 const Location = require("../models/locationModel");
 
 const addLocation = async (req, res) => {
@@ -14,6 +14,7 @@ const addLocation = async (req, res) => {
       pincode,
       workingDays,
     } = req.body;
+    console.log("req.file:", req.file);
 
     if (!title) {
       return res
@@ -51,13 +52,23 @@ const addLocation = async (req, res) => {
         .json({ success: false, message: "city is required" });
     }
 
-    const imagePath = req.files?.image
-      ? req.files.path.replace(/\\/g, "/")
-      : null;
-    // if (!imagePath)
-    //   return res
-    //     .status(400)
-    //     .json({ success: false, message: "Image is required" });
+    const imagePath = req.file ? req.file.path.replace(/\\/g, "/") : null;
+
+    if (!imagePath) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Image is required" });
+    }
+    let parsedWorkingDays;
+    try {
+      parsedWorkingDays =
+        typeof workingDays === "string" ? JSON.parse(workingDays) : workingDays;
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid workingDays format" });
+    }
+
     const newLocation = new Location({
       title,
       email,
@@ -68,8 +79,9 @@ const addLocation = async (req, res) => {
       image: imagePath,
       city: city_id,
       pincode,
-      workingDays,
+      workingDays: parsedWorkingDays,
       createdBy: req.user?._id,
+      admin: req.user?.admin,
     });
 
     await newLocation.save();
@@ -144,18 +156,26 @@ const updateLocation = async (req, res) => {
         .json({ success: false, message: "city is required" });
     }
 
-    if (req.files?.image) {
-      updateLocation.image = req.files.path.replace(/\\/g, "/");
+    if (req.file) {
+      updateLocation.image = req.file.path.replace(/\\/g, "/");
+    }
+    let parsedWorkingDays;
+    try {
+      parsedWorkingDays =
+        typeof workingDays === "string" ? JSON.parse(workingDays) : workingDays;
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid workingDays format" });
     }
 
     updateLocation.title = title;
-    updateLocation.image = imagePath;
     updateLocation.contact = contact;
     updateLocation.email = email;
     updateLocation.country = country_id;
     updateLocation.state = state_id;
     updateLocation.city = city_id;
-    updateLocation.workingDays = workingDays;
+    updateLocation.workingDays = parsedWorkingDays;
     updateLocation.status = status;
     updateLocation.location = location;
 
@@ -174,7 +194,7 @@ const updateLocation = async (req, res) => {
 const deleteLocation = async (req, res) => {
   try {
     const { id } = req.params;
-    const location = await findById(id);
+    const location = await Location.findById(id);
     if (!location) {
       return res
         .status(404)
@@ -191,4 +211,50 @@ const deleteLocation = async (req, res) => {
   }
 };
 
-module.exports = { addLocation, updateLocation, deleteLocation };
+const getAllLocation = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+    }
+
+    const location = await Location.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalLocation = await Location.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: location,
+      pagination: {
+        totalLocation,
+        currentPage: page,
+        totalPages: Math.ceil(totalLocation / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
+module.exports = {
+  addLocation,
+  updateLocation,
+  deleteLocation,
+  getAllLocation,
+};

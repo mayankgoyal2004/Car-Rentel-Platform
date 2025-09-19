@@ -8,20 +8,21 @@ const ReservationSchema = new mongoose.Schema(
       ref: "customer",
       required: true,
     },
-    createdBy: {
+    driver: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "Driver",
+      default: null,
     },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
     rentalType: {
       type: String,
       enum: ["delivery", "selfPickup"],
       required: true,
     },
-    pricing: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Pricing",
-    },
+
+    pricing: { type: mongoose.Schema.Types.ObjectId, ref: "Pricing" },
     bookingId: { type: String, unique: true },
     cancellation: {
       reason: { type: String },
@@ -33,65 +34,65 @@ const ReservationSchema = new mongoose.Schema(
       refundAmount: { type: Number, default: 0 },
     },
 
-    pickupLocation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Location",
-    },
-    pickupAddress: { type: String }, // user-typed, optional
-    dropLocation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Location",
-    },
-    dropAddress: { type: String }, 
+    pickupLocation: { type: mongoose.Schema.Types.ObjectId, ref: "Location" },
+    pickupAddress: { type: String },
+    dropLocation: { type: mongoose.Schema.Types.ObjectId, ref: "Location" },
+    dropAddress: { type: String },
 
-    noOfPassengers: { type: Number },
+    passengers: { type: Number, min: 1 },
+    securityDeposit: { type: Number, default: 0 },
 
     bookingType: {
       type: String,
-      enum: ["day", "weekly", "monthly", "yearly"],
+      enum: ["daily", "weekly", "monthly", "yearly"],
       required: true,
     },
-    pickupTime: { type: Date, required: true },
-    dropTime: { type: Date, required: true },
+    pickupTime: { type: String, required: true },
+    dropTime: { type: String, required: true },
     pickupDate: { type: Date, required: true },
     dropDate: { type: Date, required: true },
-    driver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Driver",
-      default: null,
-    },
+
     paymentStatus: {
       type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "pending",
+      enum: ["Pending", "Partial", "Paid", "Refunded"],
+      default: "Pending",
     },
     paymentMethod: {
       type: String,
-      enum: ["card", "upi", "cash", "wallet"],
-      default: "cash",
+      enum: [
+        "Credit Card",
+        "Debit Card",
+        "Cash",
+        "Bank Transfer",
+        "Digital Wallet",
+      ],
+      default: "Credit Card",
     },
     transactionId: { type: String },
 
-    extraService: [
+    extraServices: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ExtraService",
+        ref: "Service",
       },
     ],
     driverType: { type: String, enum: ["self", "withDriver"], required: true },
 
-    couponCode: { type: String, default: null },
+    driverPrice: { type: Number, default: 0 },
+    baseKilometers: { type: Number, default: 100 },
+    kmExtraPrice: { type: Number, default: 0 },
+    carPrice: { type: Number },
+    totalPrice: { type: Number },
     pricingDetails: {
       basePrice: { type: Number },
-      extraServiceCost: { type: Number, default: 0 },
       driverCost: { type: Number, default: 0 },
       discount: { type: Number, default: 0 },
       tax: { type: Number, default: 0 },
       finalAmount: { type: Number },
-      securityDeposit: { type: Number, default: 0 },
+      security: { type: Number, default: 0 },
     },
     cancellationReason: { type: String },
-    rejectionReason : {type:String},
+    rejectionReason: { type: String },
     status: {
       type: String,
       enum: [

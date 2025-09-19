@@ -39,6 +39,9 @@ const testimonial = require("../controlers/testimonialController");
 const faqCategory = require("../controlers/faqCategoryControler");
 const faq = require("../controlers/faqControler");
 const checkSubscription = require("../middlewares/checkPermission");
+const reservation = require("../controlers/reservationControler");
+const contact = require("../controlers/contactUsControler");
+
 
 const route = express.Router();
 
@@ -57,9 +60,27 @@ route.post("/verify-email", userRoute.verifyEmail);
 route.get("/get-all-testimonial-user", testimonial.getTestimonialsPublic);
 route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
 
+
+//!! comments api blog 
+route.get("/blogs/get-all-comments-user/:blogId", blogComments.getCommentBlog);
+
+
+
 //!! get all faq for public without authentication
 route.get("/get-all-active-faq", faq.getActiveFaqs);
 route.get("/get-all-active-faq-homepage", faq.getHomepageFaqs);
+route.get(
+  "/blogs/all-active-category-home",
+  BlogCategory.getAllActiveBlogCategoryHomePage
+);
+
+//!! get all cars api 
+route.get(
+  "/all-cars-home-page",
+  car.getAllCars
+);
+//!!contact
+route.post("/add-constact", contact.addContact);
 
 //!! blog
 route.get("/blogs/user", blog.getBlogForUser);
@@ -103,10 +124,8 @@ route.delete(
 
 // !!comment route for blogs
 route.post("/blogs/comments/:blogId", blogComments.createComment);
-route.get("/blogs/get-all-comments", blogComments.getAllComments);
-route.get("/blogs/get-comments/:blogId", blogComments.getCommentBlog);
-route.put("/blogs/comments/status", blogComments.updateCommentStatus);
-route.delete("/blogs/comments/delete/:id", blogComments.deleteBlogComment);
+route.get("/blogs/get-comments-admin", checkPermission("blog", "view"), blogComments.getAllComments);
+route.delete("/blogs/comments/delete/:id",checkPermission("blog", "delete"), blogComments.deleteBlogComment);
 
 // !!Category route for blog
 route.post(
@@ -129,11 +148,7 @@ route.delete(
   checkPermission("Blog", "delete"),
   BlogCategory.deleteBlogCategory
 );
-route.get(
-  "/blogs/all-active-category",
-  checkPermission("Blog", "view"),
-  BlogCategory.getAllActiveBlogCategory
-);
+route.get("/blogs/all-active-category", BlogCategory.getAllActiveBlogCategory);
 route.get(
   "/blog-all-category-superadmin",
   checkPermission("Blog", "assignPackage", true),
@@ -212,7 +227,7 @@ route.delete(
 // !!driver route
 route.post(
   "/add-driver",
-  authUser,
+  checkPermission("Driver", "create"),
   upload.driverUpload.fields([
     { name: "image", maxCount: 1 }, // 1 profile image
     { name: "file", maxCount: 1 }, // 1 license image
@@ -221,19 +236,33 @@ route.post(
 );
 route.post(
   "/update-driver/:id",
+  checkPermission("Driver", "edit"),
   upload.driverUpload.fields([
     { name: "image", maxCount: 1 }, // 1 profile image
     { name: "file", maxCount: 1 }, // 1 license image
   ]),
   driver.updateDriver
 );
-route.delete("/delete-driver/:id", driver.deleteDriver);
-route.get("/get-all-driver", authUser, driver.getAllDriver);
+route.delete(
+  "/delete-driver/:id",
+  checkPermission("Driver", "delete"),
+  driver.deleteDriver
+);
+route.get(
+  "/get-all-driver",
+  checkPermission("Driver", "view"),
+  driver.getAllDriver
+);
+route.get(
+  "/get-all-active-driver",
+  checkPermission("Driver", "view"),
+  driver.getAllActiveDriver
+);
 
 //!!customer routes
 route.post(
   "/add-customer",
-  authUser,
+  checkPermission("Customer", "create"),
   upload.customerUpload.fields([
     { name: "image", maxCount: 1 }, // 1 profile image
     { name: "file", maxCount: 1 }, // 1 license image
@@ -242,14 +271,34 @@ route.post(
 );
 route.post(
   "/update-customer/:id",
+  checkPermission("Customer", "edit"),
+
   upload.customerUpload.fields([
     { name: "image", maxCount: 1 }, // 1 profile image
     { name: "file", maxCount: 1 }, // 1 license image
   ]),
   customer.updateCustomer
 );
-route.delete("/delete-customer/:id", authUser, customer.deleteCustomer);
-route.get("/get-all-customer", authUser, customer.getAllcustomer);
+route.delete(
+  "/delete-customer/:id",
+  checkPermission("Customer", "delete"),
+  customer.deleteCustomer
+);
+route.get(
+  "/get-all-customer",
+  checkPermission("Customer", "view"),
+  customer.getAllcustomer
+);
+route.get(
+  "/get-customer-by-id/:id",
+  checkPermission("Customer", "view"),
+  customer.getCustomerbyId
+);
+route.get(
+  "/get-all-active-customer",
+  checkPermission("Customer", "view"),
+  customer.getallActiveCustomers
+);
 
 // !! company routes
 
@@ -381,6 +430,11 @@ route.get(
   "/get-all-location",
   checkPermission("location", "view"),
   location.getAllLocation
+);
+route.get(
+  "/get-all-active-location",
+  checkPermission("location", "view"),
+  location.getAllActiveLocation
 );
 
 //!! car attributes router
@@ -717,6 +771,11 @@ route.get(
   checkPermission("Car", "view"),
   extraService.getAllExtraServices
 );
+route.get(
+  "/get-all-active-extra-services",
+  checkPermission("Car", "view"),
+  extraService.getAllActiveExtraService
+);
 
 //! seasional pricing route
 route.post(
@@ -739,41 +798,60 @@ route.get(
   checkPermission("Car", "view"),
   seasonalPricing.getAllSeasonalPricing
 );
+route.get(
+  "/get-all-active-seasonal-pricing",
+  checkPermission("Car", "view"),
+  seasonalPricing.getAllActiveSeasionlaPricing
+);
 
 //!! car controler
-route.post("/add-Car", checkPermission("car", "create"), car.addCar);
-route.post("cars/:id/pricing", pricing.updateCarPricing);
+route.post(
+  "/add-car",
+  checkPermission("car", "create"),
+  upload.carImageUpload.single("image"),
+  car.addCar
+);
+route.post("/update-cars/:id/pricing", pricing.updateCarPricing);
 route.put("/cars/:id/pricing", pricing.editCarPricing);
 route.put("/update-car/:id/features", car.updateCarFeatures);
 route.put("/update-car/:id/extraService", car.updateCarExtraService);
-route.post("/update-car/:id/damage", damage.addDamage);
-route.get("/get-car/:id/damage", damage.getDamagesByCar);
-route.delete("/delete-car/:id/damage", damage.deleteDamage);
-route.put("/edit-car/:id/damage", damage.editDamage);
-route.post("/update-car/:id/faq", carFaq.addCarFaq);
-route.get("/get-car/:id/faq", carFaq.getCarFaqs);
-route.delete("/delete-car/:id/faq", carFaq.deleteFaq);
-route.put("/edit-car/:id/faq", carFaq.editFaq);
+// route.post("/update-car/:id/damage", damage.addDamage);
+// route.get("/get-car/:id/damage", damage.getDamagesByCar);
+// route.delete("/delete-car/:id/damage", damage.deleteDamage);
+// route.put("/edit-car/:id/damage", damage.editDamage);
+route.post("/cars/:carId/damages", car.saveCarDamages);
+
+route.post("/cars/:carId/faqs", car.saveCarFaqs);
+// route.get("/get-car/:id/faq", carFaq.getCarFaqs);
+// route.delete("/delete-car/:id/faq", carFaq.deleteFaq);
+// route.put("/edit-car/:id/faq", carFaq.editFaq);
+route.get("/get-all-cars-super-admin", car.getAllCarsForSuperAdmin);
 
 route.post(
   "/cars/:carId/upload",
-  upload.carFilesUpload.array("files"),
+  upload.carFilesUpload.fields([
+    { name: "documents", maxCount: 10 },
+    { name: "policies", maxCount: 10 },
+    { name: "videos", maxCount: 10 },
+  ]),
   car.uploadCarFiles
 );
 
-// route.get("/get-quick-car", car.quickSearchCar);
-// route.get("/get-all-car", car.getAllCar);
-// route.get("/get-car-by/:id", car.getCarById);
+route.get(
+  "/get-all-car-admin",
+  checkPermission("Car", "view"),
+  car.getAllCarsForAdmin
+);
 
 //!! wishlist
-route.post("/toggle-wishlist", authUser, wishlist.toggleWishlist);
-route.get("/get-wishlist", authUser, wishlist.getWishlist);
+route.post("/toggle-wishlist", wishlist.toggleWishlist);
+route.get("/get-wishlist", wishlist.getWishlist);
 
 //!! Enquiry
 
-route.post("/add-enquiry", authUser, enquiry.addEnquiry);
-route.get("/get-enquiry", authUser, enquiry.getallEnquiry);
-route.delete("/delete-enquiry/:id", authUser, enquiry.deleteEnquiry);
+route.post("/add-enquiry", enquiry.addEnquiry);
+route.get("/get-enquiry", enquiry.getallEnquiry);
+route.delete("/delete-enquiry/:id", enquiry.deleteEnquiry);
 
 //!! carReview
 
@@ -887,5 +965,44 @@ route.delete(
   checkPermission("admin", "assignPackage", true),
   faq.deleteFaq
 );
+
+//!! reservation api for admin
+route.get(
+  "/get-all-reservation",
+  checkPermission("Reservation", "view"),
+  reservation.getAllReservationsForAdmin
+);
+route.post(
+  "/add-reservation-admin",
+  checkPermission("Reservation", "Create"),
+  reservation.addReservation
+);
+route.get(
+  "/get-reservation-by/:id",
+  checkPermission("Reservation", "view"),
+  reservation.getsingleReservation
+);
+// route.get("/get-reservation-by-id/:id", reservation.getReservationById);
+route.put("/update-reservation/:id", reservation.updateReservation);
+route.delete("/delete-reservation/:id", reservation.deleteReservation);
+route.get(
+  "/get-all-active-reservation-admin",
+  car.getApprovedCarsAdminReservation
+);
+
+//!!! contact api
+route.get(
+  "/get-all-contact-admin",
+  checkPermission("admin", "assignPackage", true),
+  contact.getAllContacts
+);
+route.delete(
+  "/delete-constact/:id",
+  checkPermission("admin", "assignPackage", true),
+  contact.deleteContact
+);
+
+
+
 
 module.exports = route;

@@ -251,10 +251,47 @@ const getAllLocation = async (req, res) => {
       .json({ success: false, message: "Server Error", error: err.message });
   }
 };
+const getAllActiveLocation = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
 
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const location = await Location.find({ admin: adminId, status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalLocation = await Location.countDocuments({
+      admin: adminId,
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: location,
+      pagination: {
+        totalLocation,
+        currentPage: page,
+        totalPages: Math.ceil(totalLocation / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 module.exports = {
   addLocation,
   updateLocation,
   deleteLocation,
   getAllLocation,
+  getAllActiveLocation
 };

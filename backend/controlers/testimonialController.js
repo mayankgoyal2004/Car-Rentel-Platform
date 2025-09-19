@@ -98,15 +98,15 @@ const getAllTestimonialsAdmin = async (req, res) => {
 
 getTestimonialsPublic = async (req, res) => {
   try {
-    const { page = 1, limit = 6 } = req.query;
+    const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
 
-    const testimonials = await Testimonial.find({ status: "active" })
+    const testimonials = await Testimonial.find({ status: true })
       .skip(skip)
       .limit(Number(limit))
       .sort({ createdAt: -1 });
 
-    const total = await Testimonial.countDocuments({ status: "active" });
+    const total = await Testimonial.countDocuments({ status: true });
 
     res.json({
       success: true,
@@ -122,7 +122,7 @@ getTestimonialsPublic = async (req, res) => {
 
 getHomepageTestimonials = async (req, res) => {
   try {
-    const testimonials = await Testimonial.find({ status: "active" })
+    const testimonials = await Testimonial.find({ status: true })
       .sort({ createdAt: -1 })
       .limit(3);
 

@@ -168,6 +168,36 @@ const getAllActiveBlogCategory = async (req, res) => {
       .json({ success: false, message: "Server Error", error: err.message });
   }
 };
+const getAllActiveBlogCategoryHomePage = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const BlogCategory = await blogCategory
+      .find({ status: true })
+
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalBlogComments = await blogCategory.countDocuments({
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: BlogCategory,
+      pagination: {
+        totalBlogComments,
+        currentPage: page,
+        totalPages: Math.ceil(totalBlogComments / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 
 const deleteBlogCategory = async (req, res) => {
   var validation = "";
@@ -197,7 +227,7 @@ const deleteBlogCategory = async (req, res) => {
   }
 };
 
-const getAllBlogTagSuperAdmin = async (req, res) => {
+const getAllBlogCategorySuperAdmin = async (req, res) => {
   try {
     if (req.user.userType !== 1)
       return res.status(403).json({ message: "SuperAdmin only" });
@@ -241,5 +271,6 @@ module.exports = {
   getAllBlogCategory,
   deleteBlogCategory,
   getAllActiveBlogCategory,
-  getAllBlogTagSuperAdmin,
+  getAllBlogCategorySuperAdmin,
+  getAllActiveBlogCategoryHomePage,
 };

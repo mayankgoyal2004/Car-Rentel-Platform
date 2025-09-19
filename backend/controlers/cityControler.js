@@ -151,7 +151,7 @@ const getCitiesByState = async (req, res) => {
       state: stateId,
       status: true,
       admin: req.user.admin,
-    })
+    });
 
     res.json({ success: true, data: cities });
   } catch (err) {
@@ -163,7 +163,6 @@ const getAllActiveCity = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const adminId = req.user.admin;
 
     if (!adminId) {
       return res.status(400).json({
@@ -197,6 +196,32 @@ const getAllActiveCity = async (req, res) => {
   }
 };
 
+const getAllactiveCityHomepage = async (req, res) => {
+  try {
+    const city = await City.find({ status: true })
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalcity = await City.countDocuments({
+      status: true,
+    });
+
+    res.json({
+      success: true,
+      data: city,
+      pagination: {
+        totalcity,
+        currentPage: page,
+        totalPages: Math.ceil(totalcity / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
 module.exports = {
   addCity,
   deleteCity,
@@ -204,4 +229,5 @@ module.exports = {
   updateCity,
   getCitiesByState,
   getAllActiveCity,
+  getAllactiveCityHomepage
 };

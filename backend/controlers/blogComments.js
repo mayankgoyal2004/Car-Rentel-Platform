@@ -34,14 +34,14 @@ const getCommentBlog = async (req, res) => {
     const limit = parseInt(req.query.limit) || 3;
 
     const comments = await Comment.find({ blog: blogId, status: true })
-      .populate("user", "name email image")
+      .populate("createdBy", "name email image")
       .sort({ created_at: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
     const totalComments = await Comment.countDocuments({
       blog: blogId,
-      isActive: true,
+      status: true,
     });
 
     res.json({
@@ -64,17 +64,30 @@ const getAllComments = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = {};
+    if (search) {
+      filter.message = { $regex: search, $options: "i" };
+    }
 
-    const myBlogs = await Blog.find({ userId: _id }).select("_id");
+    const myBlogs = await Blog.find({ admin: req.user.admin }).select("_id");
     const blogId = myBlogs.map((blog) => blog._id);
 
-    const comments = await Comment.find({ blog: { $in: blogId } }, "message")
-      .populate("user", "name email image")
+    const comments = await Comment.find({ blog: { $in: blogId }, ...filter })
+      .populate("createdBy", "userName email image")
       .populate("blog", "title")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
+
     const totalComments = await Comment.countDocuments();
 
     res.json({
@@ -93,29 +106,38 @@ const getAllComments = async (req, res) => {
   }
 };
 const deleteBlogComment = async (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if (!id) {
-    es.json({
-      status: 409,
-      success: false,
-      message: "Id is Required",
-    });
-  }
+    if (!id) {
+      return res.json({
+        status: 409,
+        success: false,
+        message: "Id is Required",
+      });
+    }
 
-  const comment = await Comment.findById(id);
-  if (!comment) {
-    res.json({
-      status: 409,
-      success: false,
-      message: "Data not Found!",
-    });
-  } else {
+    const comment = await Comment.findById(id);
+    if (!comment) {
+      return res.json({
+        status: 409,
+        success: false,
+        message: "Data not Found!",
+      });
+    }
+
     await Comment.deleteOne({ _id: id });
     res.json({
       status: 200,
       success: true,
       message: "Comment Successfully Deleted",
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Server Error",
+      error: err.message,
     });
   }
 };

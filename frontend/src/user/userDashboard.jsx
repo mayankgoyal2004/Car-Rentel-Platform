@@ -78,24 +78,7 @@ const UserDashboard = () => {
                         <span>Messages</span>
                       </Link>
                     </li>
-                    <li>
-                      <Link to="user-wallet">
-                        <img
-                          src="/user-assets/img/icons/wallet-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>My Wallet</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="user-payment">
-                        <img
-                          src="/user-assets/img/icons/payment-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>Payments</span>
-                      </Link>
-                    </li>
+
                     <li>
                       <Link to="user-setting">
                         <img
@@ -288,7 +271,10 @@ const UserDashboard = () => {
               <div className="modal-body">
                 <div className="order-success-info">
                   <span className="order-success-icon">
-                    <img src="/user-assets/img/icons/check-icon.svg" alt="Icon" />
+                    <img
+                      src="/user-assets/img/icons/check-icon.svg"
+                      alt="Icon"
+                    />
                   </span>
                   <h4>Successful</h4>
                   <p>
@@ -777,7 +763,10 @@ const UserDashboard = () => {
               <div className="modal-body">
                 <div className="order-success-info">
                   <span className="order-success-icon">
-                    <img src="/user-assets/img/icons/check-icon.svg" alt="Icon" />
+                    <img
+                      src="/user-assets/img/icons/check-icon.svg"
+                      alt="Icon"
+                    />
                   </span>
                   <h4>Successful</h4>
                   <p>
@@ -1177,7 +1166,10 @@ const UserDashboard = () => {
                         <p>Started on : 20 Oct 2023</p>
                       </div>
                       <div className="status-img">
-                        <img src="/user-assets/img/icons/card-icon.svg" alt="Img" />
+                        <img
+                          src="/user-assets/img/icons/card-icon.svg"
+                          alt="Img"
+                        />
                       </div>
                     </div>
                     <div className="refund-process">
@@ -1477,7 +1469,10 @@ const UserDashboard = () => {
                           defaultValue="wallet_one"
                         />
                         <span className="checkmark" />
-                        <img src="/user-assets/img/icons/payment-1.svg" alt="Icon" />
+                        <img
+                          src="/user-assets/img/icons/payment-1.svg"
+                          alt="Icon"
+                        />
                       </label>
                       <label className="custom_radio">
                         <input
@@ -1486,7 +1481,10 @@ const UserDashboard = () => {
                           defaultValue="wallet_one"
                         />
                         <span className="checkmark" />
-                        <img src="/user-assets/img/icons/payment-2.svg" alt="Icon" />
+                        <img
+                          src="/user-assets/img/icons/payment-2.svg"
+                          alt="Icon"
+                        />
                       </label>
                       <label className="custom_radio">
                         <input
@@ -1496,7 +1494,10 @@ const UserDashboard = () => {
                           defaultChecked
                         />
                         <span className="checkmark" />
-                        <img src="/user-assets/img/icons/payment-3.svg" alt="Icon" />
+                        <img
+                          src="/user-assets/img/icons/payment-3.svg"
+                          alt="Icon"
+                        />
                       </label>
                     </div>
                     <div className="add-payment-table-info">

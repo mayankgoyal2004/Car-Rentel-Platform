@@ -1,827 +1,1069 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 
 const AdminCustomers = () => {
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [search, setSearch] = useState("");
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [deleteCustomer, setDeleteCustomer] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    licenseNumber: "",
+    dateOfIssue: "",
+    validTill: "",
+    language: "",
+    address: "",
+    gender: "",
+    dateOfBirth: "",
+    image: null,
+
+    file: null,
+  });
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const fetchCustomers = async (searchQuery = "", page = 1) => {
+    setLoading(true);
+    try {
+      const res = await apiService.getAllCustomerAdmin({
+        search: searchQuery,
+        page,
+      });
+      setCustomers(res.data.data || []);
+      setTotalPages(res.data.pagination?.totalPages || 1);
+      setTotalCount(res.data.pagination?.total || 0);
+      setPageSize(res.data.pagination?.limit || 10);
+      if (
+        res.data.pagination?.currentPage &&
+        res.data.pagination.currentPage !== currentPage
+      ) {
+        setCurrentPage(res.data.pagination.currentPage);
+      }
+    } catch (err) {
+      console.error("Error fetching Customers:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCustomers(search, currentPage);
+  }, [currentPage, search]);
+
+  const resetFormData = () => {
+    setFormData({
+      name: "",
+      email: "",
+      contact: "",
+      licenseNumber: "",
+      dateOfIssue: "",
+      validTill: "",
+      language: "",
+      address: "",
+      gender: "",
+      dateOfBirth: "",
+      image: null,
+
+      file: null,
+    });
+    setImagePreview(null);
+    setSelectedCustomer(null);
+    setDeleteCustomer(null);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      const file = files[0] || null;
+      setFormData((prev) => ({ ...prev, [name]: file }));
+      if (name === "image" && file) {
+        setImagePreview(URL.createObjectURL(file));
+      } else if (name === "image") {
+        setImagePreview(null);
+      }
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleAddCustomer = async () => {
+    try {
+      const userFormData = new FormData();
+      userFormData.append("name", formData.name);
+      userFormData.append("email", formData.email);
+      userFormData.append("contact", formData.contact);
+      userFormData.append("licenseNumber", formData.licenseNumber);
+      userFormData.append("dateOfIssue", formData.dateOfIssue);
+      userFormData.append("validTill", formData.validTill);
+      userFormData.append("language", formData.language);
+      userFormData.append("address", formData.address);
+      userFormData.append("gender", formData.gender);
+      userFormData.append("dateOfBirth", formData.dateOfBirth);
+
+      if (formData.image) {
+        userFormData.append("image", formData.image);
+      }
+
+      if (formData.file) {
+        userFormData.append("file", formData.file);
+      }
+
+      await apiService.addCustomer(userFormData);
+      fetchCustomers(search, currentPage);
+      resetFormData();
+    } catch (err) {
+      console.error("Error adding Customer:", err);
+      alert(
+        "Error adding customer: " + (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
+  const handleEdit = (customer) => {
+    setSelectedCustomer(customer);
+    setFormData({
+      name: customer.name || "",
+      email: customer.email || "",
+      contact: customer.contact || "",
+      licenseNumber: customer.licenseNumber || "",
+      dateOfIssue: customer.dateOfIssue || "",
+      validTill: customer.validTill || "",
+      language: customer.language || "",
+      address: customer.address || "",
+      gender: customer.gender || "",
+      dateOfBirth: customer.dateOfBirth || "",
+      image: null,
+      file: null,
+    });
+    setImagePreview(null);
+  };
+
+  const handleUpdateCustomer = async () => {
+    if (!selectedCustomer) return;
+    try {
+      const userFormData = new FormData();
+      userFormData.append("name", formData.name);
+      userFormData.append("email", formData.email);
+      userFormData.append("contact", formData.contact);
+      userFormData.append("licenseNumber", formData.licenseNumber);
+      userFormData.append("dateOfIssue", formData.dateOfIssue);
+      userFormData.append("validTill", formData.validTill);
+      userFormData.append("language", formData.language);
+      userFormData.append("address", formData.address);
+      userFormData.append("gender", formData.gender);
+      userFormData.append("dateOfBirth", formData.dateOfBirth);
+
+      if (formData.image) {
+        userFormData.append("image", formData.image);
+      }
+
+      if (formData.file) {
+        userFormData.append("file", formData.file);
+      }
+
+      await apiService.updateCustomer(selectedCustomer._id, userFormData);
+      fetchCustomers(search, currentPage);
+      resetFormData();
+    } catch (err) {
+      console.error("Error updating Customer:", err);
+      alert(
+        "Error updating customer: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
+  const handleDeleteConfirm = (customer) => {
+    setDeleteCustomer(customer);
+  };
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({ ...prev, image: null }));
+    setImagePreview(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deleteCustomer) return;
+    try {
+      await apiService.deleteCustomer(deleteCustomer._id);
+      fetchCustomers(search, currentPage);
+      setDeleteCustomer(null);
+    } catch (err) {
+      console.error("Error deleting Customer:", err);
+      alert(
+        "Error deleting customer: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
+  const getLanguageFlag = (language) => {
+    const flags = {
+      English: "/admin-assets/img/flags/gb.svg",
+      Spanish: "/admin-assets/img/flags/es.svg",
+      French: "/admin-assets/img/flags/fr.svg",
+      // Add more as needed
+    };
+    return flags[language] || "/admin-assets/img/flags/gb.svg";
+  };
+
   return (
- <div className="page-wrapper">
-  <div className="content me-4">
-    {/* Breadcrumb */}
-    <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
-      <div className="my-auto mb-2">
-        <h4 className="mb-1">Customers</h4>
-        <nav>
-          <ol className="breadcrumb mb-0">
-            <li className="breadcrumb-item">
-              <Link to="/admin-dashBoard">Home</Link>
-            </li>
-            <li className="breadcrumb-item active" aria-current="page">Customers</li>
-          </ol>
-        </nav>
-      </div>
-      <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-        <div className="mb-2 me-2">
-          <a href="javascript:void(0);" className="btn btn-white d-flex align-items-center"><i className="ti ti-printer me-2" />Print</a>
-        </div>
-        <div className="mb-2 me-2">
-          <div className="dropdown">
-            <a href="javascript:void(0);" className="btn btn-dark d-inline-flex align-items-center">
-              <i className="ti ti-upload me-1" />Export
-            </a>
+    <div className="page-wrapper">
+      <div className="content me-4">
+        {/* Breadcrumb */}
+        <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
+          <div className="my-auto mb-2">
+            <h4 className="mb-1">Customers</h4>
+            <nav>
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <Link to="/admin-dash-board">Home</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">
+                  Customers
+                </li>
+              </ol>
+            </nav>
+          </div>
+          <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
+            <div className="mb-2 me-2">
+              <a className="btn btn-white d-flex align-items-center">
+                <i className="ti ti-printer me-2" />
+                Print
+              </a>
+            </div>
+            <div className="mb-2 me-2">
+              <div className="dropdown">
+                <a className="btn btn-dark d-inline-flex align-items-center">
+                  <i className="ti ti-upload me-1" />
+                  Export
+                </a>
+              </div>
+            </div>
+            <div className="mb-2">
+              <a
+                className="btn btn-primary d-flex align-items-center"
+                data-bs-toggle="modal"
+                data-bs-target="#add_client"
+              >
+                <i className="ti ti-plus me-2" />
+                Add New Client
+              </a>
+            </div>
           </div>
         </div>
-        <div className="mb-2">
-          <a href="javascript:void(0);" className="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#add_client"><i className="ti ti-plus me-2" />Add New Client</a>
-        </div>
-      </div>
-    </div>
-    {/* /Breadcrumb */}
-    <div className="d-flex align-items-center mb-4">
-      <a href="all-customers" className="btn bg-secondary-transparent me-3"><i className="ti ti-user me-1" />Clients</a>
-      <Link to="/admin-dashboard/customer-companies" className="btn btn-white"><i className="ti ti-building me-1" />Companies</Link>
-    </div>
-    {/* Table Header */}
-    <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-      <div className="d-flex align-items-center flex-wrap row-gap-3">
-        <div className="dropdown me-2">
-          <a href="javascript:void(0);" className="dropdown-toggle btn btn-white d-inline-flex align-items-center" data-bs-toggle="dropdown">
-            <i className="ti ti-filter me-1" /> Sort By : Latest
-          </a>
-          <ul className="dropdown-menu  dropdown-menu-end p-2">
-            <li>
-              <a href="javascript:void(0);" className="dropdown-item rounded-1">Latest</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);" className="dropdown-item rounded-1">Ascending</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);" className="dropdown-item rounded-1">Desending</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);" className="dropdown-item rounded-1">Last Month</a>
-            </li>
-            <li>
-              <a href="javascript:void(0);" className="dropdown-item rounded-1">Last 7 Days</a>
-            </li>
-          </ul>
-        </div>
-        <div className="me-2">
-          <div className="input-icon-start position-relative topdatepicker">
-            <span className="input-icon-addon">
-              <i className="ti ti-calendar" />
-            </span>
-            <input type="text" className="form-control date-range bookingrange" placeholder="dd/mm/yyyy - dd/mm/yyyy" />
-          </div>
-        </div>                      
-        <div className="dropdown">
-          <a href="#filtercollapse" className="filtercollapse coloumn d-inline-flex align-items-center" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="filtercollapse">
-            <i className="ti ti-filter me-1" /> Filter<span className="badge badge-xs rounded-pill bg-danger ms-2">0</span>
-          </a>
-        </div>
-      </div>
-      <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-        <div className="dropdown me-2">
-          <a href="javascript:void(0);" className="dropdown-toggle btn btn-white d-inline-flex align-items-center" data-bs-toggle="dropdown">
-            <i className="ti ti-edit-circle me-1" /> Bulk Actions
-          </a>
-          <ul className="dropdown-menu dropdown-menu-end p-2">
-            <li>
-              <a href="javascript:void(0);" className="dropdown-item rounded-1">Delete</a>
-            </li>
-          </ul>
-        </div>
-        <div className="top-search me-2">
-          <div className="top-search-group">
-            <span className="input-icon">
-              <i className="ti ti-search" />
-            </span>
-            <input type="text" className="form-control" placeholder="Search" />
-          </div>
-        </div>                        
-        <div className="dropdown">
-          <a href="javascript:void(0);" className="dropdown-toggle coloumn btn btn-white d-inline-flex align-items-center" data-bs-toggle="dropdown">
-            <i className="ti ti-layout-board me-1" /> Columns
-          </a>
-          <div className="dropdown-menu dropdown-menu-lg p-2">
-            <ul>
-              <li>
-                <div className="dropdown-item d-flex align-items-center justify-content-between rounded-1">
-                  <span className="d-inline-flex align-items-center"><i className="ti ti-grip-vertical me-1" />CUSTOMER</span>
-                  <div className="form-check form-check-sm form-switch mb-0">
-                    <input className="form-check-input form-label" type="checkbox" role="switch" defaultChecked />
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="dropdown-item d-flex align-items-center justify-content-between rounded-1">
-                  <span><i className="ti ti-grip-vertical me-1" />EMAIL</span>
-                  <div className="form-check form-check-sm form-switch mb-0">
-                    <input className="form-check-input form-label" type="checkbox" role="switch" defaultChecked />
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="dropdown-item d-flex align-items-center justify-content-between rounded-1">
-                  <span><i className="ti ti-grip-vertical me-1" />LANGUAGE</span>
-                  <div className="form-check form-check-sm form-switch mb-0">
-                    <input className="form-check-input form-label" type="checkbox" role="switch" defaultChecked />
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="dropdown-item d-flex align-items-center justify-content-between rounded-1">
-                  <span><i className="ti ti-grip-vertical me-1" />DOCUMENTS</span>
-                  <div className="form-check form-check-sm form-switch mb-0">
-                    <input className="form-check-input form-label" type="checkbox" role="switch" defaultChecked />
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div className="dropdown-item d-flex align-items-center justify-content-between rounded-1">
-                  <span><i className="ti ti-grip-vertical me-1" />RENTS</span>
-                  <div className="form-check form-check-sm form-switch mb-0">
-                    <input className="form-check-input form-label" type="checkbox" role="switch" defaultChecked />
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    {/* /Table Header */}
-    <div className="collapse" id="filtercollapse">
-      <div className="filterbox mb-3 d-flex align-items-center">
-        <h6 className="me-3">Filters</h6>
-        <div className="dropdown me-2">
-          <a href="javascript:void(0);" className="dropdown-toggle btn btn-white d-inline-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-            Language
-          </a>
-          <ul className="dropdown-menu dropdown-menu-lg p-2">
-            <li>
-              <div className="top-search m-2">
-                <div className="top-search-group">
-                  <span className="input-icon">
-                    <i className="ti ti-search" />
-                  </span>
-                  <input type="text" className="form-control" placeholder="Search" />
-                </div>
-              </div>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />English
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Italian
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />French
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />German
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Hindi
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Bengali
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Chinese
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Arabic
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Japanese
-              </label>
-            </li>
-            <li>
-              <label className="dropdown-item d-flex align-items-center rounded-1">
-                <input className="form-check-input m-0 me-2" type="checkbox" />Russian
-              </label>
-            </li>
-          </ul>
-        </div>
-        <a href="javascript:void(0);" className="me-2 text-purple links">Apply</a>
-        <a href="javascript:void(0);" className="text-danger links">Clear All</a>
-      </div>
-    </div>
-    {/* Custom Data Table */}
-    <div className="custom-datatable-filter table-responsive">
-      <table className="table datatable">
-        <thead className="thead-light">
-          <tr>
-            <th className="no-sort">
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" id="select-all" />
-              </div>
-            </th>
-            <th>CUSTOMER</th>
-            <th>EMAIL</th>
-            <th>LANGUAGE</th>
-            <th>DOCUMENTS</th>
-            <th>RENTS</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-11.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Andrew Simons</Link></h6>
-                  <p>+1 56598 98956</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="e5848b81978092968c888a8b96a5809d8488958980cb868a88">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/gb.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">English</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p className="text-info">Show Documents</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-car" /></span>
-                <p className="text-violet">Recent Rents</p>
-              </div>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1"><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                         
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-12.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">David Steiger</Link></h6>
-                  <p>+1 24558 56599</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="234742554a475057464a44465163465b424e534f460d404c4e">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/it-flag.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">Italian</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p className="text-info">Show Documents</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-car" /></span>
-                <p className="text-violet">Recent Rents</p>
-              </div>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                          
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-13.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Darin Mabry</Link></h6>
-                  <p>+1 24558 56599</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="31555043585f5c50534348715449505c415d541f525e5c">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/fr-flag.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">French</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p>No Documents</p>
-              </div>
-            </td>
-            <td />
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                         
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-14.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Mark Neiman</Link></h6>
-                  <p>+1 56598 98956</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="d5b8b4a7bebbb0bcb8b4bb95b0adb4b8a5b9b0fbb6bab8">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/gb.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">English</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p className="text-info">Show Documents</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-car" /></span>
-                <p className="text-violet">Recent Rents</p>
-              </div>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                          
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-15.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Jacob Johnson</Link></h6>
-                  <p>+1 56598 98956</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="e18b80828e838b8e898f928e8fa18499808c918d84cf828e8c">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/de.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">German</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p>No Documents</p>
-              </div>
-            </td>
-            <td />
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                         
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-16.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Walter Hartmann</Link></h6>
-                  <p>+1 24558 56599</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="156274796170677d74676178747b7b55706d74786579703b767a78">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/it-flag.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">Italian</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p className="text-info">Show Documents</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-car" /></span>
-                <p className="text-violet">Recent Rents</p>
-              </div>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                          
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-17.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Andrea Jermaine</Link></h6>
-                  <p>+1 12488 14457</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="43222d273126222926312e222a2d2603263b222e332f266d202c2e">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/gb.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">English</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p>No Documents</p>
-              </div>
-            </td>
-            <td> </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                         
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-18.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Dennis Eckhardt</Link></h6>
-                  <p>+1 32569 15458</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="b8dcddd6d6d1cbdddbd3d0d9cadcccf8ddc0d9d5c8d4dd96dbd7d5">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/it-flag.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">Italian</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p className="text-info">Show Documents</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-car" /></span>
-                <p className="text-violet">Recent Rents</p>
-              </div>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                          
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details" className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-19.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Lan Adams</Link></h6>
-                  <p>+1 14782 14578</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="0f636e616e6b6e627c4f6a776e627f636a216c6062">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/fr-flag.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">French</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p>No Documents</p>
-              </div>
-            </td>
-            <td>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                         
-          <tr>
-            <td>
-              <div className="form-check form-check-md">
-                <input className="form-check-input" type="checkbox" />
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <Link to="/admin-dashboard/customer-details"  className="avatar rounded-circle me-2 flex-shrink-0">
-                  <img src="/admin-assets/img/customer/customer-20.jpg" className="rounded-circle" alt="img" />
-                </Link>
-                <div>
-                  <h6 className="fs-14 fw-semibold"><Link to="/admin-dashboard/customer-details">Julie Black</Link></h6>
-                  <p>+1 12124 14255</p>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="text-gray-9"><a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="107a657c7975727c71737b507568717d607c753e737f7d">[email&nbsp;protected]</a></p>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <a href="javascript:void(0);" className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                  <img src="/admin-assets/img/flags/gb.svg" className="rounded-circle" alt="img" />
-                </a>
-                <p className="text-gray-9">English</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-file-text" /></span>
-                <p className="text-info">Show Documents</p>
-              </div>
-            </td>
-            <td>
-              <div className="d-flex align-items-center">
-                <span className="table-icon me-2"><i className="ti ti-car" /></span>
-                <p className="text-violet">Recent Rents</p>
-              </div>
-            </td>
-            <td>
-              <div className="dropdown">
-                <button className="btn btn-icon btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i className="ti ti-dots-vertical" />
-                </button>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <Link to="/admin-dashboard/customer-details" className="dropdown-item rounded-1" ><i className="ti ti-eye me-1" />View Details</Link>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_client"><i className="ti ti-edit me-1" />Edit</a>
-                  </li>
-                  <li>
-                    <a className="dropdown-item rounded-1" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal"><i className="ti ti-trash me-1" />Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>                                                          
-        </tbody>
-      </table>
-    </div>
-    {/* Custom Data Table */}
-    <div className="table-footer" />			
-  </div>			
-</div>
+        {/* /Breadcrumb */}
 
-  )
-}
+        {/* Table Header */}
+        <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+          <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
+          <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+            <div className="dropdown me-2">
+              <a
+                className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
+                data-bs-toggle="dropdown"
+              >
+                <i className="ti ti-edit-circle me-1" /> Bulk Actions
+              </a>
+              <ul className="dropdown-menu dropdown-menu-end p-2">
+                <li>
+                  <a className="dropdown-item rounded-1">Delete</a>
+                </li>
+              </ul>
+            </div>
+            <div className="top-search me-2">
+              <div className="top-search-group">
+                <span className="input-icon">
+                  <i className="ti ti-search" />
+                </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* /Table Header */}
 
-export default AdminCustomers
+        {/* Custom Data Table */}
+        <div className="custom-datatable-filter table-responsive">
+          <table className="table datatable">
+            <thead className="thead-light">
+              <tr>
+                <th className="no-sort">
+                  <div className="form-check form-check-md">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="select-all"
+                    />
+                  </div>
+                </th>
+                <th>CUSTOMER</th>
+                <th>EMAIL</th>
+                <th>LICENSE NO</th>
+                <th>EXPIRY DATE</th>
+                <th>LANGUAGE</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    Loading...
+                  </td>
+                </tr>
+              ) : customers.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No customers found
+                  </td>
+                </tr>
+              ) : (
+                customers.map((customer) => (
+                  <tr key={customer._id}>
+                    <td>
+                      <div className="form-check form-check-md">
+                        <input className="form-check-input" type="checkbox" />
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <Link
+                          to={`/admin-dashboard/customer-details/${customer._id}`}
+                          className="avatar rounded-circle me-2 flex-shrink-0"
+                        >
+                          <img
+                            src={`${BASE_URL_IMG + customer.image}`}
+                            className="rounded-circle"
+                            alt="img"
+                          />
+                        </Link>
+                        <div>
+                          <h6 className="fs-14 fw-semibold">
+                            <Link
+                              to={`/admin-dashboard/customer-details/${customer._id}`}
+                            >
+                              {customer.name}
+                            </Link>
+                          </h6>
+                          <p>{customer.contact}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <p className="text-gray-9">{customer.email}</p>
+                    </td>
+                    <td>
+                      <p className="text-gray-9">{customer.licenseNumber}</p>
+                    </td>
+                    <td>
+                      <p className="text-gray-9">
+                        {customer.validTill
+                          ? new Date(customer.validTill).toLocaleDateString()
+                          : ""}
+                      </p>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <a className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
+                          <img
+                            src={getLanguageFlag(customer.language)}
+                            className="rounded-circle"
+                            alt="img"
+                          />
+                        </a>
+                        <p className="text-gray-9">{customer.language}</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-icon btn-sm"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <i className="ti ti-dots-vertical" />
+                        </button>
+                        <ul className="dropdown-menu dropdown-menu-end p-2">
+                          <li>
+                            <Link
+                              to={`/admin-dashboard/customer-details/${customer._id}`}
+                              className="dropdown-item rounded-1"
+                            >
+                              <i className="ti ti-eye me-1" />
+                              View Details
+                            </Link>
+                          </li>
+                          <li>
+                            <a
+                              className="dropdown-item rounded-1"
+                              onClick={() => handleEdit(customer)}
+                              data-bs-toggle="modal"
+                              data-bs-target="#edit_client"
+                            >
+                              <i className="ti ti-edit me-1" />
+                              Edit
+                            </a>
+                          </li>
+                          <li>
+                            <a
+                              className="dropdown-item rounded-1"
+                              onClick={() => handleDeleteConfirm(customer)}
+                              data-bs-toggle="modal"
+                              data-bs-target="#delete_modal"
+                            >
+                              <i className="ti ti-trash me-1" />
+                              Delete
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        {/* Custom Data Table */}
+        {!loading && totalPages > 1 && (
+          <div className="d-flex justify-content-between align-items-center flex-wrap mt-3">
+            <div className="text-muted mb-2">
+              Showing {(currentPage - 1) * pageSize + 1} to{" "}
+              {Math.min(currentPage * pageSize, totalCount)} of {totalCount}{" "}
+              entries
+            </div>
+            <nav className="mb-2">
+              <ul className="pagination mb-0">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <a
+                    className="page-link"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage > 1) setCurrentPage(currentPage - 1);
+                    }}
+                  >
+                    Previous
+                  </a>
+                </li>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <li
+                      key={page}
+                      className={`page-item ${
+                        currentPage === page ? "active" : ""
+                      }`}
+                    >
+                      <a
+                        className="page-link"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage(page);
+                        }}
+                      >
+                        {page}
+                      </a>
+                    </li>
+                  )
+                )}
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <a
+                    className="page-link"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (currentPage < totalPages)
+                        setCurrentPage(currentPage + 1);
+                    }}
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
+        <div className="table-footer" />
+      </div>
+
+      {/* Add Client */}
+      <div className="modal fade" id="add_client">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="mb-0">Create Customer</h5>
+              <button
+                type="button"
+                className="btn-close custom-btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i className="ti ti-x fs-16" />
+              </button>
+            </div>
+            <div className="modal-body pb-1">
+              <div className="row">
+                <div className="mb-3">
+                  <label className="form-label">
+                    Image <span className="text-danger">*</span>
+                  </label>
+                  <div className="d-flex align-items-center flex-wrap row-gap-3">
+                    <div className="d-flex align-items-center justify-content-center avatar avatar-xxl border me-3 flex-shrink-0 text-dark frames">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          className="rounded-circle w-100 h-100"
+                          alt="preview"
+                        />
+                      ) : (
+                        <i className="ti ti-photo-up text-gray-4 fs-24" />
+                      )}
+                    </div>
+                    <div className="profile-upload">
+                      <div className="profile-uploader d-flex align-items-center">
+                        <div className="drag-upload-btn btn btn-md btn-dark">
+                          <i className="ti ti-photo-up fs-14" />
+                          Upload
+                          <input
+                            type="file"
+                            className="form-control image-sign"
+                            name="image"
+                            accept="image/*"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <p className="fs-14">
+                          Upload Image size 180*180, within 5MB
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Customer Name <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date of Birth <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Gender <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="select"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Phone Number <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="contact"
+                      value={formData.contact}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Email <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Address <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Language <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="select"
+                      name="language"
+                      value={formData.language}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select</option>
+                      <option value="English">English</option>
+                      <option value="Spanish">Spanish</option>
+                      <option value="French">French</option>
+                    </select>
+                  </div>
+                </div>
+                <h6 className="fs-16 fw-medium mb-2">License Details</h6>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      License Number <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="licenseNumber"
+                      value={formData.licenseNumber}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date of Issue <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="dateOfIssue"
+                      value={formData.dateOfIssue}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Valid Till <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="validTill"
+                      value={formData.validTill}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <label className="form-label">Document</label>
+                  <div className="document-upload text-center br-3 mb-3">
+                    <img
+                      src="/admin-assets/img/icons/upload-icon.svg"
+                      alt="img"
+                      className="mb-2"
+                    />
+                    <p className="mb-2">
+                      Drop your files here or{" "}
+                      <span className="text-info text-decoration-underline">
+                        Browse
+                      </span>
+                    </p>
+                    <p className="fs-12 mb-0">Maximum size 50mb</p>
+                    <input
+                      type="file"
+                      className="form-control image-sign"
+                      name="file"
+                      accept=".pdf,.txt,.doc,.docx"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <div className="d-flex justify-content-center">
+                <a
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  onClick={resetFormData}
+                >
+                  Cancel
+                </a>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleAddCustomer}
+                >
+                  Create New
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* /Add Client */}
+
+      {/* Edit Client */}
+      <div className="modal fade" id="edit_client">
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="mb-0">Edit Customer</h5>
+              <button
+                type="button"
+                className="btn-close custom-btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              >
+                <i className="ti ti-x fs-16" />
+              </button>
+            </div>
+            <div className="modal-body pb-1">
+              <div className="row">
+                <div className="mb-3">
+                  <label className="form-label">
+                    Image <span className="text-danger">*</span>
+                  </label>
+                  <div className="d-flex align-items-center flex-wrap row-gap-3">
+                    <div className="d-flex align-items-center justify-content-center avatar avatar-xxl border me-3 p-2 flex-shrink-0 text-dark frames position-relative">
+                      {imagePreview || selectedCustomer?.image ? (
+                        <img
+                          src={
+                            imagePreview ||
+                            BASE_URL_IMG + selectedCustomer?.image
+                          }
+                          className="img-fluid rounded"
+                          alt="img"
+                        />
+                      ) : (
+                        <i className="ti ti-photo-up text-gray-4 fs-24" />
+                      )}
+                      {BASE_URL_IMG + selectedCustomer?.image &&
+                        !imagePreview && (
+                          <span
+                            className="avatar-badge bg-light text-danger m-1"
+                            onClick={handleRemoveImage}
+                            style={{
+                              cursor: "pointer",
+                              position: "absolute",
+                              top: 0,
+                              right: 0,
+                            }}
+                          >
+                            <i className="ti ti-trash" />
+                          </span>
+                        )}
+                    </div>
+                    <div className="profile-upload">
+                      <div className="profile-uploader d-flex align-items-center">
+                        <div className="drag-upload-btn btn btn-md btn-dark">
+                          <i className="ti ti-photo-up fs-14" />
+                          Upload
+                          <input
+                            type="file"
+                            className="form-control image-sign"
+                            name="image"
+                            accept="image/*"
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <p className="fs-14">
+                          Upload Image size 180*180, within 5MB
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Customer Name <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date of Birth <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Gender <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="select"
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select</option>
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Phone Number <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="contact"
+                      value={formData.contact}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Email <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Address <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Language <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="select"
+                      name="language"
+                      value={formData.language}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select</option>
+                      <option value="English">English</option>
+                      <option value="Spanish">Spanish</option>
+                      <option value="French">French</option>
+                    </select>
+                  </div>
+                </div>
+                <h6 className="fs-16 fw-medium mb-2">License Details</h6>
+                <div className="col-md-6">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      License Number <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      className="form-control"
+                      type="text"
+                      name="licenseNumber"
+                      value={formData.licenseNumber}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date of Issue <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="dateOfIssue"
+                      value={formData.dateOfIssue}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Valid Till <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      name="validTill"
+                      value={formData.validTill}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+                <div className="col-md-12">
+                  <label className="form-label">Document</label>
+                  <div className="document-upload text-center br-3 mb-3">
+                    <img
+                      src="/admin-assets/img/icons/upload-icon.svg"
+                      alt="img"
+                      className="mb-2"
+                    />
+                    <p className="mb-2">
+                      Drop your files here or{" "}
+                      <span className="text-info text-decoration-underline">
+                        Browse
+                      </span>
+                    </p>
+                    <p className="fs-12 mb-0">Maximum size 50mb</p>
+                    <input
+                      type="file"
+                      className="form-control image-sign"
+                      name="file"
+                      accept=".pdf,.txt,.doc,.docx"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <div className="d-flex justify-content-between align-items-center w-100">
+                <div className="d-flex justify-content-center">
+                  <a
+                    className="btn btn-light me-3"
+                    data-bs-dismiss="modal"
+                    onClick={resetFormData}
+                  >
+                    Cancel
+                  </a>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={handleUpdateCustomer}
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* /Edit Client */}
+
+      {/* Delete Modal */}
+      <div className="modal fade" id="delete_modal">
+        <div className="modal-dialog modal-dialog-centered modal-sm">
+          <div className="modal-content">
+            <div className="modal-body text-center">
+              <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
+                <i className="ti ti-trash-x fs-26" />
+              </span>
+              <h4 className="mb-1">Delete Customer</h4>
+              <p className="mb-3">
+                Are you sure you want to delete{" "}
+                {deleteCustomer?.name || "this customer"}?
+              </p>
+              <div className="d-flex justify-content-center">
+                <a className="btn btn-light me-3" data-bs-dismiss="modal">
+                  Cancel
+                </a>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleDelete}
+                  data-bs-dismiss="modal"
+                >
+                  Yes, Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* /Delete Modal */}
+    </div>
+  );
+};
+
+export default AdminCustomers;

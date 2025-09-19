@@ -29,7 +29,6 @@ const AdminRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Send data to API using apiService
 
     try {
       const res = await apiService.adminRegister(formData);
@@ -193,8 +192,8 @@ const AdminRegister = () => {
                     </div>
 
                     <div className="text-center mt-3">
-                      Already have an account?{" "}
-                      <Link to="/user-login">Login</Link>
+                      Already have an account?
+                      <Link to="/login">Login</Link>
                     </div>
                   </div>
                 </div>

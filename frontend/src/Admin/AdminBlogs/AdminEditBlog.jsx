@@ -14,6 +14,8 @@ export const AdminEditBlog = () => {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
+  const [status, setStatus] = useState(true); // default true
+
   const { id } = useParams();
 
   // 🔹 Fetch categories
@@ -45,6 +47,7 @@ export const AdminEditBlog = () => {
         setTitle(blog.title || "");
         setDescription(blog.description || "");
         setCategoryId(blog.category?._id || "");
+        setStatus(blog.status);
         setTagsId(blog.tags?.map((t) => t._id) || []);
         setPreview(blog.image ? BASE_URL_IMG + blog.image : null); // show existing image
       }
@@ -83,7 +86,7 @@ export const AdminEditBlog = () => {
       formData.append("category_id", categoryId);
       tagsId.forEach((tag) => formData.append("tags_id[]", tag));
       if (image) formData.append("image", image);
-      formData.append("status", true);
+      formData.append("status", status);
       const res = await apiService.updateblog(formData);
       toast.success(res.data.message);
     } catch (err) {
@@ -184,20 +187,34 @@ export const AdminEditBlog = () => {
         </div>
 
         {/* Actions */}
-        <div className="button-group">
-          <button
-            type="button"
-            className="btn-cancel"
-            onClick={() => {
-              getBlogDetails(); // reset to original data
-            }}
-          >
-            Reset
-          </button>
-          <button type="button" className="btn-submit" onClick={handleEditBlog}>
-            Save Changes
-          </button>
-        </div>
+     <div className="modal-footer">
+                <div className="d-flex justify-content-between align-items-center w-100">
+                <div className="form-check form-check-md form-switch me-2">
+  <label className="form-check-label form-label mt-0 mb-0">
+    <input
+      className="form-check-input form-label me-2"
+      type="checkbox"
+      role="switch"
+      checked={status}
+      onChange={(e) => setStatus(e.target.checked)}
+    />
+    Status
+  </label>
+</div>
+
+                  <div className="d-flex justify-content-center">
+                    <button
+                      className="btn btn-light me-3"
+                      data-bs-dismiss="modal"
+                    >
+                      Cancel
+                    </button>
+                    <button onClick={handleEditBlog} className="btn btn-primary">
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
       </div>
       <ToastContainer />
     </div>

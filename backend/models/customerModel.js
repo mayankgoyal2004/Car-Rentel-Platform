@@ -27,8 +27,8 @@ const customerschema = new mongoose.Schema(
     City: { type: String },
     userId: { type: mongoose.SchemaTypes.ObjectId, ref: "User", default: null },
     language: { type: String },
-    DateOfBirth: { type: Date },
-    Gender: { type: String },
+    dateOfBirth: { type: Date },
+    gender: { type: String },
     status: { type: Boolean, default: true },
 
     createdBy: {

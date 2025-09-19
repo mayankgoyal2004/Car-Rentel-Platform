@@ -1,5 +1,6 @@
 const Blog = require("../models/blogModel");
 
+
 const addBlog = async (req, res) => {
   try {
     const { title, description, category_id, tags_id } = req.body;
@@ -115,10 +116,11 @@ const updateblog = async (req, res) => {
 
 const getBlogForUser = async (req, res) => {
   try {
-    const { search, category, tag, page, limit } = req.query;
+    const { category, page, limit } = req.query;
 
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 10;
+    const search = req.query.search || "";
 
     let filter = { status: true }; // only active blogs
 
@@ -133,14 +135,10 @@ const getBlogForUser = async (req, res) => {
     if (category) {
       filter.category = category;
     }
-    if (tag) {
-      filter.tags = tag;
-    }
 
     const blogs = await Blog.find(filter)
       .populate("category", "categoryName")
-      .populate("tags", "TagName")
-      .populate("admin", "name email")
+      .populate("admin", "userName email image")
       .sort({ createdAt: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum);
@@ -259,11 +257,11 @@ const getsingleblogForUser = async (req, res) => {
         message: "slug is Required!",
       });
     }
-  
+
     const bdata = await Blog.findOne({ slug, status: true })
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("admin", "userName email")
+      .populate("admin", "userName email image")
       .exec();
     if (!bdata) {
       return res.status(404).json({
@@ -298,7 +296,7 @@ const getsingleblogForAdmin = async (req, res) => {
         success: false,
         message: "id is Required!",
       });
-    }    
+    }
     const bdata = await Blog.findById(id)
       .populate("category", "categoryName")
       .populate("tags", "TagName")
@@ -374,5 +372,5 @@ module.exports = {
   updateblog,
   deleteblog,
   getBlogAllBlogForSuperAdmin,
-  getsingleblogForAdmin
+  getsingleblogForAdmin,
 };

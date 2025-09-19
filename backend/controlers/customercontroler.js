@@ -14,7 +14,7 @@ const addCustomer = async (req, res) => {
       address,
       gender,
       language,
-      DateOfBirth,
+      dateOfBirth,
     } = req.body;
 
     if (!name) {
@@ -65,10 +65,10 @@ const addCustomer = async (req, res) => {
         .status(400)
         .json({ success: false, message: "language number is required" });
     }
-    if (!DateOfBirth) {
+    if (!dateOfBirth) {
       return res
         .status(400)
-        .json({ success: false, message: "DateOfBirth number is required" });
+        .json({ success: false, message: "DateOfBirth is required" });
     }
 
     const exitingDriverLicenseNUmber = await customer.findOne({
@@ -86,22 +86,33 @@ const addCustomer = async (req, res) => {
       return res.status(409).json({
         success: false,
         status: 409,
-        message: "licenseNumber already exists",
+        message: "contact already exists",
       });
     }
 
     const imagePath = req.files?.image
       ? req.files.image[0].path.replace(/\\/g, "/")
       : null;
+    if (!imagePath) {
+      return res
+        .status(400)
+        .json({ success: false, message: "image is required" });
+    }
+
     const filePath = req.files?.file
       ? req.files.file[0].path.replace(/\\/g, "/")
       : null;
+    if (!filePath) {
+      return res
+        .status(400)
+        .json({ success: false, message: "file is required" });
+    }
 
     const Customer = new customer({
       name,
       email,
       contact,
-      DateOfBirth,
+      dateOfBirth,
       language,
       licenseNumber,
       dateOfIssue,
@@ -110,6 +121,7 @@ const addCustomer = async (req, res) => {
       image: imagePath,
       file: filePath,
       createdBy: req.user?._id,
+      admin: req.user?.admin,
       gender,
     });
 
@@ -201,29 +213,42 @@ const getAllcustomer = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
 
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
     // Step 1: Find all cars created by me
-    const myCars = await Car.find({ createdBy: _id }).select("_id");
+    const myCars = await Car.find({ admin: req.user?.admin }).select("_id");
 
     // Step 2: Find all reservations for those cars
     const reservations = await Reservation.find({
       car: { $in: myCars },
-    }).select("user");
+    }).select("customer");
 
-    const bookedCustomerIds = reservations.map((r) => r.user);
+    const bookedCustomerIds = reservations.map((r) => r.customer);
 
     // Step 3: Get customers I created OR who booked my cars
     const query = {
-      $or: [{ createdBy: _id }, { _id: { $in: bookedCustomerIds } }],
+      $or: [filter, { _id: { $in: bookedCustomerIds } }],
     };
 
-    const customers = await Customer.find(query)
+    const customers = await customer
+      .find(query)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalcustomer = await Customer.countDocuments(query);
+    const totalcustomer = await customer.countDocuments(query);
 
     res.json({
       success: true,
@@ -242,10 +267,49 @@ const getAllcustomer = async (req, res) => {
     });
   }
 };
+const getallActiveCustomers = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const Customer = await customer.find({ admin: adminId, status: true });
+
+    res.json({
+      success: true,
+      data: Customer,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+const getCustomerbyId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const customers = await customer.findById(id);
+    if (!customers) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+    }
+    res.json({ success: true, data: customers });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
 module.exports = {
   addCustomer,
   updateCustomer,
   getAllcustomer,
   deleteCustomer,
+  getallActiveCustomers,
+  getCustomerbyId,
 };

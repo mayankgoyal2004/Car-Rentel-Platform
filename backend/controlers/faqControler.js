@@ -94,7 +94,6 @@ const getActiveFaqs = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
     const skip = (page - 1) * limit;
-    const adminId = req.user.admin;
 
     const faqs = await Faq.find({ status: true })
       .populate("category", "name")
@@ -118,7 +117,7 @@ const getActiveFaqs = async (req, res) => {
 
 const getHomepageFaqs = async (req, res) => {
   try {
-    const faqs = await Faq.find({ status: "active" })
+    const faqs = await Faq.find({ status: true })
       .populate("category", "name")
       .sort({ createdAt: -1 })
       .limit(6);

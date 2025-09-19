@@ -16,6 +16,9 @@ const AdminDashboard = () => {
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
+  const [isMini, setIsMini] = useState(true); // default collapsed
+const [isExpanded, setIsExpanded] = useState(false);
+  
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
 
@@ -27,9 +30,13 @@ const AdminDashboard = () => {
     dispatch(removeUser());
     navigete("/login");
   };
+    const toggleSidebar = () => {
+    const wrapper = document.querySelector(".main-wrapper");
+    wrapper.classList.toggle("slide-nav");
+  };
 
   return (
-    <div className="main-wrapper">
+    <div className={`main-wrapper `}>
       {/* Header */}
       <div className="header">
         <div className="main-header">
@@ -41,7 +48,7 @@ const AdminDashboard = () => {
               <img src="/admin-assets/img/logo-white.svg" alt="Logo" />
             </Link>
           </div>
-          <a id="mobile_btn" className="mobile_btn" href="#sidebar">
+          <a id="mobile_btn" className="mobile_btn"onClick={toggleSidebar}>
             <span className="bar-icon">
               <span />
               <span />
@@ -54,7 +61,7 @@ const AdminDashboard = () => {
                 className="me-auto d-flex align-items-center"
                 id="header-search"
               >
-                <a id="toggle_btn" href="javascript:void(0);">
+                <a id="toggle_btn" >
                   <i className="ti ti-menu-deep" />
                 </a>
                 <div className="add-dropdown">
@@ -224,7 +231,8 @@ const AdminDashboard = () => {
 
       {/* /Header */}
       {/* Sidebar */}
-      <div className="sidebar" id="sidebar">
+      <div className="sidebar"onMouseEnter={() => setIsExpanded(true)}
+    onMouseLeave={() => setIsExpanded(false)} id="sidebar">
         {/* Logo */}
         <div className="sidebar-logo navbar-1">
           <Link to="/admin-dashboard" className="logo logo-normal">
@@ -290,12 +298,7 @@ const AdminDashboard = () => {
                         <span>Calendar</span>
                       </Link>
                     </li>
-                    <li>
-                      <Link to="all-quotations">
-                        <i className="ti ti-file-symlink" />
-                        <span>Quotations</span>
-                      </Link>
-                    </li>
+
                     <li>
                       <Link to="all-enquiries">
                         <i className="ti ti-mail" />
@@ -379,11 +382,6 @@ const AdminDashboard = () => {
                           <li>
                             <Link to="car-features">Features</Link>
                           </li>
-                          <li>
-                            <Link to="car-safety-features">
-                              Safety Features
-                            </Link>
-                          </li>
                         </ul>
                       )}
                     </li>
@@ -399,18 +397,7 @@ const AdminDashboard = () => {
                         <span>Seasonal Pricing</span>
                       </Link>
                     </li>
-                    <li>
-                      <Link to="car-inspection">
-                        <i className="ti ti-dice-6" />
-                        <span>Inspections</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="car-tracking">
-                        <i className="ti ti-map-pin-pin" />
-                        <span>Tracking</span>
-                      </Link>
-                    </li>
+
                     <li>
                       <Link to="car-maintenance">
                         <i className="ti ti-color-filter" />
@@ -436,12 +423,6 @@ const AdminDashboard = () => {
                         <span>Invoices</span>
                       </Link>
                     </li>
-                    <li>
-                      <Link to="account-payment">
-                        <i className="ti ti-credit-card" />
-                        <span>Payments</span>
-                      </Link>
-                    </li>
                   </ul>
                 </li>
                 <li className="menu-title">
@@ -454,18 +435,6 @@ const AdminDashboard = () => {
                         <i className="ti ti-message" />
                         <span>Messages</span>
                         <span className="count">5</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-coupons">
-                        <i className="ti ti-discount-2" />
-                        <span>Coupons</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-news-letter">
-                        <i className="ti ti-file-horizontal" />
-                        <span>Newsletters</span>
                       </Link>
                     </li>
                   </ul>
@@ -548,31 +517,23 @@ const AdminDashboard = () => {
                     )}
                   </ul>
                 </li>
-                <li className="menu-title">
-                  <span>SUPPORT</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="contact-message">
-                        <i className="ti ti-messages" />
-                        <span>Contact Messages</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="all-announcements">
-                        <i className="ti ti-speakerphone" />
-                        <span>Announcements</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="all-tickets">
-                        <i className="ti ti-ticket" />
-                        <span>Tickets</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
+                {userType === 1 && (
+                  <li className="menu-title">
+                    <span>SUPPORT</span>
+                  </li>
+                )}
+                {userType === 1 && (
+                  <li>
+                    <ul>
+                      <li>
+                        <Link to="contact-message">
+                          <i className="ti ti-messages" />
+                          <span>Contact Messages</span>
+                        </Link>
+                      </li>
+                    </ul>
+                  </li>
+                )}
                 <li className="menu-title">
                   <span>USER MANAGEMENT</span>
                 </li>
@@ -592,7 +553,7 @@ const AdminDashboard = () => {
                     </li>
                   </ul>
                 </li>
-                <li className="menu-title">
+                {/* <li className="menu-title">
                   <span>REPORTS</span>
                 </li>
                 <li>
@@ -610,7 +571,7 @@ const AdminDashboard = () => {
                       </Link>
                     </li>
                   </ul>
-                </li>
+                </li> */}
 
                 <li className="menu-title">
                   <span>SETTINGS &amp; CONFIGURATION</span>
@@ -630,15 +591,6 @@ const AdminDashboard = () => {
                           </li>
                           <li>
                             <Link to="security-setting">Security</Link>
-                          </li>
-                          <li>
-                            <Link to="notification-setting">Notifications</Link>
-                          </li>
-                          <li>
-                            <Link to="integration-setting">Integrations</Link>
-                          </li>
-                          <li>
-                            <Link to="tracker-setting">Tracker</Link>
                           </li>
                         </ul>
                       )}

@@ -145,7 +145,7 @@ function App() {
           <Route path="/about-us" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/blog-list" element={<Bloglist />} />
-          <Route path="/blog-details" element={<BlogDetails />} />
+          <Route path="/blog-details/:slug" element={<BlogDetails />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-and-condition" element={<TermsAndCondition />} />
           <Route path="/pricing" element={<Pricing />} />
@@ -310,7 +310,7 @@ function App() {
               element={<AdminIntegrationSetting />}
             />
             <Route
-              path="customer-details"
+              path="customer-details/:id"
               element={<AdminCustomersDetails />}
             />
             <Route
@@ -322,7 +322,7 @@ function App() {
             <Route path="add-car" element={<AdminAddCars />} />
             <Route path="edit-car" element={<AdminEditCar />} />
             <Route
-              path="reservation-details"
+              path="reservation-details/:id"
               element={<AdminReservationDetails />}
             />
             <Route path="company-details" element={<AdminCompaniesDetails />} />

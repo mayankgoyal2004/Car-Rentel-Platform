@@ -46,7 +46,7 @@ const checkPermission = (module, action, superAdminOnly = false) => {
 
       const role = req.user.role;
 
-      if (!role.permissions || !Array.isArray(role.permissions)) {
+      if (!role.permissions ) {
         return res
           .status(403)
           .json({ message: "No permissions assigned to role" });

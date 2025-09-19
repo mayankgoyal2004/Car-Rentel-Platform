@@ -1,7 +1,297 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { Heart , Filter, Calendar ,MapPin  } from "react-feather";
 
 const Listing = () => {
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+const [wishlist, setWishlist] = useState([]);
+
+  // Get query parameters from URL
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
+  const [filters, setFilters] = useState({
+    search: "",
+    carType: "",
+    carTransmission: "",
+    carColor: "",
+    carBrand: "",
+    carModel: "",
+    pickupLocation: queryParams.get("pickupLocation") || "",
+    dropLocation: queryParams.get("dropLocation") || "",
+    pickupDate: queryParams.get("pickupDate") || "",
+    dropDate: queryParams.get("dropDate") || "",
+    city: queryParams.get("pickupLocation") || "", // Use pickupLocation as city
+    page: 1,
+    limit: 10,
+    brand: [],
+    fuelType: "",
+    transmission: "",
+    rating: [],
+  });
+
+  // Fetch cars on component mount and when filters/page change
+  const fetchCars = async () => {
+    setLoading(true);
+    try {
+      // Combine search query with other filters
+      const apiFilters = {
+        search: searchQuery || filters.search,
+        page: currentPage,
+        limit: filters.limit,
+        pickupLocation: filters.pickupLocation,
+        dropLocation: filters.dropLocation,
+        pickupDate: filters.pickupDate,
+        dropDate: filters.dropDate,
+        // map frontend keys to backend
+        carBrand: filters.brand,
+        carModel: filters.model,
+        carTransmission: filters.transmission,
+        carFuel: filters.fuelType,
+        carColor: filters.color,
+        carType: filters.type,
+      };
+
+
+      // Remove empty filters
+      Object.keys(apiFilters).forEach((key) => {
+        if (
+          apiFilters[key] === "" ||
+          (Array.isArray(apiFilters[key]) && apiFilters[key].length === 0) ||
+          apiFilters[key] === null ||
+          apiFilters[key] === undefined
+        ) {
+          delete apiFilters[key];
+        }
+      });
+
+      const res = await apiService.getAllcarHomePage(apiFilters);
+      setCars(res.data.data || []);
+      setTotalPages(res.data.pagination?.totalPages || 1);
+      if (
+        res.data.pagination?.currentPage &&
+        res.data.pagination.currentPage !== currentPage
+      ) {
+        setCurrentPage(res.data.pagination.currentPage);
+      }
+    } catch (err) {
+      console.error("Error fetching cars:", err);
+      setCars([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+const getWishList = async () => {
+  const res = await apiService.getWishlist();
+  setWishlist(res.data.wishlist); // already array of IDs
+};
+  
+
+  useEffect(() => {
+    fetchCars();
+    getWishList()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, filters.limit]);
+
+const handleWishlist = async (carId) => {
+  try {
+    const res = await apiService.addWishlist({ carId });
+    setWishlist(res.data.wishlist.cars); // already array of IDs
+  } catch (err) {
+    console.error("Error toggling wishlist:", err);
+  }
+};
+  // Update search query when URL params change
+  useEffect(() => {
+    if (queryParams.get("pickupLocation") || queryParams.get("dropLocation")) {
+      setFilters((prev) => ({
+        ...prev,
+        pickupLocation: queryParams.get("pickupLocation") || "",
+        dropLocation: queryParams.get("dropLocation") || "",
+        pickupDate: queryParams.get("pickupDate") || "",
+        dropDate: queryParams.get("dropDate") || "",
+        city: queryParams.get("pickupLocation") || "",
+      }));
+
+      // Automatically fetch cars when quick search params are present
+      if (currentPage === 1) {
+        fetchCars();
+      } else {
+        setCurrentPage(1);
+      }
+    }
+  }, [location.search]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setCurrentPage(1);
+    fetchCars();
+  };
+
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prev) => {
+      if (filterType === "brand" || filterType === "rating") {
+        const currentValues = prev[filterType] || [];
+        const newValues = currentValues.includes(value)
+          ? currentValues.filter((v) => v !== value)
+          : [...currentValues, value];
+
+        return { ...prev, [filterType]: newValues };
+      } else {
+        const mapKeys = {
+          brand: "carBrand",
+          model: "carModel",
+          transmission: "carTransmission",
+          fuelType: "carFuel",
+          color: "carColor",
+          type: "carType",
+        };
+
+        const backendKey = mapKeys[filterType] || filterType;
+
+        return {
+          ...prev,
+          [filterType]: value, // 👈 keep frontend key (for UI binding)
+          [backendKey]: value, // 👈 backend key (for API request)
+        };
+      }
+    });
+  };
+
+  const applyFilters = () => {
+    setCurrentPage(1);
+    fetchCars();
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      search: "",
+      carType: "",
+      carTransmission: "",
+      carColor: "",
+      carBrand: "",
+      carModel: "",
+      pickupLocation: "",
+      dropLocation: "",
+      pickupDate: "",
+      dropDate: "",
+      city: "",
+      page: 1,
+      limit: 10,
+      brand: [],
+      fuelType: "",
+      transmission: "",
+      rating: [],
+    });
+    setSearchQuery("");
+    setCurrentPage(1);
+
+    if (window.location.search) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  };
+  useEffect(() => {
+    fetchCars();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, currentPage]);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <li className="page-item" key={i}>
+          <button
+            className={`page-link ${currentPage === i ? "active" : ""}`}
+            onClick={() => handlePageChange(i)}
+          >
+            {i}
+          </button>
+        </li>
+      );
+    }
+
+    return (
+      <div className="blog-pagination">
+        <nav>
+          <ul className="pagination page-item justify-content-center">
+            <li className="previtem">
+              <button
+                className="page-link"
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+              >
+                <i className="fas fa-regular fa-arrow-left me-2" /> Prev
+              </button>
+            </li>
+            {startPage > 1 && (
+              <>
+                <li className="page-item">
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(1)}
+                  >
+                    1
+                  </button>
+                </li>
+                {startPage > 2 && (
+                  <li className="page-item disabled">
+                    <span className="page-link">...</span>
+                  </li>
+                )}
+              </>
+            )}
+            {pages}
+            {endPage < totalPages && (
+              <>
+                {endPage < totalPages - 1 && (
+                  <li className="page-item disabled">
+                    <span className="page-link">...</span>
+                  </li>
+                )}
+                <li className="page-item">
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(totalPages)}
+                  >
+                    {totalPages}
+                  </button>
+                </li>
+              </>
+            )}
+            <li className="nextlink">
+              <button
+                className="page-link"
+                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+              >
+                Next <i className="fas fa-regular fa-arrow-right ms-2" />
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className="main-wrapper listing-page">
@@ -14,10 +304,10 @@ const Listing = () => {
                 <nav aria-label="breadcrumb" className="page-breadcrumb">
                   <ol className="breadcrumb">
                     <li className="breadcrumb-item">
-                      <Link to="/" >Home</Link>
+                      <Link to="/">Home</Link>
                     </li>
                     <li className="breadcrumb-item">
-                      <a href="javascript:void(0);">Listings</a>
+                      <a href="#javascript">Listings</a>
                     </li>
                     <li className="breadcrumb-item active" aria-current="page">
                       Car Listings
@@ -29,94 +319,117 @@ const Listing = () => {
           </div>
         </div>
         {/* /Breadscrumb Section */}
+
         {/* Search */}
         <div className="section-search page-search">
           <div className="container">
             <div className="search-box-banner">
-              <form action="listing-grid.html">
+              <form onSubmit={handleSearch}>
                 <ul className="align-items-center">
                   <li className="column-group-main">
                     <div className="input-block">
-                      <label>Pickup Location</label>
+                      <label>Search Cars</label>
                       <div className="group-img">
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Enter City, Airport, or Address"
+                          placeholder="Search by car name, brand, or model"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
                         />
-                        <span>
-                          <i className="feather-map-pin" />
-                        </span>
                       </div>
                     </div>
                   </li>
-                  <li className="column-group-main">
-                    <div className="input-block">
-                      <label>Pickup Date</label>
-                    </div>
-                    <div className="input-block-wrapp">
-                      <div className="input-block date-widget">
-                        <div className="group-img">
-                          <input
-                            type="text"
-                            className="form-control datetimepicker"
-                            placeholder="04/11/2023"
-                          />
-                          <span>
-                            <i className="feather-calendar" />
-                          </span>
-                        </div>
-                      </div>
-                      <div className="input-block time-widge">
-                        <div className="group-img">
-                          <input
-                            type="text"
-                            className="form-control timepicker"
-                            placeholder="11:00 AM"
-                          />
-                          <span>
-                            <i className="feather-clock" />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="column-group-main">
-                    <div className="input-block">
-                      <label>Return Date</label>
-                    </div>
-                    <div className="input-block-wrapp">
-                      <div className="input-block date-widge">
-                        <div className="group-img">
-                          <input
-                            type="text"
-                            className="form-control datetimepicker"
-                            placeholder="04/11/2023"
-                          />
-                          <span>
-                            <i className="feather-calendar" />
-                          </span>
-                        </div>
-                      </div>
-                      <div className="input-block time-widge">
-                        <div className="group-img">
-                          <input
-                            type="text"
-                            className="form-control timepicker"
-                            placeholder="11:00 AM"
-                          />
-                          <span>
-                            <i className="feather-clock" />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
+                  {/* Show quick search details if they exist */}
+             
+                    <>
+                     <li className="column-group">
+  <div className="input-block">
+    <label>Pickup Location</label>
+    <div className="group-img">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Enter pickup location"
+        value={filters.pickupLocation}
+        onChange={(e) =>
+          setFilters((prev) => ({
+            ...prev,
+            pickupLocation: e.target.value,
+          }))
+        }
+      />
+    
+    </div>
+  </div>
+</li>
+
+<li className="column-group">
+  <div className="input-block">
+    <label>Dropoff Location</label>
+    <div className="group-img">
+      <input
+        type="text"
+        className="form-control"
+        placeholder="Enter dropoff location"
+        value={filters.dropLocation}
+        onChange={(e) =>
+          setFilters((prev) => ({
+            ...prev,
+            dropLocation: e.target.value,
+          }))
+        }
+      />
+    
+    </div>
+  </div>
+</li>
+                      {filters.pickupDate && (
+                        <li className="column-group">
+                          <div className="input-block">
+                            <label>Pickup Date</label>
+                            <div className="group-img">
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={new Date(
+                                  filters.pickupDate
+                                ).toLocaleString()}
+                                readOnly
+                              />
+                              <span>
+                                <i className="feather-calendar" />
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      )}
+                      {filters.dropDate && (
+                        <li className="column-group">
+                          <div className="input-block">
+                            <label>Dropoff Date</label>
+                            <div className="group-img">
+                              <input
+                                type="text"
+                                className="form-control"
+                                value={new Date(
+                                  filters.dropDate
+                                ).toLocaleString()}
+                                readOnly
+                              />
+                              <span>
+                                <i className="feather-calendar" />
+                              </span>
+                            </div>
+                          </div>
+                        </li>
+                      )}
+                    </>
+                 
                   <li className="column-group-last">
                     <div className="input-block">
                       <div className="search-btn">
                         <button className="btn search-button" type="submit">
-                          {" "}
                           <i className="fa fa-search" aria-hidden="true" />
                           Search
                         </button>
@@ -129,6 +442,7 @@ const Listing = () => {
           </div>
         </div>
         {/* /Search */}
+
         {/* Sort By */}
         <div className="sort-section">
           <div className="container">
@@ -137,60 +451,11 @@ const Listing = () => {
                 <div className="row d-flex align-items-center">
                   <div className="col-xl-4 col-lg-3 col-sm-12 col-12">
                     <div className="count-search">
-                      <p>Showing 1-9 of 154 Cars</p>
-                    </div>
-                  </div>
-                  <div className="col-xl-8 col-lg-9 col-sm-12 col-12">
-                    <div className="product-filter-group">
-                      <div className="sortbyset">
-                        <ul>
-                          <li>
-                            <span className="sortbytitle">Show : </span>
-                            <div className="sorting-select select-one">
-                              <select className="form-control select">
-                                <option>5</option>
-                                <option>10</option>
-                                <option>15</option>
-                                <option>20</option>
-                                <option>30</option>
-                              </select>
-                            </div>
-                          </li>
-                          <li>
-                            <span className="sortbytitle">Sort By </span>
-                            <div className="sorting-select select-two">
-                              <select className="form-control select">
-                                <option>Newest</option>
-                                <option>Relevance</option>
-                                <option>Low to High</option>
-                                <option>High to Low</option>
-                                <option>Best Rated</option>
-                                <option>Distance</option>
-                                <option>Popularity</option>
-                              </select>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="grid-listview">
-                        <ul>
-                          <li>
-                            <Link to="/listing" className="active">
-                              <i className="feather-grid" />
-                            </Link>
-                          </li>
-                          <li>
-                            <Link to="/listing">
-                              <i className="feather-list" />
-                            </Link>
-                          </li>
-                          <li>
-                            <Link to="/listing">
-                              <i className="feather-map-pin" />
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
+                      <p>
+                        Showing {(currentPage - 1) * filters.limit + 1}-
+                        {Math.min(currentPage * filters.limit, cars.length)} of{" "}
+                        {cars.length} Cars
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -199,56 +464,31 @@ const Listing = () => {
           </div>
         </div>
         {/* /Sort By */}
+
         {/* Car Grid View */}
         <section className="section car-listing pt-0">
           <div className="container">
             <div className="row">
+              {/* Filters Sidebar */}
               <div className="col-xl-3 col-lg-4 col-sm-12 col-12 theiaStickySidebar">
-                <form action="#" autoComplete="off" className="sidebar-form">
+                <form className="sidebar-form">
                   <div className="sidebar-heading">
                     <h3>What Are You Looking For</h3>
                   </div>
-                  <div className="product-search">
-                    <div className="form-custom">
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="member_search1"
-                        placeholder
-                      />
-                      <span>
-                        <img src="/user-assets/img/icons/search.svg" alt="img" />
-                      </span>
-                    </div>
-                  </div>
-                  <div className="product-availability">
-                    <h6>Availability</h6>
-                    <div className="status-toggle">
-                      <input
-                        id="mobile_notifications"
-                        className="check"
-                        type="checkbox"
-                        defaultChecked
-                      />
-                      <label
-                        htmlFor="mobile_notifications"
-                        className="checktoggle"
-                      >
-                        checkbox
-                      </label>
-                    </div>
-                  </div>
+
                   <div className="accord-list">
+                    {/* Car Brand Filter */}
                     <div className="accordion" id="accordionMain1">
                       <div className="card-header-new" id="headingOne">
                         <h6 className="filter-title">
                           <a
-                            href="javascript:void(0);"
+                            href="#javascript"
                             className="w-100"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapseOne"
                             aria-expanded="true"
                             aria-controls="collapseOne"
+                            onClick={(e) => e.preventDefault()}
                           >
                             Car Brand
                             <span className="float-end">
@@ -268,49 +508,31 @@ const Listing = () => {
                             <div className="col-md-12">
                               <div id="checkBoxes1">
                                 <div className="selectBox-cont">
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Tesla
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Ford
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Mercediz Benz
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Audi
-                                  </label>
-                                  {/* View All */}
-                                  <div className="view-content">
-                                    <div className="viewall-One">
-                                      <label className="custom_check w-100">
-                                        <input
-                                          type="checkbox"
-                                          name="username"
-                                        />
-                                        <span className="checkmark" /> Kia
-                                      </label>
-                                      <label className="custom_check w-100">
-                                        <input
-                                          type="checkbox"
-                                          name="username"
-                                        />
-                                        <span className="checkmark" /> Honda
-                                      </label>
-                                      <label className="custom_check w-100">
-                                        <input
-                                          type="checkbox"
-                                          name="username"
-                                        />
-                                        <span className="checkmark" /> Toyota
-                                      </label>
-                                    </div>
-                                  </div>
-                                  {/* /View All */}
+                                  {[
+                                    "Tesla",
+                                    "test",
+                                    "Ford",
+                                    "Mercedes Benz",
+                                    "Audi",
+                                    "Kia",
+                                    "Honda",
+                                    "Toyota",
+                                  ].map((brand) => (
+                                    <label
+                                      className="custom_check w-100"
+                                      key={brand}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        name="brand"
+                                        checked={filters.brand?.includes(brand)}
+                                        onChange={() =>
+                                          handleFilterChange("brand", brand)
+                                        }
+                                      />
+                                      <span className="checkmark" /> {brand}
+                                    </label>
+                                  ))}
                                 </div>
                               </div>
                             </div>
@@ -318,153 +540,19 @@ const Listing = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="accordion" id="accordionMain2">
-                      <div className="card-header-new" id="headingTwo">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseTwo"
-                            aria-expanded="true"
-                            aria-controls="collapseTwo"
-                          >
-                            Car Category
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapseTwo"
-                        className="collapse"
-                        aria-labelledby="headingTwo"
-                        data-bs-parent="#accordionExample2"
-                      >
-                        <div className="card-body-chat">
-                          <div id="checkBoxes2">
-                            <div className="selectBox-cont">
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Convertible (25)
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Coupe (15)
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Sedan (10)
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> EV (5)
-                              </label>
-                              {/* View All */}
-                              <div className="view-content">
-                                <div className="viewall-One">
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Hatchback
-                                    (123)
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Luxury (06)
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> SUV (6)
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Wagon (5)
-                                  </label>
-                                </div>
-                              </div>
-                              {/* /View All */}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain3">
-                      <div className="card-header-new" id="headingYear">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseYear"
-                            aria-expanded="true"
-                            aria-controls="collapseYear"
-                          >
-                            Year
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapseYear"
-                        className="collapse"
-                        aria-labelledby="headingYear"
-                        data-bs-parent="#accordionExample2"
-                      >
-                        <div className="card-body-chat">
-                          <div id="checkBoxes02">
-                            <div className="selectBox-cont">
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> 2024
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> 2022
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> 2021
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> 2020
-                              </label>
-                              {/* View All */}
-                              <div className="view-content">
-                                <div className="viewall-One">
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> 2019
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> 2018
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> 2019
-                                  </label>
-                                </div>
-                              </div>
-                              {/* /View All */}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
+                    {/* Fuel Type Filter */}
                     <div className="accordion" id="accordionMain04">
                       <div className="card-header-new" id="headingfuel">
                         <h6 className="filter-title">
                           <a
-                            href="javascript:void(0);"
+                            href="#javascript"
                             className="w-100 collapsed"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapsefuel"
                             aria-expanded="true"
                             aria-controls="collapsefuel"
+                            onClick={(e) => e.preventDefault()}
                           >
                             Fuel Type
                             <span className="float-end">
@@ -482,501 +570,44 @@ const Listing = () => {
                         <div className="card-body-chat">
                           <div className="fuel-list">
                             <ul>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="petrol"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="petrol">Petrol</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="diesel"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="diesel">Diesel</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="electric"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="electric">Electric</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="cng"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="cng">CNG</label>
-                                </div>
-                              </li>
+                              {["Petrol", "Diesel", "Electric", "CNG"].map(
+                                (fuel) => (
+                                  <li key={fuel}>
+                                    <div className="input-selection">
+                                      <input
+                                        type="radio"
+                                        name="fuelType" // 👈 keep this as frontend key
+                                        id={fuel.toLowerCase()}
+                                        checked={filters.fuelType === fuel} // 👈 match frontend state
+                                        onChange={() =>
+                                          handleFilterChange("fuelType", fuel)
+                                        } // 👈 let handler map it
+                                      />
+                                      <label htmlFor={fuel.toLowerCase()}>
+                                        {fuel}
+                                      </label>
+                                    </div>
+                                  </li>
+                                )
+                              )}
                             </ul>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="accordion" id="accordionMain5">
-                      <div className="card-header-new" id="headingmileage">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapsemileage"
-                            aria-expanded="true"
-                            aria-controls="collapsemileage"
-                          >
-                            Mileage
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapsemileage"
-                        className="collapse"
-                        aria-labelledby="headingmileage"
-                        data-bs-parent="#accordionExample2"
-                      >
-                        <div className="card-body-chat">
-                          <div className="fuel-list">
-                            <ul>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="mileage"
-                                    id="limited"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="limited">Limited</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="mileage"
-                                    id="unlimited"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="unlimited">Unlimited</label>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain6">
-                      <div className="card-header-new" id="headingrental">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapserental"
-                            aria-expanded="true"
-                            aria-controls="collapserental"
-                          >
-                            Rental Type
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapserental"
-                        className="collapse"
-                        aria-labelledby="headingrental"
-                        data-bs-parent="#accordionExample2"
-                      >
-                        <div className="card-body-chat">
-                          <div className="fuel-list">
-                            <ul>
-                              <li>
-                                <div className="input-selection">
-                                  <input type="radio" name="any" id="any" />
-                                  <label htmlFor="any">Any</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="day"
-                                    id="day"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="day">Per Day</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="hour"
-                                    id="hour"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="hour">Per Hour</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input type="radio" name="week" id="week" />
-                                  <label htmlFor="week">Per Week</label>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain06">
-                      <div className="card-header-new" id="headingspec">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapsespec"
-                            aria-expanded="true"
-                            aria-controls="collapsespec"
-                          >
-                            Car Specifications
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapsespec"
-                        className="collapse"
-                        aria-labelledby="headingspec"
-                        data-bs-parent="#accordionExample2"
-                      >
-                        <div className="card-body-chat">
-                          <div id="checkBoxes20">
-                            <div className="selectBox-cont">
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Air Conditioners
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Keyless
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Panoramic
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" /> Bluetooth
-                              </label>
-                              {/* View All */}
-                              <div className="view-content">
-                                <div className="viewall-One">
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Aux
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Top Window
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Speakers
-                                  </label>
-                                  <label className="custom_check w-100">
-                                    <input type="checkbox" name="username" />
-                                    <span className="checkmark" /> Automatic
-                                    Window
-                                  </label>
-                                </div>
-                              </div>
-                              {/* /View All */}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain7">
-                      <div className="card-header-new" id="headingColor">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseColor"
-                            aria-expanded="true"
-                            aria-controls="collapseColor"
-                          >
-                            Colors
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapseColor"
-                        className="collapse"
-                        aria-labelledby="headingColor"
-                        data-bs-parent="#accordionExample2"
-                      >
-                        <div className="card-body-chat">
-                          <div className="theme-colorsset">
-                            <ul>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="greenColor"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label
-                                    htmlFor="greenColor"
-                                    className="green-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="yellowColor"
-                                    defaultValue="yellow"
-                                  />
-                                  <label
-                                    htmlFor="yellowColor"
-                                    className="yellow-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="brownColor"
-                                    defaultValue="blue"
-                                  />
-                                  <label
-                                    htmlFor="brownColor"
-                                    className="brown-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="blackColor"
-                                    defaultValue="green"
-                                  />
-                                  <label
-                                    htmlFor="blackColor"
-                                    className="black-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="redColor"
-                                    defaultValue="red"
-                                    defaultChecked
-                                  />
-                                  <label
-                                    htmlFor="redColor"
-                                    className="red-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="grayColor"
-                                    defaultValue="blue"
-                                  />
-                                  <label
-                                    htmlFor="grayColor"
-                                    className="gray-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="gray100Color"
-                                    defaultValue="green"
-                                  />
-                                  <label
-                                    htmlFor="gray100Color"
-                                    className="gray100-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="blueColor"
-                                    defaultValue="yellow"
-                                  />
-                                  <label
-                                    htmlFor="blueColor"
-                                    className="blue-clr"
-                                  />
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-themeselects">
-                                  <input
-                                    type="radio"
-                                    name="color"
-                                    id="whiteColor"
-                                    defaultValue="yellow"
-                                  />
-                                  <label
-                                    htmlFor="whiteColor"
-                                    className="white-clr"
-                                  />
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain8">
-                      <div className="card-header-new" id="headingThree">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseThree"
-                            aria-expanded="true"
-                            aria-controls="collapseThree"
-                          >
-                            Capacity
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapseThree"
-                        className="collapse"
-                        aria-labelledby="headingThree"
-                        data-bs-parent="#accordionExample3"
-                      >
-                        <div className="card-body-chat">
-                          <div id="checkBoxes3">
-                            <div className="selectBox-cont">
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="bystatus" />
-                                <span className="checkmark" /> 2 Seater
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="bystatus" />
-                                <span className="checkmark" /> 4 Seater
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="bystatus" />
-                                <span className="checkmark" /> 5 Seater
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="bystatus" />
-                                <span className="checkmark" /> 7 Seater
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain9">
-                      <div className="card-header-new" id="headingFour">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseFour"
-                            aria-expanded="true"
-                            aria-controls="collapseFour"
-                          >
-                            Price
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapseFour"
-                        className="collapse"
-                        aria-labelledby="headingFour"
-                        data-bs-parent="#accordionExample4"
-                      >
-                        <div className="card-body-chat">
-                          <div className="filter-range">
-                            <input type="text" className="input-range" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+
+                    {/* Transmission Filter */}
                     <div className="accordion" id="accordionMain4">
                       <div className="card-header-new" id="headingtransmiss">
                         <h6 className="filter-title">
                           <a
-                            href="javascript:void(0);"
+                            href="#javascript"
                             className="w-100 collapsed"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapsetransmission"
                             aria-expanded="true"
                             aria-controls="collapsetransmission"
+                            onClick={(e) => e.preventDefault()}
                           >
                             Transmission
                             <span className="float-end">
@@ -994,52 +625,53 @@ const Listing = () => {
                         <div className="card-body-chat">
                           <div className="fuel-list">
                             <ul>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="transmission"
-                                    id="manual"
-                                    defaultChecked
-                                  />
-                                  <label htmlFor="manual">Manual </label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="transmission"
-                                    id="semi"
-                                  />
-                                  <label htmlFor="semi">Semi Automatic</label>
-                                </div>
-                              </li>
-                              <li>
-                                <div className="input-selection">
-                                  <input
-                                    type="radio"
-                                    name="transmission"
-                                    id="automatic"
-                                  />
-                                  <label htmlFor="automatic">Automatic</label>
-                                </div>
-                              </li>
+                              {["Manual", "Semi Automatic", "Automatic"].map(
+                                (trans) => (
+                                  <li key={trans}>
+                                    <div className="input-selection">
+                                      <input
+                                        type="radio"
+                                        name="transmission"
+                                        id={trans
+                                          .toLowerCase()
+                                          .replace(" ", "-")}
+                                        checked={filters.transmission === trans}
+                                        onChange={() =>
+                                          handleFilterChange(
+                                            "transmission",
+                                            trans
+                                          )
+                                        }
+                                      />
+                                      <label
+                                        htmlFor={trans
+                                          .toLowerCase()
+                                          .replace(" ", "-")}
+                                      >
+                                        {trans}
+                                      </label>
+                                    </div>
+                                  </li>
+                                )
+                              )}
                             </ul>
                           </div>
                         </div>
                       </div>
                     </div>
+
+                    {/* Rating Filter */}
                     <div className="accordion" id="accordionMain10">
                       <div className="card-header-new" id="headingFive">
                         <h6 className="filter-title">
                           <a
-                            href="javascript:void(0);"
+                            href="#javascript"
                             className="w-100 collapsed"
                             data-bs-toggle="collapse"
                             data-bs-target="#collapseFive"
                             aria-expanded="true"
                             aria-controls="collapseFive"
+                            onClick={(e) => e.preventDefault()}
                           >
                             Rating
                             <span className="float-end">
@@ -1057,1633 +689,276 @@ const Listing = () => {
                         <div className="card-body-chat">
                           <div id="checkBoxes4">
                             <div className="selectBox-cont">
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <span className="rating-count">5.0</span>
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star" />
-                                <span className="rating-count">4.0</span>
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <span className="rating-count">3.0</span>
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <span className="rating-count">2.0</span>
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="username" />
-                                <span className="checkmark" />
-                                <i className="fas fa-star filled" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <i className="fas fa-star" />
-                                <span className="rating-count">1.0</span>
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="accordion" id="accordionMain11">
-                      <div className="card-header-new" id="headingSix">
-                        <h6 className="filter-title">
-                          <a
-                            href="javascript:void(0);"
-                            className="w-100 collapsed"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#collapseSix"
-                            aria-expanded="true"
-                            aria-controls="collapseSix"
-                          >
-                            Customer Recommendation
-                            <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
-                            </span>
-                          </a>
-                        </h6>
-                      </div>
-                      <div
-                        id="collapseSix"
-                        className="collapse"
-                        aria-labelledby="headingSix"
-                        data-bs-parent="#accordionExample6"
-                      >
-                        <div className="card-body-chat">
-                          <div id="checkBoxes5">
-                            <div className="selectBox-cont">
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" /> 70% &amp; up
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" /> 60% &amp; up
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" /> 50% &amp; up
-                              </label>
-                              <label className="custom_check w-100">
-                                <input type="checkbox" name="category" />
-                                <span className="checkmark" /> 40% &amp; up
-                              </label>
-                              <div className="viewall-Two">
-                                <label className="custom_check w-100">
-                                  <input type="checkbox" name="username" />
+                              {[5, 4, 3, 2, 1].map((rating) => (
+                                <label
+                                  className="custom_check w-100"
+                                  key={rating}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    name="rating"
+                                    checked={filters.rating?.includes(
+                                      rating.toString()
+                                    )}
+                                    onChange={() =>
+                                      handleFilterChange(
+                                        "rating",
+                                        rating.toString()
+                                      )
+                                    }
+                                  />
                                   <span className="checkmark" />
-                                  30% &amp; up
+                                  {[...Array(5)].map((_, i) => (
+                                    <i
+                                      key={i}
+                                      className={`fas fa-star ${
+                                        i < rating ? "filled" : ""
+                                      }`}
+                                    />
+                                  ))}
+                                  <span className="rating-count">
+                                    {rating}.0
+                                  </span>
                                 </label>
-                              </div>
+                              ))}
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
+
                   <button
-                    type="submit"
+                    type="button"
                     className="d-inline-flex align-items-center justify-content-center btn w-100 btn-primary filter-btn"
+                    onClick={applyFilters}
                   >
                     <span>
-                      <i className="feather-filter me-2" />
+                     <Filter size={18} className="me-2" />
                     </span>
-                    Filter results
+                    Apply Filters
                   </button>
-                  <a href="#" className="reset-filter">
+
+                  <a
+                    href="#javascript"
+                    className="reset-filter"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      resetFilters();
+                      setTimeout(() => fetchCars(), 100);
+                    }}
+                  >
                     Reset Filter
                   </a>
                 </form>
               </div>
+
+              {/* Cars Listing */}
               <div className="col-lg-9">
-                <div className="row">
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <div className="img-slider owl-carousel">
-                          <div className="slide-images">
-                            <Link to="/listing-details" >
-                              <img
-                                src="/user-assets/img/cars/car-01.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details" >
-                              <img
-                                src="/user-assets/img/cars/car-01-slide1.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details" >
-                              <img
-                                src="/user-assets/img/cars/car-01-slide2.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details" >
-                              <img
-                                src="/user-assets/img/cars/car-01-slide3.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="fav-item justify-content-end">
-                          <span className="img-count">
-                            <i className="feather-image" />
-                            04
-                          </span>
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Toyota</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-04.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">
-                                Toyota Camry SE 350
+                {loading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p className="mt-2">Loading cars...</p>
+                  </div>
+                ) : cars.length === 0 ? (
+                  <div className="text-center py-5">
+                    <h4>No cars found</h4>
+                    <p>Try adjusting your search criteria</p>
+                    <button
+                      className="btn btn-primary mt-2"
+                      onClick={resetFilters}
+                    >
+                      Reset Filters
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="row">
+                      {cars.map((car) => (
+                        <div
+                          className="col-xxl-4 col-lg-6 col-md-6 col-12"
+                          key={car?._id}
+                        >
+                          <div className="listing-item">
+                            <div className="listing-img">
+                              <Link to={`/listing-details/${car._id}`}>
+                                <img
+                                  src={BASE_URL_IMG + car?.image}
+                                  className="img-fluid"
+                                  alt={car?.name}
+                                  onError={(e) => {
+                                    e.target.src =
+                                      "/user-assets/img/car/car-01.jpg";
+                                  }}
+                                />
                               </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 138 Reviews</span>
+                            <div className="fav-item justify-content-end">
+  <button
+    onClick={() => handleWishlist(car._id)}
+    className="btn btn-link p-0 border-0"
+  >
+    <Heart
+      size={20}
+      color={wishlist.includes(car?._id) ? "red" : "gray"}
+      fill={wishlist.includes(car?._id) ? "red" : "none"}
+    />
+  </button>
+</div>
+                              <span className="featured-text">
+                                {car?.carBrand?.brandName}
+                              </span>
                             </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              3.2m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-01.svg"
-                                  alt="Auto"
-                                />
-                              </span>
-                              <p>Auto</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="10 KM"
-                                />
-                              </span>
-                              <p>10 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Petrol"
-                                />
-                              </span>
-                              <p>Petrol</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2018}
-                                />
-                              </span>
-                              <p>2018</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Washington
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $160 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="feature-text">
-                        <span className="bg-danger">Featured</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <div className="img-slider owl-carousel">
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-02.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-02-slide1.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-02-slide2.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-02-slide3.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="fav-item justify-content-end">
-                          <span className="img-count">
-                            <i className="feather-image" />
-                            04
-                          </span>
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">KIA</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-02.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">Kia Soul 2016</Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 170 Reviews</span>
+                            <div className="listing-content">
+                              <div className="listing-features d-flex align-items-end justify-content-between">
+                                <div className="list-rating">
+                                  <h3 className="listing-title">
+                                    <Link to={`/listing-details/${car?._id}`}>
+                                      {car?.name}
+                                    </Link>
+                                  </h3>
+                                  <div className="list-rating">
+                                    {[...Array(5)].map((_, i) => (
+                                      <i
+                                        key={i}
+                                        className={`fas fa-star ${
+                                          i < Math.floor(car.rating || 0)
+                                            ? "filled"
+                                            : ""
+                                        }`}
+                                      />
+                                    ))}
+                                    <span>({car?.rating || 0}) Reviews</span>
+                                  </div>
+                                </div>
+                                <div className="list-km">
+                                  <span className="km-count">
+                                    <img
+                                      src="/user-assets/img/icons/map-pin.svg"
+                                      alt="location"
+                                    />
+                                    {car?.distance || "N/A"}
+                                  </span>
+                                </div>
+                              </div>
+                              <div className="listing-details-group">
+                                <ul>
+                                  <li>
+                                    <span>
+                                      <img
+                                        src="/user-assets/img/icons/car-parts-01.svg"
+                                        alt="Transmission"
+                                      />
+                                    </span>
+                                    <p>
+                                      {car?.carTransmission?.carTransmission ||
+                                        "N/A"}
+                                    </p>
+                                  </li>
+                                  <li>
+                                    <span>
+                                      <img
+                                        src="/user-assets/img/icons/car-parts-02.svg"
+                                        alt="Mileage"
+                                      />
+                                    </span>
+                                    <p>{car.mileage || "N/A"}</p>
+                                  </li>
+                                  <li>
+                                    <span>
+                                      <img
+                                        src="/user-assets/img/icons/car-parts-03.svg"
+                                        alt="Fuel Type"
+                                      />
+                                    </span>
+                                    <p>{car.carFuel?.carFuel || "N/A"}</p>
+                                  </li>
+                                </ul>
+                                <ul>
+                                  <li>
+                                    <span>
+                                      <img
+                                        src="/user-assets/img/icons/car-parts-04.svg"
+                                        alt="Power"
+                                      />
+                                    </span>
+                                    <p>{"Power"}</p>
+                                  </li>
+                                  <li>
+                                    <span>
+                                      <img
+                                        src="/user-assets/img/icons/car-parts-05.svg"
+                                        alt="Year"
+                                      />
+                                    </span>
+                                    <p>
+                                      {car?.year
+                                        ? new Date(car.year).getFullYear()
+                                        : "N/A"}
+                                    </p>
+                                  </li>
+                                  <li>
+                                    <span>
+                                      <img
+                                        src="/user-assets/img/icons/car-parts-06.svg"
+                                        alt="Seats"
+                                      />
+                                    </span>
+                                    <p>
+                                      {car.carSeats?.carSeats || "N/A"} Persons
+                                    </p>
+                                  </li>
+                                </ul>
+                              </div>
+                              <div className="listing-location-details">
+                                <div className="listing-price">
+                                  <span>
+                                   <MapPin size={16} className="me-2" />
+                                  </span>
+                                  {car.mainLocation?.title ||
+                                    "Location not specified"}
+                                </div>
+                                <div className="listing-price">
+                                  <h6>
+                                    ${car.pricing?.prices?.daily || "0"}
+                                    <span>/ Day</span>
+                                  </h6>
+                                </div>
+                              </div>
+                              <div className="listing-button">
+                                <Link
+                                  to={`/listing-details/${car._id}`}
+                                  className="btn btn-order"
+                                >
+                                  <span>
+                                   <Calendar size={18} className="me-2" />
+
+                                  </span>
+                                  Rent Now
+                                </Link>
+                              </div>
                             </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              4.0m
-                            </span>
+                            {car.isFeatured && (
+                              <div className="feature-text">
+                                <span className="bg-danger">Featured</span>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-01.svg"
-                                  alt="Auto"
-                                />
-                              </span>
-                              <p>Auto</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="22 KM"
-                                />
-                              </span>
-                              <p>22 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Petrol"
-                                />
-                              </span>
-                              <p>Petrol</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Diesel"
-                                />
-                              </span>
-                              <p>Diesel</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2016}
-                                />
-                              </span>
-                              <p>2016</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Belgium
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $80 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                           
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <Link  to="/listing-details" >
-                          <img
-                            src="/user-assets/img/cars/car-03.jpg"
-                            className="img-fluid"
-                            alt="Audi"
-                          />
-                        </Link>
-                        <div className="fav-item justify-content-end">
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Audi</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-03.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details" >
-                                Audi A3 2019 new
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 150 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              3.5m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt="Manual"
-                                />
-                              </span>
-                              <p>Manual</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="10 KM"
-                                />
-                              </span>
-                              <p>10 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Petrol"
-                                />
-                              </span>
-                              <p>Petrol</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2019}
-                                />
-                              </span>
-                              <p>2019</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>4 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Newyork, USA
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $45 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                           
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <Link to="/listing-details">
-                          <img
-                            src="/user-assets/img/cars/car-04.jpg"
-                            className="img-fluid"
-                            alt="Audi"
-                          />
-                        </Link>
-                        <div className="fav-item justify-content-end">
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Ferrai</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-04.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="" >
-                                Ferrari 458 MM Speciale
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 160 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              3.5m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt="Manual"
-                                />
-                              </span>
-                              <p>Manual</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="14 KM"
-                                />
-                              </span>
-                              <p>14 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Diesel"
-                                />
-                              </span>
-                              <p>Diesel</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Basic"
-                                />
-                              </span>
-                              <p>Basic</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2022}
-                                />
-                              </span>
-                              <p>2022</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Newyork, USA
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $160 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="feature-text">
-                        <span className="bg-danger">Featured</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <Link to="/listing-details">
-                          <img
-                            src="/user-assets/img/cars/car-05.jpg"
-                            className="img-fluid"
-                            alt="Audi"
-                          />
-                        </Link>
-                        <div className="fav-item justify-content-end">
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Chevrolet</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-05.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">
-                                2018 Chevrolet Camaro
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <span>(5.0) 200 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              4.5m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt="Manual"
-                                />
-                              </span>
-                              <p>Manual</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="18 KM"
-                                />
-                              </span>
-                              <p>18 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Diesel"
-                                />
-                              </span>
-                              <p>Diesel</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2018}
-                                />
-                              </span>
-                              <p>2018</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>4 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Germany
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $36 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="feature-text">
-                        <span className="bg-warning">Top Rated</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <Link to="/listing-details">
-                          <img
-                            src="/user-assets/img/cars/car-06.jpg"
-                            className="img-fluid"
-                            alt="Audi"
-                          />
-                        </Link>
-                        <div className="fav-item justify-content-end">
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Acura</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-06.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">
-                                Acura Sport Version
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 125 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              3.2m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-01.svg"
-                                  alt="Auto"
-                                />
-                              </span>
-                              <p>Auto</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="12 KM"
-                                />
-                              </span>
-                              <p>12 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Diesel"
-                                />
-                              </span>
-                              <p>Diesel</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2013}
-                                />
-                              </span>
-                              <p>2013</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Newyork, USA
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $30 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <div className="img-slider owl-carousel">
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-07.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-07-slide1.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-07-slide2.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-07-slide3.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="fav-item justify-content-end">
-                          <span className="img-count">
-                            <i className="feather-image" />
-                            04
-                          </span>
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Chevrolet</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-07.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">
-                                Chevrolet Pick Truck 3.5L
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 165 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              3.6m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt="Manual"
-                                />
-                              </span>
-                              <p>Manual</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="10 KM"
-                                />
-                              </span>
-                              <p>10 KM</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Petrol"
-                                />
-                              </span>
-                              <p>Petrol</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2012}
-                                />
-                              </span>
-                              <p>2012</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Spain
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $77 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <div className="img-slider owl-carousel">
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-10.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-10-slide1.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-10-slide2.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-10-slide3.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="fav-item justify-content-end">
-                          <span className="img-count">
-                            <i className="feather-image" />
-                            04
-                          </span>
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Ford</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-10.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">
-                                Ford Mustang 4.0 AT
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 170 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              4.1m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-01.svg"
-                                  alt="Auto"
-                                />
-                              </span>
-                              <p>Auto</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="22 miles"
-                                />
-                              </span>
-                              <p>42 miles</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Petrol"
-                                />
-                              </span>
-                              <p>Petrol</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2019}
-                                />
-                              </span>
-                              <p>2021</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Dallas, USA
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $80 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="feature-text">
-                        <span className="bg-danger">Featured</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                  {/* col */}
-                  <div className="col-xxl-4 col-lg-6 col-md-6 col-12">
-                    <div className="listing-item">
-                      <div className="listing-img">
-                        <div className="img-slider owl-carousel">
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-08.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-08-slide1.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-08-slide2.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                          <div className="slide-images">
-                            <Link to="/listing-details">
-                              <img
-                                src="/user-assets/img/cars/car-08-slide3.jpg"
-                                className="img-fluid"
-                                alt="Toyota"
-                              />
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="fav-item justify-content-end">
-                          <span className="img-count">
-                            <i className="feather-image" />
-                            04
-                          </span>
-                          <a href="javascript:void(0)" className="fav-icon">
-                            <i className="feather-heart" />
-                          </a>
-                        </div>
-                        <span className="featured-text">Toyota</span>
-                      </div>
-                      <div className="listing-content">
-                        <div className="listing-features d-flex align-items-end justify-content-between">
-                          <div className="list-rating">
-                            <a href="javascript:void(0)" className="author-img">
-                              <img
-                                src="/user-assets/img/profiles/avatar-08.jpg"
-                                alt="author"
-                              />
-                            </a>
-                            <h3 className="listing-title">
-                              <Link to="/listing-details">
-                                Toyota Tacoma 4WD
-                              </Link>
-                            </h3>
-                            <div className="list-rating">
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star filled" />
-                              <i className="fas fa-star" />
-                              <span>(4.0) 138 Reviews</span>
-                            </div>
-                          </div>
-                          <div className="list-km">
-                            <span className="km-count">
-                              <img
-                                src="/user-assets/img/icons/map-pin.svg"
-                                alt="author"
-                              />
-                              4.1m
-                            </span>
-                          </div>
-                        </div>
-                        <div className="listing-details-group">
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-01.svg"
-                                  alt="Auto"
-                                />
-                              </span>
-                              <p>Auto</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-02.svg"
-                                  alt="22 miles"
-                                />
-                              </span>
-                              <p>22 miles</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-03.svg"
-                                  alt="Diesel"
-                                />
-                              </span>
-                              <p>Diesel</p>
-                            </li>
-                          </ul>
-                          <ul>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-04.svg"
-                                  alt="Power"
-                                />
-                              </span>
-                              <p>Power</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-05.svg"
-                                  alt={2019}
-                                />
-                              </span>
-                              <p>2019</p>
-                            </li>
-                            <li>
-                              <span>
-                                <img
-                                  src="/user-assets/img/icons/car-parts-06.svg"
-                                  alt="Persons"
-                                />
-                              </span>
-                              <p>5 Persons</p>
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="listing-location-details">
-                          <div className="listing-price">
-                            <span>
-                              <i className="feather-map-pin" />
-                            </span>
-                            Dallas, USA
-                          </div>
-                          <div className="listing-price">
-                            <h6>
-                              $30 <span>/ Day</span>
-                            </h6>
-                          </div>
-                        </div>
-                        <div className="listing-button">
-                          <Link to="/listing-details"
-                            
-                            className="btn btn-order"
-                          >
-                            <span>
-                              <i className="feather-calendar me-2" />
-                            </span>
-                            Rent Now
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  {/* /col */}
-                </div>
-                {/*Pagination*/}
-                <div className="blog-pagination">
-                  <nav>
-                    <ul className="pagination page-item justify-content-center">
-                      <li className="previtem">
-                        <a className="page-link" href="#">
-                          <i className="fas fa-regular fa-arrow-left me-2" />{" "}
-                          Prev
-                        </a>
-                      </li>
-                      <li className="justify-content-center pagination-center">
-                        <div className="page-group">
-                          <ul>
-                            <li className="page-item">
-                              <a className="page-link" href="#">
-                                1
-                              </a>
-                            </li>
-                            <li className="page-item">
-                              <a className="active page-link" href="#">
-                                2{" "}
-                                <span className="visually-hidden">
-                                  (current)
-                                </span>
-                              </a>
-                            </li>
-                            <li className="page-item">
-                              <a className="page-link" href="#">
-                                3
-                              </a>
-                            </li>
-                          </ul>
-                        </div>
-                      </li>
-                      <li className="nextlink">
-                        <a className="page-link" href="#">
-                          Next{" "}
-                          <i className="fas fa-regular fa-arrow-right ms-2" />
-                        </a>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-                {/*/Pagination*/}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && renderPagination()}
+                  </>
+                )}
               </div>
             </div>
           </div>
         </section>
         {/* /Car Grid View */}
       </div>
-      {/* scrollToTop start */}
-      {/* <div className="progress-wrap active-progress">
-        <svg
-          className="progress-circle svg-content"
-          width="100%"
-          height="100%"
-          viewBox="-1 -1 102 102"
-        >
-          <path
-            d="M50,1 a49,49 0 0,1 0,98 a49,49 0 0,1 0,-98"
-            style={{
-              transition: "stroke-dashoffset 10ms linear 0s",
-              strokeDasharray: "307.919px, 307.919px",
-              strokeDashoffset: "228.265px",
-            }}
-          />
-        </svg>
-      </div> */}
     </div>
   );
 };

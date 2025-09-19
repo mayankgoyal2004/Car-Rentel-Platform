@@ -1,5 +1,5 @@
 const Reservation = require("../models/reservationModel");
-const Car = require("../models/carModel");
+const Car = require("../models/CarModule");
 const Driver = require("../models/DriverModel");
 
 const addReservation = async (req, res) => {
@@ -20,18 +20,21 @@ const addReservation = async (req, res) => {
       pickupDate,
       dropDate,
       driver_id,
+      driverType,
       paymentStatus,
       paymentMethod,
       transactionId,
-      extraService_id,
-      driverType,
-      couponCode,
-      pricingDetails,
+      extraService_id, // should be an array: [{ service, price }]
+      securityDeposit,
+
+      carPrice,
+
+      DriverPrice,
       totalPrice,
+      pricingDetails,
     } = req.body;
 
-
-    if (!car_id || !customer_id || !pickupDate || !dropDate) {
+    if (!car_id || !customer_id || !pickupDate || !dropDate || !bookingType) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required fields" });
@@ -64,34 +67,37 @@ const addReservation = async (req, res) => {
       }
     }
 
-    const orderId = "#" + Math.floor(100000 + Math.random() * 900000);
+    const bookingId = "#" + Math.floor(100000 + Math.random() * 900000);
 
     const reservation = new Reservation({
-      orderId,
+      bookingId,
       car: car_id,
-      user: customer_id,
+      customer: customer_id, // ✅ matches schema
       rentalType,
-      pricing: pricing_id,
       pickupLocation,
+
       pickupAddress,
       dropLocation,
       dropAddress,
-      noOfPassengers,
+      passengers: noOfPassengers,
       bookingType,
       pickupTime,
       dropTime,
       pickupDate,
+      driverType,
       dropDate,
       driver: assignedDriver,
       paymentStatus,
       paymentMethod,
       transactionId,
-      extraService: extraService_id,
-      driverType,
-      couponCode,
+      extraServices: extraService_id,
+
+      securityDeposit,
+      carPrice,
       totalPrice,
+      pricingDetails,
       createdBy: req.user._id,
-      admin: req.user.admin
+      admin: req.user.admin,
     });
 
     await reservation.save();
@@ -115,14 +121,13 @@ const updateReservation = async (req, res) => {
     const { id } = req.params;
     const {
       car_id,
-      user_id,
+      customer_id,
       rentalType,
       pricing_id,
       pickupLocation,
-      pickupAddress,
+
       dropLocation,
-      dropAddress,
-      noOfPassengers,
+
       bookingType,
       pickupTime,
       dropTime,
@@ -132,13 +137,12 @@ const updateReservation = async (req, res) => {
       paymentStatus,
       paymentMethod,
       transactionId,
-      extraService_id,
+      extraServices, // should be an array: [{ service, price }]
       driverType,
-      couponCode,
+      carPrice,
+      DriverPrice,
       totalPrice,
-      status,
-      cancellationReason,
-      rejectionReason,
+      pricingDetails,
     } = req.body;
 
     const reservation = await Reservation.findById(id);
@@ -260,7 +264,9 @@ const getAllReservationByCustomer = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalReservations = await Reservation.countDocuments({ createdAt: _id });
+    const totalReservations = await Reservation.countDocuments({
+      createdAt: _id,
+    });
 
     res.status(200).json({
       success: true,
@@ -297,10 +303,10 @@ const getAllReservationsForAdmin = async (req, res) => {
       });
     }
     const reservations = await Reservation.find({ car: { $in: carIds } })
-      .populate("car")
-      .populate("user")
-      .populate("driver")
-      .populate("extraService")
+      .populate("car", "carName image")
+      .populate("customer", "name image")
+     
+
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -327,10 +333,28 @@ const getAllReservationsForAdmin = async (req, res) => {
   }
 };
 
+
+const getsingleReservation  = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const reservation = await Reservation.findById(id).populate("car" ,"carName carModel")
+      ("customer", "name image contact")
+      ("driver", "name image contact")
+      if (!reservation) {
+        return res
+          .status(404)
+          .json({ success: false, message: "reservation not found" });
+      }
+      res.json({ success: true, data: reservation });
+    } catch (err) {
+      res.status(500).json({ success: false, message: err.message });
+    }
+}
 module.exports = {
   addReservation,
   updateReservation,
   deleteReservation,
   getAllReservationByCustomer,
-  getAllReservationsForAdmin
+  getAllReservationsForAdmin,
+  getsingleReservation
 };

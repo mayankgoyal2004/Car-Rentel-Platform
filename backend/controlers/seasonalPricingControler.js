@@ -159,9 +159,42 @@ const getAllSeasonalPricing = async (req, res) => {
   }
 };
 
+const getAllActiveSeasionlaPricing = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const seasionalPricing = await SeasonalPricing.find({
+      admin: adminId,
+      status: true,
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: seasionalPricing,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({
+        success: false,
+        data: seasionalPricing,
+        message: "Server Error",
+        error: err.message,
+      });
+  }
+};
+
 module.exports = {
   addSeasonalPricing,
   updateSeasonalPricing,
   deleteSeasonalPricing,
   getAllSeasonalPricing,
+  getAllActiveSeasionlaPricing,
 };

@@ -57,6 +57,17 @@ const addDriver = async (req, res) => {
         .json({ success: false, message: "gender number is required" });
     }
 
+    const existingDriver = await Driver.findOne({
+      email,
+    });
+    if (existingDriver) {
+      return res.status(409).json({
+        success: false,
+        status: 409,
+        message: "Driver already exists",
+      });
+    }
+
     const exitingDriverLicenseNUmber = await Driver.findOne({ licenseNumber });
     if (exitingDriverLicenseNUmber) {
       return res.status(409).json({
@@ -70,16 +81,27 @@ const addDriver = async (req, res) => {
       return res.status(409).json({
         success: false,
         status: 409,
-        message: "licenseNumber already exists",
+        message: "Contact already exists",
       });
     }
 
     const imagePath = req.files?.image
       ? req.files.image[0].path.replace(/\\/g, "/")
       : null;
+    if (!imagePath) {
+      return res
+        .status(400)
+        .json({ success: false, message: "image is required" });
+    }
+
     const filePath = req.files?.file
       ? req.files.file[0].path.replace(/\\/g, "/")
       : null;
+    if (!filePath) {
+      return res
+        .status(400)
+        .json({ success: false, message: "file is required" });
+    }
 
     const driver = new Driver({
       name,
@@ -92,6 +114,7 @@ const addDriver = async (req, res) => {
       image: imagePath,
       file: filePath,
       createdBy: req.user?._id,
+      admin: req.user?.admin,
       gender,
     });
 
@@ -118,7 +141,7 @@ const updateDriver = async (req, res) => {
     dateOfIssue,
     validTill,
     address,
-    status,
+    isActive,
   } = req.body;
 
   const driver = await Driver.findById(id);
@@ -135,7 +158,7 @@ const updateDriver = async (req, res) => {
     driver.dateOfIssue = dateOfIssue;
     driver.validTill = validTill;
     driver.address = address;
-    driver.status = status;
+    driver.isActive = isActive;
     driver.gender = gender;
     if (req.files?.image) {
       driver.image = req.files.image[0].path.replace(/\\/g, "/");
@@ -179,13 +202,25 @@ const getAllDriver = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const { _id } = req.user;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
 
-    const driver = await Driver.find({ createdBy: _id })
+    const driver = await Driver.find(filter)
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalDriver = await Driver.countDocuments({ createdBy: _id });
+    const totalDriver = await Driver.countDocuments(filter);
 
     res.json({
       success: true,
@@ -203,4 +238,41 @@ const getAllDriver = async (req, res) => {
   }
 };
 
-module.exports = { addDriver, updateDriver, deleteDriver, getAllDriver };
+const getAllActiveDriver = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const driver = await Driver.find({
+      admin: adminId,
+      status: "available",
+      isActive: true,
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: driver,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+module.exports = {
+  addDriver,
+  updateDriver,
+  deleteDriver,
+  getAllDriver,
+  getAllActiveDriver,
+};

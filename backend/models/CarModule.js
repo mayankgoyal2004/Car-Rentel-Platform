@@ -15,9 +15,6 @@ const CarSchema = new mongoose.Schema(
     plateNumber: {
       type: String,
     },
-    NoofSeats: {
-      type: Number,
-    },
 
     vinNumber: {
       type: String,
@@ -81,34 +78,21 @@ const CarSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Location",
     },
-    Pricing: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Pricing",
-    },
 
     status: { type: Boolean, default: false }, // superAdmin approves
-    isAvailable: { type: Boolean, default: false }, // admin toggle availability
+    isAvailable: { type: Boolean, default: true }, // admin toggle availability
     inRent: { type: Boolean, default: false }, // when car is rented
-    Damage: [
+
+    carVideo: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Damage",
+        type: String,
       },
     ],
-    carFaq: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CarFaq",
-      },
-    ],
-    carVideo: [{
-      type: String,
-    }],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     admin: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "User",
-        },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     carDocuments: [
       {
         type: String,
@@ -117,6 +101,29 @@ const CarSchema = new mongoose.Schema(
     carPolicies: [
       {
         type: String,
+      },
+    ],
+
+    description: { type: String },
+    videoPlatform: { type: String },
+    pricing: { type: mongoose.Schema.Types.ObjectId, ref: "Pricing" },
+    damages: [
+      {
+        location: { type: String },
+        type: { type: String },
+        description: { type: String },
+      },
+    ],
+    faqs: [
+      {
+        question: {
+          type: String,
+          required: true,
+        },
+        answer: {
+          type: String,
+          required: true,
+        },
       },
     ],
   },

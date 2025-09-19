@@ -5,7 +5,6 @@ import apiService from "../../../Apiservice/apiService";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 
-
 const AdminCarColor = () => {
   const [carColor, setCarColor] = useState([]);
   const [newCarColor, setnewCarColor] = useState("");
@@ -201,8 +200,8 @@ const AdminCarColor = () => {
                     <td>
                       <div className="d-inline-flex gap-2 align-items-center">
                         <div
-                          className="coloredsquare"
-                          style={{ backgroundColor: color.colorValue }}
+                        
+                       
                         />
                         <h6 className="fw-medium">
                           <a>{color.carColor}</a>
@@ -335,24 +334,6 @@ const AdminCarColor = () => {
                   placeholder="Enter Color"
                   onChange={(e) => setnewCarColor(e.target.value)}
                 />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">
-                  Color Value <span className="text-danger">*</span>
-                </label>
-                <div className="colorbox-container">
-                  <input
-                    type="color"
-                    className="colorbox"
-                    onChange={(e) => setnewCarColor(e.target.value)}
-                  />
-                  <input
-                    type="text"
-                    className="form-control colorhex"
-                    value={newCarColor}
-                    onChange={(e) => setnewCarColor(e.target.value)}
-                  />
-                </div>
               </div>
             </div>
             <div className="modal-footer">

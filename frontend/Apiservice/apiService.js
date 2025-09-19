@@ -102,6 +102,9 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  getAllActiveBlogCategoryHomepage() {
+    return axios.get(BASE_URL + "blogs/all-active-category-home");
+  }
 
   getAllBlogCategorySuperAdmin({ search = "", page } = {}) {
     return axios.get(
@@ -142,20 +145,20 @@ class apiServices {
       { headers: getAuthHeaders() }
     );
   }
-  getBlogsForUser({
-    search = "",
-    category = "",
-    tag = "",
-    page = 1,
-    limit = 10,
-  } = {}) {
+  getBlogsForUser({ search = "", category = "", page = 1, limit = 10 } = {}) {
     return axios.get(
       BASE_URL +
-        `blogs/user?search=${search}&category=${category}&tag=${tag}&page=${page}&limit=${limit}`
+        `blogs/user?search=${search}&category=${category}&page=${page}&limit=${limit}`
     );
   }
+
   getSingleBlogForAdmin(id) {
     return axios.get(BASE_URL + `blogs/get-single-blog-admin/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getSingleBlogUser(slug) {
+    return axios.get(BASE_URL + `blogs/get-single-blog-user/${slug}`, {
       headers: getAuthHeaders(),
     });
   }
@@ -220,6 +223,71 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+
+  //!! driver api
+  getAllDriverAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-driver?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  getAllActiveDriver() {
+    return axios.get(BASE_URL + `get-all-active-driver`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addDriver(data) {
+    return axios.post(BASE_URL + "add-driver", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateDriver(id, data) {
+    return axios.post(BASE_URL + `update-driver/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteDriver(data) {
+    return axios.delete(BASE_URL + `delete-driver/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! driver api
+  getAllCustomerAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-customer?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  getAllActiveCustomer() {
+    return axios.get(BASE_URL + `get-all-active-customer`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getCustomerById(id) {
+    return axios.get(BASE_URL + `get-customer-by-id/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addCustomer(data) {
+    return axios.post(BASE_URL + "add-customer", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCustomer(id, data) {
+    return axios.post(BASE_URL + `update-customer/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteCustomer(data) {
+    return axios.delete(BASE_URL + `delete-customer/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
   //!!! Faq category api
 
   getAllFaqCategory({ search = "", page } = {}) {
@@ -259,6 +327,15 @@ class apiServices {
     });
   }
 
+  getAllTestimocialUser({ search = "", page = 1, limit = 4 } = {}) {
+    return axios.get(
+      BASE_URL +
+        `get-all-testimonial-user?search=${search}&page=${page}&limit=${limit}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
   addFaq(data) {
     return axios.post(BASE_URL + "add-faq", data, {
       headers: getAuthHeaders(),
@@ -274,11 +351,23 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  getFaqHomePage() {
+    return axios.get(BASE_URL + `get-all-active-faq-homepage`);
+  }
   //!!!!! testimonial
 
   getAlltestimonial({ search = "", page } = {}) {
     return axios.get(
       BASE_URL + `get-all-testimonial-admin?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  getAllactiveFaquser({ search = "", page = 1, limit = 4 } = {}) {
+    return axios.get(
+      BASE_URL +
+        `get-all-active-faq?search=${search}&page=${page}&limit=${limit}`,
       {
         headers: getAuthHeaders(),
       }
@@ -300,6 +389,11 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  //!!! homepage testimonials
+  getTestominialHomePage() {
+    return axios.get(BASE_URL + `get-all-testimonial-homepage`);
+  }
+
   //!!!!! location country api
 
   getAllCountry({ search = "", page } = {}) {
@@ -407,6 +501,12 @@ class apiServices {
     );
   }
 
+  getAllActiveSeasionalPricing() {
+    return axios.get(BASE_URL + `get-all-active-seasonal-pricing`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
   addSeasionalPricing(data) {
     return axios.post(BASE_URL + "add-seasonal-pricing", data, {
       headers: getAuthHeaders(),
@@ -434,6 +534,11 @@ class apiServices {
     );
   }
 
+  getAllactiveExtraServices() {
+    return axios.get(BASE_URL + `get-all-active-extra-services`, {
+      headers: getAuthHeaders(),
+    });
+  }
   addExtraService(data) {
     return axios.post(BASE_URL + "add-extra-service", data, {
       headers: getAuthHeaders(),
@@ -460,6 +565,11 @@ class apiServices {
         headers: getAuthHeaders(),
       }
     );
+  }
+  getAllActiveLocation() {
+    return axios.get(BASE_URL + `get-all-active-location`, {
+      headers: getAuthHeaders(),
+    });
   }
 
   addLocation(data) {
@@ -795,23 +905,172 @@ class apiServices {
 
   addCarBrand(data) {
     return axios.post(BASE_URL + "add-car-brand", data, {
-      headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "multipart/form-data",
-      },
+      headers: getAuthHeaders(),
     });
   }
   updateCarBrand(id, data) {
     return axios.post(BASE_URL + `update-car-brand/${id}`, data, {
-      headers: {
-        ...getAuthHeaders(),
-        "Content-Type": "multipart/form-data",
-      },
+      headers: getAuthHeaders(),
     });
   }
 
   deleteCarBrand(data) {
     return axios.delete(BASE_URL + `delete-car-brand/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!! car api
+
+  getAllCarAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-admin?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllCarsForSuperAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-cars-super-admin?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+
+  //!! car api
+  addBasicCar(data) {
+    return axios.post(BASE_URL + "add-car", data, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+  updateCarFeatures(id, data) {
+    return axios.put(BASE_URL + `update-car/${id}/features`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarExtraFeatures(id, data) {
+    return axios.put(BASE_URL + `update-car/${id}/extraService`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  uploadCarDocument(id, data) {
+    return axios.post(BASE_URL + `cars/${id}/upload`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarDamage(id, data) {
+    return axios.post(BASE_URL + `cars/${id}/damages`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateCarFaq(id, data) {
+    return axios.post(BASE_URL + `cars/${id}/faqs`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllDamage(id) {
+    return axios.get(BASE_URL + `get-car/${id}/damage`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  updateCarPricing(id, data) {
+    return axios.post(BASE_URL + `update-cars/${id}/pricing`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllcarHomePage(filters = {}) {
+    return axios.get(BASE_URL + `all-cars-home-page`, {
+      params: filters,
+      paramsSerializer: (params) => new URLSearchParams(params).toString(),
+    });
+  }
+  //!!! reservation api
+
+  getAllReservationAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-reservation?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+
+  addCarReservationByAdmin(data) {
+    return axios.post(BASE_URL + "add-reservation-admin", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllAproverCarAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL +
+        `get-all-active-reservation-admin?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+
+  getsinglereservaton(id) {
+    return axios.get(BASE_URL + `get-reservation-by/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! contact api
+
+  getAllContactAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-contact-admin?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  addcontact(data) {
+    return axios.post(BASE_URL + "add-constact", data);
+  }
+  deletecontact(id) {
+    return axios.delete(BASE_URL + `delete-constact/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! blog comments api for blog
+
+  getCommentBlog(id) {
+    return axios.get(BASE_URL + `blogs/get-comments/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addblogComment(id, data) {
+    return axios.post(BASE_URL + `blogs/comments/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllCommentsAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `blogs/get-comments-admin?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllblogsComment(id) {
+    return axios.get(BASE_URL + `blogs/get-all-comments-user/${id}`);
+  }
+  deleteblogComment(data) {
+    return axios.delete(BASE_URL + `blogs/comments/delete/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! wishlist toogle api
+  addWishlist(data) {
+    return axios.post(BASE_URL + "toggle-wishlist", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getWishlist() {
+    return axios.get(BASE_URL + `get-wishlist`, {
       headers: getAuthHeaders(),
     });
   }

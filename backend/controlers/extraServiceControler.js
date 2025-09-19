@@ -150,10 +150,37 @@ const getAllExtraServices = async (req, res) => {
       .json({ success: false, message: "Server Error", error: err.message });
   }
 };
+const getAllActiveExtraService = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const extraService = await ExtraService.find({
+      admin: adminId,
+      status: true,
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      data: extraService,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 
 module.exports = {
   addExtraService,
   updateExtraService,
   deleteExtraService,
   getAllExtraServices,
+  getAllActiveExtraService
 };

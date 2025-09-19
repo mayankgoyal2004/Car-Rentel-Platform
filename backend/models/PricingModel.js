@@ -11,7 +11,9 @@ const PricingSchema = new mongoose.Schema(
     baseKilometers: { type: Number, min: 0, required: true },
     unlimitedKilometers: { type: Boolean, default: false },
     extraKilometerPrice: { type: Number, min: 0, required: true },
-    seasonal: { type: mongoose.Schema.Types.ObjectId, ref: "SeasonalPricing" },
+    seasonal: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "SeasonalPricing" },
+    ],
     insurance: [
       {
         name: String,

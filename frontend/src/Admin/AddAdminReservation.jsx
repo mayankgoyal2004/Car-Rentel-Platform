@@ -32,10 +32,10 @@ const AddAdminReservation = () => {
 
     // Step 4: Billing Details
     baseKilometers: "",
-    unlimitedKilometers: false,
+    // unlimitedKilometers: false,
     kmExtraPrice: "",
-    insuranceEnabled: false,
-    insuranceType: "",
+    // insuranceEnabled: false,
+    // insuranceType: "",
   });
 
   const steps = [
@@ -241,10 +241,10 @@ const AddAdminReservation = () => {
           driver: "",
           extraServices: [],
           baseKilometers: "",
-          unlimitedKilometers: false,
+          // unlimitedKilometers: false,
           kmExtraPrice: "",
-          insuranceEnabled: false,
-          insuranceType: "",
+          // insuranceEnabled: false,
+          // insuranceType: "",
         });
         setCurrentStep(0);
       } else {
@@ -309,9 +309,9 @@ const AddAdminReservation = () => {
     total += parseFloat(reservationData.securityDeposit) || 0;
 
     // Add insurance cost if enabled
-    if (reservationData.insuranceEnabled) {
-      total += reservationData.insuranceType === "full" ? 200 : 100;
-    }
+    // if (reservationData.insuranceEnabled) {
+    //   total += reservationData.insuranceType === "full" ? 200 : 100;
+    // }
 
     return total;
   };
@@ -1206,7 +1206,7 @@ const AddAdminReservation = () => {
                         <label className="form-label">
                           Base Kilometers (Per Day)
                         </label>
-                        <label className="d-flex align-items-center">
+                        {/* <label className="d-flex align-items-center">
                           <input
                             className="form-check-input m-0 me-2"
                             type="checkbox"
@@ -1215,7 +1215,7 @@ const AddAdminReservation = () => {
                             onChange={handleInputChange}
                           />
                           Unlimited
-                        </label>
+                        </label> */}
                       </div>
                       <input
                         type="number"
@@ -1223,7 +1223,7 @@ const AddAdminReservation = () => {
                         name="baseKilometers"
                         value={reservationData.baseKilometers}
                         onChange={handleInputChange}
-                        disabled={reservationData.unlimitedKilometers}
+                        // disabled={reservationData.unlimitedKilometers}
                         min="0"
                       />
                     </div>
@@ -1271,7 +1271,7 @@ const AddAdminReservation = () => {
                     </label>
                   </div>
                 </div>
-
+{/* 
                 {reservationData.insuranceEnabled && (
                   <div className="row">
                     <div className="col-md-6">
@@ -1341,7 +1341,7 @@ const AddAdminReservation = () => {
                       </div>
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="card-footer px-0 pb-0">
@@ -1439,14 +1439,14 @@ const AddAdminReservation = () => {
     );
     
     const securityDeposit = parseFloat(reservationData.securityDeposit) || 0;
-    const insurancePrice = reservationData.insuranceEnabled
-      ? reservationData.insuranceType === "full"
-        ? 200
-        : 100
-      : 0;
+    // const insurancePrice = reservationData.insuranceEnabled
+    //   ? reservationData.insuranceType === "full"
+    //     ? 200
+    //     : 100
+    //   : 0;
 
     const totalPrice =
-      carPrice + driverPrice + servicesPrice + securityDeposit + insurancePrice;
+      carPrice + driverPrice + servicesPrice + securityDeposit ;
 
     return (
       <>

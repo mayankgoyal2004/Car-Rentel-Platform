@@ -944,6 +944,14 @@ class apiServices {
       },
     });
   }
+  editCarBasic( id ,data) {
+    return axios.post(BASE_URL + `edit-car-basics/${id}`, data, {
+      headers: {
+        ...getAuthHeaders(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
   updateCarFeatures(id, data) {
     return axios.put(BASE_URL + `update-car/${id}/features`, data, {
       headers: getAuthHeaders(),
@@ -969,6 +977,11 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  updateCarDescription(id, data) {
+    return axios.post(BASE_URL + `cars/${id}/description`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
 
   getAllDamage(id) {
     return axios.get(BASE_URL + `get-car/${id}/damage`, {
@@ -981,11 +994,27 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+getSingleCarById(id) {
+  return axios.get(BASE_URL + `get-car-by-id-admin/${id}`, {
+    headers: getAuthHeaders(),
+  });
+}
 
   getAllcarHomePage(filters = {}) {
     return axios.get(BASE_URL + `all-cars-home-page`, {
       params: filters,
       paramsSerializer: (params) => new URLSearchParams(params).toString(),
+    });
+  }
+  getCarDetails(id) {
+    return axios.get(BASE_URL + `car-details-user/${id}`);
+  }
+  getCarReview(id) {
+    return axios.get(BASE_URL + `car-review/${id}`);
+  }
+  addCarReview(id, data) {
+    return axios.post(BASE_URL + `add-car-review/${id}`, data, {
+      headers: getAuthHeaders(),
     });
   }
   //!!! reservation api
@@ -1002,6 +1031,26 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  editReservation(id , data) {
+    return axios.post(BASE_URL + `update-reservation/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  editReservationStep2(id , data) {
+    return axios.post(BASE_URL + `edit-reservation-user-step-2/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  editReservationStep3(id , data) {
+    return axios.post(BASE_URL + `edit-reservation-user-step-3/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addReservationByUserStep1(id , data) {
+    return axios.post(BASE_URL + `add-reservation-user-step-1/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
 
   getAllAproverCarAdmin({ search = "", page } = {}) {
     return axios.get(
@@ -1013,6 +1062,12 @@ class apiServices {
 
   getsinglereservaton(id) {
     return axios.get(BASE_URL + `get-reservation-by/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getReservationByIdBooking(id) {
+    return axios.get(BASE_URL + `get-reservation-by-booking/${id}`, {
       headers: getAuthHeaders(),
     });
   }
@@ -1071,6 +1126,35 @@ class apiServices {
 
   getWishlist() {
     return axios.get(BASE_URL + `get-wishlist`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!! update user details
+
+  updateuserDetials(data) {
+    return axios.post(BASE_URL + "update-user-details", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  updateAdmin(data) {
+    return axios.post(BASE_URL + "update-admin", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getUerDetails() {
+    return axios.get(BASE_URL + `get-user-details`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  updateAdminPassword(data) {
+    return axios.post(BASE_URL + "update-admin-password", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  sendEnquiry(id, data) {
+    return axios.post(BASE_URL + `add-enquiry/${id}`, data, {
       headers: getAuthHeaders(),
     });
   }

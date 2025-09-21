@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, Outlet } from "react-router-dom";
+import { User } from "react-feather";
 
 const UserSetting = () => {
   return (
@@ -18,7 +19,7 @@ const UserSetting = () => {
                 <ul>
                   <li>
                     <Link to="" className="active">
-                      <i className="feather-user" /> Profile
+                      <User size={20} />  Profile
                     </Link>
                   </li>
                 </ul>

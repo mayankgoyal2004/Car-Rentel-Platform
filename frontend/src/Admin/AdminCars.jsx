@@ -18,7 +18,6 @@ const AdminCars = () => {
         search: searchQuery,
       });
       if (res.data.success) {
-        // Populate the necessary fields
         const populatedCars = res.data.data.map((car) => ({
           ...car,
           carType: car.carType ? car.carType.carType : "Unknown",
@@ -31,6 +30,8 @@ const AdminCars = () => {
             : "Unknown",
           carSeats: car.carSeats ? car.carSeats.carSeats : "Unknown",
           location: car.mainLocation ? car.mainLocation.location : "Unknown",
+             pricing: car?.pricing?.prices?.daily,
+
         }));
         setCars(populatedCars);
         setTotalPages(res.data.pagination.totalPages || 1);
@@ -147,7 +148,7 @@ const AdminCars = () => {
                 <th>BASE LOCATION</th>
                 <th>PRICE (PER DAY)</th>
                 <th>DAMAGES</th>
-                <th>IS FEATURED</th>
+                {/* <th>IS FEATURED</th> */}
                 <th>CREATED DATE</th>
                 <th>STATUS</th>
                 <th />
@@ -188,14 +189,14 @@ const AdminCars = () => {
                   </td>
                   <td>{car.location}</td>
                   <td>
-                    <p className="fs-14 fw-semibold text-gray-9">$3500</p>
+                    <p className="fs-14 fw-semibold text-gray-9">${car.pricing}</p>
                   </td>
-                  <td>
+                  {/* <td>
                     <p className="text-gray-9">01</p>
                   </td>
                   <td>
                     <i className="ti ti-star-filled text-warning" />
-                  </td>
+                  </td> */}
                   <td>
                     <h6 className="fs-14 fw-normal">
                       {new Date(car.createdAt).toLocaleDateString()}

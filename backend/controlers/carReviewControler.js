@@ -5,27 +5,16 @@ const addCarReview = async (req, res) => {
   try {
     const { carId } = req.params;
     const {
-      service,
-      location,
-      facilities,
-      valueForMoney,
-      cleanliness,
+      carReview,
       comment,
     } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
-    const overall =
-      (+service + +location + +facilities + +valueForMoney + +cleanliness) / 5;
 
     let review = new CarReview({
       car: carId,
       user: userId,
-      service,
-      location,
-      facilities,
-      valueForMoney,
-      cleanliness,
-      overall,
+     carReview,
       comment,
     });
 
@@ -142,4 +131,24 @@ const deleteCarReview = async (req, res) => {
   }
 };
 
-module.exports = { addCarReview, allReviewByUser, allReviewByAdmin , deleteCarReview};
+const getCarReviews = async (req, res) => {
+  try {
+    const { carId } = req.params;
+    const reviews = await CarReview.find({ car: carId })
+      .populate("user", "userName email image") // if you want user details
+      .sort({ createdAt: -1 });
+    
+
+    res.json({ success: true, reviews, total: reviews.length });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+module.exports = {
+  addCarReview,
+  allReviewByUser,
+  allReviewByAdmin,
+  deleteCarReview,
+  getCarReviews,
+};

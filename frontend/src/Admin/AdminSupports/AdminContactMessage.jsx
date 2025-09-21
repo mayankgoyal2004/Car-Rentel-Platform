@@ -104,15 +104,28 @@ const AdminContactMessage = () => {
                       </p>
                     </td>
                     <td>
-                      <span
-                        className="avatar avatar-md bg-light rounded-circle"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        data-bs-title={contact.comments}
-                      >
-                        <i className="ti ti-file-invoice text-gray-9" />
-                      </span>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-icon btn-sm"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <i className="ti ti-message text-gray-9 fs-18" />
+                        </button>
+                        <ul
+                          className="dropdown-menu p-3"
+                          style={{ minWidth: "250px" }}
+                        >
+                          <li>
+                            <p className="mb-0 text-start text-wrap">
+                              {contact.comments || "No message"}
+                            </p>
+                          </li>
+                        </ul>
+                      </div>
                     </td>
+
                     <td>
                       <div className="dropdown">
                         <button

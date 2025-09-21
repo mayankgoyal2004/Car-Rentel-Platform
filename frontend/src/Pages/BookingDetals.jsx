@@ -1,7 +1,12 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 
 const BookingDetals = () => {
+
+    const { id } = useParams();
+
+    
+  
   return (
    <div>
   <div className="main-wrapper">
@@ -65,7 +70,7 @@ const BookingDetals = () => {
           <div className="row">
             <div className="col-lg-8">
               <div className="booking-information-main">
-                <form action="/booking-payment">
+                <form action={`/booking-payment/${id}`}>
                   <div className="booking-information-card">
                     <div className="booking-info-head justify-content-between">
                       <div className="d-flex align-items-center">

@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 const customerschema = new mongoose.Schema(
   {
-    name: { type: String, default: null },
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
     email: { type: String, default: null },
     contact: { type: Number, default: 0 },
     address: { type: String, default: "United Kingdom" },
@@ -23,8 +24,9 @@ const customerschema = new mongoose.Schema(
       type: Date,
     },
     pincode: { type: Number },
-    Country: { type: String },
-    City: { type: String },
+    country: { type: String },
+    city: { type: String },
+    state: { type: String },
     userId: { type: mongoose.SchemaTypes.ObjectId, ref: "User", default: null },
     language: { type: String },
     dateOfBirth: { type: Date },

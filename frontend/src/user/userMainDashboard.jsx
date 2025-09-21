@@ -65,7 +65,7 @@ const UserMainDashboard = () => {
               <div className="widget-header">
                 <div className="widget-content">
                   <h6>Wishlist Cars</h6>
-                  <h3>{wishlist?.cars?.length}</h3>
+                  <h3>{wishlist?.length}</h3>
                 </div>
                 <div className="widget-icon">
                   <span className="bg-danger">

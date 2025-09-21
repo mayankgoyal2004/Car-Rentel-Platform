@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import Master from "./layout/Master";
 import Main from "./homepage/Main";
 import "aos/dist/aos.css";
@@ -132,7 +132,10 @@ import EmailVerified from "./authentication/emailVerified";
 import ResetPassword from "./authentication/ResetPassword";
 import AdminRegister from "./Admin/AdminAuthentication/adminRegister";
 
+
 function App() {
+  
+
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -141,7 +144,7 @@ function App() {
           <Route path="/" element={<Main />} />
           <Route path="/contact-us" element={<Contact />} />
           <Route path="/listing" element={<Listing />} />
-          <Route path="/listing-details" element={<ListingDetails />} />
+          <Route path="/listing-details/:id" element={<ListingDetails />} />
           <Route path="/about-us" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/blog-list" element={<Bloglist />} />
@@ -152,11 +155,11 @@ function App() {
 
           <Route path="/testimonials" element={<Testimonials />} />
           <Route path="/booking" element={<Booking />} />
-          <Route path="/booking-checkout" element={<BookingCheckout />} />
-          <Route path="/booking-add-on" element={<BookingAddOn />} />
-          <Route path="/booking-details" element={<BookingDetals />} />
-          <Route path="/booking-payment" element={<BookingPayment />} />
-          <Route path="/booking-success" element={<BookingSuccess />} />
+          <Route path="/booking-checkout/:id" element={<BookingCheckout />} />
+          <Route path="/booking-add-on/:id" element={<BookingAddOn />} />
+          <Route path="/booking-details/:id" element={<BookingDetals />} />
+          <Route path="/booking-payment/:id" element={<BookingPayment />} />
+          <Route path="/booking-success/:id" element={<BookingSuccess />} />
           <Route path="/our-team" element={<Team />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route element={<ProtectedRoute allowedRoles={[4]} />}>
@@ -320,13 +323,13 @@ function App() {
             <Route path="invoice-details" element={<AdminInvoiceDetails />} />
             <Route path="car-details" element={<AdminCarDetails />} />
             <Route path="add-car" element={<AdminAddCars />} />
-            <Route path="edit-car" element={<AdminEditCar />} />
+            <Route path="edit-car/:id" element={<AdminEditCar />} />
             <Route
               path="reservation-details/:id"
               element={<AdminReservationDetails />}
             />
             <Route path="company-details" element={<AdminCompaniesDetails />} />
-            <Route path="edit-reservation" element={<AdminEditReservation />} />
+            <Route path="edit-reservation/:id" element={<AdminEditReservation />} />
             <Route
               path="quotation-details"
               element={<AdminQuatationDetails />}

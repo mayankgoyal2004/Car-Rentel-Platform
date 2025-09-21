@@ -1,26 +1,36 @@
 const Enquiry = require("../models/enquiryModel");
 const Car = require("../models/CarModule");
+const customer = require("../models/customerModel")
 
 const addEnquiry = async (req, res) => {
   try {
-    const { car_id, message, phoneNumber, name } = req.body;
+    const { id } = req.params; // carId
+    const {message, phone, name, email } = req.body;
 
-    if (!car_id || !message || !phoneNumber || !customer_id || !name) {
-      return res.status(404).json({ message: "all fields are required" });
+    // find customer by user id
+    const Customer = await customer.findOne({ userId: req.user._id });
+    if (!Customer) {
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    }
+
+    if (!id || !message || !phone || !name) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const newEnquiry = new Enquiry({
-      car: car_id,
+       car: id,
       message,
-      phoneNumber,
-      customer: customer_id,
+      phoneNumber: phone,
       name,
+      email, // ✅ add email
+      customer: Customer._id,
     });
 
     await newEnquiry.save();
+
     res.status(201).json({
       success: true,
-      message: "enquiry send successfully",
+      message: "Enquiry sent successfully",
       data: newEnquiry,
     });
   } catch (err) {

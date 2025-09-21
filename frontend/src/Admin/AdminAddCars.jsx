@@ -30,15 +30,15 @@ const AdminAddCars = () => {
     yearlyPrice: "",
     baseKilometers: "",
     extraKmPrice: "",
-    unlimitedKm: false,
+    // unlimitedKm: false,
     pricingTypes: ["daily", "weekly", "monthly", "yearly"], // Default all selected
-    insurance: [],
-    seasonal: [],
+    // insurance: [],
+    // seasonal: [],
   });
-  const [selectedSeasonalPricingIds, setSelectedSeasonalPricingIds] = useState(
-    []
-  );
-  const [seasonalPricings, setSeasonalPricings] = useState([]);
+  // const [selectedSeasonalPricingIds, setSelectedSeasonalPricingIds] = useState(
+  //   []
+  // );
+  // const [seasonalPricings, setSeasonalPricings] = useState([]);
 
   const [formData, setFormData] = useState({
     carName: "",
@@ -64,14 +64,12 @@ const AdminAddCars = () => {
     image: null,
     carFeatures: [],
     extraService: [],
-    seasonalPricingId: "",
+    // seasonalPricingId: "",
     carDocuments: [],
     carPolicies: [],
     carVideo: [],
     damages: [],
     faqs: [],
-    metaTitle: "",
-    keywords: "",
     description: "",
     dailyPrice: "",
     weeklyPrice: "",
@@ -103,6 +101,7 @@ const AdminAddCars = () => {
     "documents",
     "damages",
     "faq",
+    "seo",
   ];
 
   const fetchCarTypes = async () => {
@@ -192,16 +191,16 @@ const AdminAddCars = () => {
     }
   };
 
-  const fetchSeasionalPricing = async () => {
-    try {
-      const res = await apiService.getAllActiveSeasionalPricing();
-      if (res.data.success) {
-        setSeasonalPricings(res.data.data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // const fetchSeasionalPricing = async () => {
+  //   try {
+  //     const res = await apiService.getAllActiveSeasionalPricing();
+  //     if (res.data.success) {
+  //       setSeasonalPricings(res.data.data);
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
   const fetCarFeatures = async () => {
     try {
       const res = await apiService.getAllActiveCarFeatures();
@@ -233,7 +232,7 @@ const AdminAddCars = () => {
     fetchCarSeats();
     fetchLocations();
     fetCarFeatures();
-    fetchSeasionalPricing();
+    // fetchSeasionalPricing();
     fetchcarExtraServices();
   }, []);
 
@@ -334,7 +333,7 @@ const AdminAddCars = () => {
       const res = await apiService.updateCarFaq(carId, { faqs }); // faqs is an array of {question, answer}
       if (res.data.success) {
         toast.success("FAQs saved successfully!");
-        navigate("/admin-dashboard/all-cars");
+        nextStep();
       } else {
         toast.error(res.data.message || "Failed to save FAQs");
       }
@@ -449,24 +448,17 @@ const AdminAddCars = () => {
     const { name, value, type, checked } = e.target;
 
     if (type === "checkbox") {
-      if (name === "unlimitedKm") {
-        setPricingData((prev) => ({
-          ...prev,
-          [name]: checked,
-        }));
-      } else {
-        // Handle pricing type toggles (daily, weekly, etc.)
-        setPricingData((prev) => {
-          const newPricingTypes = checked
-            ? [...prev.pricingTypes, name]
-            : prev.pricingTypes.filter((type) => type !== name);
+      // Handle pricing type toggles (daily, weekly, etc.)
+      setPricingData((prev) => {
+        const newPricingTypes = checked
+          ? [...prev.pricingTypes, name]
+          : prev.pricingTypes.filter((type) => type !== name);
 
-          return {
-            ...prev,
-            pricingTypes: newPricingTypes,
-          };
-        });
-      }
+        return {
+          ...prev,
+          pricingTypes: newPricingTypes,
+        };
+      });
     } else {
       setPricingData((prev) => ({
         ...prev,
@@ -493,9 +485,9 @@ const AdminAddCars = () => {
         },
         baseKilometers: Number(pricingData.baseKilometers),
         extraKilometerPrice: Number(pricingData.extraKmPrice),
-        unlimitedKilometers: pricingData.unlimitedKm,
-        seasonal: selectedSeasonalPricingIds,
-        insurance: pricingData.insurance,
+        // unlimitedKilometers: pricingData.unlimitedKm,
+        // seasonal: selectedSeasonalPricingIds,
+        // insurance: pricingData.insurance,
       };
 
       const res = await apiService.updateCarPricing(carId, payload);
@@ -537,12 +529,29 @@ const AdminAddCars = () => {
       }
     });
   };
+  const handleSaveSeo = async () => {
+    try {
+      const res = await apiService.updateCarDescription(carId, {
+        description: formData.description,
+      });
 
-  const toggleSeasonalPricing = (id) => {
-    setSelectedSeasonalPricingIds((prev) =>
-      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
-    );
+      if (res.data.success) {
+        toast.success("SEO data saved successfully!");
+        navigate("/admin-dashboard/all-cars");
+      } else {
+        toast.error(res.data.message || "Failed to save SEO data");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error saving SEO data");
+    }
   };
+
+  // const toggleSeasonalPricing = (id) => {
+  //   setSelectedSeasonalPricingIds((prev) =>
+  //     prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+  //   );
+  // };
 
   // Toggle insurance
 
@@ -1431,7 +1440,7 @@ const AdminAddCars = () => {
                   </div>
 
                   {/* Insurance Section */}
-                  <div className="border-bottom mb-2 pb-2">
+                  {/* <div className="border-bottom mb-2 pb-2">
                     <div className="row row-gap-4">
                       <div className="col-xl-3">
                         <h6 className="mb-1">Insurance</h6>
@@ -1450,15 +1459,15 @@ const AdminAddCars = () => {
                           </button>
                         </div>
 
-                        {/* Display selected insurance here */}
+                     
                         <div className="empty-data bg-light text-center mb-3">
                           <p className="fw-medium">No Insurance Added</p>
                         </div>
 
-                        {/* You can display selected insurance here when available */}
+                      
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Navigation Buttons */}
                   <div className="d-flex align-items-center justify-content-end pt-3">
@@ -1906,251 +1915,61 @@ const AdminAddCars = () => {
                   </button>
                 </div>
               </fieldset>
+              <fieldset style={showStep(7)}>
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <div className="filterbox p-20 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <h4 className="d-flex align-items-center">
+                      <i className="ti ti-seo text-secondary me-2" />
+                      SEO
+                    </h4>
+                  </div>
+                  <div className="border-bottom mb-2 pb-2">
+                    <div className="row row-gap-4">
+                      <div className="col-xl-3">
+                        <h6 className="mb-1">SEO</h6>
+                        <p>Add SEO Meta of the car</p>
+                      </div>
+                      <div className="col-xl-9">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Description <span className="text-danger">*</span>
+                          </label>
+                          <textarea
+                            className="form-control"
+                            rows={3}
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="d-flex align-items-center justify-content-end pt-3">
+                    <button
+                      type="button"
+                      className="btn btn-outline-light border wizard-prev me-2"
+                      onClick={prevStep}
+                    >
+                      <i className="ti ti-chevron-left me-1" />
+                      Back
+                    </button>
+                    <button
+                      className="btn btn-primary d-flex align-items-center"
+                      onClick={handleSaveSeo}
+                    >
+                      Save &amp; Exit
+                      <i className="ti ti-chevron-right ms-1" />
+                    </button>
+                  </div>
+                </form>
+              </fieldset>
             </div>
           </div>
         </div>
       </div>
 
       {/* /Create Seasonal Pricing */}
-      {/* Select Seasonal Pricing */}
-      <div className="modal fade" id="select_price">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title mb-0">Seasonal Pricing</h5>
-              <button
-                type="button"
-                className="btn-close custom-btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <i className="ti ti-x fs-16" />
-              </button>
-            </div>
-            <form onSubmit={(e) => e.preventDefault()}>
-              <div className="modal-body pb-1">
-                {seasonalPricings.map((sp) => (
-                  <div
-                    key={sp._id}
-                    className="d-flex align-items-center justify-content-between flex-wrap bg-white gap-3 border br-5 p-20 mb-3"
-                  >
-                    <div>
-                      <h6 className="fs-14 fw-semibold d-inline-flex align-items-center mb-1">
-                        {sp.seasonName}
-                        <span className="badge bg-secondary-transparent ms-2">
-                          {sp.startDate} - {sp.endDate}
-                        </span>
-                      </h6>
-                      <div className="d-flex align-items-center gap-2 flex-wrap">
-                        <p className="fs-13 fw-medium border-end pe-2 mb-0">
-                          Daily Rate :{" "}
-                          <span className="text-gray-9">${sp.dailyRate}</span>
-                        </p>
-                        <p className="fs-13 fw-medium border-end pe-2 mb-0">
-                          Weekly Rate :{" "}
-                          <span className="text-gray-9">${sp.weeklyRate}</span>
-                        </p>
-                        <p className="fs-13 fw-medium border-end pe-2 mb-0">
-                          Monthly Rate :{" "}
-                          <span className="text-gray-9">${sp.monthlyRate}</span>
-                        </p>
-                        <p className="fs-13 fw-medium mb-0 pe-2 mb-0">
-                          Late Fee :{" "}
-                          <span className="text-gray-9">${sp.lateFee}</span>
-                        </p>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center icon-list delivery-add">
-                      <input
-                        type="checkbox"
-                        checked={selectedSeasonalPricingIds.includes(sp._id)}
-                        onChange={() => toggleSeasonalPricing(sp._id)}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="modal-footer">
-                <div className="d-flex justify-content-center">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-light me-3"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </a>
-                  <button type="button" className="btn btn-primary">
-                    Save
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div className="modal fade" id="add-damage">
-        <div className="modal-dialog modal-dialog-centered modal-md">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title mb-0">Add New Damage</h5>
-              <button
-                type="button"
-                className="btn-close custom-btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <i className="ti ti-x fs-16" />
-              </button>
-            </div>
-            <form action="add-car.html">
-              <div className="modal-body pb-1">
-                <div className="mb-3">
-                  <label className="form-label">
-                    Damage Location <span className="text-danger">*</span>
-                  </label>
-                  <select className="select">
-                    <option>Select</option>
-                    <option>Interior</option>
-                    <option>Exterior</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Damage Type <span className="text-danger">*</span>
-                  </label>
-                  <select className="select">
-                    <option>Select</option>
-                    <option>Scratch</option>
-                    <option>Dent</option>
-                    <option>Crack</option>
-                    <option>Clip</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
-                    rows={3}
-                    defaultValue={""}
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <div className="d-flex justify-content-center">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-light me-3"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </a>
-                  <button type="submit" className="btn btn-primary">
-                    Create New
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      {/* /Add New Damage */}
-      {/* Edit Damage */}
-      <div className="modal fade" id="edit-damage">
-        <div className="modal-dialog modal-dialog-centered modal-md">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title mb-0">Edit Damage</h5>
-              <button
-                type="button"
-                className="btn-close custom-btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <i className="ti ti-x fs-16" />
-              </button>
-            </div>
-            <form action="add-car.html">
-              <div className="modal-body pb-1">
-                <div className="mb-3">
-                  <label className="form-label">
-                    Damage Location <span className="text-danger">*</span>
-                  </label>
-                  <select className="select">
-                    <option>Select</option>
-                    <option selected>Interior</option>
-                    <option>Exterior</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Damage Type <span className="text-danger">*</span>
-                  </label>
-                  <select className="select">
-                    <option>Select</option>
-                    <option selected>Scratch</option>
-                    <option>Dent</option>
-                    <option>Crack</option>
-                    <option>Clip</option>
-                  </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control"
-                    rows={3}
-                    defaultValue={
-                      "Cracks, scratches, or faded surfaces due to heat exposure."
-                    }
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <div className="d-flex justify-content-center">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-light me-3"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </a>
-                  <button type="submit" className="btn btn-primary">
-                    Save Changes
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      {/* /Edit Damage */}
-      {/* Delete Damage */}
-      <div className="modal fade deletemodal" id="delete_damage">
-        <div className="modal-dialog modal-dialog-centered modal-sm">
-          <div className="modal-content">
-            <div className="modal-body text-center">
-              <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
-                <i className="ti ti-trash-x fs-26" />
-              </span>
-              <h4 className="mb-1">Delete Damage</h4>
-              <p className="mb-3">Are you sure you want to delete Damage?</p>
-              <div className="d-flex justify-content-center">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-light me-3"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </a>
-                <a href="add-car.html" className="btn btn-primary">
-                  Yes, Delete
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* /Select Seasonal Pricing */}
       {/* Select Seasonal Pricing */}
     </div>
   );

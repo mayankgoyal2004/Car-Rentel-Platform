@@ -64,6 +64,10 @@ route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
 //!! comments api blog 
 route.get("/blogs/get-all-comments-user/:blogId", blogComments.getCommentBlog);
 
+//!! car 
+route.get("/car-details-user/:id", car.getSingleCarUser);
+route.get("/car-review/:carId", carReview.getCarReviews);
+
 
 
 //!! get all faq for public without authentication
@@ -91,7 +95,7 @@ route.post("/logout", userRoute.logout);
 
 route.post("/change-password", userRoute.changePassword);
 route.post(
-  "/update-user",
+  "/update-user-details",
   upload.userImageUpload.single("image"),
   userRoute.updateUserDetails
 );
@@ -105,10 +109,18 @@ route.post(
   upload.userImageUpload.single("image"),
   userRoute.adduserByadmin
 );
+route.post(
+  "/update-admin-password",
+  userRoute.changeAdminPassword
+);
 route.get(
   "/get-user-by-admin",
   checkPermission("user", "view"),
   userRoute.getUserByAdmin
+);
+route.get(
+  "/get-user-details",
+  userRoute.getUserDetails
 );
 route.post(
   "/update-user-by-admin",
@@ -811,6 +823,12 @@ route.post(
   upload.carImageUpload.single("image"),
   car.addCar
 );
+route.post(
+  "/edit-car-basics/:id",
+  checkPermission("car", "edit"),
+  upload.carImageUpload.single("image"),
+  car.editBasicCar
+);
 route.post("/update-cars/:id/pricing", pricing.updateCarPricing);
 route.put("/cars/:id/pricing", pricing.editCarPricing);
 route.put("/update-car/:id/features", car.updateCarFeatures);
@@ -822,6 +840,7 @@ route.put("/update-car/:id/extraService", car.updateCarExtraService);
 route.post("/cars/:carId/damages", car.saveCarDamages);
 
 route.post("/cars/:carId/faqs", car.saveCarFaqs);
+route.post("/cars/:carId/description", car.saveCarDescription);
 // route.get("/get-car/:id/faq", carFaq.getCarFaqs);
 // route.delete("/delete-car/:id/faq", carFaq.deleteFaq);
 // route.put("/edit-car/:id/faq", carFaq.editFaq);
@@ -843,19 +862,30 @@ route.get(
   car.getAllCarsForAdmin
 );
 
+route.get(
+  "/get-car-by-id-admin/:id",
+  checkPermission("Car", "view"),
+  car.getCayByIdAdmin
+);
+
+
+
+
+
+
 //!! wishlist
 route.post("/toggle-wishlist", wishlist.toggleWishlist);
 route.get("/get-wishlist", wishlist.getWishlist);
 
 //!! Enquiry
 
-route.post("/add-enquiry", enquiry.addEnquiry);
+route.post("/add-enquiry/:id", enquiry.addEnquiry);
 route.get("/get-enquiry", enquiry.getallEnquiry);
 route.delete("/delete-enquiry/:id", enquiry.deleteEnquiry);
 
 //!! carReview
 
-route.post("/add-car-review", carReview.addCarReview);
+route.post("/add-car-review/:carId", carReview.addCarReview);
 route.get("/get-all-review-admin", carReview.allReviewByAdmin);
 route.get("/get-all-review-user", carReview.allReviewByUser);
 route.delete("/delete-car-review/:id", carReview.deleteCarReview);
@@ -977,13 +1007,36 @@ route.post(
   checkPermission("Reservation", "Create"),
   reservation.addReservation
 );
+route.post(
+  "/add-reservation-user-step-1/:id",
+  reservation.addReservationStep1
+);
+route.post(
+  "/edit-reservation-user-step-2/:id",
+  reservation.editReservationStep2
+);
+route.post(
+  "/edit-reservation-user-step-3/:id",
+  upload.customerUpload.single("driverDetailsDocument"),
+  reservation.editReservationStep3
+);
+
+
+route.post(
+  "/update-reservation/:id",
+  checkPermission("Reservation", "edit"),
+  reservation.updateReservation
+);
 route.get(
   "/get-reservation-by/:id",
   checkPermission("Reservation", "view"),
   reservation.getsingleReservation
 );
+route.get(
+  "/get-reservation-by-booking/:id",
+  reservation.getReservationById
+);
 // route.get("/get-reservation-by-id/:id", reservation.getReservationById);
-route.put("/update-reservation/:id", reservation.updateReservation);
 route.delete("/delete-reservation/:id", reservation.deleteReservation);
 route.get(
   "/get-all-active-reservation-admin",

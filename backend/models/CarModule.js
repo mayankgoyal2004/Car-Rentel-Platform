@@ -31,7 +31,7 @@ const CarSchema = new mongoose.Schema(
       default: 0,
     },
     year: {
-      type: Number,
+      type: Date,
     },
     carColor: { type: mongoose.Schema.Types.ObjectId, ref: "CarColor" },
     carFuel: { type: mongoose.Schema.Types.ObjectId, ref: "CarFuel" },

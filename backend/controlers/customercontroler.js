@@ -293,7 +293,7 @@ const getallActiveCustomers = async (req, res) => {
 const getCustomerbyId = async (req, res) => {
   try {
     const { id } = req.params;
-    const customers = await customer.findById(id);
+    const customers = await customer.findById(id)
     if (!customers) {
       return res
         .status(404)

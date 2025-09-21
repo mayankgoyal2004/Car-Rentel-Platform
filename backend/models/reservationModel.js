@@ -73,7 +73,7 @@ const ReservationSchema = new mongoose.Schema(
     extraServices: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Service",
+        ref: "ExtraService",
       },
     ],
     driverType: { type: String, enum: ["self", "withDriver"], required: true },

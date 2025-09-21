@@ -1,6 +1,90 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
+import { addUser } from "../../utils/userSlice";
+import { Link } from "react-router-dom";
 
 const AdminProfileSetting = () => {
+  const [loading, setLoading] = useState(false);
+
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [image, setImage] = useState(null); // file or string
+  const [imagePreview, setImagePreview] = useState(null);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+
+  const dispatch = useDispatch();
+
+  const fetchUser = async () => {
+    try {
+      const res = await apiService.getUerDetails();
+      const { user } = res.data;
+      setFirstName(user?.firstName || "");
+      setLastName(user?.lastName || "");
+      setUserName(user?.userName || "");
+      setEmail(user?.email || "");
+      setPhone(user?.contact || "");
+      setAddress(user?.address || "");
+
+      const img = user?.image || null;
+      setImage(img);
+      if (img) {
+        setImagePreview(
+          typeof img === "string"
+            ? BASE_URL_IMG + img
+            : URL.createObjectURL(img)
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  // Submit updated user data
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("userName", userName);
+      formData.append("email", email);
+      formData.append("contact", phone);
+      formData.append("address", address);
+      formData.append("firstName", firstName);
+      formData.append("lastName", lastName);
+
+      if (image instanceof File) {
+        formData.append("image", image);
+      } else if (typeof image === "string" && image !== "") {
+        formData.append("image", image);
+      }
+
+      const res = await apiService.updateAdmin(formData);
+
+      alert("Profile updated!");
+      dispatch(addUser(res?.data?.admin)); // update Redux with backend response
+      fetchUser(); // reload updated data
+    } catch (err) {
+      console.error(err);
+      alert("Error saving profile");
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="page-wrapper">
       <div className="content me-0 pb-0">
@@ -11,7 +95,7 @@ const AdminProfileSetting = () => {
             <nav>
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <a href="index.html">Home</a>
+                  <Link to="/admin-dashboard">Home</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
                   Settings
@@ -40,10 +124,10 @@ const AdminProfileSetting = () => {
                         </a>
                       </li>
                       <li>
-                        <a href="security-setting.html">
+                        <Link to="/admin-dashboard/security-setting">
                           <i className="ti ti-lock me-2" />
                           Security
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </li>
@@ -57,7 +141,7 @@ const AdminProfileSetting = () => {
               <div className="card-header">
                 <h5 className="fw-bold">Account Settings</h5>
               </div>
-              <form action="profile-setting.html">
+              <form onSubmit={handleSubmit}>
                 <div className="card-body pb-1">
                   <h6 className="fw-bold mb-3">Basic Information</h6>
                   <div className="border-bottom mb-3">
@@ -67,17 +151,13 @@ const AdminProfileSetting = () => {
                           <label className="form-label">Profile Photo</label>
                           <div className="d-flex align-items-center flex-wrap row-gap-3 mb-3">
                             <div className="d-flex align-items-center justify-content-center avatar avatar-xxl me-3 flex-shrink-0 text-dark frames">
-                              <img
-                                src="/admin-assets/img/customer/customer-01.jpg"
-                                className="img-fluid"
-                                alt="brands"
-                              />
-                              <a
-                                href="javascript:void(0);"
-                                className="upload-img-trash btn btn-sm rounded-circle"
-                              >
-                                <i className="ti ti-trash fs-12" />
-                              </a>
+                              {imagePreview && (
+                                <img
+                                  src={imagePreview}
+                                  className="img-fluid"
+                                  alt="Profile"
+                                />
+                              )}
                             </div>
                             <div className="profile-upload">
                               <div className="profile-uploader d-flex align-items-center">
@@ -87,7 +167,7 @@ const AdminProfileSetting = () => {
                                   <input
                                     type="file"
                                     className="form-control image-sign"
-                                    multiple
+                                    onChange={handleImageChange}
                                   />
                                 </div>
                               </div>
@@ -103,10 +183,30 @@ const AdminProfileSetting = () => {
                       <div className="col-md-6">
                         <div className="mb-3">
                           <label className="form-label">
+                            User Name{" "}
+                            <span className="text-danger ms-1">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
                             First Name
                             <span className="text-danger ms-1">*</span>
                           </label>
-                          <input type="text" className="form-control" />
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                          />
                         </div>
                       </div>
                       <div className="col-md-6">
@@ -114,7 +214,12 @@ const AdminProfileSetting = () => {
                           <label className="form-label">
                             Last Name<span className="text-danger ms-1">*</span>
                           </label>
-                          <input type="text" className="form-control" />
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                          />
                         </div>
                       </div>
                       <div className="col-md-6">
@@ -123,7 +228,12 @@ const AdminProfileSetting = () => {
                             Email Address
                             <span className="text-danger ms-1">*</span>
                           </label>
-                          <input type="text" className="form-control" />
+                          <input
+                            type="email"
+                            className="form-control"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                          />
                         </div>
                       </div>
                       <div className="col-md-6">
@@ -135,8 +245,8 @@ const AdminProfileSetting = () => {
                           <input
                             type="text"
                             className="form-control"
-                            id="phone"
-                            name="name"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
                           />
                         </div>
                       </div>
@@ -147,61 +257,31 @@ const AdminProfileSetting = () => {
                     <div className="col-md-12">
                       <div className="mb-3">
                         <label className="form-label">Address Line</label>
-                        <input type="text" className="form-control" />
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label className="form-label">Country</label>
-                        <select className="select">
-                          <option>Select</option>
-                          <option>USA</option>
-                          <option>Canada</option>
-                          <option>UK</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label className="form-label">State</label>
-                        <select className="select">
-                          <option>Select</option>
-                          <option>California</option>
-                          <option>New York</option>
-                          <option>Florida</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label className="form-label">City</label>
-                        <select className="select">
-                          <option>Select</option>
-                          <option>Los Angeles</option>
-                          <option>San Diego</option>
-                          <option>Fresno</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="col-md-6">
-                      <div className="mb-3">
-                        <label className="form-label">Postal Code</label>
-                        <input type="text" className="form-control" />
+                        <textarea
+                          className="form-control"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="card-footer">
                   <div className="d-flex justify-content-end">
-                    <a
-                      href="javascript:void(0);"
+                    <button
+                      type="button"
+                      onClick={fetchUser}
                       className="btn btn-light me-3"
                       data-bs-dismiss="modal"
                     >
                       Cancel
-                    </a>
-                    <button type="submit" className="btn btn-primary">
-                      Save Changes
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={loading}
+                    >
+                      {loading ? "Saving..." : "Save Changes"}
                     </button>
                   </div>
                 </div>

@@ -114,6 +114,105 @@ const addCar = async (req, res) => {
   }
 };
 
+
+
+const editBasicCar = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Car ID is required",
+      });
+    }
+
+    const {
+      carName,
+      permalink,
+      carType,
+      carBrand,
+      carModel,
+      category,
+      plateNumber,
+      vinNumber,
+      mainLocation,
+      otherLocations,
+      carFuel,
+      odometer,
+      carColor,
+      yearOfCar,
+      carTransmission,
+      mileage,
+      passengers,
+      NoofSeats,
+      airbags,
+      noOfDoors,
+    } = req.body;
+
+    // Find existing car
+    const car = await Car.findById(id);
+    if (!car) {
+      return res.status(404).json({
+        success: false,
+        message: "Car not found",
+      });
+    }
+
+    // Update fields
+    car.carName = carName || car.carName;
+    car.permalink = permalink || car.permalink;
+    car.carType = carType || car.carType;
+    car.carBrand = carBrand || car.carBrand;
+    car.carModel = carModel || car.carModel;
+    car.category = category || car.category;
+    car.plateNumber = plateNumber || car.plateNumber;
+    car.vinNumber = vinNumber || car.vinNumber;
+    car.mainLocation = mainLocation || car.mainLocation;
+    car.otherLocations = otherLocations || car.otherLocations;
+    car.carFuel = carFuel || car.carFuel;
+    car.odometer = odometer || car.odometer;
+    car.carColor = carColor || car.carColor;
+    car.year = yearOfCar || car.year;
+    car.carTransmission = carTransmission || car.carTransmission;
+    car.mileage = mileage || car.mileage;
+    car.passengers = passengers || car.passengers;
+    car.carSeats = NoofSeats || car.carSeats;
+    car.airbags = airbags || car.airbags;
+    car.noOfDoors = noOfDoors || car.noOfDoors;
+
+    // If new image uploaded, replace old
+    if (req.file) {
+      const imagePath = req.file.path.replace(/\\/g, "/");
+      car.image = imagePath;
+    }
+
+    // Keep status/isAvailable/inRent logic same
+    car.status = false; // on edit, set pending approval again
+    car.isAvailable = false;
+    car.inRent = false;
+
+    // Update meta info
+    car.updatedAt = Date.now();
+    car.updatedBy = req.user._id;
+
+    await car.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Car updated successfully. Pending SuperAdmin approval.",
+      car,
+    });
+  } catch (error) {
+    console.error("Edit Car Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating car",
+      error: error.message,
+    });
+  }
+};
+
 const updateCarFeatures = async (req, res) => {
   try {
     const { id } = req.params;
@@ -606,6 +705,7 @@ const getAllCarsForAdmin = async (req, res) => {
         { path: "carTransmission", select: "carTransmission" },
         { path: "otherLocations", select: "location" },
         { path: "mainLocation", select: "location" },
+        { path: "pricing", select: "prices" },
       ])
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -674,6 +774,32 @@ const saveCarFaqs = async (req, res) => {
     await car.save();
 
     res.status(200).json({ success: true, message: "FAQs saved", car });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
+  }
+};
+const saveCarDescription = async (req, res) => {
+  try {
+    const { carId } = req.params;
+    const { description } = req.body;
+
+    if (!description) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Discription is required" });
+    }
+
+    const car = await Car.findById(carId);
+    if (!car)
+      return res.status(404).json({ success: false, message: "Car not found" });
+
+    car.description = description;
+    await car.save();
+
+    res.status(200).json({ success: true, message: "Description saved", car });
   } catch (error) {
     console.error(error);
     res
@@ -791,6 +917,140 @@ const getApprovedCarsAdminReservation = async (req, res) => {
   }
 };
 
+const getSingleCarUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      res.json({
+        status: 409,
+        success: false,
+        message: "id is Required!",
+      });
+    }
+    const carData = await Car.findById(id).populate([
+      { path: "carBrand", select: "brandName" },
+      { path: "carModel", select: "carModel" },
+      { path: "carType", select: "carType" },
+      { path: "carFuel", select: "carFuel" },
+      { path: "carColor", select: "carColor" },
+      { path: "carTransmission", select: "carTransmission" },
+      { path: "mainLocation", select: "title location" },
+      { path: "carCylinder", select: "carCylinder" },
+      { path: "carSeats", select: "carSeats" },
+      { path: "admin", select: "userName email contact address image" },
+      {
+        path: "extraService",
+        select: "name quantity price type description status",
+      },
+      {
+        path: "carFeatures",
+        select: "carFeature",
+      },
+      {
+        path: "pricing",
+        select:
+          "prices baseKilometers  extraKilometerPrice",
+      },
+    ]);
+    if (!carData) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "CAr not found!",
+      });
+    }
+
+    res.json({
+      status: 200,
+      success: true,
+      message: "Car Data Successfully Fetched!",
+      data: carData,
+    });
+  } catch (err) {
+    res.json({
+      status: 500,
+      success: false,
+      message: "Server Error!",
+      error: err.message,
+    });
+  }
+};
+
+
+
+const getCayByIdAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "Car ID is required!",
+      });
+    }
+
+    const carData = await Car.findById(id).populate([
+      { path: "carBrand", select: "brandName" },
+      { path: "carModel", select: "carModel" },
+      { path: "carType", select: "carType" },
+      { path: "carFuel", select: "carFuel" },
+      { path: "carColor", select: "carColor" },
+      { path: "carTransmission", select: "carTransmission" },
+      { path: "mainLocation", select: "title location" },
+      { path: "otherLocations", select: "title location" },
+      { path: "carCylinder", select: "carCylinder" },
+      { path: "carSeats", select: "carSeats" },
+      {
+        path: "extraService",
+        select: "name quantity price type description status",
+      },
+      {
+        path: "carFeatures",
+        select: "carFeature",
+      },
+      {
+        path: "pricing",
+        select: "prices baseKilometers extraKilometerPrice pricingTypes",
+      },
+      {
+        path: "damages",
+        select: "title description image",
+      },
+      {
+        path: "faqs",
+        select: "question answer",
+      },
+    ]);
+
+    if (!carData) {
+      return res.status(404).json({
+        status: 404,
+        success: false,
+        message: "Car not found!",
+      });
+    }
+
+   
+
+    res.json({
+      status: 200,
+      success: true,
+      message: "Car Data Successfully Fetched!",
+      data: carData,
+    });
+  } catch (err) {
+    console.error("Error fetching car:", err);
+    res.status(500).json({
+      status: 500,
+      success: false,
+      message: "Server Error!",
+      error: err.message,
+    });
+  }
+};
+
 module.exports = {
   addCar,
   updateCarFeatures,
@@ -805,4 +1065,8 @@ module.exports = {
   getAllCarsForSuperAdmin,
   getApprovedCarsAdminReservation,
   getAllCars,
+  saveCarDescription,
+  getSingleCarUser,
+  getCayByIdAdmin,
+  editBasicCar
 };

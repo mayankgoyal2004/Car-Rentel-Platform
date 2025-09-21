@@ -172,7 +172,6 @@ const login = async (req, res) => {
       userType: user.userType,
     };
     const token = jwt.sign(payload, secretKey, { expiresIn: "1d" });
-    res.cookie("token", token);
 
     return res.status(200).json({
       success: true,
@@ -427,21 +426,62 @@ const changePassword = async (req, res) => {
 
 const updateUserDetails = async (req, res) => {
   try {
-    const { _id } = req.user;
+    const { _id } = req.user; // logged in user id
 
-    // Find the user
-    const user = await User.findById(_id);
+    // Update user basic info
+    const updateData = {
+      userName: req.body.userName,
+      email: req.body.email,
+      contact: req.body.contact,
+    };
+
+    if (req.file) {
+      updateData.image = req.file.path.replace(/\\/g, "/");
+    }
+
+    // Update user
+    const user = await User.findByIdAndUpdate(_id, updateData, { new: true });
     if (!user) return res.status(404).json({ error: "User not found" });
+    // Save extra details in Customer schema
+    const Customer = await customer.findOneAndUpdate(
+      { userId: _id },
+      {
+        userId: _id,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email:req.body.email,
+        contact: req.body.contact,
+        address: req.body.address,
+        country: req.body.country,
+        state: req.body.state,
+        city: req.body.city,
+        pincode: req.body.pincode,
+      },
+      { new: true, upsert: true }
+    );
 
-    if (req.body.userType) user.userType = req.body.userType;
-    if (req.body.userName) user.userName = req.body.userName;
-    if (req.body.email) user.email = req.body.email;
-    if (req.body.contact) user.contact = req.body.contact;
-    if (req.body.image) await user.save();
+    res.json({
+      success: true,
+      message: "Details updated",
+      user,
+      Customer,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
 
-    res.status(200).json({ message: "User updated successfully", user });
-  } catch (error) {
-    console.error(error);
+const getUserDetails = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    if (!_id) return res.status(404).json({ error: "User not found" });
+    const user = await User.findById(_id);
+    const Customer = await customer.findOne({ userId: _id });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json({ user, Customer });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -729,7 +769,17 @@ const registerAdmin = async (req, res) => {
 const updateAdmin = async (req, res) => {
   try {
     const { _id } = req.user;
-    const { name, email, contact, password, packageId } = req.body;
+    const {
+      name,
+      email,
+      contact,
+      firstName,
+      lastName,
+      userName,
+      password,
+      address,
+      packageId,
+    } = req.body;
     const admin = await User.findById(_id);
     if (!admin || admin.userType !== 2) {
       return res.status(404).json({
@@ -739,7 +789,11 @@ const updateAdmin = async (req, res) => {
     }
     if (name) admin.userName = name;
     if (email) admin.email = email;
+    if (firstName) admin.firstName = firstName;
+    if (lastName) admin.lastName = lastName;
+    if (userName) admin.userName = userName;
     if (contact) admin.contact = contact;
+    if (address) admin.address = address;
     if (password) {
       const hashedPassword = await bcrypt.hash(password, saltround);
       admin.password = hashedPassword;
@@ -777,6 +831,41 @@ const updateAdmin = async (req, res) => {
     });
   }
 };
+
+// PUT /api/admin/change-password
+const changeAdminPassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user._id);
+
+    // 1️⃣ Check current password
+    try {
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) throw new Error("Current password is incorrect");
+
+      user.password = await bcrypt.hash(newPassword, saltround);
+      await user.save();
+
+      // ✅ Make sure to return here
+      return res.status(200).json({
+        success: true,
+        message: "Password updated successfully",
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -792,4 +881,6 @@ module.exports = {
   updateAdmin,
   getUserByAdmin,
   deleteUserByAdmin,
+  getUserDetails,
+  changeAdminPassword,
 };

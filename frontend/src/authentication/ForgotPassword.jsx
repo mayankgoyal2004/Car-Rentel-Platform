@@ -2,32 +2,38 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiService from "../../Apiservice/apiService";
 import { CornerDownLeft } from "react-feather";
+import ReCAPTCHA from "react-google-recaptcha";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPassword = () => {
   const nav = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
   const handleFormSubmit = async (e) => {
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA!");
+      return;
+    }
     e.preventDefault();
-    setMessage("");
-    setError("");
+
     setLoading(true);
 
     try {
-      const res = await apiService.forgotPassword({email});
+      const res = await apiService.forgotPassword({ email, recaptchaToken });
 
       if (res.data.success) {
-        setMessage("Reset link has been sent to your email!");
-        nav("/reset-password")
- sessionStorage.setItem("email", email);
+        toast.success("Reset link has been sent to your email!");
+        nav("/reset-password");
+        sessionStorage.setItem("email", email);
       } else {
-        setError(res.data.message || "Something went wrong");
+        toast.error(res.data.message || "Something went wrong");
       }
     } catch (err) {
-      setError(err.response?.data?.message || "Server error");
+      toast.error(err.response?.data?.message || "Server error");
     } finally {
       setLoading(false);
     }
@@ -53,7 +59,7 @@ const ForgotPassword = () => {
               <div className="sign-group">
                 <Link to="/" className="btn sign-up">
                   <span>
-                    <CornerDownLeft size={24}  color="#000"/>
+                    <CornerDownLeft size={24} color="#000" />
                   </span>{" "}
                   Back To Home
                 </Link>
@@ -78,16 +84,22 @@ const ForgotPassword = () => {
                     className="form-control"
                   />
                 </div>
+                <div className="my-3">
+                  <ReCAPTCHA
+                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
+" //
+                    onChange={(token) => setRecaptchaToken(token)}
+                    onExpired={() => setRecaptchaToken(null)}
+                  />
+                </div>
                 <button
                   type="submit"
                   className="btn btn-outline-light w-100 btn-size"
-                  disabled={loading}
+                  disabled={loading || !recaptchaToken}
                 >
                   {loading ? "Sending..." : "Send Reset Link"}
                 </button>
               </form>
-              {message && <p className="text-success mt-2">{message}</p>}
-              {error && <p className="text-danger mt-2">{error}</p>}
             </div>
           </div>
         </div>
@@ -98,13 +110,23 @@ const ForgotPassword = () => {
           {/* Copyright */}
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2024 Dreams Rent. All Rights Reserved.</p>
+              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
             </div>
           </div>
           {/* /Copyright */}
         </div>
       </footer>
-      {/* /Footer */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

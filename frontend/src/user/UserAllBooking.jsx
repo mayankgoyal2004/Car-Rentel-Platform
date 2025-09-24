@@ -1,440 +1,728 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { useState } from "react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import {
+  PlusCircle,
+  AlertCircle,
+  MapPin,
+  Trash2,
+  Edit3,
+  Eye,
+} from "react-feather";
 
 const UserAllBooking = () => {
+  const [reservation, setReservation] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [deleteBooking, setDeleteBooking] = useState(null);
+  const [cancelationReseion, setCancellationReasion] = useState("");
+  const getAllReservationUser = async () => {
+    try {
+      setLoading(true);
+      const res = await apiService.getAllreservationUser();
+      setReservation(res.data.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch Reservation");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getAllReservationUser();
+  }, []);
+
+  const cancelReservation = async () => {
+    try {
+      setLoading(true);
+      const res = await apiService.cancelRideByUser(deleteBooking, {
+        cancellationReason: cancelationReseion,
+      });
+      setReservation(res.data.data);
+      getAllReservationUser();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch Reservation");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateTotalPrice = (reservation) => {
+    const { bookingType, extraServices, securityDeposit } = reservation;
+
+    let basePrice = 0;
+
+    if (reservation.car.pricing.prices) {
+      if (bookingType === "daily")
+        basePrice = reservation.car.pricing.prices.daily || 0;
+      else if (bookingType === "weekly")
+        basePrice = reservation.car.pricing.prices.weekly || 0;
+      else if (bookingType === "monthly")
+        basePrice = reservation.car.pricing.prices.monthly || 0;
+      else if (bookingType === "yearly")
+        basePrice = reservation.car.pricing.prices.yearly || 0;
+    }
+
+    const extraServicesTotal = extraServices.reduce(
+      (sum, service) => sum + (service.price || 0),
+      0
+    );
+
+    const deposit = securityDeposit || 0;
+
+    // 4️⃣ Total price
+    const totalPrice = basePrice + extraServicesTotal + deposit;
+
+    return totalPrice;
+  };
+
   return (
-     <div className="col-lg-12 d-flex">
-        <div className="card book-card flex-fill mb-0">
-          <div className="card-header">	
-            <div className="row align-items-center">
-              <div className="col-md-5">
-                <h4>All Bookings <span>40</span></h4>	
-              </div>
-              <div className="col-md-7 text-md-end">
-                <div className="table-search">
-                  <div id="tablefilter" />										
-                  <Link to="/listing" className="btn btn-add"><i className="feather-plus-circle" />Add Booking</Link>	
-                </div>
+    <div className="col-lg-12 d-flex">
+      <div className="card book-card flex-fill mb-0">
+        <div className="card-header">
+          <div className="row align-items-center">
+            <div className="col-md-5">
+              <h4>
+                All Bookings <span>{reservation.length}</span>
+              </h4>
+            </div>
+            <div className="col-md-7 text-md-end">
+              <div className="table-search">
+                <div id="tablefilter" />
+                <Link to="/listing" className="btn btn-add">
+                  <PlusCircle size={16} />
+                  Add Booking
+                </Link>
               </div>
             </div>
           </div>
-          <div className="card-body">	
-            <div className="table-responsive dashboard-table">
-              <table className="table datatable">
-                <thead className="thead-light">
+        </div>
+        <div className="card-body">
+          <div className="table-responsive dashboard-table">
+            <table className="table datatable">
+              <thead className="thead-light">
+                <tr>
+                  <th>
+                    <label className="custom_check w-100">
+                      <input type="checkbox" name="username" />
+                      <span className="checkmark" />
+                    </label>
+                  </th>
+                  <th>Booking ID</th>
+                  <th>Car Name</th>
+                  <th>Rental Type</th>
+                  <th>Pickup / Delivery Location</th>
+                  <th>Dropoff Location</th>
+                  <th>Booked On</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
                   <tr>
-                    <th>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </th>
-                    <th>Booking ID</th>
-                    <th>Car Name</th>
-                    <th>Rental Type</th>
-                    <th>Pickup / Delivery Location</th>
-                    <th>Dropoff Location</th>
-                    <th>Booked On</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1001</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-04.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">Ferrari 458 MM Speciale</a>
-                          <p>Delivery</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Hourly</p>
-                    </td>
-                    <td>
-                      <p>45, Avenue ,Mark Street, <span className="d-block">USA 15 Sep 2023, 09:30 AM</span></p>
-                    </td>
-                    <td>
-                      <p>21, Avenue, Windham,  <span className="d-block">USA 15 Sep 2023, 11:30 AM</span></p>
-                    </td>
-                    <td>
-                      <p>15 Sep 2023, 09:00 AM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$300</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-secondary">Upcoming</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#upcoming_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#edit_booking">
-                            <i className="feather-edit-3" /> Edit
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
+                    <td colSpan="6" className="text-center">
+                      Loading...
                     </td>
                   </tr>
+                ) : reservation.length > 0 ? (
+                  reservation.map((res) => (
+                    <tr key={res._id}>
+                      <td>
+                        <label className="custom_check w-100">
+                          <input type="checkbox" name="username" />
+                          <span className="checkmark" />
+                        </label>
+                      </td>
+                      <td>
+                        <a>{res.bookingId}</a>
+                      </td>
+                      <td>
+                        <div className="table-avatar">
+                          <a
+                            href="#"
+                            className="avatar avatar-lg flex-shrink-0"
+                          >
+                            <img
+                              className="avatar-img"
+                              src={BASE_URL_IMG + res?.car?.image}
+                            />
+                          </a>
+                          <div className="table-head-name flex-grow-1">
+                            <a href="#"> {res?.car?.carName}</a>
+                            <p>{res.rentalType}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <p>{res.bookingType}</p>
+                      </td>
+                      <td>
+                        <p>
+                          {res.pickupAddress}
+                          <span className="d-block">
+                            {new Date(res.pickupDate).toDateString()}{" "}
+                          </span>
+                        </p>
+                      </td>
+                      <td>
+                        <p>
+                          {res.dropAddress}
+                          <span className="d-block">
+                            {new Date(res.dropDate).toDateString()}{" "}
+                          </span>
+                        </p>
+                      </td>
+                      <td>
+                        <p> {new Date(res.createdAt).toDateString()}</p>
+                      </td>
+                      <td>
+                        <p className="text-darker">
+                          ${calculateTotalPrice(res)}
+                        </p>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge ${
+                            res.status === "cancelled"
+                              ? "badge-danger"
+                              : res.status === "confirmed"
+                              ? "badge-success"
+                              : "badge-secondary"
+                          }`}
+                        >
+                          {res.status}
+                        </span>
+                      </td>
+                      <td className="text-end">
+                        <div className="dropdown dropdown-action">
+                          <a
+                            className="dropdown-toggle"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="fas fa-ellipsis-vertical" />
+                          </a>
+                          <div className="dropdown-menu dropdown-menu-end">
+                            <a
+                              className="dropdown-item"
+                              data-bs-toggle="modal"
+                              data-bs-target="#upcoming_booking_All_Booking"
+                              onClick={() => setSelectedBooking(res)} // set the clicked booking
+                            >
+                              <Eye size={16} color="#000" /> View
+                            </a>
+                            {/* <a
+                              className="dropdown-item"
+                           
+                              data-bs-toggle="modal"
+                              data-bs-target="#edit_booking"
+                              onClick={() => setEditBooking(res)}
+                            >
+                              <Edit3 size={16} color="#000" /> Edit
+                            </a> */}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1002</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-01.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">Toyota Camry SE 350</a>
-                          <p>Self Pickup</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Day</p>
-                    </td>
-                    <td>
-                      <p>1646 West St, Grand Rapids <span className="d-block">18 Sep 2023, 09:00 AM</span></p>
-                    </td>
-                    <td>
-                      <p>26 Platinum Drive, Canonsburg<span className="d-block">15 Sep 2023, 11:30 AM</span></p>
-                    </td>
-                    <td>
-                      <p>18 Sep 2023, 08:10 PM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$500</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-warning">Inprogress</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#inprogress_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
+                    <td colSpan="6" className="text-center">
+                      No Reservation found
                     </td>
                   </tr>
-                  <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1003</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-05.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">Kia Soul 2016</a>
-                          <p>Delivery</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Weekly</p>
-                    </td>
-                    <td>
-                      <p>14 Straford Park, Pittsburg <span className="d-block">03 Oct 2023, 10:15 AM</span></p>
-                    </td>
-                    <td>
-                      <p>11 Pleasant Hill, Pittsburg <span className="d-block">10 Oct 2023, 10:15 AM</span></p>
-                    </td>
-                    <td>
-                      <p>21 Sep 2023, 04:15 PM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$600</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-danger">Cancelled</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#cancelled_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1004</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-03.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">Audi A3 2019 new</a>
-                          <p>Self Pickup</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Monthly</p>
-                    </td>
-                    <td>
-                      <p>63 White Pine Lane, Martinsville <span className="d-block">05 Nov 2023, 02:30 PM</span></p>
-                    </td>
-                    <td>
-                      <p>14 Roane Avenue, Herndon <span className="d-block">05 Dec 2023, 02:30 PM</span></p>
-                    </td>
-                    <td>
-                      <p>04 Oct 2023, 08:00 AM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$1500</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-warning">Inprogress</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#inprogress_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1005</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-05.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">2018 Chevrolet Camaro</a>
-                          <p>Delivery</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Day</p>
-                    </td>
-                    <td>
-                      <p>24 Better Street, Kansas City <span className="d-block">16 Nov 2023, 10:20 AM</span></p>
-                    </td>
-                    <td>
-                      <p>77 Geraldine Lane, Newyork <span className="d-block">17 Nov 2023, 10:20 AM</span></p>
-                    </td>
-                    <td>
-                      <p>16 Oct 2023, 12:30 PM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$450</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-danger">Cancelled</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#cancelled_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1006</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-06.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">Acura Sport Version</a>
-                          <p>Sel pickup</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Hourly</p>
-                    </td>
-                    <td>
-                      <p>78 Cityview Drive, Glenolden <span className="d-block">24 Nov 2023, 06:40 AM</span></p>
-                    </td>
-                    <td>
-                      <p>66 Ottis Street, Shawnee <span className="d-block">24 Nov 2023, 08:40 AM</span></p>
-                    </td>
-                    <td>
-                      <p>24 Oct 2023, 05:40 PM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$250</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-success">Completed</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#complete_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);">
-                            <i className="feather-edit-3" /> Edit
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label className="custom_check w-100">
-                        <input type="checkbox" name="username" />
-                        <span className="checkmark" /> 
-                      </label>
-                    </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1007</a></td>
-                    <td>
-                      <div className="table-avatar">
-                        <a href="#" className="avatar avatar-lg flex-shrink-0">
-                          <img className="avatar-img" src="/user-assets/img/cars/car-08.jpg" alt="Booking" />
-                        </a>
-                        <div className="table-head-name flex-grow-1">
-                          <a href="#">Toyota Tacoma 4WD</a>
-                          <p>Delivery</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <p>Monthly</p>
-                    </td>
-                    <td>
-                      <p>41 Duke Lane, Branchburg <span className="d-block">15 Dec 2023, 04:30 PM</span></p>
-                    </td>
-                    <td>
-                      <p>80 Glory Road, Nashville <span className="d-block">15 Jan 2024, 04:30 PM</span></p>
-                    </td>
-                    <td>
-                      <p>02 Nov 2023, 07:30 AM</p>
-                    </td>
-                    <td>
-                      <p className="text-darker">$1000</p>
-                    </td>
-                    <td>
-                      <span className="badge badge-light-danger">Cancelled</span>
-                    </td>
-                    <td className="text-end">
-                      <div className="dropdown dropdown-action">
-                        <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i className="fas fa-ellipsis-vertical" />
-                        </a>
-                        <div className="dropdown-menu dropdown-menu-end">
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#cancelled_booking">
-                            <i className="feather-eye" /> View
-                          </a>
-                          <a className="dropdown-item" href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#delete_modal">
-                            <i className="feather-trash-2" /> Delete
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>	
-            <div className="table-footer">
-              <div className="row">
-                <div className="col-md-6">
-                  <div id="tablelength" />
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="modal new-modal multi-step fade"
+        id="upcoming_booking_All_Booking"
+        data-keyboard="false"
+        data-backdrop="static"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button
+                type="button"
+                className="close-btn"
+                data-bs-dismiss="modal"
+              >
+                <span>×</span>
+              </button>
+            </div>
+            {selectedBooking ? (
+              <div className="modal-body">
+                <div className="booking-header">
+                  <div className="booking-img-wrap">
+                    <div className="book-img">
+                      <img
+                        src={BASE_URL_IMG + selectedBooking?.car?.image}
+                        alt="car"
+                      />
+                    </div>
+                    <div className="book-info">
+                      <h6>{selectedBooking?.car?.carName}</h6>
+
+                      <p>
+                        <MapPin size={16} color="#000" />
+                        Location : {selectedBooking?.pickupAddress}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="book-amount">
+                    <p>Total Amount</p>
+                    <h6>
+                      ${calculateTotalPrice(selectedBooking)}{" "}
+                      <a href="javascript:void(0);">
+                        <AlertCircle size={16} color="#f00" />
+                      </a>
+                    </h6>
+                  </div>
                 </div>
-                <div className="col-md-6 text-md-end">
-                  <div id="tablepage" />
+                <div className="booking-group">
+                  <div className="booking-wrapper">
+                    <div className="booking-title">
+                      <h6>Booking Details</h6>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Booking Type</h6>
+                          <p>{selectedBooking?.bookingType}</p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Rental Type</h6>
+                          <p>{selectedBooking?.rentalType}</p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Extra Service</h6>
+                          <p>
+                            {selectedBooking?.extraServices
+                              ?.map((service) => service.name)
+                              .join(", ")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Delivery</h6>
+                          <p>{selectedBooking?.pickupAddress}</p>
+                          <p>
+                            {new Date(
+                              selectedBooking?.pickupDate
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Dropoff</h6>
+                          <p>{selectedBooking?.dropAddress}</p>
+                          <p>
+                            {new Date(
+                              selectedBooking?.dropDate
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Status</h6>
+                          <span
+                            className={`badge ${
+                              selectedBooking?.status === "cancelled"
+                                ? "badge-danger"
+                                : selectedBooking?.status === "confirmed"
+                                ? "badge-success"
+                                : "badge-secondary"
+                            }`}
+                          >
+                            {selectedBooking?.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Booked On</h6>
+                          <p>
+                            {new Date(
+                              selectedBooking?.createdAt
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="booking-wrapper">
+                    <div className="booking-title">
+                      <h6>Personal Details</h6>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Details</h6>
+                          <p>{selectedBooking?.customer.name}</p>
+                          <p>{selectedBooking?.customer.contact}</p>
+                          <p>
+                            <a>{selectedBooking?.customer.email}</a>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Address</h6>
+                          <p>{selectedBooking?.customer.address}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <div className="modal-btn modal-btn-sm text-end">
+                  <a
+                    data-bs-target="#cancel_ride"
+                    data-bs-toggle="modal"
+                    data-bs-dismiss="modal"
+                    className="btn btn-secondary"
+                    onClick={() => setDeleteBooking(selectedBooking._id)}
+                  >
+                    Cancel Booking
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <p>Loading...</p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="modal new-modal multi-step fade"
+        id="edit_booking"
+        data-keyboard="false"
+        data-backdrop="static"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header border-0 pb-0">
+              <button
+                type="button"
+                className="close-btn"
+                data-bs-dismiss="modal"
+              >
+                <span>×</span>
+              </button>
+              <div className="badge-item w-100 text-end">
+                <span className="badge badge-light-warning">Inprogress</span>
+              </div>
+            </div>
+            <div className="modal-body">
+              <div className="booking-header">
+                <div className="booking-img-wrap">
+                  <div className="book-img">
+                    <img src="assets/img/cars/car-05.jpg" alt="img" />
+                  </div>
+                  <div className="book-info">
+                    <h6>Chevrolet Camaro</h6>
+                    <p>
+                      <MapPin size={16} color="#000" />
+                      Location : Miami St, Destin, FL 32550, USA
+                    </p>
+                  </div>
+                </div>
+                <div className="book-amount">
+                  <p>Total Amount</p>
+                  <h6>
+                    $4700{" "}
+                    <a href="javascript:void(0);">
+                      <AlertCircle size={16} color="#f00" />
+                    </a>
+                  </h6>
+                </div>
+              </div>
+              <div className="booking-group">
+                <div className="booking-wrapper">
+                  <div className="booking-title">
+                    <h6>Select Location</h6>
+                  </div>
+                  <div className="row">
+                    <div className="col-md-12">
+                      <div className="loc-wrap">
+                        <div className="modal-form-group loc-item">
+                          <label>Delivery Location</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter Location"
+                          />
+                        </div>
+                        <div className="modal-form-group">
+                          <label className="d-sm-block">&nbsp;</label>
+                          <a
+                            href="javascript:void(0);"
+                            className="btn btn-secondary"
+                          >
+                            <i className="fa-solid fa-location-crosshairs" />{" "}
+                            Current Location
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="col-md-12">
+                      <div className="modal-form-group">
+                        <label>Dropoff Location</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          defaultValue="78, 10th street Laplace USA"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="booking-wrapper">
+                  <div className="booking-title">
+                    <h6>
+                      <span className="title-icon">
+                        <i className="fa-solid fa-location-dot" />
+                      </span>
+                      Select Booking type &amp; Time{" "}
+                      <a href="javascript:void(0);">
+                        <AlertCircle size={16} color="#f00" />
+                      </a>
+                    </h6>
+                  </div>
+                  <div className="row">
+                    <div className="col-lg-3 col-md-6">
+                      <div className="modal-form-group rent-radio active">
+                        <label className="custom_radio">
+                          <input
+                            type="radio"
+                            className="rent-types"
+                            name="rent_type"
+                            defaultChecked
+                          />
+                          <span className="checkmark" />
+                          <span className="rent-option">Hourly</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-lg-3 col-md-6">
+                      <div className="modal-form-group rent-radio">
+                        <label className="custom_radio">
+                          <input
+                            type="radio"
+                            className="rent-types"
+                            name="rent_type"
+                          />
+                          <span className="checkmark" />
+                          <span className="rent-option">Day (8 Hrs)</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-lg-3 col-md-6">
+                      <div className="modal-form-group rent-radio">
+                        <label className="custom_radio">
+                          <input
+                            type="radio"
+                            className="rent-types"
+                            name="rent_type"
+                          />
+                          <span className="checkmark" />
+                          <span className="rent-option">Weekly</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-lg-3 col-md-6">
+                      <div className="modal-form-group rent-radio">
+                        <label className="custom_radio">
+                          <input
+                            type="radio"
+                            className="rent-types"
+                            name="rent_type"
+                          />
+                          <span className="checkmark" />
+                          <span className="rent-option">Monthly</span>
+                        </label>
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="modal-form-group">
+                        <label>Start Date</label>
+                        <input type="date" className="form-control" />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="modal-form-group">
+                        <label>Start Time</label>
+                        <input type="time" className="form-control" />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="modal-form-group">
+                        <label>Return Date</label>
+                        <input type="date" className="form-control" />
+                      </div>
+                    </div>
+                    <div className="col-md-6">
+                      <div className="modal-form-group">
+                        <label>Return Time</label>
+                        <input type="time" className="form-control" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="booking-wrapper">
+                  <div className="booking-title">
+                    <h6>
+                      <span className="title-icon">
+                        <i className="fa-solid fa-medal" />
+                      </span>
+                      Extra Service
+                    </h6>
+                  </div>
+                  <div className="selectbox-cont">
+                    <label className="custom_check w-100">
+                      <input type="checkbox" name="username" />
+                      <span className="checkmark" /> Baby Seat -{" "}
+                      <span className="amt">$10</span>
+                    </label>
+                    <label className="custom_check w-100">
+                      <input type="checkbox" name="username" defaultChecked />
+                      <span className="checkmark" /> Mobile Charging -{" "}
+                      <span className="amt">$50</span>
+                    </label>
+                    <label className="custom_check w-100">
+                      <input type="checkbox" name="username" />
+                      <span className="checkmark" /> Wi-Fi Hotspot -{" "}
+                      <span className="amt">$60</span>
+                    </label>
+                    <label className="custom_check w-100">
+                      <input type="checkbox" name="username" />
+                      <span className="checkmark" /> Airport Shuttle Service -{" "}
+                      <span className="amt">$90</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-btn modal-btn-sm text-end">
+                <a
+                  href="javascript:void(0);"
+                  data-bs-dismiss="modal"
+                  className="btn btn-secondary"
+                >
+                  Go Back
+                </a>
+                <a
+                  href="javascript:void(0);"
+                  data-bs-dismiss="modal"
+                  className="btn btn-primary"
+                >
+                  Save &amp; Continue
+                </a>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <div
+        className="modal new-modal fade"
+        id="cancel_ride"
+        data-keyboard="false"
+        data-backdrop="static"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h4 className="modal-title">Cancel Reason</h4>
+              <button
+                type="button"
+                className="close-btn"
+                data-bs-dismiss="modal"
+              >
+                <span>×</span>
+              </button>
+            </div>
+            <div className="modal-body">
+              <form action="#">
+                <div className="modal-item">
+                  <div className="modal-form-group">
+                    <label>
+                      Reason <span className="text-danger">*</span>
+                    </label>
+                    <textarea
+                      className="form-control"
+                      rows={4}
+                      value={cancelationReseion}
+                      onChange={(e) => setCancellationReasion(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="modal-btn modal-btn-sm text-end">
+                  <a data-bs-dismiss="modal" className="btn btn-secondary">
+                    Cancel
+                  </a>
+                  <a
+                    data-bs-dismiss="modal"
+                    className="btn btn-primary"
+                    onClick={cancelReservation}
+                  >
+                    Submit
+                  </a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default UserAllBooking;
+
+
+
+
+
+
+
+
+
+
+	// <li class="nav-item dropdown has-arrow logged-item">
+	// 						<a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
+	// 							<span class="user-img">
+	// 								<img class="rounded-circle" src="assets/img/profiles/avatar-14.jpg" alt="Profile">
+	// 							</span>
+	// 							<span class="user-text">Daniel Johshuva</span>
+	// 						</a>
+	// 						<div class="dropdown-menu dropdown-menu-end">
+	// 							<a class="dropdown-item" href="user-dashboard.html">
+	// 								<i class="feather-user-check"></i> Dashboard
+	// 							</a>
+	// 							<a class="dropdown-item" href="user-settings.html">
+	// 								<i class="feather-settings"></i> Settings
+	// 							</a>
+	// 							<a class="dropdown-item" href="index.html">
+	// 								<i class="feather-power"></i> Logout
+	// 							</a>
+	// 						</div>
+	// 					</li>

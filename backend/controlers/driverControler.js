@@ -269,10 +269,46 @@ const getAllActiveDriver = async (req, res) => {
   }
 };
 
+
+const getTop5ActiveDrivers = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Admin Id is required",
+      });
+    }
+
+    const drivers = await Driver.find({
+      admin: adminId,
+      isActive: true,
+    })
+      .sort({ createdAt: -1 }) 
+      .limit(5); 
+
+    res.json({
+      success: true,
+      data: drivers,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+
+
 module.exports = {
   addDriver,
   updateDriver,
   deleteDriver,
   getAllDriver,
   getAllActiveDriver,
+  getTop5ActiveDrivers,
 };

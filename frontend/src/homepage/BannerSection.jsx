@@ -36,7 +36,7 @@ function BannerSection() {
 
   return (
     <section className="banner-section-four">
-      <div className="container">
+      <div className="container pt-3">
         <div className="home-banner">
           <div className="row align-items-center">
             <div className="col-lg-5" data-aos="fade-down">

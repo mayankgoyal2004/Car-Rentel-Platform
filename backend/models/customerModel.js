@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 
 const customerschema = new mongoose.Schema(
   {
+    name:{
+      type: String,
+    },
     firstName: { type: String, default: null },
     lastName: { type: String, default: null },
     email: { type: String, default: null },

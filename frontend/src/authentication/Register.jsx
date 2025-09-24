@@ -4,7 +4,7 @@ import apiServices from "../../Apiservice/apiService"; // 👈 your API helper
 import { CornerDownLeft } from "react-feather";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import ReCAPTCHA from "react-google-recaptcha";
 const Register = () => {
   const navigate = useNavigate();
 
@@ -16,20 +16,53 @@ const Register = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   // handle input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    // At least 8 chars, one uppercase, one lowercase, one number, one special char
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
   // handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name) {
+      toast.error("User name is required");
+      return;
+    }
+
+    if (!validateEmail(formData.email)) {
+      toast.error("Please enter a valid email address!");
+      return;
+    }
+
+    if (!validatePassword(formData.password)) {
+      toast.error(
+        "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
+      );
+      return;
+    }
+
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA!");
+      return;
+    }
     setLoading(true);
 
     try {
-      const res = await apiServices.register(formData);
+      const res = await apiServices.register({ ...formData, recaptchaToken });
       toast.success(res.data.message);
 
       if (res.data.success) {
@@ -145,11 +178,19 @@ const Register = () => {
                     />
                   </div>
                 </div>
+                <div className="my-3">
+                  <ReCAPTCHA
+                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
+" //
+                    onChange={(token) => setRecaptchaToken(token)}
+                    onExpired={() => setRecaptchaToken(null)}
+                  />
+                </div>
 
                 <button
                   type="submit"
                   className="btn btn-outline-light w-100 btn-size mt-1"
-                  disabled={loading}
+                  disabled={loading || !recaptchaToken}
                 >
                   {loading ? "Registering..." : "Sign Up"}
                 </button>
@@ -208,14 +249,12 @@ const Register = () => {
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2024 Dreams Rent. All Rights Reserved.</p>
+              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
             </div>
           </div>
         </div>
       </footer>
-      <div>
-        {/* Your existing JSX */}
-
+     
         <ToastContainer
           position="top-right"
           autoClose={3000}
@@ -227,7 +266,7 @@ const Register = () => {
           draggable
           pauseOnHover
         />
-      </div>
+   
     </div>
   );
 };

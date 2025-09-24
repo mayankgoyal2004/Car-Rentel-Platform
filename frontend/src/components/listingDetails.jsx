@@ -6,6 +6,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ListingDetails = () => {
   const [carData, setCarData] = useState(null);
@@ -26,9 +28,9 @@ const ListingDetails = () => {
     carReview: 0,
     comment: "",
   });
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-   const [reservation , setReservation ] = useState({
+  const [reservation, setReservation] = useState({
     pickupAddress: "",
     dropAddress: "",
     pickupDate: "",
@@ -125,7 +127,7 @@ const ListingDetails = () => {
   };
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
+    setReservation((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
       ...(name === "pickupAddress" && prev.returnSameLocation
@@ -134,20 +136,19 @@ const ListingDetails = () => {
     }));
   };
 
-  
   const handlePriceRateChange = (rate) => {
-    setFormData((prev) => ({ ...prev, priceRate: rate }));
+    setReservation((prev) => ({ ...prev, priceRate: rate }));
   };
 
   const handleRentTypeChange = (type) => {
-    setFormData((prev) => ({ ...prev, rentType: type }));
+    setReservation((prev) => ({ ...prev, rentType: type }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await apiService.addReservationByUserStep1(id, formData);
+      const res = await apiService.addReservationByUserStep1(id, reservation);
 
       if (res.data.success) {
         navigate("/booking-checkout/" + res.data.data._id);
@@ -160,90 +161,77 @@ const ListingDetails = () => {
     }
   };
 
-
   const handleEnquiryChange = (e) => {
-  const { name, value } = e.target;
-  setEnquiryForm({
-    ...enquiryForm,
-    [name]: value
-  });
-  
-  // Clear error when user starts typing
-  if (enquiryErrors[name]) {
-    setEnquiryErrors({
-      ...enquiryErrors,
-      [name]: ''
+    const { name, value } = e.target;
+    setEnquiryForm({
+      ...enquiryForm,
+      [name]: value,
     });
-  }
-};
 
-
-const validateEnquiryForm = () => {
-  const newErrors = {};
-  
-  if (!enquiryForm.name.trim()) {
-    newErrors.name = 'Name is required';
-  }
-  
-  if (!enquiryForm.email.trim()) {
-    newErrors.email = 'Email is required';
-  } else if (!/\S+@\S+\.\S+/.test(enquiryForm.email)) {
-    newErrors.email = 'Email is invalid';
-  }
-  
-  if (!enquiryForm.phone.trim()) {
-    newErrors.phone = 'Phone number is required';
-  }
-  
-  if (!enquiryForm.message.trim()) {
-    newErrors.message = 'Message is required';
-  }
-  
-  setEnquiryErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
-
-// Add this function to submit the enquiry
-const submitEnquiry = async (e) => {
-  e.preventDefault(); // This is the key fix - prevent default form submission
-  
-  if (!validateEnquiryForm()) {
-    return;
-  }
-  
-  setEnquirySubmitting(true);
-  try {
-    // Replace with your actual API endpoint
-    const res = await apiService.sendEnquiry(id, enquiryForm);
-    
-    if (res.data.success) {
-      // Reset form
-      setEnquiryForm({
-        name: "",
-        email: "",
-        phone: "",
-        message: ""
+    // Clear error when user starts typing
+    if (enquiryErrors[name]) {
+      setEnquiryErrors({
+        ...enquiryErrors,
+        [name]: "",
       });
-      
-      // Close modal using Bootstrap's modal method
-      const modal = document.getElementById('enquiry');
-      if (modal) {
-        const bsModal = bootstrap.Modal.getInstance(modal);
-        if (bsModal) {
-          bsModal.hide();
-        }
-      }
-      
-      alert('Enquiry sent successfully!');
-    } else {
-      alert('Failed to send enquiry: ' + (res.data.message || 'Unknown error'));
     }
-  } catch (err) {
-    alert('Failed to send enquiry: ' + (err.message || 'Unknown error'));
-  } finally {
-    setEnquirySubmitting(false);
-  }
-};
+  };
+
+  const validateEnquiryForm = () => {
+    const newErrors = {};
+
+    if (!enquiryForm.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+
+    if (!enquiryForm.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(enquiryForm.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!enquiryForm.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    }
+
+    if (!enquiryForm.message.trim()) {
+      newErrors.message = "Message is required";
+    }
+
+    setEnquiryErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Add this function to submit the enquiry
+  const submitEnquiry = async (e) => {
+    e.preventDefault(); // This is the key fix - prevent default form submission
+
+    if (!validateEnquiryForm()) {
+      return;
+    }
+
+    setEnquirySubmitting(true);
+    try {
+      // Replace with your actual API endpoint
+      const res = await apiService.sendEnquiry(id, enquiryForm);
+
+      if (res.data.success) {
+        // Reset form
+        setEnquiryForm({
+          name: "",
+          email: "",
+          phone: "",
+          message: "",
+        });
+
+        toast.success("Enquiry sent successfully!");
+      }
+    } catch (err) {
+      alert("Failed to send enquiry: " + (err.message || "Unknown error"));
+    } finally {
+      setEnquirySubmitting(false);
+    }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -293,7 +281,7 @@ const submitEnquiry = async (e) => {
         await fetchReviews();
 
         // Show success message (you can add a toast notification here)
-        alert("Review submitted successfully!");
+        toast.success("Review submitted successfully!");
       } else {
         setError("Failed to submit review");
       }
@@ -962,133 +950,145 @@ const submitEnquiry = async (e) => {
                 <div className="review-header">
                   <h4>Pricing</h4>
                 </div>
-                 <div className="mb-3">
-          {["daily", "weekly", "monthly", "yearly"].map((rate) => (
-            <label key={rate} className="booking_custom_check bookin-check-2">
-              <input
-                type="radio"
-                name="price_rate"
-                checked={formData.priceRate === rate}
-                onChange={() => handlePriceRateChange(rate)}
-              />
-              <span className="booking_checkmark">
-                <span className="checked-title">{rate.charAt(0).toUpperCase() + rate.slice(1)}</span>
-                <span className="price-rate">${carData.pricing.prices[rate]}</span>
-              </span>
-            </label>
-          ))}
-        </div>
+                <div className="mb-3">
+                  {["daily", "weekly", "monthly", "yearly"].map((rate) => (
+                    <label
+                      key={rate}
+                      className="booking_custom_check bookin-check-2"
+                    >
+                      <input
+                        type="radio"
+                        name="price_rate"
+                        checked={reservation.priceRate === rate}
+                        onChange={() => handlePriceRateChange(rate)}
+                      />
+                      <span className="booking_checkmark">
+                        <span className="checked-title">
+                          {rate.charAt(0).toUpperCase() + rate.slice(1)}
+                        </span>
+                        <span className="price-rate">
+                          ${carData.pricing.prices[rate]}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
                 <div className="location-content">
                   <div className="delivery-tab">
                     <ul className="nav">
-                       {["delivery", "selfPickup"].map((type) => (
-                <li key={type}>
-                  <label className="booking_custom_check">
-                    <input
-                      type="radio"
-                      name="rent_type"
-                      checked={formData.rentType === type}
-                      onChange={() => handleRentTypeChange(type)}
-                    />
-                    <span className="booking_checkmark">
-                      <span className="checked-title">
-                        {type === "delivery" ? "Delivery" : "Self Pickup"}
-                      </span>
-                    </span>
-                  </label>
-                </li>
-              ))}
+                      {["delivery", "selfPickup"].map((type) => (
+                        <li key={type}>
+                          <label className="booking_custom_check">
+                            <input
+                              type="radio"
+                              name="rent_type"
+                              checked={reservation.rentType === type}
+                              onChange={() => handleRentTypeChange(type)}
+                            />
+                            <span className="booking_checkmark">
+                              <span className="checked-title">
+                                {type === "delivery"
+                                  ? "Delivery"
+                                  : "Self Pickup"}
+                              </span>
+                            </span>
+                          </label>
+                        </li>
+                      ))}
                     </ul>
                   </div>
                   <div className="tab-content">
                     <div className="tab-pane fade active show" id="delivery">
-          <form onSubmit={handleSubmit}>
+                      <form onSubmit={handleSubmit}>
                         <ul>
-                         <li className="column-group-main">
-                <div className="input-block">
-                  <label>Pickup Location</label>
-                  <input
-                    type="text"
-                    name="pickupAddress"
-                    value={formData.pickupAddress}
-                    onChange={handleChange}
-                    placeholder="Pickup address"
-                    className="form-control"
-                  />
-                </div>
-              </li>
-                           <li className="column-group-main">
-                <div className="input-block">
-                  <label className="custom_check d-inline-flex location-check m-0">
-                    <span>Return to same location</span>
-                    <input
-                      type="checkbox"
-                      name="returnSameLocation"
-                      checked={formData.returnSameLocation}
-                      onChange={handleChange}
-                    />
-                    <span className="checkmark" />
-                  </label>
-                </div>
-              </li>
                           <li className="column-group-main">
-                <div className="input-block">
-                  <label>Return Location</label>
-                  <input
-                    type="text"
-                    name="dropAddress"
-                    value={formData.dropAddress}
-                    onChange={handleChange}
-                    placeholder="Return address"
-                    className="form-control"
-                    disabled={formData.returnSameLocation}
-                  />
-                </div>
-              </li>
+                            <div className="input-block">
+                              <label>Pickup Location</label>
+                              <input
+                                type="text"
+                                name="pickupAddress"
+                                value={reservation.pickupAddress}
+                                onChange={handleChange}
+                                placeholder="Pickup address"
+                                className="form-control"
+                              />
+                            </div>
+                          </li>
                           <li className="column-group-main">
-                <div className="input-block">
-                  <label>Pickup Date</label>
-                  <input
-                    type="date"
-                    name="pickupDate"
-                    value={formData.pickupDate}
-                    onChange={handleChange}
-                    className="form-control"
-                  />
-                  <input
-                    type="time"
-                    name="pickupTime"
-                    value={formData.pickupTime}
-                    onChange={handleChange}
-                    className="form-control mt-2"
-                  />
-                </div>
-              </li>
-                      <li className="column-group-main">
-                <div className="input-block">
-                  <label>Return Date</label>
-                  <input
-                    type="date"
-                    name="returnDate"
-                    value={formData.returnDate}
-                    onChange={handleChange}
-                    className="form-control"
-                  />
-                  <input
-                    type="time"
-                    name="returnTime"
-                    value={formData.returnTime}
-                    onChange={handleChange}
-                    className="form-control mt-2"
-                  />
-                </div>
-              </li>
+                            <div className="input-block">
+                              <label className="custom_check d-inline-flex location-check m-0">
+                                <span>Return to same location</span>
+                                <input
+                                  type="checkbox"
+                                  name="returnSameLocation"
+                                  checked={reservation.returnSameLocation}
+                                  onChange={handleChange}
+                                />
+                                <span className="checkmark" />
+                              </label>
+                            </div>
+                          </li>
+                          <li className="column-group-main">
+                            <div className="input-block">
+                              <label>Return Location</label>
+                              <input
+                                type="text"
+                                name="dropAddress"
+                                value={reservation.dropAddress}
+                                onChange={handleChange}
+                                placeholder="Return address"
+                                className="form-control"
+                                disabled={reservation.returnSameLocation}
+                              />
+                            </div>
+                          </li>
+                          <li className="column-group-main">
+                            <div className="input-block">
+                              <label>Pickup Date</label>
+                              <input
+                                type="date"
+                                name="pickupDate"
+                                value={reservation.pickupDate}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+                              <input
+                                type="time"
+                                name="pickupTime"
+                                value={reservation.pickupTime}
+                                onChange={handleChange}
+                                className="form-control mt-2"
+                              />
+                            </div>
+                          </li>
+                          <li className="column-group-main">
+                            <div className="input-block">
+                              <label>Return Date</label>
+                              <input
+                                type="date"
+                                name="returnDate"
+                                value={reservation.returnDate}
+                                onChange={handleChange}
+                                className="form-control"
+                              />
+                              <input
+                                type="time"
+                                name="returnTime"
+                                value={reservation.returnTime}
+                                onChange={handleChange}
+                                className="form-control mt-2"
+                              />
+                            </div>
+                          </li>
                           <li className="column-group-last">
                             <div className="input-block mb-0">
                               <div className="search-btn">
-                                <button type="submit" className="btn btn-primary w-100">
-                    Book
-                  </button>
+                                <button
+                                  type="submit"
+                                  className="btn btn-primary w-100"
+                                >
+                                  Book
+                                </button>
                                 <a
                                   data-bs-toggle="modal"
                                   data-bs-target="#enquiry"
@@ -1265,7 +1265,7 @@ const submitEnquiry = async (e) => {
                   <div className="owner-img">
                     <a href="#">
                       <img
-                        src={BASE_URL_IMG + carData.admin.image}
+                        src={BASE_URL_IMG + carData?.admin?.image}
                         alt="User"
                       />
                     </a>
@@ -1278,7 +1278,7 @@ const submitEnquiry = async (e) => {
                   </div>
                   <div className="reviewbox-list-rating">
                     <h5>
-                      <a>{carData.admin.userName}</a>
+                      <a>{carData?.admin?.userName}</a>
                     </h5>
                     <p>
                       <i className="fas fa-star filled" />
@@ -1294,21 +1294,21 @@ const submitEnquiry = async (e) => {
                   <li>
                     Email
                     <span>
-                     <a
-  href={`mailto:${carData.admin.email}`}
-  className="__cf_email__"
->
-  {carData.admin.email}
-</a>
+                      <a
+                        href={`mailto:${carData?.admin?.email}`}
+                        className="__cf_email__"
+                      >
+                        {carData?.admin?.email}
+                      </a>
                     </span>
                   </li>
                   <li>
                     Phone Number
-                    <span>{carData.admin.contact}</span>
+                    <span>{carData.admin?.contact}</span>
                   </li>
                   <li>
                     Location
-                    <span>{carData.admin.address}</span>
+                    <span>{carData.admin?.address}</span>
                   </li>
                 </ul>
                 <div className="message-btn">
@@ -1369,7 +1369,6 @@ const submitEnquiry = async (e) => {
               </div>
             </div>
           </div>
-         
         </div>
       </section>
       {/* Modal */}
@@ -1419,7 +1418,7 @@ const submitEnquiry = async (e) => {
               </button>
             </div>
             <div className="modal-body">
-            <form onSubmit={submitEnquiry} className="enquire-modal">
+              <form onSubmit={submitEnquiry} className="enquire-modal">
                 <div className="booking-header">
                   <div className="booking-img-wrap">
                     <div className="book-img">
@@ -1436,47 +1435,67 @@ const submitEnquiry = async (e) => {
                   <input
                     type="text"
                     name="name"
-                    className={`form-control ${enquiryErrors.name ? 'is-invalid' : ''}`}
-            placeholder="Enter Name"
-            value={enquiryForm.name}
-            onChange={handleEnquiryChange}
+                    className={`form-control ${
+                      enquiryErrors.name ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter Name"
+                    value={enquiryForm.name}
+                    onChange={handleEnquiryChange}
                   />
                 </div>
                 <div className="modal-form-group">
                   <label>Email</label>
                   <input
                     type="email"
-                   name="email"
-            className={`form-control ${enquiryErrors.email ? 'is-invalid' : ''}`}
-            placeholder="Enter Email Address"
-            value={enquiryForm.email}
-            onChange={handleEnquiryChange}
+                    name="email"
+                    className={`form-control ${
+                      enquiryErrors.email ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter Email Address"
+                    value={enquiryForm.email}
+                    onChange={handleEnquiryChange}
                   />
-                   {enquiryErrors.email && <div className="text-danger small">{enquiryErrors.email}</div>}
+                  {enquiryErrors.email && (
+                    <div className="text-danger small">
+                      {enquiryErrors.email}
+                    </div>
+                  )}
                 </div>
                 <div className="modal-form-group">
                   <label>Phone Number</label>
                   <input
                     type="text"
-                  name="phone"
-            className={`form-control ${enquiryErrors.phone ? 'is-invalid' : ''}`}
-            placeholder="Enter Phone Number"
-            value={enquiryForm.phone}
-            onChange={handleEnquiryChange}
-          />
-          {enquiryErrors.phone && <div className="text-danger small">{enquiryErrors.phone}</div>}
+                    name="phone"
+                    className={`form-control ${
+                      enquiryErrors.phone ? "is-invalid" : ""
+                    }`}
+                    placeholder="Enter Phone Number"
+                    value={enquiryForm.phone}
+                    onChange={handleEnquiryChange}
+                  />
+                  {enquiryErrors.phone && (
+                    <div className="text-danger small">
+                      {enquiryErrors.phone}
+                    </div>
+                  )}
                 </div>
                 <div className="modal-form-group">
                   <label>Message</label>
                   <textarea
-                  name="message"
-                    className={`form-control ${enquiryErrors.message ? 'is-invalid' : ''}`}
-            rows={4}
-            placeholder="Enter your message"
-            value={enquiryForm.message}
-            onChange={handleEnquiryChange}
-          />
-          {enquiryErrors.message && <div className="text-danger small">{enquiryErrors.message}</div>}
+                    name="message"
+                    className={`form-control ${
+                      enquiryErrors.message ? "is-invalid" : ""
+                    }`}
+                    rows={4}
+                    placeholder="Enter your message"
+                    value={enquiryForm.message}
+                    onChange={handleEnquiryChange}
+                  />
+                  {enquiryErrors.message && (
+                    <div className="text-danger small">
+                      {enquiryErrors.message}
+                    </div>
+                  )}
                 </div>
                 <label className="custom_check w-100">
                   <input type="checkbox" name="username" />
@@ -1485,13 +1504,13 @@ const submitEnquiry = async (e) => {
                   <Link to="">Privacy Policy</Link>
                 </label>
                 <div className="modal-btn modal-btn-sm">
-                   <button 
-            type="submit" 
-            className="btn btn-primary w-100"
-            disabled={enquirySubmitting}
-          >
-            {enquirySubmitting ? 'Sending...' : 'Submit Enquiry'}
-          </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary w-100"
+                    disabled={enquirySubmitting}
+                  >
+                    {enquirySubmitting ? "Sending..." : "Submit Enquiry"}
+                  </button>
                 </div>
               </form>
             </div>
@@ -1557,7 +1576,7 @@ const submitEnquiry = async (e) => {
                           <td>Door delivery &amp; Pickup</td>
                           <td colSpan={2} className="amt text-end">
                             {" "}
-                            + $60
+                            + $0
                           </td>
                         </tr>
                         <tr>

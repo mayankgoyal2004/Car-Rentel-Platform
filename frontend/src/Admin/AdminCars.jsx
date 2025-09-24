@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";import { useSelector } from "react-redux";
 
 const AdminCars = () => {
   const [cars, setCars] = useState([]);
@@ -10,13 +11,25 @@ const AdminCars = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const userData = useSelector((store) => store.user);
+  const userType = userData?.userType; //
+
   const fetchAllCars = async (page = 1, searchQuery = "") => {
     setLoading(true);
     try {
-      const res = await apiService.getAllCarAdmin({
-        page,
-        search: searchQuery,
-      });
+      let res;
+      if (userType === 1) {
+        res = await apiService.getAllCarsForSuperAdmin({
+          page,
+          search: searchQuery,
+        });
+      } else {
+        res = await apiService.getAllCarAdmin({
+          page,
+          search: searchQuery,
+        });
+      }
+
       if (res.data.success) {
         const populatedCars = res.data.data.map((car) => ({
           ...car,
@@ -30,8 +43,7 @@ const AdminCars = () => {
             : "Unknown",
           carSeats: car.carSeats ? car.carSeats.carSeats : "Unknown",
           location: car.mainLocation ? car.mainLocation.location : "Unknown",
-             pricing: car?.pricing?.prices?.daily,
-
+          pricing: car?.pricing?.prices?.daily,
         }));
         setCars(populatedCars);
         setTotalPages(res.data.pagination.totalPages || 1);
@@ -47,6 +59,29 @@ const AdminCars = () => {
   useEffect(() => {
     fetchAllCars(currentPage, search);
   }, [currentPage, search]);
+
+
+
+  const handleToggleStatus = async (carId, currentStatus) => {
+  try {
+    const res = await apiService.toolgeStatusByAdmin(carId, {status:  !currentStatus});
+
+    if (res.data.success) {
+      toast.success("Car status updated successfully");
+
+      // Update state without refetch
+      setCars((prevCars) =>
+        prevCars.map((c) =>
+          c._id === carId ? { ...c, status: !currentStatus } : c
+        )
+      );
+    } else {
+      toast.error(res.data.message || "Failed to update status");
+    }
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Server error");
+  }
+};
 
   // Pagination
   const handlePageChange = (page) => {
@@ -76,27 +111,37 @@ const AdminCars = () => {
               </ol>
             </nav>
           </div>
+            <div className="dropdown me-3">
+  <a href="javascript:void(0);" className="dropdown-toggle btn btn-white d-inline-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+    Status
+  </a>
+  <ul className="dropdown-menu dropdown-menu-md p-2">
+    <li className="dropdown-item">
+      Active
+    </li>
+    <li className="dropdown-item">
+      Inactive
+    </li>
+  </ul>
+</div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
             <div className="mb-2 me-2">
-              <a
-                href="javascript:void(0);"
-                className="btn btn-white d-flex align-items-center"
-              >
-                <i className="ti ti-printer me-2" />
-                Print
-              </a>
+             
             </div>
             <div className="mb-2 me-2">
               <div className="dropdown">
                 <a
-                  href="javascript:void(0);"
+                   
                   className="btn btn-dark d-inline-flex align-items-center"
                 >
                   <i className="ti ti-upload me-1" />
                   Export
                 </a>
               </div>
+           
+
             </div>
+            
             <div className="mb-2">
               <Link
                 to="/admin-dashboard/add-car"
@@ -108,6 +153,7 @@ const AdminCars = () => {
             </div>
           </div>
         </div>
+        
         {/* /Breadcrumb */}
         {/* Table Header */}
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
@@ -147,7 +193,7 @@ const AdminCars = () => {
                 <th>CAR</th>
                 <th>BASE LOCATION</th>
                 <th>PRICE (PER DAY)</th>
-                <th>DAMAGES</th>
+                {/* <th>DAMAGES</th> */}
                 {/* <th>IS FEATURED</th> */}
                 <th>CREATED DATE</th>
                 <th>STATUS</th>
@@ -189,7 +235,9 @@ const AdminCars = () => {
                   </td>
                   <td>{car.location}</td>
                   <td>
-                    <p className="fs-14 fw-semibold text-gray-9">${car.pricing}</p>
+                    <p className="fs-14 fw-semibold text-gray-9">
+                      ${car.pricing}
+                    </p>
                   </td>
                   {/* <td>
                     <p className="text-gray-9">01</p>
@@ -206,14 +254,26 @@ const AdminCars = () => {
                     </p>
                   </td>
                   <td>
-                    <span
-                      className={`badge  ${
-                        car.status ? "bg-success" : "bg-danger"
-                      }`}
-                    >
-                      {car.status ? "Active" : "Inactive"}
-                    </span>
+                    {userType === 1 ? (
+                      <button
+                        className={`badge border-0 ${
+                          car.status ? "bg-success" : "bg-danger"
+                        }`}
+                        onClick={() => handleToggleStatus(car._id, car.status)}
+                      >
+                        {car.status ? "Active" : "Inactive"}
+                      </button>
+                    ) : (
+                      <span
+                        className={`badge ${
+                          car.status ? "bg-success" : "bg-danger"
+                        }`}
+                      >
+                        {car.status ? "Active" : "Inactive"}
+                      </span>
+                    )}
                   </td>
+
                   <td>
                     <div className="dropdown">
                       <button
@@ -234,7 +294,7 @@ const AdminCars = () => {
                             View Details
                           </Link>
                         </li>
-                        <li>
+                      {userType !==1&&    (    <li>
                           <Link
                             to="/admin-dashboard/add-reservation"
                             className="dropdown-item rounded-1"
@@ -242,8 +302,8 @@ const AdminCars = () => {
                             <i className="ti ti-plus me-1" />
                             Add Reservation
                           </Link>
-                        </li>
-                        <li>
+                        </li> )}
+                  {userType !==1&&    (<li>
                           <Link
                             to={`/admin-dashboard/edit-car/${car._id}`}
                             className="dropdown-item rounded-1"
@@ -251,11 +311,11 @@ const AdminCars = () => {
                             <i className="ti ti-edit me-1" />
                             Edit
                           </Link>
-                        </li>
+                        </li>) }  
                         <li>
                           <a
                             className="dropdown-item rounded-1"
-                            href="javascript:void(0);"
+                             
                             data-bs-toggle="modal"
                             data-bs-target="#delete_extra_services"
                           >
@@ -316,6 +376,21 @@ const AdminCars = () => {
         {/* Custom Data Table */}
         <div className="table-footer" />
       </div>
+        <div>
+              {/* Your existing JSX */}
+      
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
     </div>
   );
 };

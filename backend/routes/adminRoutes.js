@@ -42,7 +42,6 @@ const checkSubscription = require("../middlewares/checkPermission");
 const reservation = require("../controlers/reservationControler");
 const contact = require("../controlers/contactUsControler");
 
-
 const route = express.Router();
 
 route.post("/register", userRoute.register);
@@ -60,15 +59,12 @@ route.post("/verify-email", userRoute.verifyEmail);
 route.get("/get-all-testimonial-user", testimonial.getTestimonialsPublic);
 route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
 
-
-//!! comments api blog 
+//!! comments api blog
 route.get("/blogs/get-all-comments-user/:blogId", blogComments.getCommentBlog);
 
-//!! car 
+//!! car
 route.get("/car-details-user/:id", car.getSingleCarUser);
 route.get("/car-review/:carId", carReview.getCarReviews);
-
-
 
 //!! get all faq for public without authentication
 route.get("/get-all-active-faq", faq.getActiveFaqs);
@@ -78,11 +74,8 @@ route.get(
   BlogCategory.getAllActiveBlogCategoryHomePage
 );
 
-//!! get all cars api 
-route.get(
-  "/all-cars-home-page",
-  car.getAllCars
-);
+//!! get all cars api
+route.get("/all-cars-home-page", car.getAllCars);
 //!!contact
 route.post("/add-constact", contact.addContact);
 
@@ -109,19 +102,13 @@ route.post(
   upload.userImageUpload.single("image"),
   userRoute.adduserByadmin
 );
-route.post(
-  "/update-admin-password",
-  userRoute.changeAdminPassword
-);
+route.post("/update-admin-password", userRoute.changeAdminPassword);
 route.get(
   "/get-user-by-admin",
   checkPermission("user", "view"),
   userRoute.getUserByAdmin
 );
-route.get(
-  "/get-user-details",
-  userRoute.getUserDetails
-);
+route.get("/get-user-details", userRoute.getUserDetails);
 route.post(
   "/update-user-by-admin",
 
@@ -135,9 +122,21 @@ route.delete(
 );
 
 // !!comment route for blogs
-route.post("/blogs/comments/:blogId", blogComments.createComment);
-route.get("/blogs/get-comments-admin", checkPermission("blog", "view"), blogComments.getAllComments);
-route.delete("/blogs/comments/delete/:id",checkPermission("blog", "delete"), blogComments.deleteBlogComment);
+route.post(
+  "/blogs/comments/:blogId",
+  checkPermission("Blog", "create"),
+  blogComments.createComment
+);
+route.get(
+  "/blogs/get-comments-admin",
+  checkPermission("Blog", "view"),
+  blogComments.getAllComments
+);
+route.delete(
+  "/blogs/comments/delete/:id",
+  checkPermission("Blog", "delete"),
+  blogComments.deleteBlogComment
+);
 
 // !!Category route for blog
 route.post(
@@ -266,6 +265,11 @@ route.get(
   driver.getAllDriver
 );
 route.get(
+  "/get-5-latest-driver",
+  checkPermission("Driver", "view"),
+  driver.getAllDriver
+);
+route.get(
   "/get-all-active-driver",
   checkPermission("Driver", "view"),
   driver.getAllActiveDriver
@@ -300,6 +304,31 @@ route.get(
   "/get-all-customer",
   checkPermission("Customer", "view"),
   customer.getAllcustomer
+);
+route.get(
+  "/get-all-customer-super-admin",
+
+  customer.getAllCustomerSuperAdmin
+);
+route.get(
+  "/get-all-owner-super-admin",
+
+  customer.getAllOwner
+);
+route.get(
+  "/chat/:receiverId",
+
+  customer.getMessage
+);
+route.get(
+  "/get-all-message-by-customer",
+
+  customer.getCustomerByMessage
+);
+route.get(
+  "/get-5-customer-admin",
+  checkPermission("Customer", "view"),
+  customer.getLatest5Customers
 );
 route.get(
   "/get-customer-by-id/:id",
@@ -823,6 +852,7 @@ route.post(
   upload.carImageUpload.single("image"),
   car.addCar
 );
+
 route.post(
   "/edit-car-basics/:id",
   checkPermission("car", "edit"),
@@ -845,6 +875,8 @@ route.post("/cars/:carId/description", car.saveCarDescription);
 // route.delete("/delete-car/:id/faq", carFaq.deleteFaq);
 // route.put("/edit-car/:id/faq", carFaq.editFaq);
 route.get("/get-all-cars-super-admin", car.getAllCarsForSuperAdmin);
+route.post("/change-status-by-admin/:id", car.updateCarStatusByAdmin);
+route.get("/get-car-by-id/:id", car.getCarById);
 
 route.post(
   "/cars/:carId/upload",
@@ -861,17 +893,22 @@ route.get(
   checkPermission("Car", "view"),
   car.getAllCarsForAdmin
 );
+route.get(
+  "/get-newly-added-car-admin",
+  checkPermission("Car", "view"),
+  car.getNewlyAddedCars
+);
+route.get(
+  "/get-all-car-inRental",
+  checkPermission("Car", "view"),
+  car.getInRentalCars
+);
 
 route.get(
   "/get-car-by-id-admin/:id",
   checkPermission("Car", "view"),
   car.getCayByIdAdmin
 );
-
-
-
-
-
 
 //!! wishlist
 route.post("/toggle-wishlist", wishlist.toggleWishlist);
@@ -887,7 +924,7 @@ route.delete("/delete-enquiry/:id", enquiry.deleteEnquiry);
 
 route.post("/add-car-review/:carId", carReview.addCarReview);
 route.get("/get-all-review-admin", carReview.allReviewByAdmin);
-route.get("/get-all-review-user", carReview.allReviewByUser);
+route.get("/get-all-review-user-dashboard", carReview.allReviewByUser);
 route.delete("/delete-car-review/:id", carReview.deleteCarReview);
 
 //!! role route
@@ -1002,14 +1039,25 @@ route.get(
   checkPermission("Reservation", "view"),
   reservation.getAllReservationsForAdmin
 );
+route.get(
+  "/get-all-reservation-superAdmin",
+  checkPermission("admin", "assignPackage", true),
+
+  reservation.getAllReservationSuperAdmin
+);
 route.post(
   "/add-reservation-admin",
   checkPermission("Reservation", "Create"),
   reservation.addReservation
 );
+route.post("/add-reservation-user-step-1/:id", reservation.addReservationStep1);
 route.post(
-  "/add-reservation-user-step-1/:id",
-  reservation.addReservationStep1
+  "/cancel-reservation-user/:id",
+  reservation.reservationCancelledByUser
+);
+route.post(
+  "/cancel-reservation-admin/:id",
+  reservation.reservationCancelledByAdmin
 );
 route.post(
   "/edit-reservation-user-step-2/:id",
@@ -1021,27 +1069,46 @@ route.post(
   reservation.editReservationStep3
 );
 
-
 route.post(
   "/update-reservation/:id",
   checkPermission("Reservation", "edit"),
   reservation.updateReservation
+);
+route.post(
+  "/change-reservation-status-conformed/:id",
+  checkPermission("Reservation", "edit"),
+  reservation.changetheStatusofReservationToConformed
 );
 route.get(
   "/get-reservation-by/:id",
   checkPermission("Reservation", "view"),
   reservation.getsingleReservation
 );
+route.get("/get-last-5-reservation", reservation.getLast5Reservations);
 route.get(
-  "/get-reservation-by-booking/:id",
-  reservation.getReservationById
+  "/get-last-5-reservation-admin",
+  reservation.getLatest5ReservationsForAdmin
 );
-// route.get("/get-reservation-by-id/:id", reservation.getReservationById);
+route.get(
+  "/get-all-calender-reservation",
+  reservation.getAllReservationCalender
+);
+route.get("/get-all-reservation-user", reservation.getAllReservationUser);
+route.get(
+  "/get-all-pending-reservation-user",
+  reservation.getPendingReservationsUser
+);
+route.get(
+  "/get-all-completed-reservation-user",
+  reservation.getCompletedReservationsUser
+);
+route.get(
+  "/get-all-cancelled-reservation-user",
+  reservation.getCancelledReservationsUser
+);
+route.get("/get-reservation-by-booking/:id", reservation.getReservationById);
 route.delete("/delete-reservation/:id", reservation.deleteReservation);
-route.get(
-  "/get-all-active-reservation-admin",
-  car.getApprovedCarsAdminReservation
-);
+route.get("/get-all-active-car-admin", car.getApprovedCarsAdminReservation);
 
 //!!! contact api
 route.get(
@@ -1054,8 +1121,5 @@ route.delete(
   checkPermission("admin", "assignPackage", true),
   contact.deleteContact
 );
-
-
-
 
 module.exports = route;

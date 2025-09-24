@@ -194,7 +194,7 @@ function App() {
                   element={<UserUpcomingBooking />}
                 />
                 <Route
-                  path="user-booking-inProgress"
+                  path="user-booking-in-progress"
                   element={<UserBookingInProgress />}
                 />
                 <Route
@@ -321,7 +321,7 @@ function App() {
               element={<AdminCustomersCumpanies />}
             />
             <Route path="invoice-details" element={<AdminInvoiceDetails />} />
-            <Route path="car-details" element={<AdminCarDetails />} />
+            <Route path="car-details/:id" element={<AdminCarDetails />} />
             <Route path="add-car" element={<AdminAddCars />} />
             <Route path="edit-car/:id" element={<AdminEditCar />} />
             <Route

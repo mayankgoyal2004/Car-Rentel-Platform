@@ -3,17 +3,23 @@ import { Link, useNavigate } from "react-router-dom";
 import apiService from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
 import { CornerDownLeft } from "react-feather";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
-const nav = useNavigate()
+  const nav = useNavigate();
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA!");
+      return;
+    }
     setLoading(true);
     setMessage(null);
 
@@ -22,13 +28,14 @@ const nav = useNavigate()
         email,
         otp,
         newPassword,
+        recaptchaToken,
       };
       const res = await apiService.resetpassword(data);
-      console.log(res)
-       if (res.data.success) {
-        
+      console.log(res);
+      if (res.data.success) {
         toast.success(res.data.message);
-        nav("/login"); }
+        nav("/login");
+      }
 
       setMessage({ type: "success", text: res.data.message });
     } catch (err) {
@@ -61,7 +68,7 @@ const nav = useNavigate()
               <div className="sign-group">
                 <Link to="/" className="btn sign-up">
                   <span>
-                     <CornerDownLeft size={24}  color="#000"/>
+                    <CornerDownLeft size={24} color="#000" />
                   </span>{" "}
                   Back To Home
                 </Link>
@@ -120,10 +127,18 @@ const nav = useNavigate()
                     <span className="fas fa-eye-slash toggle-password-two" />
                   </div>
                 </div>
+                <div className="my-3">
+                  <ReCAPTCHA
+                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
+" //
+                    onChange={(token) => setRecaptchaToken(token)}
+                    onExpired={() => setRecaptchaToken(null)}
+                  />
+                </div>
                 <button
                   type="submit"
                   className="btn btn-outline-light w-100 btn-size"
-                  disabled={loading}
+                  disabled={loading || !recaptchaToken}
                 >
                   {loading ? "Saving..." : "Save Changes"}{" "}
                 </button>
@@ -148,13 +163,24 @@ const nav = useNavigate()
           {/* Copyright */}
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2024 Dreams Rent. All Rights Reserved.</p>
+              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
             </div>
           </div>
           {/* /Copyright */}
         </div>
       </footer>
       {/* /Footer */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

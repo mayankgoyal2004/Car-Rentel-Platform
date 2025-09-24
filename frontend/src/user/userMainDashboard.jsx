@@ -1,21 +1,64 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import apiService from "../../Apiservice/apiService";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useState } from "react";
 import { useEffect } from "react";
 import { ArrowRight } from "react-feather";
+import { toast } from "react-toastify";
 
 
 const UserMainDashboard = () => {
   const [wishlist, setWishlist] = useState([]);
+  const[reservation, setReservation ] = useState([])
+    const [loading, setLoading] = useState(false);
+  
 
   const getWishList = async () => {
     const res = await apiService.getWishlist();
     setWishlist(res.data.wishlist);
   };
+  const getLast5reservation = async () => {
+  try{
+    setLoading(true)
+      const res = await apiService.getLast5Reservation();
+    setReservation(res.data.data);
+  } catch (error) {
+        console.error(error);
+        toast.error("Failed to fetch contacts");
+      } finally {
+        setLoading(false);
+      }
+
+  };
   useEffect(() => {
+    getLast5reservation();
     getWishList();
   }, []);
+
+  const calculateTotalPrice = (reservation) => {
+  const {  bookingType, extraServices, securityDeposit } = reservation;
+
+  
+  let basePrice = 0;
+
+  if (reservation.car.pricing.prices) {
+    if (bookingType === "daily") basePrice = reservation.car.pricing.prices.daily || 0;
+    else if (bookingType === "weekly") basePrice = reservation.car.pricing.prices.weekly || 0;
+    else if (bookingType === "monthly") basePrice = reservation.car.pricing.prices.monthly || 0;
+    else if (bookingType === "yearly") basePrice = reservation.car.pricing.prices.yearly || 0;
+  }
+
+  const extraServicesTotal = extraServices.reduce((sum, service) => sum + (service.price || 0), 0);
+
+  const deposit = securityDeposit || 0;
+
+  // 4️⃣ Total price
+  const totalPrice = basePrice + extraServicesTotal + deposit;
+
+  return totalPrice;
+};
+
+// Example usage:
 
   return (
     <div className="content dashboard-content">
@@ -36,7 +79,7 @@ const UserMainDashboard = () => {
               <div className="widget-header">
                 <div className="widget-content">
                   <h6>My Bookings</h6>
-                  <h3>450</h3>
+                  <h3>{reservation?.length}</h3>
                 </div>
                 <div className="widget-icon">
                   <span>
@@ -85,7 +128,7 @@ const UserMainDashboard = () => {
         </div>
         <div className="row">
           {/* Last 5 Bookings */}
-          <div className="col-lg-8 d-flex">
+          <div className="">
             <div className="card user-card flex-fill">
               <div className="card-header">
                 <div className="row align-items-center">
@@ -94,10 +137,10 @@ const UserMainDashboard = () => {
                   </div>
                   <div className="col-sm-7 text-sm-end">
                     <div className="booking-select">
-                      <select className="form-control select">
+                      {/* <select className="form-control select">
                         <option>Last 30 Days</option>
                         <option>Last 7 Days</option>
-                      </select>
+                      </select> */}
                       <Link to="user-booking" className="view-link">
                         View all Bookings
                       </Link>
@@ -109,7 +152,15 @@ const UserMainDashboard = () => {
                 <div className="table-responsive dashboard-table dashboard-table-info">
                   <table className="table">
                     <tbody>
-                      <tr>
+                      {loading ? (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    Loading...
+                  </td>
+                </tr>
+              ) : reservation.length > 0 ? (
+                reservation.map((res) => (
+                      <tr key={res._id}>
                         <td>
                           <div className="table-avatar">
                             <Link
@@ -118,223 +169,55 @@ const UserMainDashboard = () => {
                             >
                               <img
                                 className="avatar-img"
-                                src="/user-assets/img/cars/car-04.jpg"
+                                src={BASE_URL_IMG + res?.car?.image}
                                 alt="Booking"
                               />
                             </Link>
                             <div className="table-head-name flex-grow-1">
                               <Link to="user-booking">
-                                Ferrari 458 MM Speciale
+                                {res?.car?.carName}
                               </Link>
-                              <p>Rent Type : Hourly</p>
+                              <p>{res.driverType}</p>
                             </div>
                           </div>
                         </td>
                         <td>
                           <h6>Start date</h6>
-                          <p>15 Sep 2023, 11:30 PM</p>
+                          <p>{new Date(res.pickupDate).toDateString()}</p>
                         </td>
                         <td>
                           <h6>End Date</h6>
-                          <p>15 Sep 2023, 1:30 PM</p>
+                          <p>{new Date(res.dropDate).toDateString()}</p>
                         </td>
                         <td>
                           <h6>Price</h6>
-                          <h5 className="text-danger">$200</h5>
+                          <h5 className="text-danger">${calculateTotalPrice(res)}</h5>
                         </td>
                         <td>
-                          <span className="badge badge-light-secondary">
-                            Upcoming
-                          </span>
-                        </td>
+  <span
+    className={`badge ${
+      res.status === "confirmed"
+        ? "badge-success"
+        : res.status === "pending"
+        ? "badge-warning"
+        : res.status === "cancelled"
+        ? "badge-danger"
+        : "badge-secondary"
+    }`}
+  >
+    {res.status.charAt(0).toUpperCase() + res.status.slice(1)}
+  </span>
+</td>
                       </tr>
-                      <tr>
-                        <td>
-                          <div className="table-avatar">
-                            <Link
-                              to="user-booking"
-                              className="avatar avatar-lg flex-shrink-0"
-                            >
-                              <img
-                                className="avatar-img"
-                                src="/user-assets/img/cars/car-05.jpg"
-                                alt="Booking"
-                              />
-                            </Link>
-                            <div className="table-head-name flex-grow-1">
-                              <Link to="user-booking">Kia Soul 2016</Link>
-                              <p>Rent Type : Hourly</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <h6>Start date</h6>
-                          <p>15 Sep 2023, 09:00 AM</p>
-                        </td>
-                        <td>
-                          <h6>End Date</h6>
-                          <p>15 Sep 2023, 1:30 PM</p>
-                        </td>
-                        <td>
-                          <h6>Price</h6>
-                          <h5 className="text-danger">$300</h5>
-                        </td>
-                        <td>
-                          <span className="badge badge-light-secondary">
-                            Upcoming
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="table-avatar">
-                            <Link
-                              to="user-booking"
-                              className="avatar avatar-lg flex-shrink-0"
-                            >
-                              <img
-                                className="avatar-img"
-                                src="/user-assets/img/cars/car-01.jpg"
-                                alt="Booking"
-                              />
-                            </Link>
-                            <div className="table-head-name flex-grow-1">
-                              <Link to="user-booking">Toyota Camry SE 350</Link>
-                              <p>Rent Type : Day</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <h6>Start date</h6>
-                          <p>18 Sep 2023, 09:00 AM</p>
-                        </td>
-                        <td>
-                          <h6>End Date</h6>
-                          <p>18 Sep 2023, 05:00 PM</p>
-                        </td>
-                        <td>
-                          <h6>Price</h6>
-                          <h5 className="text-danger">$600</h5>
-                        </td>
-                        <td>
-                          <span className="badge badge-light-warning">
-                            Inprogress
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="table-avatar">
-                            <Link
-                              to="user-booking"
-                              className="avatar avatar-lg flex-shrink-0"
-                            >
-                              <img
-                                className="avatar-img"
-                                src="/user-assets/img/cars/car-03.jpg"
-                                alt="Booking"
-                              />
-                            </Link>
-                            <div className="table-head-name flex-grow-1">
-                              <Link to="user-booking">Audi A3 2019 new</Link>
-                              <p>Rent Type : Weekly</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <h6>Start date</h6>
-                          <p>10 Oct 2023, 10:30 AM</p>
-                        </td>
-                        <td>
-                          <h6>End Date</h6>
-                          <p>16 Oct 2023, 10:30 AM</p>
-                        </td>
-                        <td>
-                          <h6>Price</h6>
-                          <h5 className="text-danger">$800</h5>
-                        </td>
-                        <td>
-                          <span className="badge badge-light-success">
-                            Completed
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="table-avatar">
-                            <Link
-                              to="user-booking"
-                              className="avatar avatar-lg flex-shrink-0"
-                            >
-                              <img
-                                className="avatar-img"
-                                src="/user-assets/img/cars/car-05.jpg"
-                                alt="Booking"
-                              />
-                            </Link>
-                            <div className="table-head-name flex-grow-1">
-                              <Link to="user-booking">
-                                2018 Chevrolet Camaro
-                              </Link>
-                              <p>Rent Type : Hourly</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <h6>Start date</h6>
-                          <p>14 Nov 2023, 02:00 PM</p>
-                        </td>
-                        <td>
-                          <h6>End Date</h6>
-                          <p>14 Nov 2023, 04:00 PM</p>
-                        </td>
-                        <td>
-                          <h6>Price</h6>
-                          <h5 className="text-danger">$240</h5>
-                        </td>
-                        <td>
-                          <span className="badge badge-light-success">
-                            Completed
-                          </span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="table-avatar">
-                            <Link
-                              to="user-booking"
-                              className="avatar avatar-lg flex-shrink-0"
-                            >
-                              <img
-                                className="avatar-img"
-                                src="/user-assets/img/cars/car-06.jpg"
-                                alt="Booking"
-                              />
-                            </Link>
-                            <div className="table-head-name flex-grow-1">
-                              <Link to="user-booking">Acura Sport Version</Link>
-                              <p>Rent Type : Monthly</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <h6>Start date</h6>
-                          <p>01 Dec 2023, 08:15 AM</p>
-                        </td>
-                        <td>
-                          <h6>End Date</h6>
-                          <p>01 Jan 2024, 08:15 AM</p>
-                        </td>
-                        <td>
-                          <h6>Price</h6>
-                          <h5 className="text-danger">$1000</h5>
-                        </td>
-                        <td>
-                          <span className="badge badge-light-danger">
-                            Cancelled
-                          </span>
-                        </td>
-                      </tr>
+                   ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center">
+                    No contacts found
+                  </td>
+                </tr>
+              )}
+                        
                     </tbody>
                   </table>
                 </div>
@@ -343,7 +226,7 @@ const UserMainDashboard = () => {
           </div>
           {/* /Last 5 Bookings */}
           {/* Recent Transaction */}
-          <div className="col-lg-4 d-flex">
+          {/* <div className="col-lg-4 d-flex">
             <div className="card user-card flex-fill">
               <div className="card-header">
                 <div className="row align-items-center">
@@ -509,7 +392,7 @@ const UserMainDashboard = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
           {/* /Recent Transaction */}
         </div>
         {/* /Dashboard */}

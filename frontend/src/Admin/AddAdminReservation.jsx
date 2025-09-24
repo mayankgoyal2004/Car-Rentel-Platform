@@ -10,8 +10,8 @@ const AddAdminReservation = () => {
 
   const [reservationData, setReservationData] = useState({
     // Step 1: Car & Dates Info
-    tariff: "Weekly",
-    rentalType: "Self Pickup",
+    tariff: "weekly",
+    rentalType: "self",
     passengers: "",
     startDate: "",
     startTime: "",
@@ -64,7 +64,7 @@ const AddAdminReservation = () => {
           image: car.image,
           extraServices:
             car.extraService?.map((es) => ({
-              id: es._id || es.id,
+              id: es._id, // use _id here
               name: es.name,
               price: es.price,
               type: es.type,
@@ -163,21 +163,21 @@ const AddAdminReservation = () => {
     });
   };
 
-  const handleServiceToggle = (serviceId) => {
-    setReservationData((prev) => {
-      const services = [...prev.extraServices];
-      const index = services.indexOf(serviceId);
+ const handleServiceToggle = (serviceId) => {
+  // Convert to string to ensure consistent comparison
+  const idStr = String(serviceId);
+  
+  setReservationData((prev) => {
+    const exists = prev.extraServices.some(s => String(s) === idStr);
 
-      if (index > -1) {
-        services.splice(index, 1);
-      } else {
-        services.push(serviceId);
-      }
-
-      return { ...prev, extraServices: services };
-    });
-  };
-
+    return {
+      ...prev,
+      extraServices: exists
+        ? prev.extraServices.filter((s) => String(s) !== idStr)
+        : [...prev.extraServices, idStr],
+    };
+  });
+};
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -225,8 +225,8 @@ const AddAdminReservation = () => {
         alert("Reservation created successfully!");
         // Reset form or navigate away
         setReservationData({
-          tariff: "Weekly",
-          rentalType: "Self Pickup",
+          tariff: "weekly",
+          rentalType: "self",
           passengers: "",
           startDate: "",
           startTime: "",
@@ -836,9 +836,10 @@ const AddAdminReservation = () => {
                                 <span className="avatar avatar-rounded flex-shrink-0 me-2">
                                   <img
                                     src={
+                                      BASE_URL_IMG +
                                       customers.find(
                                         (c) => c.id === reservationData.customer
-                                      )?.image || "/default-user.jpg"
+                                      )?.image
                                     }
                                     alt="Customer"
                                     style={{
@@ -946,6 +947,7 @@ const AddAdminReservation = () => {
                                 <span className="avatar avatar-rounded flex-shrink-0 me-2">
                                   <img
                                     src={
+                                      BASE_URL_IMG +
                                       drivers.find(
                                         (d) => d.id === reservationData.driver
                                       )?.image
@@ -1058,7 +1060,7 @@ const AddAdminReservation = () => {
     const selectedCar = cars.find(
       (car) => car.id === reservationData.selectedCar
     );
-    
+
     // Get the extra services for the selected car
     const carExtraServices = selectedCar ? selectedCar.extraServices : [];
 
@@ -1102,13 +1104,13 @@ const AddAdminReservation = () => {
                             : ""
                         }`}
                       >
-                        <div className="form-check form-check-md">
+                        <div className="form-check form-check-md d-flex align-items-center">
                           <input
-                            className="form-check-input"
+                            className="form-check"
                             type="checkbox"
                             id={`custom-check-${service.id}`}
                             checked={reservationData.extraServices.includes(
-                              service.id
+                              String(service.id)
                             )}
                             onChange={() => handleServiceToggle(service.id)}
                           />
@@ -1248,7 +1250,7 @@ const AddAdminReservation = () => {
               </div>
 
               <div>
-                <div className="d-flex align-items-center justify-content-between mb-3">
+                {/* <div className="d-flex align-items-center justify-content-between mb-3">
                   <div>
                     <h6 className="mb-1">Insurance</h6>
                     <p>Add Insurance for Your Ride</p>
@@ -1270,8 +1272,8 @@ const AddAdminReservation = () => {
                       Enable
                     </label>
                   </div>
-                </div>
-{/* 
+                </div> */}
+                {/* 
                 {reservationData.insuranceEnabled && (
                   <div className="row">
                     <div className="col-md-6">
@@ -1417,7 +1419,7 @@ const AddAdminReservation = () => {
     // Calculate total price
     const carPrice = selectedCar ? selectedCar.price * rentalDays : 0;
     const driverPrice = selectedDriver ? selectedDriver.price * rentalDays : 0;
-    
+
     // Calculate services price from selected car's extra services
     const servicesPrice = reservationData.extraServices.reduce(
       (total, serviceId) => {
@@ -1437,7 +1439,7 @@ const AddAdminReservation = () => {
       },
       0
     );
-    
+
     const securityDeposit = parseFloat(reservationData.securityDeposit) || 0;
     // const insurancePrice = reservationData.insuranceEnabled
     //   ? reservationData.insuranceType === "full"
@@ -1445,8 +1447,7 @@ const AddAdminReservation = () => {
     //     : 100
     //   : 0;
 
-    const totalPrice =
-      carPrice + driverPrice + servicesPrice + securityDeposit ;
+    const totalPrice = carPrice + driverPrice + servicesPrice + securityDeposit;
 
     return (
       <>
@@ -1586,12 +1587,12 @@ const AddAdminReservation = () => {
               </div>
             )}
 
-            {insurancePrice > 0 && (
+            {/* {insurancePrice > 0 && (
               <div className="d-flex align-items-center justify-content-between mb-2">
                 <h6 className="fw-medium fs-14">Insurance</h6>
                 <p>${insurancePrice}</p>
               </div>
-            )}
+            )} */}
 
             <div className="border-top pt-3 mt-3">
               <div className="d-flex align-items-center justify-content-between">

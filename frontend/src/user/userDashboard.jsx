@@ -1,102 +1,121 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet ,NavLink } from "react-router-dom";
 
 const UserDashboard = () => {
   return (
     <div>
-      <div className="main-wrapper">
-        {/* Breadscrumb Section */}
-        <div className="breadcrumb-bar">
-          <div className="container">
-            <div className="row align-items-center text-center">
-              <div className="col-md-12 col-12">
-                <h2 className="breadcrumb-title">User Dashboard</h2>
-                <nav aria-label="breadcrumb" className="page-breadcrumb">
-                  <ol className="breadcrumb">
-                    <li className="breadcrumb-item">
-                      <Link to="/">Home</Link>
-                    </li>
-                    <li className="breadcrumb-item active" aria-current="page">
-                      User Dashboard
-                    </li>
-                  </ol>
-                </nav>
-              </div>
-            </div>
-          </div>
+     <div className="main-wrapper">
+  {/* Breadscrumb Section */}
+  <div className="breadcrumb-bar">
+    <div className="container">
+      <div className="row align-items-center text-center">
+        <div className="col-md-12 col-12">
+          <h2 className="breadcrumb-title">User Dashboard</h2>
+          <nav aria-label="breadcrumb" className="page-breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <NavLink to="/">Home</NavLink>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                User Dashboard
+              </li>
+            </ol>
+          </nav>
         </div>
-        {/* /Breadscrumb Section */}
-        {/* Dashboard Menu */}
-        <div className="dashboard-section">
-          <div className="container">
-            <div className="row">
-              <div className="col-lg-12">
-                <div className="dashboard-menu">
-                  <ul>
-                    <li>
-                      <Link to="" className="active">
-                        <img
-                          src="/user-assets/img/icons/dashboard-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>Dashboard</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="user-booking">
-                        <img
-                          src="/user-assets/img/icons/booking-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>My Bookings</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="user-review">
-                        <img
-                          src="/user-assets/img/icons/review-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>Reviews</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="user-wishlist">
-                        <img
-                          src="/user-assets/img/icons/wishlist-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>Wishlist</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="user-message">
-                        <img
-                          src="/user-assets/img/icons/message-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>Messages</span>
-                      </Link>
-                    </li>
-
-                    <li>
-                      <Link to="user-setting">
-                        <img
-                          src="/user-assets/img/icons/settings-icon.svg"
-                          alt="Icon"
-                        />
-                        <span>Settings</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* /Dashboard Menu */}
-        <Outlet />
       </div>
+    </div>
+  </div>
+  {/* /Breadscrumb Section */}
+
+  {/* Dashboard Menu */}
+  <div className="dashboard-section">
+    <div className="container">
+      <div className="row">
+        <div className="col-lg-12">
+          <div className="dashboard-menu">
+            <ul>
+              <li>
+                <NavLink
+                  to=""
+                  end
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <img
+                    src="/user-assets/img/icons/dashboard-icon.svg"
+                    alt="Icon"
+                  />
+                  <span>Dashboard</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="user-booking"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <img
+                    src="/user-assets/img/icons/booking-icon.svg"
+                    alt="Icon"
+                  />
+                  <span>My Bookings</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="user-review"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <img
+                    src="/user-assets/img/icons/review-icon.svg"
+                    alt="Icon"
+                  />
+                  <span>Reviews</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="user-wishlist"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <img
+                    src="/user-assets/img/icons/wishlist-icon.svg"
+                    alt="Icon"
+                  />
+                  <span>Wishlist</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="user-message"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <img
+                    src="/user-assets/img/icons/message-icon.svg"
+                    alt="Icon"
+                  />
+                  <span>Messages</span>
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="user-setting"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  <img
+                    src="/user-assets/img/icons/settings-icon.svg"
+                    alt="Icon"
+                  />
+                  <span>Settings</span>
+                </NavLink>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {/* /Dashboard Menu */}
+  <Outlet />
+</div>
       <div>
         <div
           className="modal new-modal multi-step fade"
@@ -245,7 +264,7 @@ const UserDashboard = () => {
                 </div>
                 <div className="modal-btn modal-btn-sm text-end">
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-target="#start_ride"
                     data-bs-toggle="modal"
                     data-bs-dismiss="modal"
@@ -440,7 +459,7 @@ const UserDashboard = () => {
                 </div>
                 <div className="modal-btn modal-btn-sm text-end">
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-target="#cancel_ride"
                     data-bs-toggle="modal"
                     data-bs-dismiss="modal"
@@ -449,7 +468,7 @@ const UserDashboard = () => {
                     Cancel Booking
                   </a>
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-target="#start_rides"
                     data-bs-toggle="modal"
                     data-bs-dismiss="modal"
@@ -527,7 +546,7 @@ const UserDashboard = () => {
                           <div className="modal-form-group">
                             <label className="d-sm-block">&nbsp;</label>
                             <a
-                              href="javascript:void(0);"
+                             
                               className="btn btn-secondary"
                             >
                               <i className="fa-solid fa-location-crosshairs" />{" "}
@@ -675,14 +694,14 @@ const UserDashboard = () => {
                 </div>
                 <div className="modal-btn modal-btn-sm text-end">
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-dismiss="modal"
                     className="btn btn-secondary"
                   >
                     Go Back
                   </a>
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-dismiss="modal"
                     className="btn btn-primary"
                   >
@@ -731,14 +750,14 @@ const UserDashboard = () => {
                   </div>
                   <div className="modal-btn modal-btn-sm text-end">
                     <a
-                      href="javascript:void(0);"
+                     
                       data-bs-dismiss="modal"
                       className="btn btn-secondary"
                     >
                       Cancel
                     </a>
                     <a
-                      href="javascript:void(0);"
+                     
                       data-bs-dismiss="modal"
                       className="btn btn-primary"
                     >
@@ -932,7 +951,7 @@ const UserDashboard = () => {
                 </div>
                 <div className="modal-btn modal-btn-sm text-end">
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-target="#start_ride"
                     data-bs-toggle="modal"
                     data-bs-dismiss="modal"
@@ -1110,7 +1129,7 @@ const UserDashboard = () => {
                 </div>
                 <div className="modal-btn modal-btn-sm text-end">
                   <a
-                    href="javascript:void(0);"
+                   
                     data-bs-target="#view_status"
                     data-bs-toggle="modal"
                     data-bs-dismiss="modal"
@@ -1250,7 +1269,7 @@ const UserDashboard = () => {
                     <div className="row">
                       <div className="col-6">
                         <a
-                          href="javascript:void(0);"
+                         
                           data-bs-dismiss="modal"
                           className="btn btn-secondary w-100"
                         >
@@ -1259,7 +1278,7 @@ const UserDashboard = () => {
                       </div>
                       <div className="col-6">
                         <a
-                          href="javascript:void(0);"
+                         
                           data-bs-dismiss="modal"
                           className="btn btn-primary w-100"
                         >
@@ -1309,14 +1328,14 @@ const UserDashboard = () => {
                   </div>
                   <div className="modal-btn modal-btn-sm text-end">
                     <a
-                      href="javascript:void(0);"
+                     
                       data-bs-dismiss="modal"
                       className="btn btn-secondary"
                     >
                       Cancel Booking
                     </a>
                     <a
-                      href="javascript:void(0);"
+                     
                       data-bs-dismiss="modal"
                       className="btn btn-primary"
                     >

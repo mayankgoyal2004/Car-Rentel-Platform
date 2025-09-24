@@ -53,7 +53,8 @@ const UserUpcomingBooking = () => {
                         <span className="checkmark" /> 
                       </label>
                     </td>
-                    <td><a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1001</a></td>
+                    <td>
+                      <a href="#" data-bs-toggle="modal" data-bs-target="#upcoming_booking">#1001</a></td>
                     <td>
                       <div className="table-avatar">
                         <a href="#" className="avatar avatar-lg flex-shrink-0">

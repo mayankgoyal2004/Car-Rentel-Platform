@@ -1,459 +1,265 @@
-import React from 'react'
+import React, { useEffect, useState, useRef } from "react";
+import io from "socket.io-client";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { useSelector } from "react-redux";
+
+const socket = io("http://localhost:7777");
 
 const UserMessage = () => {
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const chatEndRef = useRef();
+  const [chatOpen, setChatOpen] = useState(false);
+  const userData = useSelector((store) => store.user);
+  const currentUserId = userData._id;
+
+  useEffect(() => {
+    if (!currentUserId) return;
+    socket.emit("user-connected", currentUserId);
+  }, [currentUserId]);
+
+  useEffect(() => {
+    const handleReceiveMessage = ({ senderId, message }) => {
+      if (selectedUser && selectedUser._id === senderId) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: senderId,
+            message,
+          },
+        ]);
+      }
+    };
+
+    socket.on("receive-message", handleReceiveMessage);
+
+    return () => {
+      socket.off("receive-message", handleReceiveMessage);
+    };
+  }, [selectedUser]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await apiService.getAllOwnerAdmin();
+        setUsers(res.data.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  // Fetch chat history
+  const selectUser = async (user) => {
+    setSelectedUser(user);
+    setChatOpen(true);
+    try {
+      const res = await apiService.getChat(user._id);
+      if (res.data.success) {
+        setMessages(res.data.data || []);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
+
+  const closeChat = () => {
+    setChatOpen(false);
+   
+  };
+  const sendMessage = () => {
+    if (!input || !selectedUser) return;
+    socket.emit("send-message", {
+      senderId: currentUserId,
+      receiverId: selectedUser._id,
+      message: input,
+    });
+    setMessages((prev) => [...prev, { sender: currentUserId, message: input }]);
+    setInput("");
+  };
+
   return (
     <div className="content content-chat top-space-chat">
-  <div className="container">
-    {/* Content Header */}
-    <div className="content-header">
-      <h4>Messages</h4>
-    </div>
-    {/* /Content Header */}	
-    <div className="row chat-window">
-      <div className="col-xl-12">
-        <div className="chat-window">
-          {/* Chat Left */}
-          <div className="chat-cont-left">
+      <div className="container">
+        <div className="content-header">
+          <h4>Messages</h4>
+        </div>
+        <div className={`row chat-window ${chatOpen ? "chat-slide" : ""}`}>
+          {/* Users List */}
+          <div className="col-xl-4 chat-cont-left">
             <div className="chat-header">
               <span>Chats</span>
-              <a href="javascript:void(0)" className="chat-compose">
-                <i className="feather-plus-circle" />
-              </a>
             </div>
-            <form className="chat-search">
-              <div className="input-group">
-                <div className="input-group-prepend">
-                  <i className="fas fa-search" />
-                </div>
-                <input type="text" className="form-control rounded-pill" placeholder="Search" />
-              </div>
-            </form>
             <div className="chat-users-list">
               <div className="chat-scroll">
-                <a href="javascript:void(0);" className="notify-block d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-away">
-                      <img src="/user-assets/img/profiles/avatar-08.jpg" alt="User Image" className="avatar-img rounded-circle" />
+                {users.length > 0 ? (
+                  users.map((user) => (
+                    <div
+                      key={user._id}
+                      className={`notify-block d-flex ${
+                        selectedUser?._id === user._id ? "active" : ""
+                      }`}
+                      onClick={() => selectUser(user)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <div className="media-img-wrap flex-shrink-0">
+                       
+                        <div className="avatar avatar-online">
+                          <img
+                            src={BASE_URL_IMG + user.image}
+                            alt={user.userName}
+                            className="avatar-img rounded-circle"
+                          
+                          />
+                        </div>
+                      </div>
+                      <div className="media-body chat-custom flex-grow-1">
+                        <div className="user-name">{user.userName}</div>
+
+                        <div className="text-muted small text-truncate">
+                          New Message
+                        </div>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center p-3 text-muted">
+                    No users available for messaging
                   </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Mark Villiams</div>
-                      <div className="user-last-chat">Have you called them?</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">2 min</div>
-                      <div className="badge badge-success rounded-pill">15</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat active d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-online">
-                      <img src="/user-assets/img/profiles/avatar-09.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Elizabeth Sosa</div>
-                      <div className="user-last-chat">I'll call you later </div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">8:01 PM</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-away">
-                      <img src="/user-assets/img/profiles/avatar-10.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Michael Howard</div>
-                      <div className="user-last-chat">Thank you</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">7:30 PM</div>
-                      <div className="badge badge-success rounded-pill">3</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-online">
-                      <img src="/user-assets/img/profiles/avatar-11.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Horace Keene</div>
-                      <div className="user-last-chat">Have you called them?</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">5 Mins Ago</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-offline">
-                      <img src="/user-assets/img/profiles/avatar-12.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Marvin Campbell</div>
-                      <div className="user-last-chat">Yesterday i completed the task</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">11:21 AM</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-online">
-                      <img src="/user-assets/img/profiles/avatar-13.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">James Albert</div>
-                      <div className="user-last-chat">What is the major functionality?</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">10:05 AM</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-away">
-                      <img src="/user-assets/img/profiles/avatar-14.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Richard Ohare</div>
-                      <div className="user-last-chat">This has allowed me to showcase not only my technical skills</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">Yesterday</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-offline">
-                      <img src="/user-assets/img/profiles/avatar-15.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Paul Richard</div>
-                      <div className="user-last-chat">Let's talk briefly in the evening. </div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">Sunday</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-online">
-                      <img src="/user-assets/img/profiles/avatar-07.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">John Gibbs </div>
-                      <div className="user-last-chat">Do you have any collections? If so, what of?</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">Saturday</div>
-                    </div>
-                  </div>
-                </a>
-                <a href="javascript:void(0);" className="notify-block read-chat d-flex open-chat">
-                  <div className="media-img-wrap flex-shrink-0">
-                    <div className="avatar avatar-away">
-                      <img src="/user-assets/img/profiles/avatar-06.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                  </div>
-                  <div className="media-body chat-custom flex-grow-1">
-                    <div>
-                      <div className="user-name">Judy Mercer</div>
-                      <div className="user-last-chat">Connect the two modules with in 1 day.</div>
-                    </div>
-                    <div>
-                      <div className="last-chat-time block">Friday</div>
-                    </div>
-                  </div>
-                </a>
+                )}
               </div>
             </div>
           </div>
-          {/* /Chat Left */}
-          {/* Chat Right */}
-          <div className="chat-cont-right">
+
+          {/* Chat Area */}
+          <div className="col-xl-8 chat-cont-right">
             <div className="chat-header">
-              <a id="back_user_list" href="javascript:void(0)" className="back-user-list">
-                <i className="feather-chevron-left" />
-              </a>
               <div className="notify-block d-flex">
-                <div className="media-img-wrap flex-shrink-0">
-                  <div className="avatar avatar-online">
-                    <img src="/user-assets/img/profiles/avatar-08.jpg" alt="User Image" className="avatar-img rounded-circle" />
+                {selectedUser ? (
+                  <>
+                    <div className="media-img-wrap flex-shrink-0">
+                      <div className="avatar avatar-online">
+                         <button onClick={closeChat}>
+                          <i className="ti ti-close"></i>
+                        </button>
+                        <img
+                          src={
+                            selectedUser.image
+                              ? BASE_URL_IMG + selectedUser.image
+                              : "/default-avatar.png"
+                          }
+                          alt={selectedUser.userName}
+                          className="avatar-img rounded-circle"
+                          onError={(e) => {
+                            e.target.src = "/default-avatar.png";
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="media-body flex-grow-1">
+                      <div className="user-name">
+                        {selectedUser.firstName && selectedUser.lastName
+                          ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                          : selectedUser.userName}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="user-name">
+                    Select a user to start chatting
                   </div>
-                </div>
-                <div className="media-body flex-grow-1">
-                  <div className="user-name">Mark Villiams</div>
-                  <div className="user-status">online</div>
-                </div>
-              </div>
-              <div className="chat-options">
-                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#voice_call">
-                  <i className="feather-phone" />
-                </a>
-                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#video_call">
-                  <i className="feather-video" />
-                </a>
-                <a href="javascript:void(0)">
-                  <i className="feather-more-vertical" />
-                </a>
+                )}
               </div>
             </div>
-            <div className="chat-body">
-              <div className="chat-scroll">
-                <ul className="list-unstyled">
-                  <li className="notify-block sent d-flex">
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <p>Hello. What can I do for you?</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:30 AM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="notify-block received d-flex">
-                    <div className="avatar flex-shrink-0">
-                      <img src="/user-assets/img/profiles/avatar-08.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <p>I'm just looking around.</p>
-                          <p>Will you tell me something about yourself?</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:35 AM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div className="msg-box">
-                        <div>
-                          <p>Are you there? That time!</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:40 AM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div className="msg-box">
-                        <div>
-                          <div className="chat-msg-attachments">
-                            <div className="chat-attachment">
-                              <img src="/user-assets/img/chat-img-01.jpg" alt="Attachment" />
-                              <a href="#" className="chat-attach-download">
-                                <i className="fas fa-download" />
-                              </a>
-                            </div>
-                            <div className="chat-attachment">
-                              <img src="/user-assets/img/chat-img-02.jpg" alt="Attachment" />
-                              <a href="#" className="chat-attach-download">
-                                <i className="fas fa-download" />
-                              </a>
-                            </div>
+
+            {/* Messages */}
+            <div className="chat-body chat-scroll">
+              <ul className="list-unstyled">
+                {messages.length > 0 ? (
+                  messages.map((msg, index) => (
+                    <li
+                      key={msg._id || index}
+                      className={`notify-block d-flex ${
+                        msg.sender === currentUserId ||
+                        (typeof msg.sender === "object" &&
+                          msg.sender._id === currentUserId)
+                          ? "sent"
+                          : "received"
+                      }`}
+                    >
+                      {msg.sender !== currentUserId &&
+                        !(
+                          typeof msg.sender === "object" &&
+                          msg.sender._id === currentUserId
+                        ) && (
+                          <div className="avatar flex-shrink-0">
+                            <img
+                              src={
+                                selectedUser?.image
+                                  ? BASE_URL_IMG + selectedUser.image
+                                  : "/default-avatar.png"
+                              }
+                              className="avatar-img rounded-circle"
+                              alt="User"
+                              onError={(e) => {
+                                e.target.src = "/default-avatar.png";
+                              }}
+                            />
                           </div>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:41 AM</span>
-                              </div>
-                            </li>
-                          </ul>
+                        )}
+                      <div className="media-body flex-grow-1">
+                        <div className="msg-box">
+                          <p>{msg.message}</p>
+                          <span className="time small text-muted">
+                            {new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                  <li className="notify-block sent d-flex">
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <p>Where?</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:42 AM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div className="msg-box">
-                        <div>
-                          <p>OK, my name is Limingqiang. I like singing, playing basketballand so on.</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:42 AM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div className="msg-box">
-                        <div>
-                          <div className="chat-msg-attachments">
-                            <div className="chat-attachment">
-                              <img src="/user-assets/img/chat-img-03.jpg" alt="Attachment" />
-                              <a href="#" className="chat-attach-download">
-                                <i className="fas fa-download" />
-                              </a>
-                            </div>
-                          </div>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:50 AM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="notify-block received d-flex">
-                    <div className="avatar flex-shrink-0">
-                      <img src="/user-assets/img/profiles/avatar-08.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <p>You wait for notice.</p>
-                          <p>Consectetuorem ipsum dolor sit?</p>
-                          <p>Ok?</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>8:55 PM</span>
-                              </div>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="chat-date">Today</li>
-                  <li className="notify-block received d-flex">
-                    <div className="avatar flex-shrink-0">
-                      <img src="/user-assets/img/profiles/avatar-08.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</p>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>10:17 AM</span>
-                              </div>
-                            </li>
-                            <li><a href="#">Edit</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="notify-block sent d-flex">
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <p>Lorem ipsum dollar sit</p>
-                          <div className="chat-msg-actions dropdown">
-                            <a href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <i className="fe fe-elipsis-v" />
-                            </a>
-                            <div className="dropdown-menu dropdown-menu-end">
-                              <a className="dropdown-item" href="#">Delete</a>
-                            </div>
-                          </div>
-                          <ul className="chat-msg-info">
-                            <li>
-                              <div className="chat-time">
-                                <span>10:19 AM</span>
-                              </div>
-                            </li>
-                            <li><a href="#">Edit</a></li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="notify-block received d-flex">
-                    <div className="avatar flex-shrink-0">
-                      <img src="/user-assets/img/profiles/avatar-08.jpg" alt="User Image" className="avatar-img rounded-circle" />
-                    </div>
-                    <div className="media-body flex-grow-1">
-                      <div className="msg-box">
-                        <div>
-                          <div className="msg-typing">
-                            <span />
-                            <span />
-                            <span />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                </ul>
-              </div>
+                    </li>
+                  ))
+                ) : (
+                  <div className="text-center p-4 text-muted">
+                    {selectedUser
+                      ? "No messages yet. Start the conversation!"
+                      : "Select a user to view messages"}
+                  </div>
+                )}
+                <div ref={chatEndRef} />
+              </ul>
             </div>
+
+            {/* Message Input */}
             <div className="chat-footer">
               <div className="input-group">
-                <div className="btn-file btn">
-                  <i className="fa fa-paperclip" />
-                  <input type="file" />
-                </div>
-                <input type="text" className="input-msg-send form-control rounded-pill" placeholder="Type something" />
-                <button type="button" className="btn msg-send-btn rounded-pill ms-2"><i className="fa-solid fa-paper-plane" /></button>
+                <input
+                  type="text"
+                  className="form-control rounded-pill"
+                  placeholder="Type a message..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  disabled={!selectedUser}
+                />
+                <button
+                  type="button"
+                  className="btn btn-primary rounded-pill ms-2"
+                  onClick={sendMessage}
+                  disabled={!selectedUser || !input.trim()}
+                >
+                  Send
+                </button>
               </div>
             </div>
           </div>
-          {/* /Chat Right */}
         </div>
       </div>
     </div>
-    {/* /Row */}
-  </div>
-</div>
+  );
+};
 
-  )
-}
-
-export default UserMessage
+export default UserMessage;

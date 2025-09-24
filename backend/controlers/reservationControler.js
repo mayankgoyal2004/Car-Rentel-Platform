@@ -4,14 +4,12 @@ const Driver = require("../models/DriverModel");
 const customer = require("../models/customerModel");
 const mongoose = require("mongoose");
 
-
 const addReservation = async (req, res) => {
   try {
     const {
       car_id,
       customer_id,
       rentalType,
-      pricing_id,
       pickupLocation,
       pickupAddress,
       dropLocation,
@@ -51,12 +49,16 @@ const addReservation = async (req, res) => {
     await car.save();
 
     let assignedDriver = null;
+
     if (driverType === "withDriver") {
       if (driver_id) {
         assignedDriver = driver_id;
+        // Update status of the chosen driver
+        await Driver.findByIdAndUpdate(driver_id, { status: "assigned" });
       } else {
+        // Auto-assign an available driver
         const availableDriver = await Driver.findOneAndUpdate(
-          { status: "available" },
+          { status: "available", isActive: true, admin: req.user.admin },
           { status: "assigned" },
           { new: true }
         );
@@ -273,10 +275,10 @@ const getAllReservationByCustomer = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    if (!customerId) {
+    if (!_id) {
       return res
         .status(400)
-        .json({ success: false, message: "Customer ID is required" });
+        .json({ success: false, message: " ID is required" });
     }
 
     const reservations = await Reservation.find({ createdBy: _id })
@@ -346,6 +348,75 @@ const getAllReservationsForAdmin = async (req, res) => {
         currentPage: page,
         totalPages: Math.ceil(totalReservations / limit),
       },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+    c;
+  }
+};
+
+const getLatest5ReservationsForAdmin = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+
+    // Step 1: Get all cars for this admin
+    const cars = await Car.find({ admin: adminId }).select("_id");
+    const carIds = cars.map((c) => c._id);
+
+    if (carIds.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No reservations found",
+      });
+    }
+
+    // Step 2: Fetch only latest 5 reservations
+    const reservations = await Reservation.find({ car: { $in: carIds } })
+      .populate("car", "carName image")
+      .populate("customer", "name image")
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.status(200).json({
+      success: true,
+      data: reservations,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const getAllReservationCalender = async (req, res) => {
+  try {
+    const cars = await Car.find({ admin: req.user.admin }).select("_id");
+
+    const carIds = cars.map((c) => c._id);
+
+    if (carIds.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        pagination: { totalReservations: 0, currentPage: page, totalPages: 0 },
+      });
+    }
+    const reservations = await Reservation.find({ car: { $in: carIds } })
+      .populate("car", "carName image")
+      .populate("customer", "name image")
+
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: reservations,
     });
   } catch (err) {
     res.status(500).json({
@@ -549,9 +620,12 @@ const getReservationById = async (req, res) => {
           { path: "pricing" },
           { path: "extraService" },
           { path: "mainLocation" },
+          { path: "carType" },
         ],
       })
-      .populate("extraServices");
+      .populate("customer")
+      .populate("extraServices")
+      .populate("driver");
 
     if (!reservation) {
       return res
@@ -564,9 +638,6 @@ const getReservationById = async (req, res) => {
   }
 };
 
-
- 
-
 const editReservationStep3 = async (req, res) => {
   const { id } = req.params;
   const { extraServices, driverType, totalPrice } = req.body;
@@ -576,52 +647,57 @@ const editReservationStep3 = async (req, res) => {
   try {
     const reservation = await Reservation.findById(id);
     if (!reservation) {
-      return res.status(404).json({ success: false, message: "Reservation not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
     }
 
     // 1️⃣ Update total price
     if (totalPrice !== undefined) reservation.totalPrice = totalPrice;
 
     // 2️⃣ Update extra services
- if (extraServices) {
-  const extrasArray = Array.isArray(extraServices) ? extraServices : [extraServices];
+    if (extraServices) {
+      const extrasArray = Array.isArray(extraServices)
+        ? extraServices
+        : [extraServices];
 
-  reservation.extraServices = extrasArray
-    .map((svc) => {
-      const id = typeof svc === "object" && svc._id ? svc._id : svc;
-      return mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
-    })
-    .filter(Boolean); // remove invalid IDs
-}
+      reservation.extraServices = extrasArray
+        .map((svc) => {
+          const id = typeof svc === "object" && svc._id ? svc._id : svc;
+          return mongoose.Types.ObjectId.isValid(id)
+            ? new mongoose.Types.ObjectId(id)
+            : null;
+        })
+        .filter(Boolean); // remove invalid IDs
+    }
 
     // 3️⃣ Update driver details
-   if (driverType === "self") {
-  reservation.driverType = "self";
+    if (driverType === "self") {
+      reservation.driverType = "self";
 
-  const driverDetails = req.body.driverDetails || {};
+      const driverDetails = req.body.driverDetails || {};
 
-  // Map incoming driverDetails to customer schema fields
-   const driverData = {
-    firstName: driverDetails.firstName || null,
-    lastName: driverDetails.lastName || null,
-    age: driverDetails.age ? Number(driverDetails.age) : null,
-    contact: driverDetails.mobile || null, // mobile -> contact
-    licenseNumber: driverDetails.licenseNumber || null,
-    file: req.file ? req.file.path.replace(/\\/g, "/") : undefined, // <-- here
-  };
+      // Map incoming driverDetails to customer schema fields
+      const driverData = {
+        firstName: driverDetails.firstName || null,
+        lastName: driverDetails.lastName || null,
+        age: driverDetails.age ? Number(driverDetails.age) : null,
+        contact: driverDetails.mobile || null, // mobile -> contact
+        licenseNumber: driverDetails.licenseNumber || null,
+        file: req.file ? req.file.path.replace(/\\/g, "/") : undefined, // <-- here
+      };
 
- const customerRecord = await customer.findById(reservation.customer);
-  if (customerRecord) {
-    customerRecord.firstName = driverData.firstName;
-    customerRecord.lastName = driverData.lastName;
-    customerRecord.age = driverData.age;
-    customerRecord.contact = driverData.contact;
-    customerRecord.licenseNumber = driverData.licenseNumber;
-    if (driverData.file) customerRecord.file = driverData.file; // <-- FIXED
+      const customerRecord = await customer.findById(reservation.customer);
+      if (customerRecord) {
+        customerRecord.firstName = driverData.firstName;
+        customerRecord.lastName = driverData.lastName;
+        customerRecord.age = driverData.age;
+        customerRecord.contact = driverData.contact;
+        customerRecord.licenseNumber = driverData.licenseNumber;
+        if (driverData.file) customerRecord.file = driverData.file; // <-- FIXED
 
-    await customerRecord.save();
-  }
-
+        await customerRecord.save();
+      }
     } else if (driverType === "withDriver") {
       reservation.driverType = "withDriver";
     }
@@ -634,14 +710,363 @@ const editReservationStep3 = async (req, res) => {
       message: "Step 3 updated successfully",
       data: reservation,
     });
-
   } catch (error) {
     console.error("Error updating Step 3:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+const getLast5Reservations = async (req, res) => {
+  try {
+    const customerObj = await customer.findOne({ userId: req.user._id });
 
+    if (!customerObj) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+    }
 
+    const reservations = await Reservation.find({ customer: customerObj._id })
+      .populate({
+        path: "car",
+        populate: [{ path: "pricing" }],
+      })
+      .populate("customer")
+      .populate("driver")
+      .populate("extraServices")
+      .sort({ createdAt: -1 }) // newest first
+      .limit(5); // ✅ only last 5 reservations
+
+    const totalReservations = await Reservation.countDocuments({
+      customer: customerObj._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: reservations,
+      pagination: {
+        totalReservations,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const getAllReservationUser = async (req, res) => {
+  try {
+    const customerObj = await customer.findOne({ userId: req.user._id });
+
+    if (!customerObj) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+    }
+
+    const reservations = await Reservation.find({ customer: customerObj._id })
+      .populate({
+        path: "car",
+        populate: [{ path: "pricing" }],
+      })
+      .populate("customer")
+      .populate("driver")
+      .populate("extraServices")
+      .sort({ createdAt: -1 });
+
+    const totalReservations = await Reservation.countDocuments({
+      customer: customerObj._id,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: reservations,
+      pagination: {
+        totalReservations,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+// Assuming you have Reservation model
+const reservationCancelledByUser = async (req, res) => {
+  try {
+    const { cancellationReason } = req.body;
+    const { id } = req.params;
+    if (!id || !cancellationReason) {
+      return res.status(400).json({
+        success: false,
+        message: "Reservation ID and cancellation reason are required",
+      });
+    }
+
+    const reservation = await Reservation.findById(id);
+
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+
+    // Update status and cancellation reason
+    reservation.status = "cancelled";
+    reservation.cancellationReason = cancellationReason;
+    reservation.cancelledBy = "user";
+
+    await reservation.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Reservation cancelled successfully",
+      data: reservation,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+const reservationCancelledByAdmin = async (req, res) => {
+  try {
+    const { cancellationReason } = req.body;
+    const { id } = req.params;
+    if (!id || !cancellationReason) {
+      return res.status(400).json({
+        success: false,
+        message: "Reservation ID and cancellation reason are required",
+      });
+    }
+
+    const reservation = await Reservation.findById(id);
+
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+
+    // Update status and cancellation reason
+    reservation.status = "cancelled";
+    reservation.cancellationReason = cancellationReason;
+    reservation.cancelledBy = "owner";
+
+    await reservation.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Reservation cancelled successfully",
+      data: reservation,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+const getPendingReservationsUser = async (req, res) => {
+  try {
+    // 1️⃣ Find customer for the logged-in user
+    const customerObj = await customer.findOne({ userId: req.user._id });
+
+    if (!customerObj) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+    }
+
+    // 2️⃣ Find reservations with status 'pending'
+    const pendingReservations = await Reservation.find({
+      customer: customerObj._id,
+      status: "pending", // filter only pending
+    })
+      .populate({
+        path: "car",
+        populate: [{ path: "pricing" }],
+      })
+      .populate("customer")
+      .populate("driver")
+      .populate("extraServices")
+      .sort({ createdAt: -1 });
+
+    // 3️⃣ Count total pending reservations
+    const totalPending = await Reservation.countDocuments({
+      customer: customerObj._id,
+      status: "pending",
+    });
+
+    // 4️⃣ Return response
+    res.status(200).json({
+      success: true,
+      data: pendingReservations,
+      pagination: {
+        totalPending,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+const getCompletedReservationsUser = async (req, res) => {
+  try {
+    // 1️⃣ Find customer for the logged-in user
+    const customerObj = await customer.findOne({ userId: req.user._id });
+
+    if (!customerObj) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+    }
+
+    const completedReservations = await Reservation.find({
+      customer: customerObj._id,
+      status: "completed", // filter only completed
+    })
+      .populate({
+        path: "car",
+        populate: [{ path: "pricing" }],
+      })
+      .populate("customer")
+      .populate("driver")
+      .populate("extraServices")
+      .sort({ createdAt: -1 });
+
+    // 3️⃣ Count total pending reservations
+    const CompletedReservations = await Reservation.countDocuments({
+      customer: customerObj._id,
+      status: "completed",
+    });
+
+    res.status(200).json({
+      success: true,
+      data: completedReservations,
+      pagination: {
+        CompletedReservations,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+const getCancelledReservationsUser = async (req, res) => {
+  try {
+    // 1️⃣ Find customer for the logged-in user
+    const customerObj = await customer.findOne({ userId: req.user._id });
+
+    if (!customerObj) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
+    }
+
+    // 2️⃣ Find reservations with status 'pending'
+    const cancelledReservations = await Reservation.find({
+      customer: customerObj._id,
+      status: "cancelled", // filter only pending
+    })
+      .populate({
+        path: "car",
+        populate: [{ path: "pricing" }],
+      })
+      .populate("customer")
+      .populate("driver")
+      .populate("extraServices")
+      .sort({ createdAt: -1 });
+
+    // 3️⃣ Count total pending reservations
+    const totalCancelled = await Reservation.countDocuments({
+      customer: customerObj._id,
+      status: "cancelled",
+    });
+
+    // 4️⃣ Return response
+    res.status(200).json({
+      success: true,
+      data: cancelledReservations,
+      pagination: {
+        totalCancelled,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const changetheStatusofReservationToConformed = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const cancelledReservations = await Reservation.findById(id);
+    if (!cancelledReservations) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+    cancelledReservations.status = "confirmed";
+    cancelledReservations.save();
+    // 3️⃣ Count total pending reservations
+
+    // 4️⃣ Return response
+    res.status(200).json({
+      success: true,
+      data: cancelledReservations,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const getAllReservationSuperAdmin = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    let filter = {};
+    if (search) {
+      filter.userName = { $regex: search, $options: "i" };
+    }
+    const reservations = await Reservation.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalReservation = await Reservation.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: reservations,
+      pagination: {
+        totalReservation,
+        currentPage: page,
+        totalPages: Math.ceil(totalReservation / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
 
 module.exports = {
   addReservation,
@@ -654,4 +1079,15 @@ module.exports = {
   getReservationById,
   editReservationStep2,
   editReservationStep3,
+  getLast5Reservations,
+  getAllReservationUser,
+  reservationCancelledByUser,
+  getPendingReservationsUser,
+  getCancelledReservationsUser,
+  getCompletedReservationsUser,
+  getAllReservationCalender,
+  getLatest5ReservationsForAdmin,
+  changetheStatusofReservationToConformed,
+  reservationCancelledByAdmin,
+  getAllReservationSuperAdmin
 };

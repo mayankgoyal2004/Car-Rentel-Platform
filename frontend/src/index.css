@@ -1,28 +1,23 @@
-@import url(../Font/css2);
-@import url(../Font/css2-1);
-@import url(../Font/css2-2);
-
+@import url("https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap");
 
 @font-face {
   font-family: "Poppins";
-  src: url("/assets/fonts/poppins/Poppins-Light.woff2") format("woff2"),
-    url("/assets/fonts/poppins/Poppins-Light.woff") format("woff"),
-    url("/assets/fonts/poppins/Poppins-Light.ttf") format("truetype"),
-    url("/assets/fonts/poppins/Poppins-Light.eot") format("embedded-opentype");
+  src: url("/frontend/public/fonts/Poppins-Light.woff2") format("woff2"),
+    url("/frontend/public/fonts/Poppins-Light.woff") format("woff"),
+    url("/frontend/public/fonts/Poppins-Light.ttf") format("truetype"),
+    url("/frontend/public/fonts/Poppins-Light.eot") format("embedded-opentype");
+
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 
-
 .btn-outline-light {
-  background-color: #000 !important;   /* Black background */
-  color: #fff !important;             /* White text */
-  border: 1px solid #000 !important;  /* Black border */
+  background-color: #000 !important; /* Black background */
+  color: #fff !important; /* White text */
+  border: 1px solid #000 !important; /* Black border */
   transition: all 0.3s ease-in-out !important;
 }
-
-
 
 button.btn.btn-outline-light:hover,
 a.btn.btn-outline-light:hover {
@@ -32,14 +27,13 @@ a.btn.btn-outline-light:hover {
 }
 
 .contact-btn {
-    background-color: black !important;
-    color: #fff !important;
+  background-color: black !important;
+  color: #fff !important;
 }
 .contact-btn:hover {
-    background-color: #fff !important;
-    color: #000000 !important;
+  background-color: #fff !important;
+  color: #000000 !important;
 }
-
 
 /* Wrap your table in a div with this class */
 .custom-table-wrapper {
@@ -62,7 +56,7 @@ a.btn.btn-outline-light:hover {
 .custom-dropdown-table .dropdown-menu {
   position: absolute !important;
   top: 100%; /* below button */
-  left: auto; 
+  left: auto;
   right: 0; /* align right */
   z-index: 1050; /* above other content */
   display: none; /* initially hidden */
@@ -80,7 +74,6 @@ a.btn.btn-outline-light:hover {
   }
 }
 
-
 .blog-wrapper {
   max-width: 700px;
   margin: 40px auto;
@@ -91,7 +84,7 @@ a.btn.btn-outline-light:hover {
   background: #fff;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .blog-title {
@@ -209,5 +202,33 @@ a.btn.btn-outline-light:hover {
   pointer-events: auto;
 }
 
+.chat-cont-right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 
+.chat-body.chat-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+}
 
+.msg-box {
+  max-width: 70%;
+  word-wrap: break-word;
+  white-space: normal;
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.sent .msg-box {
+  background: #d1e7ff;
+  margin-left: auto;
+}
+
+.received .msg-box {
+  background: #f1f1f1;
+  margin-right: auto;
+}

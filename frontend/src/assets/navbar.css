@@ -1,18 +1,32 @@
-
- .header-four {
+.header-four {
   background: #171717 !important;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    margin-left: -250px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   /* or */
   min-height: 80px; /* fixed height */
-
-  
+}
+/* Fix header positioning */
+.header-four {
+  margin-left: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
 }
 
+@media (min-width: 992px) {
+  .header {
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* If you have a sidebar that's 240px wide */
+  body.has-sidebar .header-four {
+    width: calc(100% - 240px) !important;
+    left: 240px !important;
+  }
+}
 
 @media (min-width: 991px) {
   .header-four {
@@ -26,15 +40,17 @@
     margin-left: 0;
   }
 }
+.custam-class {
+  font-size: 16px !important;
+  border: none !important;
+}
 
 
-
-/* Ensure content is not hidden behind the fixed navbar */
 .main-wrapper,
 .banner-section,
 .banner-section-four,
 .banner-section.banner-slider {
-  padding-top: 70px; /* Adjust to your header height */
+  padding-top: 70px; 
 }
 
 @media (max-width: 991.96px) {

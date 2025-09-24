@@ -6,12 +6,15 @@ import { addUser } from "../utils/userSlice";
 import { CornerDownLeft } from "react-feather";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -19,10 +22,15 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA!");
+      return;
+    }
+    setLoading(true);
     setLoading(true);
 
     try {
-      const data = { email, password };
+      const data = { email, password, recaptchaToken };
       const res = await apiServices.login(data);
       toast.success(res.data.message);
 
@@ -135,11 +143,18 @@ const Login = () => {
                     Forgot Password ?
                   </Link>
                 </div>
-
+                <div className="my-3">
+                  <ReCAPTCHA
+                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
+" //
+                    onChange={(token) => setRecaptchaToken(token)}
+                    onExpired={() => setRecaptchaToken(null)}
+                  />
+                </div>
                 <button
                   type="submit"
                   className="btn btn-outline-light w-100 btn-size mt-1"
-                  disabled={loading}
+                  disabled={loading || !recaptchaToken}
                 >
                   {loading ? "Signing In..." : "Sign In"}
                 </button>
@@ -196,7 +211,7 @@ const Login = () => {
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2024 Dreams Rent. All Rights Reserved.</p>
+              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
             </div>
           </div>
         </div>

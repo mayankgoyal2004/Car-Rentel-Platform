@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet ,NavLink  } from "react-router-dom";
 
 const UserBooking = () => {
   return (
@@ -9,16 +9,7 @@ const UserBooking = () => {
         <div className="content-header d-flex align-items-center justify-content-between">
           <h4>My Bookings</h4>
           <ul className="booking-nav">
-            <li>
-              <Link to="user-booking" className="active">
-                <i className="fa-solid fa-list" />
-              </Link>
-            </li>
-            <li>
-              <Link to="user-booking-calender">
-                <i className="fa-solid fa-calendar-days" />
-              </Link>
-            </li>
+            
           </ul>
         </div>
         {/* /Content Header */}
@@ -27,28 +18,49 @@ const UserBooking = () => {
           <div className="col-lg-12">
             <div className="sorting-info">
               <div className="row d-flex align-items-center">
-                <div className="col-xl-7 col-lg-8 col-sm-12 col-12">
-                  <div className="booking-lists">
-                    <ul className="nav">
-                      <li>
-                        <Link to="" className="active">
-                          All Bookings
-                        </Link>
-                      </li>
+             <div className="col-xl-7 col-lg-8 col-sm-12 col-12">
+  <div className="booking-lists">
+    <ul className="nav">
+      <li>
+        <NavLink
+          to=""
+          end
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          All Bookings
+        </NavLink>
+      </li>
 
-                      <li>
-                        <Link to="user-booking-inProgress">Inprogress</Link>
-                      </li>
-                      <li>
-                        <Link to="user-booking-completed">Completed</Link>
-                      </li>
-                      <li>
-                        <Link to="user-booking-cancelled">Cancelled</Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="col-xl-5 col-lg-4 col-sm-12 col-12">
+      <li>
+        <NavLink
+          to="user-booking-in-progress"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Inprogress
+        </NavLink>
+      </li>
+
+      <li>
+        <NavLink
+          to="user-booking-completed"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Completed
+        </NavLink>
+      </li>
+
+      <li>
+        <NavLink
+          to="user-booking-cancelled"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Cancelled
+        </NavLink>
+      </li>
+    </ul>
+  </div>
+</div>
+                {/* <div className="col-xl-5 col-lg-4 col-sm-12 col-12">
                   <div className="filter-group">
                     <div className="sort-week sort">
                       <div className="dropdown dropdown-action">
@@ -130,7 +142,7 @@ const UserBooking = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

@@ -313,7 +313,7 @@ const AdminCustomers = () => {
                 <th>EMAIL</th>
                 <th>LICENSE NO</th>
                 <th>EXPIRY DATE</th>
-                <th>LANGUAGE</th>
+              
                 <th />
               </tr>
             </thead>
@@ -375,18 +375,7 @@ const AdminCustomers = () => {
                           : ""}
                       </p>
                     </td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <a className="avatar avatar-xxs rounded-circle me-1 flex-shrink-0">
-                          <img
-                            src={getLanguageFlag(customer.language)}
-                            className="rounded-circle"
-                            alt="img"
-                          />
-                        </a>
-                        <p className="text-gray-9">{customer.language}</p>
-                      </div>
-                    </td>
+                 
                     <td>
                       <div className="dropdown">
                         <button

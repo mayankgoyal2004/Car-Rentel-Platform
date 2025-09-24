@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { Heart , Filter, Calendar ,MapPin  } from "react-feather";
+import { Heart, Filter, Calendar, MapPin } from "react-feather";
 
 const Listing = () => {
   const [cars, setCars] = useState([]);
@@ -9,7 +9,7 @@ const Listing = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
-const [wishlist, setWishlist] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
 
   // Get query parameters from URL
   const location = useLocation();
@@ -57,7 +57,6 @@ const [wishlist, setWishlist] = useState([]);
         carType: filters.type,
       };
 
-
       // Remove empty filters
       Object.keys(apiFilters).forEach((key) => {
         if (
@@ -87,26 +86,25 @@ const [wishlist, setWishlist] = useState([]);
     }
   };
 
-const getWishList = async () => {
-  const res = await apiService.getWishlist();
-  setWishlist(res.data.wishlist); // already array of IDs
-};
-  
+  const getWishList = async () => {
+    const res = await apiService.getWishlist();
+    setWishlist(res.data.wishlist); // already array of IDs
+  };
 
   useEffect(() => {
     fetchCars();
-    getWishList()
+    getWishList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, filters.limit]);
 
-const handleWishlist = async (carId) => {
-  try {
-    const res = await apiService.addWishlist({ carId });
-    setWishlist(res.data.wishlist.cars); // already array of IDs
-  } catch (err) {
-    console.error("Error toggling wishlist:", err);
-  }
-};
+  const handleWishlist = async (carId) => {
+    try {
+      const res = await apiService.addWishlist({ carId });
+      setWishlist(res.data.wishlist.cars); // already array of IDs
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+    }
+  };
   // Update search query when URL params change
   useEffect(() => {
     if (queryParams.get("pickupLocation") || queryParams.get("dropLocation")) {
@@ -341,91 +339,89 @@ const handleWishlist = async (carId) => {
                     </div>
                   </li>
                   {/* Show quick search details if they exist */}
-             
-                    <>
-                     <li className="column-group">
-  <div className="input-block">
-    <label>Pickup Location</label>
-    <div className="group-img">
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Enter pickup location"
-        value={filters.pickupLocation}
-        onChange={(e) =>
-          setFilters((prev) => ({
-            ...prev,
-            pickupLocation: e.target.value,
-          }))
-        }
-      />
-    
-    </div>
-  </div>
-</li>
 
-<li className="column-group">
-  <div className="input-block">
-    <label>Dropoff Location</label>
-    <div className="group-img">
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Enter dropoff location"
-        value={filters.dropLocation}
-        onChange={(e) =>
-          setFilters((prev) => ({
-            ...prev,
-            dropLocation: e.target.value,
-          }))
-        }
-      />
-    
-    </div>
-  </div>
-</li>
-                      {filters.pickupDate && (
-                        <li className="column-group">
-                          <div className="input-block">
-                            <label>Pickup Date</label>
-                            <div className="group-img">
-                              <input
-                                type="text"
-                                className="form-control"
-                                value={new Date(
-                                  filters.pickupDate
-                                ).toLocaleString()}
-                                readOnly
-                              />
-                              <span>
-                                <i className="feather-calendar" />
-                              </span>
-                            </div>
+                  <>
+                    <li className="column-group">
+                      <div className="input-block">
+                        <label>Pickup Location</label>
+                        <div className="group-img">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter pickup location"
+                            value={filters.pickupLocation}
+                            onChange={(e) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                pickupLocation: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    </li>
+
+                    <li className="column-group">
+                      <div className="input-block">
+                        <label>Dropoff Location</label>
+                        <div className="group-img">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Enter dropoff location"
+                            value={filters.dropLocation}
+                            onChange={(e) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                dropLocation: e.target.value,
+                              }))
+                            }
+                          />
+                        </div>
+                      </div>
+                    </li>
+                    {filters.pickupDate && (
+                      <li className="column-group">
+                        <div className="input-block">
+                          <label>Pickup Date</label>
+                          <div className="group-img">
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={new Date(
+                                filters.pickupDate
+                              ).toLocaleString()}
+                              readOnly
+                            />
+                            <span>
+                              <i className="feather-calendar" />
+                            </span>
                           </div>
-                        </li>
-                      )}
-                      {filters.dropDate && (
-                        <li className="column-group">
-                          <div className="input-block">
-                            <label>Dropoff Date</label>
-                            <div className="group-img">
-                              <input
-                                type="text"
-                                className="form-control"
-                                value={new Date(
-                                  filters.dropDate
-                                ).toLocaleString()}
-                                readOnly
-                              />
-                              <span>
-                                <i className="feather-calendar" />
-                              </span>
-                            </div>
+                        </div>
+                      </li>
+                    )}
+                    {filters.dropDate && (
+                      <li className="column-group">
+                        <div className="input-block">
+                          <label>Dropoff Date</label>
+                          <div className="group-img">
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={new Date(
+                                filters.dropDate
+                              ).toLocaleString()}
+                              readOnly
+                            />
+                            <span>
+                              <i className="feather-calendar" />
+                            </span>
                           </div>
-                        </li>
-                      )}
-                    </>
-                 
+                        </div>
+                      </li>
+                    )}
+                  </>
+
                   <li className="column-group-last">
                     <div className="input-block">
                       <div className="search-btn">
@@ -734,7 +730,7 @@ const handleWishlist = async (carId) => {
                     onClick={applyFilters}
                   >
                     <span>
-                     <Filter size={18} className="me-2" />
+                      <Filter size={18} className="me-2" />
                     </span>
                     Apply Filters
                   </button>
@@ -787,25 +783,29 @@ const handleWishlist = async (carId) => {
                                 <img
                                   src={BASE_URL_IMG + car?.image}
                                   className="img-fluid"
-                                  alt={car?.name}
-                                  onError={(e) => {
-                                    e.target.src =
-                                      "/user-assets/img/car/car-01.jpg";
-                                  }}
+                                  alt={car?.carName}
                                 />
                               </Link>
-                            <div className="fav-item justify-content-end">
-  <button
-    onClick={() => handleWishlist(car._id)}
-    className="btn btn-link p-0 border-0"
-  >
-    <Heart
-      size={20}
-      color={wishlist.includes(car?._id) ? "red" : "gray"}
-      fill={wishlist.includes(car?._id) ? "red" : "none"}
-    />
-  </button>
-</div>
+                              <div className="fav-item justify-content-end">
+                                <button
+                                  onClick={() => handleWishlist(car._id)}
+                                  className="btn btn-link p-0 border-0"
+                                >
+                                  <Heart
+                                    size={20}
+                                    color={
+                                      wishlist.includes(car?._id)
+                                        ? "red"
+                                        : "gray"
+                                    }
+                                    fill={
+                                      wishlist.includes(car?._id)
+                                        ? "red"
+                                        : "none"
+                                    }
+                                  />
+                                </button>
+                              </div>
                               <span className="featured-text">
                                 {car?.carBrand?.brandName}
                               </span>
@@ -815,7 +815,7 @@ const handleWishlist = async (carId) => {
                                 <div className="list-rating">
                                   <h3 className="listing-title">
                                     <Link to={`/listing-details/${car?._id}`}>
-                                      {car?.name}
+                                      {car?.carName}
                                     </Link>
                                   </h3>
                                   <div className="list-rating">
@@ -838,7 +838,7 @@ const handleWishlist = async (carId) => {
                                       src="/user-assets/img/icons/map-pin.svg"
                                       alt="location"
                                     />
-                                    {car?.distance || "N/A"}
+                                    {car?.distance}
                                   </span>
                                 </div>
                               </div>
@@ -852,8 +852,7 @@ const handleWishlist = async (carId) => {
                                       />
                                     </span>
                                     <p>
-                                      {car?.carTransmission?.carTransmission ||
-                                        "N/A"}
+                                      {car?.carTransmission?.carTransmission}
                                     </p>
                                   </li>
                                   <li>
@@ -863,7 +862,7 @@ const handleWishlist = async (carId) => {
                                         alt="Mileage"
                                       />
                                     </span>
-                                    <p>{car.mileage || "N/A"}</p>
+                                    <p>{car.mileage}</p>
                                   </li>
                                   <li>
                                     <span>
@@ -914,7 +913,7 @@ const handleWishlist = async (carId) => {
                               <div className="listing-location-details">
                                 <div className="listing-price">
                                   <span>
-                                   <MapPin size={16} className="me-2" />
+                                    <MapPin size={16} className="me-2" />
                                   </span>
                                   {car.mainLocation?.title ||
                                     "Location not specified"}
@@ -932,8 +931,7 @@ const handleWishlist = async (carId) => {
                                   className="btn btn-order"
                                 >
                                   <span>
-                                   <Calendar size={18} className="me-2" />
-
+                                    <Calendar size={18} className="me-2" />
                                   </span>
                                   Rent Now
                                 </Link>

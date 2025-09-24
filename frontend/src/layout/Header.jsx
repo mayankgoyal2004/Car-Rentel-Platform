@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../assets/navbar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
 import { BASE_URL_IMG } from "../../Apiservice/apiService";
 
+
 const Header = () => {
   const [pageOpen, setPageOpen] = useState(false);
-  const [user, setUser] = useState(null); // store logged in user
+  const [user, setUser] = useState(null);
+  const [activePath, setActivePath] = useState("/");
   const dispatch = useDispatch();
-  const navigate= useNavigate()
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Update active path when location changes
+  useEffect(() => {
+    setActivePath(location.pathname);
+  }, [location.pathname]);
 
   useEffect(() => {
     const mobileBtn = document.getElementById("mobile_btn");
@@ -30,7 +38,7 @@ const Header = () => {
 
   const userData = useSelector((store) => store.user);
 
-   useEffect(() => {
+  useEffect(() => {
     if (userData) {
       setUser(userData);
     } else {
@@ -42,7 +50,14 @@ const Header = () => {
     sessionStorage.clear();
     dispatch(removeUser());
     setUser(null);
-    navigate("/")
+    navigate("/");
+  };
+
+  // Helper function to check if a path is active
+  const isActive = (path) => {
+    if (path === "/" && activePath === "/") return true;
+    if (path !== "/" && activePath.startsWith(path)) return true;
+    return false;
   };
 
   return (
@@ -99,13 +114,16 @@ const Header = () => {
             </div>
 
             <ul className="main-nav">
-              <li className="has-submenu megamenu active">
+              <li className=
+               {`has-submenu   ${isActive("/") ? "active" : ""}`}>
                 <Link to="/">Home</Link>
               </li>
-              <li className="has-submenu">
+              <li className={`has-submenu ${isActive("/listing") ? "active" : ""}`}>
                 <Link to="/listing">Listings</Link>
               </li>
-              <li className={`has-submenu ${pageOpen ? "submenu-open" : ""}`}>
+              <li className={`has-submenu ${pageOpen ? "submenu-open" : ""} ${
+                isActive("/about-us") || isActive("/contact-us") || isActive("/faq") ? "active" : ""
+              }`}>
                 <a
                   href="#"
                   onClick={(e) => {
@@ -116,18 +134,18 @@ const Header = () => {
                   Pages <i className="fas fa-chevron-down" />
                 </a>
                 <ul className="submenu">
-                  <li>
+                  <li className={isActive("/about-us") ? "active" : ""}>
                     <Link to="/about-us">About Us</Link>
                   </li>
-                  <li>
+                  <li className={isActive("/contact-us") ? "active" : ""}>
                     <Link to="/contact-us">Contact Us</Link>
                   </li>
-                  <li>
+                  <li className={isActive("/faq") ? "active" : ""}>
                     <Link to="/faq">FAQ</Link>
                   </li>
                 </ul>
               </li>
-              <li className="has-submenu">
+              <li className={`has-submenu ${isActive("/blog-list") ? "active" : ""}`}>
                 <Link to="/blog-list">Blogs</Link>
               </li>
             </ul>
@@ -144,7 +162,7 @@ const Header = () => {
                   data-bs-toggle="dropdown"
                   data-bs-auto-close="outside"
                 >
-                  <span className="avatar avatar-sm">
+                  <span className="user-img">
                     <img
                       src={`${BASE_URL_IMG + user.image}`}
                       alt="Profile"
@@ -152,7 +170,7 @@ const Header = () => {
                     />
                   </span>
                 </a>
-                <div className="dropdown-menu">
+                <div className="dropdown-menu p-1">
                   <div className="profileset d-flex align-items-center">
                     <span className="user-img me-2">
                       <img
@@ -168,7 +186,9 @@ const Header = () => {
                   <div className="dropdown-divider my-2" />
                   <Link
                     to="/user-dashboard"
-                    className="dropdown-item d-flex align-items-center"
+                    className={`dropdown-item d-flex align-items-center ${
+                      isActive("/user-dashboard") ? "active" : ""
+                    }`}
                   >
                     <i className="ti ti-exchange me-2" /> Profile
                   </Link>
@@ -188,19 +208,23 @@ const Header = () => {
             ) : (
               // Sign in/up buttons when not logged in
               <>
-                <li className="nav-item user-link">
+                <li className="nav-item">
                   <Link
                     to="/login"
-                    className="nav-link btn-secondary btn d-inline-flex align-items-center"
+                    className={`nav-link custom-nav btn-secondary btn d-inline-flex align-items-center  custam-class${
+                      isActive("/login") ? "active" : ""
+                    }`}
                   >
                     <i className="bx bx-user me-1" />
                     Sign In
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item ">
                   <Link
                     to="/register"
-                    className="nav-link header-reg d-inline-flex align-items-center"
+                    className={`nav-link header-reg custam2 d-inline-flex  custam-class align-items-center ${
+                      isActive("/register") ? "active" : ""
+                    }`}
                   >
                     <span>
                       <i className="bx bx-lock" />

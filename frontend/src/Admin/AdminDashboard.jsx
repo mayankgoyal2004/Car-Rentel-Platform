@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./assets/logo.css";
 // import "./assets/css/admin-style.css"
 import "./assets/css/admin-style.css";
@@ -17,8 +17,8 @@ const AdminDashboard = () => {
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
   const [isMini, setIsMini] = useState(true); // default collapsed
-const [isExpanded, setIsExpanded] = useState(false);
-  
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
 
@@ -30,7 +30,7 @@ const [isExpanded, setIsExpanded] = useState(false);
     dispatch(removeUser());
     navigete("/login");
   };
-    const toggleSidebar = () => {
+  const toggleSidebar = () => {
     const wrapper = document.querySelector(".main-wrapper");
     wrapper.classList.toggle("slide-nav");
   };
@@ -38,46 +38,45 @@ const [isExpanded, setIsExpanded] = useState(false);
   return (
     <div className={`main-wrapper `}>
       {/* Header */}
-      <div className="header">
+      <div className="header ">
         <div className="main-header">
           <div className="header-left">
-            <Link to="/admin-dashboard" className="logo">
+            <NavLink to="/admin-dashboard" className="logo">
               <img src="/admin-assets/img/logo.svg" alt="Logo" />
-            </Link>
-            <Link to="/admin-dashboard" className="dark-logo">
+            </NavLink>
+            <NavLink to="/admin-dashboard" className="dark-logo">
               <img src="/admin-assets/img/logo-white.svg" alt="Logo" />
-            </Link>
+            </NavLink>
           </div>
-          <a id="mobile_btn" className="mobile_btn"onClick={toggleSidebar}>
+          <a id="mobile_btn" className="mobile_btn" onClick={toggleSidebar}>
             <span className="bar-icon">
               <span />
               <span />
               <span />
             </span>
           </a>
-          <div className=" header-user">
-            <div className="nav user-menu nav-list navouter">
+          <div className=" header-user custom-admin">
+            <div className="nav custom-admin user-menu nav-list navouter">
               <div
                 className="me-auto d-flex align-items-center"
                 id="header-search"
               >
-                <a id="toggle_btn" >
+                <a id="toggle_btn">
                   <i className="ti ti-menu-deep" />
                 </a>
                 <div className="add-dropdown">
-                  <Link
+                  <NavLink
                     to="add-reservation"
                     className="btn btn-dark d-inline-flex align-items-center"
                   >
                     <i className="ti ti-plus me-1" />
                     New Reservation
-                  </Link>
+                  </NavLink>
                 </div>
               </div>
               <div className="d-flex align-items-center header-icons">
                 <div className="dropdown">
                   <a
-                    href="javascript:void(0);"
                     className="btn btn-menubar"
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
@@ -87,50 +86,32 @@ const [isExpanded, setIsExpanded] = useState(false);
                   <div className="dropdown-menu p-3">
                     <ul>
                       <li>
-                        <Link
+                        <NavLink
                           to="add-car"
                           className="dropdown-item d-inline-flex align-items-center"
                         >
                           <i className="ti ti-car me-2" />
                           car
-                        </Link>
+                        </NavLink>
                       </li>
 
                       <li>
-                        <a
-                          href="pricing.html"
-                          className="dropdown-item d-inline-flex align-items-center"
-                        >
-                          <i className="ti ti-file-dollar me-2" />
-                          Seasonal Pricing
-                        </a>
-                      </li>
-                      <li>
-                        <Link
+                        <NavLink
                           to=""
                           href="extra-services.html"
                           className="dropdown-item d-inline-flex align-items-center"
                         >
                           <i className="ti ti-script-plus me-2" />
                           Extra Service
-                        </Link>
+                        </NavLink>
                       </li>
-                      <li>
-                        <a
-                          href="inspections.html"
-                          className="dropdown-item d-inline-flex align-items-center"
-                        >
-                          <i className="ti ti-dice-6 me-2" />
-                          Inspection
-                        </a>
-                      </li>
+
                       <li></li>
                     </ul>
                   </div>
                 </div>
                 <div className="dropdown profile-dropdown">
                   <a
-                    href="javascript:void(0);"
                     className="d-flex align-items-center"
                     data-bs-toggle="dropdown"
                     data-bs-auto-close="outside"
@@ -147,15 +128,16 @@ const [isExpanded, setIsExpanded] = useState(false);
                     <div className="profileset d-flex align-items-center">
                       <span className="user-img me-2">
                         <img
-                          src="/admin-assets/img/profiles/avatar-05.jpg"
-                          alt
+                          src={`${BASE_URL_IMG + userData.image}`}
+                          alt="Img"
                         />
                       </span>
                       <div>
-                        <h6 className="fw-semibold mb-1">Andrew Simmonds</h6>
+                        <h6 className="fw-semibold mb-1">
+                          {userData.userName}
+                        </h6>
                         <p className="fs-13">
                           <a
-                            href="/cdn-cgi/l/email-protection"
                             className="__cf_email__"
                             data-cfemail="f7969993859280b7928f969a879b92d994989a"
                           >
@@ -164,29 +146,29 @@ const [isExpanded, setIsExpanded] = useState(false);
                         </p>
                       </div>
                     </div>
-                    <Link
+                    <NavLink
                       to="profile-setting"
                       className="dropdown-item d-flex align-items-center"
                     >
                       <i className="ti ti-user-edit me-2" />
                       Edit Profile
-                    </Link>
+                    </NavLink>
                     <div className="dropdown-divider my-2" />
                     <div className="dropdown-item"></div>
-                    <Link
+                    <NavLink
                       to="security-setting"
                       className="dropdown-item d-flex align-items-center"
                     >
                       <i className="ti ti-exchange me-2" />
                       Change Password
-                    </Link>
-                    <Link
+                    </NavLink>
+                    <NavLink
                       to="profile-setting"
                       className="dropdown-item d-flex align-items-center"
                     >
                       <i className="ti ti-settings me-2" />
                       Settings
-                    </Link>
+                    </NavLink>
                     <div className="dropdown-divider my-2" />
                     <button
                       onClick={handleLogout}
@@ -206,7 +188,6 @@ const [isExpanded, setIsExpanded] = useState(false);
           {/* Mobile Menu */}
           <div className="dropdown mobile-user-menu">
             <a
-              href="javascript:void(0);"
               className="nav-link dropdown-toggle"
               data-bs-toggle="dropdown"
               aria-expanded="false"
@@ -217,12 +198,12 @@ const [isExpanded, setIsExpanded] = useState(false);
               <a className="dropdown-item" href="profile.html">
                 My Profile
               </a>
-              <Link to="profile-setting" className="dropdown-item">
+              <NavLink to="profile-setting" className="dropdown-item">
                 Settings
-              </Link>
-              <Link to="/login" className="dropdown-item">
+              </NavLink>
+              <NavLink to="/login" className="dropdown-item">
                 Logout
-              </Link>
+              </NavLink>
             </div>
           </div>
           {/* /Mobile Menu */}
@@ -231,19 +212,23 @@ const [isExpanded, setIsExpanded] = useState(false);
 
       {/* /Header */}
       {/* Sidebar */}
-      <div className="sidebar"onMouseEnter={() => setIsExpanded(true)}
-    onMouseLeave={() => setIsExpanded(false)} id="sidebar">
+      <div
+        className="sidebar"
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
+        id="sidebar"
+      >
         {/* Logo */}
         <div className="sidebar-logo navbar-1">
-          <Link to="/admin-dashboard" className="logo logo-normal">
+          <NavLink to="/admin-dashboard" className="logo logo-normal">
             <img src="/admin-assets/img/logo.svg" alt="Logo" />
-          </Link>
-          <Link to="/admin-dashboard" className="logo-small">
+          </NavLink>
+          <NavLink to="/admin-dashboard" className="logo-small">
             <img src="/admin-assets/img/logo-small.svg" alt="Logo" />
-          </Link>
-          <Link to="/admin-dashboard" className="dark-logo">
+          </NavLink>
+          <NavLink to="/admin-dashboard" className="dark-logo">
             <img src="/admin-assets/img/logo-white.svg" alt="Logo" />
-          </Link>
+          </NavLink>
         </div>
         {/* /Logo */}
         <div className="sidebar-inner ">
@@ -273,227 +258,262 @@ const [isExpanded, setIsExpanded] = useState(false);
                 <li>
                   <ul>
                     <li className="active">
-                      <Link to="">
+                      <NavLink to="">
                         <i className="ti ti-layout-dashboard" />
                         <span>Dashboard</span>
-                      </Link>
+                      </NavLink>
                     </li>
                   </ul>
                 </li>
-                <li className="menu-title">
-                  <span>Bookings</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="all-reservation">
-                        <i className="ti ti-files" />
-                        <span>Reservations</span>
-                        <span className="track-icon" />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="admin-calender">
-                        <i className="ti ti-calendar-bolt" />
-                        <span>Calendar</span>
-                      </Link>
-                    </li>
+                {userType !== 1 && (
+                  <li className="menu-title">
+                    <span>Bookings</span>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li>
+                    <ul>
+                      <li>
+                        <NavLink to="all-reservation">
+                          <i className="ti ti-files" />
+                          <span>Reservations</span>
+                          <span className="track-icon" />
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="admin-calender">
+                          <i className="ti ti-calendar-bolt" />
+                          <span>Calendar</span>
+                        </NavLink>
+                      </li>
 
-                    <li>
-                      <Link to="all-enquiries">
-                        <i className="ti ti-mail" />
-                        <span>Enquiries</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-                <li className="menu-title">
-                  <span>Manage</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="all-customers">
-                        <i className="ti ti-users-group" />
-                        <span>Customers</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="all-drivers">
-                        <i className="ti ti-user-bolt" />
-                        <span>Drivers</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="all-locations">
-                        <i className="ti ti-map-pin" />
-                        <span>Locations</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
+                      <li>
+                        <NavLink to="all-enquiries">
+                          <i className="ti ti-mail" />
+                          <span>Enquiries</span>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li className="menu-title">
+                    <span>Manage</span>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li>
+                    <ul>
+                      <li>
+                        <NavLink to="all-customers">
+                          <i className="ti ti-users-group" />
+                          <span>Customers</span>
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="all-drivers">
+                          <i className="ti ti-user-bolt" />
+                          <span>Drivers</span>
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="all-locations">
+                          <i className="ti ti-map-pin" />
+                          <span>Locations</span>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                )}
+
                 <li className="menu-title">
                   <span>RENTALS</span>
                 </li>
+
                 <li>
                   <ul>
                     <li>
-                      <Link to="all-cars">
+                      <NavLink to="all-cars">
                         <i className="ti ti-car" />
                         <span>Cars</span>
-                      </Link>
+                      </NavLink>
                     </li>
-                    <li>
-                      <a onClick={() => setOpen(!open)}>
-                        <i className="ti ti-device-camera-phone" />
-                        <span>car Attributes</span>
-                        <span className="menu-arrow" />
-                      </a>
-                      {open && (
-                        <ul>
-                          <li>
-                            <Link to="car-brands">Brands</Link>
-                          </li>
-                          <li>
-                            <Link to="car-types">Types</Link>
-                          </li>
-                          <li>
-                            <Link to="car-models">Models</Link>
-                          </li>
-                          <li>
-                            <Link to="car-transmissions">Transmissions</Link>
-                          </li>
-                          <li>
-                            <Link to="car-fuel">Fuels</Link>
-                          </li>
-                          <li>
-                            <Link to="car-color">Colors</Link>
-                          </li>
-                          <li>
-                            <Link to="car-steering">Steering</Link>
-                          </li>
-                          <li>
-                            <Link to="car-seats">Seats</Link>
-                          </li>
-                          <li>
-                            <Link to="car-cylinders">Cylinders</Link>
-                          </li>
 
-                          <li>
-                            <Link to="car-features">Features</Link>
-                          </li>
-                        </ul>
-                      )}
-                    </li>
-                    <li>
-                      <Link to="car-extra-features">
-                        <i className="ti ti-script-plus" />
-                        <span>Extra Service</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="car-pricing">
+                    {userType !== 1 && (
+                      <li>
+                        <a onClick={() => setOpen(!open)}>
+                          <i className="ti ti-device-camera-phone" />
+                          <span>car Attributes</span>
+                          <span className="menu-arrow" />
+                        </a>
+                        {open && (
+                          <ul>
+                            <li>
+                              <NavLink to="car-brands">Brands</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-types">Types</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-models">Models</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-transmissions">
+                                Transmissions
+                              </NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-fuel">Fuels</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-color">Colors</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-steering">Steering</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-seats">Seats</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="car-cylinders">Cylinders</NavLink>
+                            </li>
+
+                            <li>
+                              <NavLink to="car-features">Features</NavLink>
+                            </li>
+                          </ul>
+                        )}
+                      </li>
+                    )}
+                    {userType !== 1 && (
+                      <li>
+                        <NavLink to="car-extra-features">
+                          <i className="ti ti-script-plus" />
+                          <span>Extra Service</span>
+                        </NavLink>
+                      </li>
+                    )}
+                    {/* <li>
+                      <NavLink to="car-pricing">
                         <i className="ti ti-file-dollar" />
                         <span>Seasonal Pricing</span>
-                      </Link>
-                    </li>
+                      </NavLink>
+                    </li> */}
 
-                    <li>
-                      <Link to="car-maintenance">
+                    {/* <li>
+                      <NavLink to="car-maintenance">
                         <i className="ti ti-color-filter" />
                         <span>Maintenance</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="car-review">
-                        <i className="ti ti-star" />
-                        <span>Reviews</span>
-                      </Link>
-                    </li>
+                      </NavLink>
+                    </li> */}
+                    {userType !== 1 && (
+                      <li>
+                        <NavLink to="car-review">
+                          <i className="ti ti-star" />
+                          <span>Reviews</span>
+                        </NavLink>
+                      </li>
+                    )}
                   </ul>
                 </li>
-                <li className="menu-title">
-                  <span>FINANCE &amp; ACCOUNTS</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="all-invoice">
-                        <i className="ti ti-file-invoice" />
-                        <span>Invoices</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-                <li className="menu-title">
-                  <span>OTHERS</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="admin-message">
-                        <i className="ti ti-message" />
-                        <span>Messages</span>
-                        <span className="count">5</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
+                {userType !== 1 && (
+                  <li className="menu-title">
+                    <span>FINANCE &amp; ACCOUNTS</span>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li>
+                    <ul>
+                      <li>
+                        <NavLink to="all-invoice">
+                          <i className="ti ti-file-invoice" />
+                          <span>Invoices</span>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li className="menu-title">
+                    <span>OTHERS</span>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li>
+                    <ul>
+                      <li>
+                        <NavLink to="admin-message">
+                          <i className="ti ti-message" />
+                          <span>Messages</span>
+                          <span className="count">5</span>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                )}
                 <li className="menu-title">
                   <span>CMS</span>
                 </li>
                 <li>
                   <ul>
-                    <li>
-                      <a onClick={() => setblogOpen(!blogOpen)}>
-                        <i className="ti ti-device-desktop-analytics" />
-                        <span>Blogs</span>
-                        <span className="menu-arrow" />
-                      </a>
-                      {blogOpen && (
-                        <ul>
-                          <li>
-                            <Link to="all-blogs">All Blogs</Link>
-                          </li>
-                          <li>
-                            <Link to="blogs-categories">Categories</Link>
-                          </li>
-                          <li>
-                            <Link to="blogs-comments">Comments</Link>
-                          </li>
-                          <li>
-                            <Link to="blogs-blogs-tags">Blog Tags</Link>
-                          </li>
-                        </ul>
-                      )}
-                    </li>
-                    <li>
-                      <a onClick={() => SetLocationOpen(!LocationOpen)}>
-                        <i className="ti ti-map" />
-                        <span>Locations</span>
-                        <span className="menu-arrow" />
-                      </a>
-                      {LocationOpen && (
-                        <ul>
-                          <li>
-                            <Link to="location-countries">Countries</Link>
-                          </li>
-                          <li>
-                            <Link to="location-states">States</Link>
-                          </li>
-                          <li>
-                            <Link to="location-cities">Cities</Link>
-                          </li>
-                        </ul>
-                      )}
-                    </li>
+                    {userType !== 1 && (
+                      <li>
+                        <a onClick={() => setblogOpen(!blogOpen)}>
+                          <i className="ti ti-device-desktop-analytics" />
+                          <span>Blogs</span>
+                          <span className="menu-arrow" />
+                        </a>
+                        {blogOpen && (
+                          <ul>
+                            <li>
+                              <NavLink to="all-blogs">All Blogs</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="blogs-categories">
+                                Categories
+                              </NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="blogs-comments">Comments</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="blogs-blogs-tags">Blog Tags</NavLink>
+                            </li>
+                          </ul>
+                        )}
+                      </li>
+                    )}
+                    {userType !== 1 && (
+                      <li>
+                        <a onClick={() => SetLocationOpen(!LocationOpen)}>
+                          <i className="ti ti-map" />
+                          <span>Locations</span>
+                          <span className="menu-arrow" />
+                        </a>
+                        {LocationOpen && (
+                          <ul>
+                            <li>
+                              <NavLink to="location-countries">
+                                Countries
+                              </NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="location-states">States</NavLink>
+                            </li>
+                            <li>
+                              <NavLink to="location-cities">Cities</NavLink>
+                            </li>
+                          </ul>
+                        )}
+                      </li>
+                    )}
 
                     {userType === 1 && (
                       <li>
-                        <Link to="all-testimonials">
+                        <NavLink to="all-testimonials">
                           <i className="ti ti-brand-hipchat" />
                           <span>Testimonials</span>
-                        </Link>
+                        </NavLink>
                       </li>
                     )}
                     {userType === 1 && (
@@ -506,10 +526,12 @@ const [isExpanded, setIsExpanded] = useState(false);
                         {FaqOpen && (
                           <ul>
                             <li>
-                              <Link to="all-faq">FAQ's</Link>
+                              <NavLink to="all-faq">FAQ's</NavLink>
                             </li>
                             <li>
-                              <Link to="all-faq-categories">FAQ Category</Link>
+                              <NavLink to="all-faq-categories">
+                                FAQ Category
+                              </NavLink>
                             </li>
                           </ul>
                         )}
@@ -526,49 +548,53 @@ const [isExpanded, setIsExpanded] = useState(false);
                   <li>
                     <ul>
                       <li>
-                        <Link to="contact-message">
+                        <NavLink to="contact-message">
                           <i className="ti ti-messages" />
                           <span>Contact Messages</span>
-                        </Link>
+                        </NavLink>
                       </li>
                     </ul>
                   </li>
                 )}
-                <li className="menu-title">
-                  <span>USER MANAGEMENT</span>
-                </li>
-                <li>
-                  <ul>
-                    <li>
-                      <Link to="all-user">
-                        <i className="ti ti-user-circle" />
-                        <span>Users</span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link to="roles-permissions">
-                        <i className="ti ti-user-shield" />
-                        <span>Roles &amp; Permissions</span>
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
+                {userType !== 1 && (
+                  <li className="menu-title">
+                    <span>USER MANAGEMENT</span>
+                  </li>
+                )}
+                {userType !== 1 && (
+                  <li>
+                    <ul>
+                      <li>
+                        <NavLink to="all-user">
+                          <i className="ti ti-user-circle" />
+                          <span>Users</span>
+                        </NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="roles-permissions">
+                          <i className="ti ti-user-shield" />
+                          <span>Roles &amp; Permissions</span>
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </li>
+                )}
                 {/* <li className="menu-title">
                   <span>REPORTS</span>
                 </li>
                 <li>
                   <ul>
                     <li>
-                      <Link to="earning-reports">
+                      <NavLink to="earning-reports">
                         <i className="ti ti-chart-line" />
                         <span>Earnings</span>
-                      </Link>
+                      </NavLink>
                     </li>
                     <li>
-                      <Link to="rental-report">
+                      <NavLink to="rental-report">
                         <i className="ti ti-chart-infographic" />
                         <span>Rentals</span>
-                      </Link>
+                      </NavLink>
                     </li>
                   </ul>
                 </li> */}
@@ -587,10 +613,10 @@ const [isExpanded, setIsExpanded] = useState(false);
                       {SettingOpen && (
                         <ul>
                           <li>
-                            <Link to="profile-setting">Profile</Link>
+                            <NavLink to="profile-setting">Profile</NavLink>
                           </li>
                           <li>
-                            <Link to="security-setting">Security</Link>
+                            <NavLink to="security-setting">Security</NavLink>
                           </li>
                         </ul>
                       )}

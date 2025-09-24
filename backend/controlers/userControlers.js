@@ -3,11 +3,14 @@ const User = require("../models/userModel");
 const customer = require("../models/customerModel");
 const Package = require("../models/packageModel");
 const bcrypt = require("bcrypt");
+const axios = require("axios")
 const nodemailer = require("nodemailer");
 const saltround = 12;
 const secretKey = "Protect@@@@";
 const emailSecret = "EmailVerifySecret@@@";
 const otpGenerator = require("otp-generator");
+
+const secretKeyGoogle = "6LcdLNMrAAAAAHDxeu6icIVsGhraE2G43DtRraOc";
 
 const generateVerificationToken = (user) => {
   const token = jwt.sign({ userId: user._id }, emailSecret, {
@@ -60,7 +63,7 @@ async function sendVerifyMail({ name, email, token }) {
 }
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, recaptchaToken } = req.body;
 
     let validator = "";
     if (!name) validator += "Name is Required. ";
@@ -71,6 +74,18 @@ const register = async (req, res) => {
         status: 400,
         success: false,
         message: validator.trim(),
+      });
+    }
+
+    const recaptchaResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
+    );
+
+     if (!recaptchaResponse.data.success) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "reCAPTCHA verification failed",
       });
     }
 
@@ -130,10 +145,22 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     let validator = "";
-    const { email, password } = req.body;
+    const { email, password , recaptchaToken} = req.body;
     if (!password) validator += "Password is Required. ";
     if (!email) validator += "Email is Required. ";
 
+
+     const recaptchaResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
+    );
+
+     if (!recaptchaResponse.data.success) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "reCAPTCHA verification failed",
+      });
+    }
     if (validator) {
       return res.json({
         status: 409,
@@ -191,11 +218,22 @@ const login = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email , recaptchaToken } = req.body;
     if (!email) {
       return res.status(400).json({
         success: false,
         message: "Email is required",
+      });
+    }
+     const recaptchaResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
+    );
+
+     if (!recaptchaResponse.data.success) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "reCAPTCHA verification failed",
       });
     }
 
@@ -256,13 +294,24 @@ const forgotPassword = async (req, res) => {
 };
 const resetPassword = async (req, res) => {
   try {
-    const { email, otp, newPassword } = req.body;
+    const { email, otp, newPassword ,recaptchaToken } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
+      });
+    }
+     const recaptchaResponse = await axios.post(
+      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
+    );
+
+     if (!recaptchaResponse.data.success) {
+      return res.status(400).json({
+        status: 400,
+        success: false,
+        message: "reCAPTCHA verification failed",
       });
     }
 
@@ -449,7 +498,7 @@ const updateUserDetails = async (req, res) => {
         userId: _id,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        email:req.body.email,
+        email: req.body.email,
         contact: req.body.contact,
         address: req.body.address,
         country: req.body.country,

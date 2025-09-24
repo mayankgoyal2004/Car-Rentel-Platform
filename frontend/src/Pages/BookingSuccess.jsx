@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import apiService from '../../Apiservice/apiService';
+import apiService, { BASE_URL_IMG } from '../../Apiservice/apiService';
 
 const BookingSuccess = () => {
   const { id } = useParams();
@@ -29,6 +29,121 @@ const BookingSuccess = () => {
 
     fetchReservation();
   }, [id]);
+
+    const getRentalPeriod = () => {
+    if (!reservation?.pickupDate || !reservation?.dropDate) return 0;
+
+    const start = new Date(reservation.pickupDate);
+    const end = new Date(reservation.dropDate);
+
+    // Calculate difference in milliseconds
+    const diffTime = end - start;
+
+    // Convert to days (round up to include partial days)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getTotalPrice = () => {
+    if (!reservation?.car?.pricing) return 0;
+
+    const rentalDays = getRentalPeriod();
+    const prices = reservation.car.pricing.prices;
+
+    let carPrice = 0;
+
+    switch (reservation.bookingType) {
+      case "daily": {
+        carPrice = prices.daily * rentalDays;
+        break;
+      }
+      case "weekly": {
+        const weeks = Math.ceil(rentalDays / 7);
+        carPrice = prices.weekly * weeks;
+        break;
+      }
+      case "monthly": {
+        const months = Math.ceil(rentalDays / 30);
+        carPrice = prices.monthly * months;
+        break;
+      }
+      case "yearly": {
+        const years = Math.ceil(rentalDays / 365);
+        carPrice = prices.yearly * years;
+        break;
+      }
+      default: {
+        carPrice = 0;
+      }
+    }
+
+    // Add extra charges
+    const extraServices = reservation.extraServices || [];
+    const extraServicesPrice = extraServices.reduce(
+      (total, service) => total + service.price * (service.quantity || 1),
+      0
+    );
+    const securityDeposit = reservation.securityDeposit || 0;
+    const driverPrice = reservation.driverPrice || 0;
+
+    const total = carPrice + extraServicesPrice + securityDeposit + driverPrice;
+    return total;
+  };
+
+  const getTotalCarPricing = () => {
+    if (!reservation?.car?.pricing) return 0;
+
+    const rentalDays = getRentalPeriod();
+    const prices = reservation.car.pricing.prices;
+
+    let carPrice = 0;
+
+    switch (reservation.bookingType) {
+      case "daily": {
+        carPrice = prices.daily * rentalDays;
+        break;
+      }
+      case "weekly": {
+        const weeks = Math.ceil(rentalDays / 7);
+        carPrice = prices.weekly * weeks;
+        break;
+      }
+      case "monthly": {
+        const months = Math.ceil(rentalDays / 30);
+        carPrice = prices.monthly * months;
+        break;
+      }
+      case "yearly": {
+        const years = Math.ceil(rentalDays / 365);
+        carPrice = prices.yearly * years;
+        break;
+      }
+      default: {
+        carPrice = 0;
+      }
+    }
+
+    const total = carPrice;
+    return total;
+  };
+
+  const getCarPrice = () => {
+    if (!reservation?.car?.pricing) return 0;
+    const prices = reservation.car.pricing.prices;
+
+    switch (reservation.bookingType) {
+      case "daily":
+        return prices.daily;
+      case "weekly":
+        return prices.weekly;
+      case "monthly":
+        return prices.monthly;
+      case "yearly":
+        return prices.yearly;
+      default:
+        return 0;
+    }
+  };
 
   if (loading) {
     return (
@@ -142,25 +257,25 @@ const BookingSuccess = () => {
                   <i className="fa-solid fa-check-double" />
                 </span>
                 <h5>Thank you! Your Order has been Received</h5>
-                <h5 className="order-no">Order Number : <span>#{reservation.bookingId || id}</span></h5>
+                <h5 className="order-no">Order Number : <span>#{reservation.bookingId }</span></h5>
               </div>
               
               <div className="booking-header">
                 <div className="booking-img-wrap">
                   <div className="book-img">
                     <img 
-                      src={reservation.carImage || "/user-assets/img/cars/car-05.jpg"} 
-                      alt={reservation.carModel || "Car"} 
+                      src={ BASE_URL_IMG+ reservation.car.image } 
+                      alt={ "Car"} 
                     />
                   </div>
                   <div className="book-info">
-                    <h6>{reservation.carModel || "Chevrolet Camaro"}</h6>
-                    <p><i className="feather-map-pin" /> Location : {reservation.pickupLocation || "Miami St, Destin, FL 32550, USA"}</p>
+                    <h6>{reservation.carName }</h6>
+                    <p><i className="feather-map-pin" /> Location : {reservation.pickupAddress }</p>
                   </div>
                 </div>
                 <div className="book-amount">
                   <p>Total Amount</p>
-                  <h6>${reservation.totalAmount || "4700"}</h6>
+                  <h6>${getTotalPrice()}</h6>
                 </div>
               </div>
               
@@ -175,38 +290,38 @@ const BookingSuccess = () => {
                       <ul className="pricing-lists">
                         <li>
                           <div>
-                            <p>Rental Charges Rate <span>({reservation.rentalDays || "1"} day)</span></p>
+                            <p>Rental Charges Rate <span>({getRentalPeriod()}/ day)</span></p>
                             <p className="text-danger">(This does not include fuel)</p>
                           </div>
-                          <span> + ${reservation.baseRate || "60"}</span>
+                          <span> + ${getCarPrice()}</span>
                         </li>
                         <li>
                           <p>Doorstep delivery</p>
-                          <span> + ${reservation.deliveryFee || "60"}</span>
+                          <span> + ${reservation.deliveryFee || "0"}</span>
                         </li>
                         <li>
                           <p>Trip Protection Fees</p>
-                          <span> + ${reservation.protectionFee || "25"}</span>
+                          <span> + ${reservation.protectionFee || "0"}</span>
                         </li>
                         <li>
                           <p>Convenience Fees</p>
-                          <span> + ${reservation.convenienceFee || "2"}</span>
+                          <span> + ${reservation.convenienceFee || "0"}</span>
                         </li>
                         <li>
                           <p>Tax</p>
-                          <span> + ${reservation.tax || "2"}</span>
+                          <span> + ${reservation.tax || "0"}</span>
                         </li>
                         <li>
                           <p>Refundable Deposit</p>
-                          <span> +${reservation.deposit || "1200"}</span>
+                          <span> +${reservation.deposit || "0"}</span>
                         </li>
                         <li>
                           <p>Full Premium Insurance</p>
-                          <span>+${reservation.insurance || "200"}</span>
+                          <span>+${reservation.insurance || "0"}</span>
                         </li>
                         <li className="total">
                           <p>Subtotal</p>
-                          <span>+${reservation.subtotal || "1604"}</span>
+                          <span>+${getTotalCarPricing()}</span>
                         </li>
                       </ul>
                     </div>
@@ -224,21 +339,21 @@ const BookingSuccess = () => {
                       <ul className="location-lists">
                         <li>
                           <h6>Booking Type</h6>
-                          <p>{reservation.bookingType || "Delivery"}</p>
+                          <p>{reservation.bookingType}</p>
                         </li>
                         <li>
                           <h6>Rental Type</h6>
-                          <p>{reservation.rentalType || "Daily"}</p>
+                          <p>{reservation.rentalType }</p>
                         </li>
                         <li>
                           <h6>Pickup</h6>
-                          <p>{reservation.pickupLocation || "1230 E Springs Rd, Los Angeles, CA, USA"}</p>
-                          <p>{reservation.pickupDate || "04/18/2024"} - {reservation.pickupTime || "14:00"}</p>
+                          <p>{reservation.pickupAddress }</p>
+                          <p>{new Date(reservation.pickupDate).toDateString()} - {reservation.pickupTime }</p>
                         </li>
                         <li>
                           <h6>Return</h6>
-                          <p>{reservation.returnLocation || "1230 E Springs Rd, Los Angeles, CA, USA"}</p>
-                          <p>{reservation.returnDate || "04/18/2024"} - {reservation.returnTime || "14:00"}</p>
+                          <p>{reservation.dropAddress }</p>
+                          <p>{new Date(reservation.dropDate ).toDateString()} - {reservation.dropTime}</p>
                         </li>
                       </ul>
                     </div>
@@ -262,7 +377,11 @@ const BookingSuccess = () => {
                         ))}
                         <li className="total">
                           <p>Extra Services Charges Rate</p>
-                          <span>${reservation.extraServicesTotal || "100"}</span>
+                          <span>$  {reservation?.extraServices?.reduce(
+                              (total, service) =>
+                                total + service.price * (service.quantity || 1),
+                              0
+                            )}</span>
                         </li>
                       </ul>
                     </div>
@@ -280,10 +399,10 @@ const BookingSuccess = () => {
                       <ul className="location-lists">
                         <li>
                           <h6>Driver Type</h6>
-                          <p>{reservation.driverType || "Acting Driver"}</p>
+                          <p>{reservation.driverType }</p>
                         </li>
                       </ul>
-                      {reservation.driver && (
+                      {/* {reservation.driver && (
                         <div className="driver-info">
                           <span>
                             <img src={reservation.driver.image || "/user-assets/img/user.jpg"} alt="Driver" />
@@ -296,14 +415,14 @@ const BookingSuccess = () => {
                             </ul>
                           </div>
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
                 {/* /Driver Details */}
                 
                 {/* Billing Information */}
-                <div className="col-lg-6 col-md-6 d-flex">
+                {/* <div className="col-lg-6 col-md-6 d-flex">
                   <div className="book-card flex-fill">
                     <div className="book-head">
                       <h6>Billing Information</h6>
@@ -318,7 +437,7 @@ const BookingSuccess = () => {
                       </ul>
                     </div>
                   </div>
-                </div>
+                </div> */}
                 {/* /Billing Information */}
                 
                 {/* Payment Details */}
@@ -352,7 +471,7 @@ const BookingSuccess = () => {
                     <div className="book-body">
                       <ul className="location-lists">
                         <li>
-                          <p>{reservation.additionalInfo || "Rental companies typically require customers to return the vehicle with a full tank of fuel. If the vehicle is returned with less than a full tank, customers may be charged for refueling the vehicle at a premium rate, often higher than local fuel prices."}</p>
+                          <p>{ "Rental companies typically require customers to return the vehicle with a full tank of fuel. If the vehicle is returned with less than a full tank, customers may be charged for refueling the vehicle at a premium rate, often higher than local fuel prices."}</p>
                         </li>
                       </ul>
                     </div>

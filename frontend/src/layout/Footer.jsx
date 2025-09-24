@@ -173,7 +173,7 @@ const Footer = () => {
             <div className="row align-items-center">
               <div className="col-md-6">
                 <div className="copyright-text">
-                  <p>© 2024 Dreams Rent. All Rights Reserved.</p>
+                  <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
                 </div>
               </div>
               <div className="col-md-6">

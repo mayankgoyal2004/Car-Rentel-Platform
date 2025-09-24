@@ -140,7 +140,7 @@ const AdminContactMessage = () => {
                           <li>
                             <a
                               className="dropdown-item rounded-1"
-                              href="javascript:void(0);"
+
                               data-bs-toggle="modal"
                               data-bs-target="#delete_contact"
                               onClick={() => setSelectedId(contact._id)}

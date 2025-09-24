@@ -270,12 +270,12 @@ h1 {
 
 h2 {
   font-weight: 900;
-  font-size: 36px;
+  font-size: 36px !important;
   color: #111111;
 }
 @media (max-width: 991.96px) {
   h2 {
-    font-size: 26px;
+    font-size: 26px !important;
   }
 }
 
@@ -328,7 +328,7 @@ h6 {
 
 .display-1 {
   font-weight: 700;
-  font-size: 62px;
+  font-size: 62px !important;
   color: #111111;
 }
 @media (max-width: 1199.98px) {
@@ -877,6 +877,7 @@ Version      : 1.0
   color: #2F2F2F;
   line-height: 85px;
   font-weight: 500;
+   font-size: 18px !important;
 }
 @media (max-width: 991.96px) {
   .header .header-nav .main-nav > li > a {
@@ -910,6 +911,7 @@ Version      : 1.0
   transition: all 0.35s ease;
   width: 100%;
   position: relative;
+ 
 }
 @media (max-width: 991.96px) {
   .header .header-nav .main-nav > li .submenu li a {

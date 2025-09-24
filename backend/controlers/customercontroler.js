@@ -1,6 +1,8 @@
 const customer = require("../models/customerModel");
 const Reservation = require("../models/reservationModel");
 const Car = require("../models/CarModule");
+const User = require("../models/userModel");
+const Message = require("../models/messageModel");
 
 const addCustomer = async (req, res) => {
   try {
@@ -267,6 +269,52 @@ const getAllcustomer = async (req, res) => {
     });
   }
 };
+
+const getLatest5Customers = async (req, res) => {
+  try {
+    const adminId = req.user.admin;
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Admin ID is required",
+      });
+    }
+
+    // Step 1: Find all cars created by this admin
+    const myCars = await Car.find({ admin: adminId }).select("_id");
+
+    // Step 2: Find all reservations for those cars
+    const reservations = await Reservation.find({
+      car: { $in: myCars },
+    }).select("customer");
+
+    const bookedCustomerIds = reservations.map((r) => r.customer);
+
+    // Step 3: Get customers created by admin OR who booked my cars
+    const query = {
+      $or: [{ admin: adminId }, { _id: { $in: bookedCustomerIds } }],
+    };
+
+    // Fetch only latest 5 customers
+    const customers = await customer
+      .find(query)
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({
+      success: true,
+      data: customers,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
 const getallActiveCustomers = async (req, res) => {
   try {
     const adminId = req.user.admin;
@@ -278,7 +326,7 @@ const getallActiveCustomers = async (req, res) => {
         message: "Id is required",
       });
     }
-    const Customer = await customer.find({ admin: adminId, status: true });
+    const Customer = await customer.find({ admin: adminId });
 
     res.json({
       success: true,
@@ -293,7 +341,7 @@ const getallActiveCustomers = async (req, res) => {
 const getCustomerbyId = async (req, res) => {
   try {
     const { id } = req.params;
-    const customers = await customer.findById(id)
+    const customers = await customer.findById(id);
     if (!customers) {
       return res
         .status(404)
@@ -305,6 +353,146 @@ const getCustomerbyId = async (req, res) => {
   }
 };
 
+const getAllCustomerSuperAdmin = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    let filter = {};
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
+    const customers = await customer
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalcustomer = await customer.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: customers,
+      pagination: {
+        totalcustomer,
+        currentPage: page,
+        totalPages: Math.ceil(totalcustomer / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getAllOwner = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
+    let filter = { userType: 2 };
+    if (search) {
+      filter.userName = { $regex: search, $options: "i" };
+    }
+    const users = await User.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalUser = await User.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: users,
+      pagination: {
+        totalUser,
+        currentPage: page,
+        totalPages: Math.ceil(totalUser / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getCustomerByMessage = async (req, res) => {
+  try {
+    const sender = req.user._id;
+
+    const conversations = await Message.aggregate([
+      {
+        $match: {
+          $or: [{ sender: sender }, { receiver: sender }],
+        },
+      },
+      {
+        $project: {
+          otherUser: {
+            $cond: [{ $eq: ["$sender", sender] }, "$receiver", "$sender"],
+          },
+          lastMessage: "$message",
+          lastMessageTime: "$createdAt",
+        },
+      },
+      {
+        $group: {
+          _id: "$otherUser",
+          lastMessage: { $last: "$lastMessage" },
+          lastMessageTime: { $last: "$lastMessageTime" },
+        },
+      },
+      {
+        $sort: { lastMessageTime: -1 },
+      },
+    ]);
+
+    const userIDs = conversations.map((conv) => conv._id);
+    const users = await User.find({ _id: { $in: userIDs } }).select(
+      "_id userName image "
+    );
+
+    const usersWithConversations = users.map((user) => {
+      const conversation = conversations.find(
+        (conv) => conv._id.toString() === user._id.toString()
+      );
+      return {
+        ...user.toObject(),
+        lastMessage: conversation?.lastMessage,
+        lastMessageTime: conversation?.lastMessageTime,
+      };
+    });
+
+    res.json({
+      success: true,
+      data: usersWithConversations,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getMessage = async (req, res) => {
+  try {
+    const { receiverId } = req.params;
+    const userId = req.user._id;
+
+    const messages = await Message.find({
+      $or: [
+        { sender: userId, receiver: receiverId },
+        { sender: receiverId, receiver: userId },
+      ],
+    })
+      .populate("sender", "userName image ")
+      .populate("receiver", "userName image ")
+      .sort({ createdAt: 1 });
+
+    res.json({
+      success: true,
+      data: messages,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 module.exports = {
   addCustomer,
   updateCustomer,
@@ -312,4 +500,9 @@ module.exports = {
   deleteCustomer,
   getallActiveCustomers,
   getCustomerbyId,
+  getLatest5Customers,
+  getAllCustomerSuperAdmin,
+  getAllOwner,
+  getCustomerByMessage,
+  getMessage,
 };

@@ -114,8 +114,6 @@ const addCar = async (req, res) => {
   }
 };
 
-
-
 const editBasicCar = async (req, res) => {
   try {
     const { id } = req.params;
@@ -362,9 +360,17 @@ const updateCarStatusByAdmin = async (req, res) => {
       return res.status(403).json({ message: "SuperAdmin only" });
 
     const { status } = req.body;
-    const car = await Car.findById(req.params.id);
-    car.status = status;
-    await car.save();
+
+    const car = await Car.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true } // return updated doc
+    );
+
+    if (!car) {
+      return res.status(404).json({ success: false, message: "Car not found" });
+    }
+
     res.json({ success: true, message: "Car approved", car });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -474,22 +480,21 @@ const getAllCars = async (req, res) => {
       page = 1,
       limit = 10,
     } = req.query;
+    console.log(req.query)
 
-    console.log(req.query);
-    // ✅ Only active and available cars
     let filter = { status: true, isAvailable: true };
 
-    // Free text search (carName, brandName, modelName)
     if (search) {
-      filter.$or = [{ carName: { $regex: search, $options: "i" } }];
-    }
+  filter.$or = [
+    { carName: { $regex: search, $options: "i" } },
+    { description: { $regex: search, $options: "i" } }
+  ];
+}
     if (carFuel) {
-      // Normalize to array
       const fuelNames = Array.isArray(carFuel)
         ? carFuel
         : carFuel.split(",").map((f) => f.trim());
 
-      // Build regex OR query (case-insensitive)
       const regexQueries = fuelNames.map((f) => ({
         carFuel: { $regex: new RegExp(f, "i") },
       }));
@@ -499,7 +504,7 @@ const getAllCars = async (req, res) => {
       if (fuels.length > 0) {
         filter.carFuel = { $in: fuels.map((f) => f._id) };
       } else {
-        filter.carFuel = { $in: [] }; // ensures no cars returned
+        filter.carFuel = { $in: [] };
       }
     }
 
@@ -552,27 +557,63 @@ const getAllCars = async (req, res) => {
         filter.carModel = modelDoc._id;
       }
     }
-    // ✅ Location based filter
-    if (pickupLocation) {
-      const city = await City.findOne({
-        cityName: { $regex: pickupLocation, $options: "i" },
-      }).select("_id");
+   
+ if (pickupLocation) {
+  const cities = await City.find({
+    cityName: { $regex: pickupLocation, $options: "i" },
+    status: true,
+  }).select("_id");
 
-      console.log("Matched city:", city);
+  if (cities.length > 0) {
+    const pickupLocs = await Location.find({
+      city: { $in: cities.map((c) => c._id) },
+    }).select("_id");
 
-      if (city) {
-        const pickupLocs = await Location.find({ city: city._id }).select(
-          "_id"
-        );
-        if (pickupLocs.length > 0) {
-          filter.mainLocation = { $in: pickupLocs.map((loc) => loc._id) };
-        } else {
-          filter.mainLocation = { $in: [] }; // no locations in this city
-        }
-      } else {
-        filter.mainLocation = { $in: [] }; // city not found
-      }
+    const locIds = pickupLocs.map((loc) => loc._id);
+
+    let cars = await Car.find({
+      ...filter,
+      mainLocation: { $in: locIds },
+    });
+
+    if (cars.length === 0) {
+      filter.otherLocations = { $in: locIds };
+      delete filter.mainLocation; 
+    } else {
+      filter.mainLocation = { $in: locIds }; 
     }
+  } else {
+    filter.mainLocation = { $in: [] }; 
+  }
+}
+ if (dropLocation) {
+  const cities = await City.find({
+    cityName: { $regex: dropLocation, $options: "i" },
+    status: true,
+  }).select("_id");
+
+  if (cities.length > 0) {
+    const dropLocs = await Location.find({
+      city: { $in: cities.map((c) => c._id) },
+    }).select("_id");
+
+    const locIds = dropLocs.map((loc) => loc._id);
+
+    let cars = await Car.find({
+      ...filter,
+      mainLocation: { $in: locIds },
+    });
+
+    if (cars.length === 0) {
+      filter.otherLocations = { $in: locIds };
+      delete filter.mainLocation; 
+    } else {
+      filter.mainLocation = { $in: locIds }; 
+    }
+  } else {
+    filter.mainLocation = { $in: [] }; 
+  }
+}
 
     // Drop-off Location (search by cityId)
     // if (dropLocation) {
@@ -637,9 +678,30 @@ const getAllCars = async (req, res) => {
 const getCarById = async (req, res) => {
   try {
     const { id } = req.params;
-    const car = await Car.findById(id).populate("carFeatures");
+    if (!id)
+      return res
+        .status(400)
+        .json({ success: false, message: "Car id is required" });
+    const car = await Car.findById(id)
+      .populate("carType", "carType")
+      .populate("carBrand", "brandName")
+      .populate("carModel", "carModel")
+      .populate("carCylinder", "carCylinder")
+      .populate("carFeatures", "carFeature")
+      .populate("carColor", "carColor")
+      .populate("carFuel", "carFuel")
+      .populate("carSeats", "carSeats")
+      .populate("carTransmission", "carTransmission")
+      .populate("carSafetyFeature", "safetyFeatureName")
+      .populate("carSteering", "steeringType")
+      .populate("extraService", "name price")
+      .populate("mainLocation", "title")
+      .populate("otherLocations", "title")
+      .populate("pricing")
+      .populate("createdBy", "name email")
+      .populate("admin", "name email");
     console.log(car);
-    res.status(200).json({ success: true, car });
+    res.status(200).json({ success: true, data: car });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
@@ -706,6 +768,7 @@ const getAllCarsForAdmin = async (req, res) => {
         { path: "otherLocations", select: "location" },
         { path: "mainLocation", select: "location" },
         { path: "pricing", select: "prices" },
+        { path: "admin", select: "userName email" },
       ])
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -824,24 +887,30 @@ const getAllCarsForSuperAdmin = async (req, res) => {
     let statusFilter = req.query.status; // true | false | undefined
 
     // Convert query string to boolean if provided
-    if (statusFilter === "true") statusFilter = true;
-    else if (statusFilter === "false") statusFilter = false;
-    else statusFilter = undefined;
 
     // Build filter object
     let filter = {};
     if (search) {
       filter.carName = { $regex: search, $options: "i" };
     }
-    if (statusFilter !== undefined) {
+    if (statusFilter) {
       filter.isAvailable = statusFilter;
     }
 
     // Query cars
     const cars = await Car.find(filter)
-      .populate("pricing", "prices")
-      .populate("mainLocation", "location")
-      .populate("admin", "name email")
+      .populate([
+        { path: "carType", select: "carType" },
+        { path: "carBrand", select: "brandName" },
+        { path: "carModel", select: "carModel" },
+        { path: "carFuel", select: "carFuel" },
+        { path: "carColor", select: "colorName" },
+        { path: "carTransmission", select: "carTransmission" },
+        { path: "otherLocations", select: "location" },
+        { path: "mainLocation", select: "location" },
+        { path: "pricing", select: "prices" },
+        { path: "admin", select: "userName email" },
+      ])
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -871,7 +940,7 @@ const getApprovedCarsAdminReservation = async (req, res) => {
     const search = req.query.search ? req.query.search.trim() : "";
 
     // ✅ Only approved cars
-    let filter = { status: true };
+    let filter = { admin: req.user.admin };
 
     // ✅ Search filter
     if (search) {
@@ -949,8 +1018,7 @@ const getSingleCarUser = async (req, res) => {
       },
       {
         path: "pricing",
-        select:
-          "prices baseKilometers  extraKilometerPrice",
+        select: "prices baseKilometers  extraKilometerPrice",
       },
     ]);
     if (!carData) {
@@ -976,8 +1044,6 @@ const getSingleCarUser = async (req, res) => {
     });
   }
 };
-
-
 
 const getCayByIdAdmin = async (req, res) => {
   try {
@@ -1032,8 +1098,6 @@ const getCayByIdAdmin = async (req, res) => {
       });
     }
 
-   
-
     res.json({
       status: 200,
       success: true,
@@ -1046,6 +1110,54 @@ const getCayByIdAdmin = async (req, res) => {
       status: 500,
       success: false,
       message: "Server Error!",
+      error: err.message,
+    });
+  }
+};
+
+const getInRentalCars = async (req, res) => {
+  try {
+    // 2️⃣ Find reservations with status 'pending'
+    const getAllcarsInRental = await Car.find({
+      admin: req.user.admin,
+      inRent: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: getAllcarsInRental,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const getNewlyAddedCars = async (req, res) => {
+  try {
+    const newCars = await Car.find({ admin: req.user.admin })
+      .populate([
+        { path: "carBrand", select: "brandName" },
+        { path: "carModel", select: "carModel" },
+        { path: "carType", select: "carType" },
+        { path: "carFuel", select: "carFuel" },
+        { path: "carColor", select: "carColor" },
+        { path: "carTransmission", select: "carTransmission" },
+        { path: "pricing", select: "prices" },
+      ])
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: newCars,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
       error: err.message,
     });
   }
@@ -1068,5 +1180,8 @@ module.exports = {
   saveCarDescription,
   getSingleCarUser,
   getCayByIdAdmin,
-  editBasicCar
+  editBasicCar,
+  getInRentalCars,
+  getNewlyAddedCars,
+  updateCarStatusByAdmin,
 };

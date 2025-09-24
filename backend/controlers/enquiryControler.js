@@ -1,24 +1,28 @@
 const Enquiry = require("../models/enquiryModel");
 const Car = require("../models/CarModule");
-const customer = require("../models/customerModel")
+const customer = require("../models/customerModel");
 
 const addEnquiry = async (req, res) => {
   try {
     const { id } = req.params; // carId
-    const {message, phone, name, email } = req.body;
+    const { message, phone, name, email } = req.body;
 
     // find customer by user id
     const Customer = await customer.findOne({ userId: req.user._id });
     if (!Customer) {
-      return res.status(404).json({ success: false, message: "Customer not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Customer not found" });
     }
 
     if (!id || !message || !phone || !name) {
-      return res.status(400).json({ success: false, message: "All fields are required" });
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields are required" });
     }
 
     const newEnquiry = new Enquiry({
-       car: id,
+      car: id,
       message,
       phoneNumber: phone,
       name,
@@ -40,17 +44,55 @@ const addEnquiry = async (req, res) => {
 
 const getallEnquiry = async (req, res) => {
   try {
-    const { _id } = req.user;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const cars = await Car.find({ createdBy: _id }).select("_id");
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+
+    // Get carIds for this admin
+    const cars = await Car.find({ admin: adminId }).select("_id");
     const carIds = cars.map((c) => c._id);
-    const enquiry = await Enquiry.find({ car: { $in: carIds } })
-      .populate("car")
+
+    // Build filter
+    let filter = { car: { $in: carIds } };
+
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Query with filter
+    const enquiry = await Enquiry.find(filter)
+      .populate({
+        path: "car",
+        populate: [{ path: "carType" }],
+      })
       .populate("customer")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
+
+    const totalEnquiry = await Enquiry.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: enquiry,
+      pagination: {
+        totalEnquiry,
+        currentPage: page,
+        totalPages: Math.ceil(totalEnquiry / limit),
+      },
+    });
   } catch (err) {
     res.status(500).json({
       success: false,
@@ -59,6 +101,7 @@ const getallEnquiry = async (req, res) => {
     });
   }
 };
+
 
 const deleteEnquiry = async (req, res) => {
   const { id } = req.params;
@@ -70,9 +113,13 @@ const deleteEnquiry = async (req, res) => {
       .json({ success: false, message: "Delete ID is required" });
   }
   await Enquiry.deleteOne({ _id: id });
+  res
+    .status(200)
+    .json({ success: true, message: "Enquiry deleted successfully" });
 };
 
-
 module.exports = {
-    addEnquiry, getallEnquiry,deleteEnquiry
-}
+  addEnquiry,
+  getallEnquiry,
+  deleteEnquiry,
+};

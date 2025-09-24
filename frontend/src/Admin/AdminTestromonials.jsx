@@ -202,6 +202,7 @@ const AdminTestimonials = () => {
                 <th>Customer</th>
                 <th>Rating</th>
                 <th>Review</th>
+                <th>Created at</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
@@ -240,6 +241,15 @@ const AdminTestimonials = () => {
                     </td>
                     <td>{item.review}</td>
                     <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+                      <td>
+                      <span
+                        className={`badge badge-md ${
+                          item.status ? "badge-soft-success" : "badge-soft-danger"
+                        }`}
+                      >
+                        {item.status ? "Published" : "Unpublished"}
+                      </span>
+                    </td>
                     <td>
                       <div className="dropdown">
                         <button

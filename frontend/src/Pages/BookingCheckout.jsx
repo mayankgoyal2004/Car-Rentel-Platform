@@ -34,7 +34,7 @@ const BookingCheckout = () => {
               : "",
             pickupTime: reservationData.pickupTime || "10:00",
             returnTime: reservationData.dropTime || "10:00",
-            doorStepDelivery: 60,
+            doorStepDelivery: 0,
             tripProtection: 25,
             convenienceFee: 2,
             tax: reservationData.pricingDetails?.tax || 0,
@@ -65,67 +65,68 @@ const BookingCheckout = () => {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Transform formData to match backend enums
-  const payload = {
-    ...formData,
-    rentalType: formData.rentalType === "pickup" ? "selfPickup" : formData.rentalType,
-    priceRate: ["daily", "weekly", "monthly", "yearly"].includes(formData.priceRate)
-      ? formData.priceRate
-      : "daily",
-  };
+    // Transform formData to match backend enums
+    const payload = {
+      ...formData,
+      rentalType:
+        formData.rentalType === "pickup" ? "selfPickup" : formData.rentalType,
+      priceRate: ["daily", "weekly", "monthly", "yearly"].includes(
+        formData.priceRate
+      )
+        ? formData.priceRate
+        : "daily",
+    };
 
-  try {
-    const res = await apiService.editReservationStep2(id, payload);
-    if (res.data.success) {
-      navigate(`/booking-add-on/${id}`);
+    try {
+      const res = await apiService.editReservationStep2(id, payload);
+      if (res.data.success) {
+        navigate(`/booking-add-on/${id}`);
+      }
+    } catch (err) {
+      console.error("Error updating reservation:", err);
     }
-  } catch (err) {
-    console.error("Error updating reservation:", err);
-  }
-};
-
+  };
 
   // Calculate the number of days between pickup and return
   const calculateNumberOfDays = () => {
     if (!formData.pickupDate || !formData.returnDate) return 0;
-    
+
     const start = new Date(formData.pickupDate);
     const end = new Date(formData.returnDate);
-    
-    // Calculate difference in days (inclusive of both start and end dates)
+
     const diffTime = Math.abs(end - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) ;
+
     return diffDays;
   };
 
   // Calculate the rental rate based on selected rate type and number of days
   const calculateRentalRate = () => {
     if (!formData.priceRate || !formData.car?.pricing?.prices) return 0;
-    
+
     const days = calculateNumberOfDays();
     const rateType = formData.priceRate;
     const ratePrices = formData.car.pricing.prices;
-    
-    switch(rateType) {
-      case "daily":
+
+    switch (rateType) {
+      case "daily":{
         return days * ratePrices.daily;
-      
-      case "weekly":
+}
+      case "weekly":{
         const weeks = Math.ceil(days / 7);
         return weeks * ratePrices.weekly;
-      
-      case "monthly":
+}
+      case "monthly":{
         const months = Math.ceil(days / 30);
         return months * ratePrices.monthly;
-      
-      case "yearly":
+}
+      case "yearly":{
         const years = Math.ceil(days / 365);
         return years * ratePrices.yearly;
-      
+}
       default:
         return days * ratePrices.daily;
     }
@@ -134,12 +135,13 @@ const handleSubmit = async (e) => {
   // Calculate the total amount
   const calculateTotal = () => {
     const rentalRate = calculateRentalRate();
-    const additionalFees = (formData.doorStepDelivery || 0) + 
-                          (formData.tripProtection || 0) + 
-                          (formData.convenienceFee || 0) + 
-                          (formData.tax || 0) + 
-                          (formData.deposit || 0);
-    
+    const additionalFees =
+      (formData.doorStepDelivery || 0) +
+      (formData.tripProtection || 0) +
+      (formData.convenienceFee || 0) +
+      (formData.tax || 0) +
+      (formData.deposit || 0);
+
     return rentalRate + additionalFees;
   };
 
@@ -147,25 +149,25 @@ const handleSubmit = async (e) => {
   const getRatePeriodText = () => {
     const days = calculateNumberOfDays();
     const rateType = formData.priceRate;
-    
-    switch(rateType) {
+
+    switch (rateType) {
       case "daily":
-        return `${days} ${days === 1 ? 'day' : 'days'}`;
-      
-      case "weekly":
-        const weeks = Math.ceil(days / 7);
-        return `${weeks} ${weeks === 1 ? 'week' : 'weeks'}`;
-      
-      case "monthly":
+        return `${days} ${days === 1 ? "day" : "days"}`;
+
+      case "weekly":{
+        const weeks = Math.ceil(days / 7)
+        return `${weeks} ${weeks === 1 ? "week" : "weeks"}`;}
+
+      case "monthly":{
         const months = Math.ceil(days / 30);
-        return `${months} ${months === 1 ? 'month' : 'months'}`;
-      
-      case "yearly":
+        return `${months} ${months === 1 ? "month" : "months"}`;
+}
+      case "yearly":{
         const years = Math.ceil(days / 365);
-        return `${years} ${years === 1 ? 'year' : 'years'}`;
-      
+        return `${years} ${years === 1 ? "year" : "years"}`;}
+
       default:
-        return `${days} ${days === 1 ? 'day' : 'days'}`;
+        return `${days} ${days === 1 ? "day" : "days"}`;
     }
   };
 
@@ -590,7 +592,6 @@ const handleSubmit = async (e) => {
                       <button
                         type="submit"
                         className="btn btn-primary continue-book-btn"
-                      
                       >
                         Continue to Add-ons
                       </button>
@@ -627,11 +628,12 @@ const handleSubmit = async (e) => {
                           <div className="booking-car-detail">
                             <span className="car-img">
                               <img
-                                src={BASE_URL_IMG + (formData.car?.image || '')}
+                                src={BASE_URL_IMG + (formData.car?.image || "")}
                                 className="img-fluid"
                                 alt="Car"
                                 onError={(e) => {
-                                  e.target.src = '/user-assets/img/car-list-4.jpg';
+                                  e.target.src =
+                                    "/user-assets/img/car-list-4.jpg";
                                 }}
                               />
                             </span>

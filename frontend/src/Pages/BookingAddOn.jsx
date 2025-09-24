@@ -45,7 +45,7 @@ const BookingAddOn = () => {
               : "",
             pickupTime: reservationData.pickupTime || "10:00",
             returnTime: reservationData.dropTime || "10:00",
-            doorStepDelivery: 60,
+            doorStepDelivery: 0,
             tripProtection: 25,
             convenienceFee: 2,
             tax: reservationData.pricingDetails?.tax || 0,

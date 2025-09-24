@@ -91,8 +91,15 @@ const ReservationSchema = new mongoose.Schema(
       finalAmount: { type: Number },
       security: { type: Number, default: 0 },
     },
-    cancellationReason: { type: String },
+    cancellationReason: { type: String  , default:null},
     rejectionReason: { type: String },
+    cancelledBy: {  type: String,
+      enum: [
+        "user",
+        "owner",
+       
+      ],
+},
     status: {
       type: String,
       enum: [

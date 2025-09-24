@@ -1,253 +1,574 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 
 const AdminReservationDetails = () => {
-  return (
-  <div>
-  {/* Page Wrapper */}
-  <div className="page-wrapper">
-    <div className="content me-4">
-      <div className="row justify-content-center">
-        <div className="col-md-10">
-          <div className="mb-3">
-            <Link to="all-reservation"  className="d-inline-flex align-items-center fw-medium"><i className="ti ti-arrow-narrow-left me-2" />Reservation</Link>
-          </div>
-          <div className="card">
-            <div className="card-header d-flex align-items-center justify-content-between">
-              <h5>Reservation Details</h5>
-              <span className="badge bg-orange-transparent">Requested</span>
+  const [reservations, setReservations] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
+
+  const { id } = useParams();
+  const fetchReservations = async () => {
+    setLoading(true);
+
+    try {
+      const res = await apiService.getReservationByIdBooking(id);
+      setReservations(res.data.data);
+    } catch (err) {
+      console.error("Error fetching Reservations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+  }, [id]);
+
+  const getRentalPeriod = () => {
+    if (!reservations?.pickupDate || !reservations?.dropDate) return 0;
+
+    const start = new Date(reservations.pickupDate);
+    const end = new Date(reservations.dropDate);
+
+    // Calculate difference in milliseconds
+    const diffTime = end - start;
+
+    // Convert to days (round up to include partial days)
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const getTotalPrice = () => {
+    if (!reservations?.car?.pricing) return 0;
+
+    const rentalDays = getRentalPeriod();
+    const prices = reservations.car.pricing.prices;
+
+    let carPrice = 0;
+
+    switch (reservations.bookingType) {
+      case "daily": {
+        carPrice = prices.daily * rentalDays;
+        break;
+      }
+      case "weekly": {
+        const weeks = Math.ceil(rentalDays / 7);
+        carPrice = prices.weekly * weeks;
+        break;
+      }
+      case "monthly": {
+        const months = Math.ceil(rentalDays / 30);
+        carPrice = prices.monthly * months;
+        break;
+      }
+      case "yearly": {
+        const years = Math.ceil(rentalDays / 365);
+        carPrice = prices.yearly * years;
+        break;
+      }
+      default: {
+        carPrice = 0;
+      }
+    }
+
+    // Add extra charges
+    const extraServices = reservations.extraServices || [];
+    const extraServicesPrice = extraServices.reduce(
+      (total, service) => total + service.price * (service.quantity || 1),
+      0
+    );
+    const securityDeposit = reservations.securityDeposit || 0;
+    const driverPrice = reservations.driverPrice || 0;
+
+    const total = carPrice + extraServicesPrice + securityDeposit + driverPrice;
+    return total;
+  };
+
+  const getTotalCarPricing = () => {
+    if (!reservations?.car?.pricing) return 0;
+
+    const rentalDays = getRentalPeriod();
+    const prices = reservations.car.pricing.prices;
+
+    let carPrice = 0;
+
+    switch (reservations.bookingType) {
+      case "daily": {
+        carPrice = prices.daily * rentalDays;
+        break;
+      }
+      case "weekly": {
+        const weeks = Math.ceil(rentalDays / 7);
+        carPrice = prices.weekly * weeks;
+        break;
+      }
+      case "monthly": {
+        const months = Math.ceil(rentalDays / 30);
+        carPrice = prices.monthly * months;
+        break;
+      }
+      case "yearly": {
+        const years = Math.ceil(rentalDays / 365);
+        carPrice = prices.yearly * years;
+        break;
+      }
+      default: {
+        carPrice = 0;
+      }
+    }
+
+    const total = carPrice;
+    return total;
+  };
+
+  const getCarPrice = () => {
+    if (!reservations?.car?.pricing) return 0;
+    const prices = reservations.car.pricing.prices;
+
+    switch (reservations.bookingType) {
+      case "daily":
+        return prices.daily;
+      case "weekly":
+        return prices.weekly;
+      case "monthly":
+        return prices.monthly;
+      case "yearly":
+        return prices.yearly;
+      default:
+        return 0;
+    }
+  };
+
+  const handleConfirm = async () => {
+    await apiService.changeReservationStatusToConformed(reservations._id);
+    setReservations({ ...reservations, status: "confirmed" });
+  };
+
+  const handleCancel = async () => {
+    if (!cancelReason.trim()) {
+      alert("Please enter cancellation reason");
+      return;
+    }
+    await apiService.cancelRideByAdmin(reservations._id, {cancellationReason: cancelReason});
+    setReservations({ ...reservations, status: "cancelled", cancelReason });
+    setCancelReason("");
+  };
+
+    if (loading) {
+    return (
+      <div className="main-wrapper">
+        <div className="container">
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Loading...</span>
             </div>
-            <div className="card-body">
-              <ul className="nav nav-tabs nav-tabs-solid custom-nav-tabs mb-3" role="tablist">
-                <li className="nav-item" role="presentation"><a className="nav-link active" href="#solid-tab1" data-bs-toggle="tab" aria-selected="true" role="tab">Reservation Info</a></li>
-                <li className="nav-item" role="presentation"><a className="nav-link" href="#solid-tab2" data-bs-toggle="tab" aria-selected="false" role="tab">History</a></li>
-              </ul>
-              <div className="tab-content">
-                <div className="tab-pane active show" id="solid-tab1" role="tabpanel">
-                  <div className="border rounded p-3 bg-light mb-3">
-                    <div className="row">
-                      <div className="col-8">
-                        <div className="d-flex align-items-center">
-                          <span className="avatar flex-shrink-0 me-2">
-                            <img src="/admin-assets/img/car/car-07.jpg" alt />
-                          </span>
-                          <div>
-                            <p className="mb-1">Sedan</p>
-                            <h6 className="fs-14">Acura Sport </h6>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-4">
-                        <div className="text-end">
-                          <p className="mb-1">Price</p>
-                          <h6 className="fs-14">$60<span className="text-gray-5 fw-normal">/day</span></h6>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border-bottom mb-3 pb-3">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium fs-14">Start Date</h6>
-                      <p>10 Feb 2025, 12:00 PM</p>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium fs-14">End Date</h6>
-                      <p>11 Feb 2025, 01:00 PM</p>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium fs-14">Rental Period</h6>
-                      <p>2 Days</p>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium fs-14">Driving Type</h6>
-                      <p>Self</p>
-                    </div>
-                    <div className="row">
-                      <div className="col-md-6">
-                        <div className="d-flex align-items-center">
-                          <div className="bg-light p-3 rounded flex-fill mb-3">
-                            <h6 className="mb-1 fs-14 fw-medium">Pickup Location</h6>
-                            <p>2nd Avenue, Lasvegas</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="bg-light p-3 rounded mb-3">
-                          <h6 className="mb-1 fs-14 fw-medium">Return Location</h6>
-                          <p>4th Street, Newyork</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <a href="javascript:void(0);" className="text-decoration-underline text-violet">Edit</a>
-                    </div>
-                  </div>
-                  <div className="border-bottom mb-3">
-                    <div className="row">
-                      <div className="col-md-6">
-                        <div>
-                          <div className="mb-3">
-                            <h6 className="d-inline-flex align-items-center fs-14 fw-medium ">Customer<a href="javascript:void(0);" className="ms-2"><i className="ti ti-edit" /></a></h6>
-                          </div>
-                          <div className="d-flex align-items-center mb-3">
-                            <span className="avatar avatar-rounded flex-shrink-0 me-2">
-                              <img src="/admin-assets/img/customer/customer-02.jpg" alt />
-                            </span>
-                            <div>
-                              <h6 className="fs-14 fw-medium mb-1">Andrew Simons</h6>
-                              <p>+1 56598 98956</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div>
-                          <div className="mb-3">
-                            <h6 className="d-inline-flex align-items-center fs-14 fw-medium ">Driver<a href="javascript:void(0);" className="ms-2"><i className="ti ti-edit" /></a></h6>
-                          </div>
-                          <div className="d-flex align-items-center mb-3">
-                            <span className="avatar avatar-rounded flex-shrink-0 me-2">
-                              <img src="/admin-assets/img/customer/customer-01.jpg" alt />
-                            </span>
-                            <div>
-                              <h6 className="fs-14 fw-medium mb-1">Reuben Keen</h6>
-                              <p>+1 56598 98956</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border-bottom mb-3 pb-2">
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium fs-14">Pricing of Car</h6>
-                      <p>$120</p>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium d-flex align-items-center fs-14">3 Extra Services 
-                        <a href="javascript:void(0);" className="me-2 ms-2" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="Navigation, USB Charger, Dash Cam"><i className="ti ti-info-circle-filled" /></a>
-                        <a href="javascript:void(0);"><i className="ti ti-edit" /></a>
-                      </h6>
-                      <p>$30</p>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium d-flex align-items-center fs-14">Security Deposit
-                        <a href="javascript:void(0);" className="ms-2"><i className="ti ti-edit" /></a>
-                      </h6>
-                      <p>$150</p>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between mb-2">
-                      <h6 className="fw-medium d-flex align-items-center fs-14">Driver Price
-                        <a href="javascript:void(0);" className="ms-2"><i className="ti ti-edit" /></a>
-                      </h6>
-                      <p>$180</p>
-                    </div>
-                  </div>
-                  <div className="d-flex align-items-center justify-content-between">
-                    <h6>Total Price</h6>
-                    <h6>$300</h6>
-                  </div>
+            <p className="mt-3">Loading reservation details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div>
+      {/* Page Wrapper */}
+      <div className="page-wrapper">
+        <div className="content me-4">
+          <div className="row justify-content-center">
+            <div className="col-md-10">
+              <div className="mb-3">
+                <Link
+                  to="all-reservation"
+                  className="d-inline-flex align-items-center fw-medium"
+                >
+                  <i className="ti ti-arrow-narrow-left me-2" />
+                  Reservation
+                </Link>
+              </div>
+              <div className="card">
+                <div className="card-header d-flex align-items-center justify-content-between">
+                  <h5>Reservation Details</h5>
+                  <span className="badge bg-orange-transparent">
+                    {reservations?.status}
+                  </span>
                 </div>
-                <div className="tab-pane" id="solid-tab2" role="tabpanel">
-                  <div className="border rounded p-3 bg-light mb-3">
-                    <div className="row">
-                      <div className="col-8">
-                        <div className="d-flex align-items-center">
-                          <span className="avatar flex-shrink-0 me-2">
-                            <img src="/admin-assets/img/car/car-07.jpg" alt />
-                          </span>
-                          <div>
-                            <p className="mb-1">Sedan</p>
-                            <h6 className="fs-14">Acura Sport </h6>
+                <div className="card-body">
+                  <ul
+                    className="nav nav-tabs nav-tabs-solid custom-nav-tabs mb-3"
+                    role="tablist"
+                  >
+                    <li className="nav-item" role="presentation">
+                      <a
+                        className="nav-link active"
+                        href="#solid-tab1"
+                        data-bs-toggle="tab"
+                        aria-selected="true"
+                        role="tab"
+                      >
+                        Reservation Info
+                      </a>
+                    </li>
+                   { reservations.cancellationReason &&(<li className="nav-item" role="presentation">
+                      <a
+                        className="nav-link"
+                        href="#solid-tab2"
+                        data-bs-toggle="tab"
+                        aria-selected="false"
+                        role="tab"
+                      >
+                        Cancellation Reasion
+                      </a>
+                    </li>)}
+                  </ul>
+                  <div className="tab-content">
+                    <div
+                      className="tab-pane active show"
+                      id="solid-tab1"
+                      role="tabpanel"
+                    >
+                      <div className="border rounded p-3 bg-light mb-3">
+                        <div className="row">
+                          <div className="col-8">
+                            <div className="d-flex align-items-center">
+                              <span className="avatar flex-shrink-0 me-2">
+                                <img
+                                  src={BASE_URL_IMG + reservations?.car?.image}
+                                  alt={reservations?.car?.carName}
+                                />
+                              </span>
+                              <div>
+                                <p className="mb-1">
+                                  {reservations?.car?.carType?.carType}
+                                </p>
+                                <h6 className="fs-14">
+                                  {reservations?.car?.carName}
+                                </h6>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-4">
+                            <div className="text-end">
+                              <p className="mb-1">Price</p>
+                              <h6 className="fs-14">
+                                ${getCarPrice()}
+                                <span className="text-gray-5 fw-normal">
+                                  /{reservations.bookingType}
+                                </span>
+                              </h6>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div className="col-4">
-                        <div className="text-end">
-                          <p className="mb-1">Price</p>
-                          <h6 className="fs-14">$60<span className="text-gray-5 fw-normal">/day</span></h6>
+                      <div className="border-bottom mb-3 pb-3">
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium fs-14">Start Date</h6>
+                          <p>
+                            {new Date(reservations?.pickupDate).toDateString()},{" "}
+                            {reservations.pickupTime}
+                          </p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium fs-14">End Date</h6>
+                          <p>
+                            {new Date(reservations?.dropDate).toDateString()},{" "}
+                            {reservations.dropTime}
+                          </p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium fs-14">Rental Period</h6>
+                          <p>
+                            {getRentalPeriod()}{" "}
+                            {getRentalPeriod() > 1 ? "Days" : "Day"}
+                          </p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium fs-14">Driving Type</h6>
+                          <p>{reservations?.driverType}</p>
+                        </div>
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div className="d-flex align-items-center">
+                              <div className="bg-light p-3 rounded flex-fill mb-3">
+                                <h6 className="mb-1 fs-14 fw-medium">
+                                  Pickup Location
+                                </h6>
+                                <p>{reservations?.pickupAddress}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            <div className="bg-light p-3 rounded mb-3">
+                              <h6 className="mb-1 fs-14 fw-medium">
+                                Return Location
+                              </h6>
+                              <p>{reservations?.dropAddress}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
+                      <div className="border-bottom mb-3">
+                        <div className="row">
+                          <div className="col-md-6">
+                            <div>
+                              <div className="mb-3">
+                                <h6 className="d-inline-flex align-items-center fs-14 fw-medium ">
+                                  Customer
+                                  <a className="ms-2"></a>
+                                </h6>
+                              </div>
+                              <div className="d-flex align-items-center mb-3">
+                                <span className="avatar avatar-rounded flex-shrink-0 me-2">
+                                  <img
+                                    src={
+                                      BASE_URL_IMG +
+                                      reservations?.customer?.image
+                                    }
+                                    alt
+                                  />
+                                </span>
+                                <div>
+                                  <h6 className="fs-14 fw-medium mb-1">
+                                    {reservations?.customer?.name}
+                                  </h6>
+                                  <p>{reservations?.customer?.contact}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-md-6">
+                            {reservations.driverType === "withDriver" && (
+                              <div>
+                                <div className="mb-3">
+                                  <h6 className="d-inline-flex align-items-center fs-14 fw-medium ">
+                                    Driver
+                                    <a className="ms-2">
+                                      <i className="ti ti-edit" />
+                                    </a>
+                                  </h6>
+                                </div>
+                                <div className="d-flex align-items-center mb-3">
+                                  <span className="avatar avatar-rounded flex-shrink-0 me-2">
+                                    <img
+                                      src={
+                                        BASE_URL_IMG +
+                                        reservations?.driver?.image
+                                      }
+                                      alt
+                                    />
+                                  </span>
+                                  <div>
+                                    <h6 className="fs-14 fw-medium mb-1">
+                                      {reservations.driver?.name}
+                                    </h6>
+                                    <p>{reservations?.driver?.contact}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="border-bottom mb-3 pb-2">
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium fs-14">Pricing of Car</h6>
+                          <p>${getTotalCarPricing()}</p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium d-flex align-items-center fs-14">
+                            {reservations.extraServices?.length || 0}
+                            <a
+                              className="me-2 ms-2"
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
+                              title={reservations.extraServices
+                                ?.map((s) => s.name)
+                                .join(", ")}
+                            >
+                              <i className="ti ti-info-circle-filled" />
+                            </a>
+                          </h6>
+
+                          <p>
+                            $
+                            {reservations?.extraServices?.reduce(
+                              (total, service) =>
+                                total + service.price * (service.quantity || 1),
+                              0
+                            )}
+                          </p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium d-flex align-items-center fs-14">
+                            Security Deposit
+                          </h6>
+                          <p>${reservations.securityDeposit || 0}</p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between mb-2">
+                          <h6 className="fw-medium d-flex align-items-center fs-14">
+                            Driver Price
+                          </h6>
+                          <p>${reservations.driverPrice || 0}</p>
+                        </div>
+                      </div>
+                      <div className="d-flex align-items-center justify-content-between">
+                        <h6>Total Price</h6>
+                        <h6>${getTotalPrice()}</h6>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <h6 className="mb-3">Histrory</h6>
-                    <div className="d-flex align-items-center mb-3">
-                      <div className="border rounded text-center flex-shrink-0 p-1 me-2">
-                        <h5 className="mb-2">23</h5>
-                        <span className="fw-medium fs-12 bg-primary-transparent p-1 d-inline-block rounded-1 text-gray-9">Feb, 2025</span>
+                    <div className="tab-pane" id="solid-tab2" role="tabpanel">
+                      <div className="border rounded p-3 bg-light mb-3">
+                        <div className="row">
+                          <div className="col-8">
+                            <div className="d-flex align-items-center">
+                              <span className="avatar flex-shrink-0 me-2">
+                                <img
+                                  src={BASE_URL_IMG + reservations?.car?.image}
+                                  alt={reservations?.car?.carName}
+                                />
+                              </span>
+                              <div>
+                                <p className="mb-1">
+                                  {" "}
+                                  {reservations?.car?.carType?.carType}
+                                </p>
+                                <h6 className="fs-14">
+                                  {" "}
+                                  {reservations?.car?.carName}
+                                </h6>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-4">
+                            <div className="text-end">
+                              <p className="mb-1">Price</p>
+                              <h6 className="fs-14">
+                                ${getCarPrice()}
+                                <span className="text-gray-5 fw-normal">
+                                  /{reservations.bookingType}
+                                </span>
+                              </h6>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                       <div>
-                        <h6 className="fs-14 mb-1">Reservation created</h6>
-                        <span className="fs-13">01:30 PM</span>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center mb-3">
-                      <div className="border rounded text-center flex-shrink-0 p-1 me-2">
-                        <h5 className="mb-2">23</h5>
-                        <span className="fw-medium fs-12 bg-primary-transparent p-1 d-inline-block rounded-1 text-gray-9">Feb, 2025</span>
-                      </div>
-                      <div>
-                        <h6 className="fs-14 mb-1">Updated: status changed to confirmed</h6>
-                        <span className="fs-13">02:45 PM</span>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center mb-3">
-                      <div className="border rounded text-center flex-shrink-0 p-1 me-2">
-                        <h5 className="mb-2">24</h5>
-                        <span className="fw-medium fs-12 bg-primary-transparent p-1 d-inline-block rounded-1 text-gray-9">Feb, 2025</span>
-                      </div>
-                      <div>
-                        <h6 className="fs-14 mb-1">Deposit Amount Done</h6>
-                        <span className="fs-13">04:25 PM</span>
-                      </div>
-                    </div>
-                    <div className="d-flex align-items-center">
-                      <div className="border rounded text-center flex-shrink-0 p-1 me-2">
-                        <h5 className="mb-2">25</h5>
-                        <span className="fw-medium fs-12 bg-primary-transparent p-1 d-inline-block rounded-1 text-gray-9">Feb, 2025</span>
-                      </div>
-                      <div>
-                        <h6 className="fs-14 mb-1">Check in completed</h6>
-                        <span className="fs-13">04:35 PM</span>
+                        
+                        <div className="d-flex align-items-center mb-3">
+                          <div className="border rounded text-center flex-shrink-0 p-1 me-2">
+                            <h5 className="mb-2">Cancellation Reason</h5>
+                            <span className="fw-medium fs-12 bg-primary-transparent p-1 d-inline-block rounded-1 text-gray-9">
+                             {reservations.cancellationReason}
+                            </span>
+                          </div>
+                         
+                        </div>
+                  
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <div className="d-flex align-items-center justify-content-center flex-wrap row-gap-3">
+                <Link
+                  to="/admin-dashboard/invoice-details"
+                  className="btn btn-primary me-3"
+                >
+                  <i className="ti ti-files me-1" />
+                  View Invoice
+                </Link>
+                {reservations.status === "pending" && (
+                  <button className="btn btn-success" onClick={handleConfirm}>
+                    <i className="ti ti-check me-1" /> Confirm Booking
+                  </button>
+                )}
+                {reservations.status === "confirmed" && (
+                  <>
+                    <button
+                      className="btn btn-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#cancelModal"
+                    >
+                      <i className="ti ti-x me-1" /> Cancel Booking
+                    </button>
+
+                    {/* Cancel Modal */}
+                    <div
+                      className="modal fade"
+                      id="cancelModal"
+                      tabIndex="-1"
+                      aria-hidden="true"
+                    >
+                      <div className="modal-dialog modal-dialog-centered modal-lg">
+                        <div className="modal-content">
+                          <div className="modal-header">
+                            <h4 className="modal-title">Cancel Reason</h4>
+                            <button
+                              type="button"
+                              className="btn-close"
+                              data-bs-dismiss="modal"
+                            ></button>
+                          </div>
+                          <div className="modal-body">
+                            <textarea
+                              className="form-control mb-3"
+                              rows={4}
+                              placeholder="Enter cancellation reason"
+                              value={cancelReason}
+                              onChange={(e) => setCancelReason(e.target.value)}
+                            />
+                            <div className="text-end">
+                              <button
+                                className="btn btn-secondary me-2"
+                                data-bs-dismiss="modal"
+                              >
+                                Close
+                              </button>
+                              <button
+                                className="btn btn-primary"
+                                data-bs-dismiss="modal"
+                                onClick={handleCancel}
+                              >
+                                Submit
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="d-flex align-items-center justify-content-center flex-wrap row-gap-3">
-            <Link to="/admin-dashboard/invoice-details" className="btn btn-primary me-3"><i className="ti ti-files me-1" />View Invoice</Link>
-            <a href="javascript:void(0);" className="btn btn-dark me-3"><i className="ti ti-calendar me-1" />Reschedule</a>
-            <a href="javascript:void(0);" className="btn btn-danger"><i className="ti ti-x me-1" />Cancel Booking</a>
           </div>
         </div>
       </div>
-    </div>			
-  </div>
-  {/* /Page Wrapper */}
-  <div className="modal fade" id="reservation_completed">
-    <div className="modal-dialog modal-dialog-centered modal-sm">
-      <div className="modal-content">
-        <div className="modal-body text-center">
-          <form action="add-reservation">
-            <span className="avatar avatar-lg bg-transparent-success rounded-circle text-success mb-3">
-              <i className="ti ti-check fs-26" />
-            </span>
-            <h4 className="mb-1">Created Successful</h4>
-            <p className="mb-3">Reservation created for the <span className="text-gray-9">“Ford Fiesta” </span> on <span className="text-gray-9">“24 Feb 2025”</span></p>
-            <div className="d-flex justify-content-center">
-              <button type="submit" className="btn btn-primary w-100">View Details</button>
+      {/* /Page Wrapper */}
+      <div className="modal fade" id="reservation_completed">
+        <div className="modal-dialog modal-dialog-centered modal-sm">
+          <div className="modal-content">
+            <div className="modal-body text-center">
+              <form action="add-reservation">
+                <span className="avatar avatar-lg bg-transparent-success rounded-circle text-success mb-3">
+                  <i className="ti ti-check fs-26" />
+                </span>
+                <h4 className="mb-1">Created Successful</h4>
+                <p className="mb-3">
+                  Reservation created for the{" "}
+                  <span className="text-gray-9">“Ford Fiesta” </span> on{" "}
+                  <span className="text-gray-9">“24 Feb 2025”</span>
+                </p>
+                <div className="d-flex justify-content-center">
+                  <button type="submit" className="btn btn-primary w-100">
+                    View Details
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>	
-</div>
+  );
+};
 
-  )
-}
-
-export default AdminReservationDetails
+export default AdminReservationDetails;

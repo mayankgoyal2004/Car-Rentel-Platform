@@ -72,7 +72,7 @@ const PopularSection = () => {
   };
 
   return (
-    <section className="popular-section-four">
+    <section className="popular-section-four pt-4 " >
       <div className="container">
         {/* Section Header */}
         <div className="section-heading heading-four" data-aos="fade-down">

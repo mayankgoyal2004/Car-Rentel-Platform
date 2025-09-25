@@ -148,11 +148,11 @@ try {
         message: "Id is required",
       });
     }
-    const tag = await Tag.find({ admin:adminId , status : true}) 
+    const tag = await Tag.find({  status : true}) 
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalTag = await Tag.countDocuments({ admin:adminId , status : true});
+    const totalTag = await Tag.countDocuments({  status : true});
 
     res.json({ 
       success: true,

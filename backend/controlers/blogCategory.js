@@ -143,7 +143,7 @@ const getAllActiveBlogCategory = async (req, res) => {
       });
     }
     const BlogCategory = await blogCategory
-      .find({ admin: adminId, status: true })
+      .find({ status: true })
 
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -236,7 +236,7 @@ const getAllBlogCategorySuperAdmin = async (req, res) => {
     const search = req.query.search || "";
     let filter = {};
     if (search) {
-      filter.TagName = { $regex: search, $options: "i" };
+      filter.categoryName = { $regex: search, $options: "i" };
     }
 
     const category = await blogCategory

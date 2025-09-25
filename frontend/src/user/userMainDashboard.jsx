@@ -41,7 +41,7 @@ const UserMainDashboard = () => {
   
   let basePrice = 0;
 
-  if (reservation.car.pricing.prices) {
+  if (reservation?.car?.pricing?.prices) {
     if (bookingType === "daily") basePrice = reservation.car.pricing.prices.daily || 0;
     else if (bookingType === "weekly") basePrice = reservation.car.pricing.prices.weekly || 0;
     else if (bookingType === "monthly") basePrice = reservation.car.pricing.prices.monthly || 0;

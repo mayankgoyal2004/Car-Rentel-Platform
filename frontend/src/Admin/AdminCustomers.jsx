@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { useSelector } from "react-redux";
 
 const AdminCustomers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+
   const [search, setSearch] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [deleteCustomer, setDeleteCustomer] = useState(null);
+  const userData = useSelector((store) => store.user);
+  const userType = userData?.userType; //
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,7 +26,6 @@ const AdminCustomers = () => {
     gender: "",
     dateOfBirth: "",
     image: null,
-
     file: null,
   });
   const [imagePreview, setImagePreview] = useState(null);
@@ -32,14 +33,21 @@ const AdminCustomers = () => {
   const fetchCustomers = async (searchQuery = "", page = 1) => {
     setLoading(true);
     try {
-      const res = await apiService.getAllCustomerAdmin({
-        search: searchQuery,
-        page,
-      });
-      setCustomers(res.data.data || []);
-      setTotalPages(res.data.pagination?.totalPages || 1);
-      setTotalCount(res.data.pagination?.total || 0);
-      setPageSize(res.data.pagination?.limit || 10);
+      let res;
+      if (userType === 1) {
+        res = await apiService.getAllcustomerSuperAdmin({
+          page,
+          search: searchQuery,
+        });
+      } else {
+        res = await apiService.getAllCustomerAdmin({
+          page,
+          search: searchQuery,
+        });
+      }
+      setCustomers(res.data.data);
+      setTotalPages(res.data.pagination?.totalPages);
+
       if (
         res.data.pagination?.currentPage &&
         res.data.pagination.currentPage !== currentPage
@@ -91,6 +99,11 @@ const AdminCustomers = () => {
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
 
   const handleAddCustomer = async () => {
@@ -203,16 +216,6 @@ const AdminCustomers = () => {
     }
   };
 
-  const getLanguageFlag = (language) => {
-    const flags = {
-      English: "/admin-assets/img/flags/gb.svg",
-      Spanish: "/admin-assets/img/flags/es.svg",
-      French: "/admin-assets/img/flags/fr.svg",
-      // Add more as needed
-    };
-    return flags[language] || "/admin-assets/img/flags/gb.svg";
-  };
-
   return (
     <div className="page-wrapper">
       <div className="content me-4">
@@ -264,19 +267,6 @@ const AdminCustomers = () => {
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
           <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-            <div className="dropdown me-2">
-              <a
-                className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                data-bs-toggle="dropdown"
-              >
-                <i className="ti ti-edit-circle me-1" /> Bulk Actions
-              </a>
-              <ul className="dropdown-menu dropdown-menu-end p-2">
-                <li>
-                  <a className="dropdown-item rounded-1">Delete</a>
-                </li>
-              </ul>
-            </div>
             <div className="top-search me-2">
               <div className="top-search-group">
                 <span className="input-icon">
@@ -313,7 +303,7 @@ const AdminCustomers = () => {
                 <th>EMAIL</th>
                 <th>LICENSE NO</th>
                 <th>EXPIRY DATE</th>
-              
+
                 <th />
               </tr>
             </thead>
@@ -375,7 +365,7 @@ const AdminCustomers = () => {
                           : ""}
                       </p>
                     </td>
-                 
+
                     <td>
                       <div className="dropdown">
                         <button
@@ -426,73 +416,54 @@ const AdminCustomers = () => {
               )}
             </tbody>
           </table>
-        </div>
-        {/* Custom Data Table */}
-        {!loading && totalPages > 1 && (
-          <div className="d-flex justify-content-between align-items-center flex-wrap mt-3">
-            <div className="text-muted mb-2">
-              Showing {(currentPage - 1) * pageSize + 1} to{" "}
-              {Math.min(currentPage * pageSize, totalCount)} of {totalCount}{" "}
-              entries
-            </div>
-            <nav className="mb-2">
-              <ul className="pagination mb-0">
-                <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+
+          {/* Pagination */}
+          <nav aria-label="Page navigation" className="mt-3">
+            <ul className="pagination justify-content-center">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  <a
-                    className="page-link"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (currentPage > 1) setCurrentPage(currentPage - 1);
-                    }}
-                  >
-                    Previous
-                  </a>
-                </li>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
-                    <li
-                      key={page}
-                      className={`page-item ${
-                        currentPage === page ? "active" : ""
-                      }`}
-                    >
-                      <a
-                        className="page-link"
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage(page);
-                        }}
-                      >
-                        {page}
-                      </a>
-                    </li>
-                  )
-                )}
+                  Prev
+                </button>
+              </li>
+
+              {[...Array(totalPages)].map((_, idx) => (
                 <li
+                  key={idx}
                   className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
+                    currentPage === idx + 1 ? "active" : ""
                   }`}
                 >
-                  <a
+                  <button
                     className="page-link"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (currentPage < totalPages)
-                        setCurrentPage(currentPage + 1);
-                    }}
+                    onClick={() => handlePageChange(idx + 1)}
                   >
-                    Next
-                  </a>
+                    {idx + 1}
+                  </button>
                 </li>
-              </ul>
-            </nav>
-          </div>
-        )}
+              ))}
+
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        {/* Custom Data Table */}
+
         <div className="table-footer" />
       </div>
 

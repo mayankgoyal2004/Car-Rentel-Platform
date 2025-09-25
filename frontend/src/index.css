@@ -206,6 +206,7 @@ a.btn.btn-outline-light:hover {
   display: flex;
   flex-direction: column;
   height: 100%;
+  z-index: 10 !important;
 }
 
 .chat-body.chat-scroll {

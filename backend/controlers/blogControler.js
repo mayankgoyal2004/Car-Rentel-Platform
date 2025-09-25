@@ -1,6 +1,5 @@
 const Blog = require("../models/blogModel");
 
-
 const addBlog = async (req, res) => {
   try {
     const { title, description, category_id, tags_id } = req.body;
@@ -214,16 +213,16 @@ const getBlogAllBlogForSuperAdmin = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    const search = req.query.search || "";
+    const search = req.query.search;
     let filter = {};
     if (search) {
-      filter.TagName = { $regex: search, $options: "i" };
+      filter.title = { $regex: search, $options: "i" };
     }
 
     const blogs = await Blog.find(filter)
       .populate("category", "categoryName")
       .populate("tags", "TagName")
-      .populate("createdBy", "name email")
+      .populate("createdBy", "userName email")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -364,6 +363,26 @@ const deleteblog = async (req, res) => {
   }
 };
 
+const getLatestBlog = async (req, res) => {
+  try {
+    const blogs = await Blog.find({
+      status: true,
+    }).populate("category", "categoryName").populate("admin", "userName email image")
+      .sort({ createdAt: -1 })
+      .limit(3);
+
+    res.json({
+      success: true,
+      data: blogs,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
 module.exports = {
   addBlog,
   getBlogForUser,
@@ -373,4 +392,5 @@ module.exports = {
   deleteblog,
   getBlogAllBlogForSuperAdmin,
   getsingleblogForAdmin,
+  getLatestBlog
 };

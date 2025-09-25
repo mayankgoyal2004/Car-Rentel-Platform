@@ -146,14 +146,7 @@ const AdminDashboard = () => {
                         </p>
                       </div>
                     </div>
-                    <NavLink
-                      to="profile-setting"
-                      className="dropdown-item d-flex align-items-center"
-                    >
-                      <i className="ti ti-user-edit me-2" />
-                      Edit Profile
-                    </NavLink>
-                    <div className="dropdown-divider my-2" />
+
                     <div className="dropdown-item"></div>
                     <NavLink
                       to="security-setting"
@@ -296,35 +289,45 @@ const AdminDashboard = () => {
                     </ul>
                   </li>
                 )}
-                {userType !== 1 && (
-                  <li className="menu-title">
-                    <span>Manage</span>
-                  </li>
-                )}
-                {userType !== 1 && (
-                  <li>
-                    <ul>
+
+                <li className="menu-title">
+                  <span>Manage</span>
+                </li>
+
+                <li>
+                  <ul>
+                    <li>
+                      <NavLink to="all-customers">
+                        <i className="ti ti-users-group" />
+                        <span>Customers</span>
+                      </NavLink>
+                    </li>
+                    {userType === 1 && (
                       <li>
-                        <NavLink to="all-customers">
+                        <NavLink to="all-owners">
                           <i className="ti ti-users-group" />
-                          <span>Customers</span>
+                          <span>Owners</span>
                         </NavLink>
                       </li>
+                    )}
+                    {userType !== 1 && (
                       <li>
                         <NavLink to="all-drivers">
                           <i className="ti ti-user-bolt" />
                           <span>Drivers</span>
                         </NavLink>
                       </li>
+                    )}
+                    {userType !== 1 && (
                       <li>
                         <NavLink to="all-locations">
                           <i className="ti ti-map-pin" />
                           <span>Locations</span>
                         </NavLink>
                       </li>
-                    </ul>
-                  </li>
-                )}
+                    )}
+                  </ul>
+                </li>
 
                 <li className="menu-title">
                   <span>RENTALS</span>
@@ -456,33 +459,36 @@ const AdminDashboard = () => {
                 </li>
                 <li>
                   <ul>
-                    {userType !== 1 && (
-                      <li>
-                        <a onClick={() => setblogOpen(!blogOpen)}>
-                          <i className="ti ti-device-desktop-analytics" />
-                          <span>Blogs</span>
-                          <span className="menu-arrow" />
-                        </a>
-                        {blogOpen && (
-                          <ul>
-                            <li>
-                              <NavLink to="all-blogs">All Blogs</NavLink>
-                            </li>
+                    <li>
+                      <a onClick={() => setblogOpen(!blogOpen)}>
+                        <i className="ti ti-device-desktop-analytics" />
+                        <span>Blogs</span>
+                        <span className="menu-arrow" />
+                      </a>
+                      {blogOpen && (
+                        <ul>
+                          <li>
+                            <NavLink to="all-blogs">All Blogs</NavLink>
+                          </li>
+                          {userType === 1 && (
                             <li>
                               <NavLink to="blogs-categories">
                                 Categories
                               </NavLink>
                             </li>
+                          )}
+                          {userType !== 1 && (
                             <li>
                               <NavLink to="blogs-comments">Comments</NavLink>
                             </li>
-                            <li>
-                              <NavLink to="blogs-blogs-tags">Blog Tags</NavLink>
-                            </li>
-                          </ul>
-                        )}
-                      </li>
-                    )}
+                          )}
+                          <li>
+                            <NavLink to="blogs-blogs-tags">Blog Tags</NavLink>
+                          </li>
+                        </ul>
+                      )}
+                    </li>
+
                     {userType !== 1 && (
                       <li>
                         <a onClick={() => SetLocationOpen(!LocationOpen)}>
@@ -603,25 +609,30 @@ const AdminDashboard = () => {
                   <span>SETTINGS &amp; CONFIGURATION</span>
                 </li>
                 <li>
-                  <ul>
-                    <li>
-                      <a onClick={() => SetSettingOpen(!SettingOpen)}>
-                        <i className="ti ti-user-cog" />
-                        <span>Account Settings</span>
-                        <span className="menu-arrow" />
-                      </a>
-                      {SettingOpen && (
-                        <ul>
-                          <li>
-                            <NavLink to="profile-setting">Profile</NavLink>
-                          </li>
-                          <li>
-                            <NavLink to="security-setting">Security</NavLink>
-                          </li>
-                        </ul>
-                      )}
-                    </li>
-                  </ul>
+                  {userType === 1 ||
+                    (userType === 2 && (
+                      <ul>
+                        <li>
+                          <a onClick={() => SetSettingOpen(!SettingOpen)}>
+                            <i className="ti ti-user-cog" />
+                            <span>Account Settings</span>
+                            <span className="menu-arrow" />
+                          </a>
+                          {SettingOpen && (
+                            <ul>
+                              <li>
+                                <NavLink to="profile-setting">Profile</NavLink>
+                              </li>
+                              <li>
+                                <NavLink to="security-setting">
+                                  Security
+                                </NavLink>
+                              </li>
+                            </ul>
+                          )}
+                        </li>
+                      </ul>
+                    ))}
                 </li>
               </ul>
             </div>

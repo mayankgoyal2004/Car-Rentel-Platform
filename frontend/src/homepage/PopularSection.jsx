@@ -1,62 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
-const cars = [
-  {
-    brand: "FORD",
-    model: "MUSTANG",
-    img: "/user-assets/img/cars/car-15.png",
-    price: 650,
-    specs: [
-      { icon: "/user-assets/img/icons/spec-01.svg", label: "Auto" },
-      { icon: "/user-assets/img/icons/spec-02.svg", label: "Power" },
-      { icon: "/user-assets/img/icons/spec-03.svg", label: "30 K" },
-      { icon: "/user-assets/img/icons/spec-04.svg", label: "AC" },
-      { icon: "/user-assets/img/icons/spec-05.svg", label: "Diesel" },
-      { icon: "/user-assets/img/icons/spec-05.svg", label: "5 Persons" },
-    ],
-    link: "/listing-details",
-  },
-  {
-    brand: "AUDI",
-    model: "A3 2024 New",
-    img: "/user-assets/img/cars/car-16.png",
-    price: 650,
-    specs: [
-      { icon: "/user-assets/img/icons/spec-01.svg", label: "Auto" },
-      { icon: "/user-assets/img/icons/spec-02.svg", label: "Power" },
-      { icon: "/user-assets/img/icons/spec-03.svg", label: "60 K" },
-      { icon: "/user-assets/img/icons/spec-04.svg", label: "AC" },
-      { icon: "/user-assets/img/icons/spec-05.svg", label: "Gas" },
-      { icon: "/user-assets/img/icons/spec-05.svg", label: "4 Persons" },
-    ],
-    link: "/listing-details",
-  },
-  {
-    brand: "TOYOTA",
-    model: "CAMRY SE 350",
-    img: "/user-assets/img/cars/car-17.png",
-    price: 799,
-    specs: [
-      { icon: "/user-assets/img/icons/spec-01.svg", label: "Auto" },
-      { icon: "/user-assets/img/icons/spec-02.svg", label: "Power" },
-      { icon: "/user-assets/img/icons/spec-03.svg", label: "80 K" },
-      { icon: "/user-assets/img/icons/spec-04.svg", label: "AC" },
-      { icon: "/user-assets/img/icons/spec-05.svg", label: "Petrol" },
-      { icon: "/user-assets/img/icons/spec-05.svg", label: "6 Persons" },
-    ],
-    link: "/listing-details",
-  },
-];
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 
 const PopularSection = () => {
+  const [cars, setCars] = useState([]);
+
+  const fetchPopularCars = async () => {
+    try {
+      const res = await apiService.getFeaturedCar();
+      setCars(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
-    AOS.init();
+    AOS.init({});
+  }, []);
+  useEffect(() => {
+    fetchPopularCars();
   }, []);
 
   const sliderSettings = {
@@ -72,7 +39,7 @@ const PopularSection = () => {
   };
 
   return (
-    <section className="popular-section-four pt-4 " >
+    <section className="popular-section-four pt-4 ">
       <div className="container">
         {/* Section Header */}
         <div className="section-heading heading-four" data-aos="fade-down">
@@ -80,31 +47,48 @@ const PopularSection = () => {
           <p>Here are some versatile options that cater to different needs</p>
         </div>
         {/* /Section Header */}
+
         <Slider {...sliderSettings} className="car-slider">
           {cars.map((car, idx) => (
-            <div className="car-item" key={idx}>
-              <h6>{car.brand}</h6>
-              <h2 className="display-1">{car.model}</h2>
+            <div className="car-item" key={car._id || idx}>
+              <h6>{car?.carBrand?.brandName}</h6>
+              <h2 className="display-1">{car?.carModel?.carModel}</h2>
+
               <div className="car-img">
-                <img src={car.img} alt={car.model} className="img-fluid" />
+                <img
+                  src={`${BASE_URL_IMG}${car?.image}`}
+                  alt={car?.carModel?.carModel}
+                  className="img-fluid"
+                />
                 <div className="amount-icon">
                   <span className="day-amt">
                     <p>Starts From</p>
                     <h6>
-                      ${car.price} <span>/day</span>
+                      ${car?.pricing?.prices?.daily} <span>/day</span>
                     </h6>
                   </span>
                 </div>
               </div>
+
               <div className="spec-list">
-                {car.specs.map((spec, i) => (
-                  <span key={i}>
-                    <img src={spec.icon} alt="img" />
-                    {spec.label}
-                  </span>
-                ))}
+                <span>
+                  <img src="/user-assets/img/icons/spec-01.svg" alt="trans" />
+                  {car?.carTransmission?.carTransmission}
+                </span>
+                <span>
+                  <img src="/user-assets/img/icons/spec-05.svg" alt="fuel" />
+                  {car?.carFuel?.carFuel}
+                </span>
+                <span>
+                  <img src="/user-assets/img/icons/spec-05.svg" alt="seats" />
+                  {car?.carSeats?.carSeats} Seats
+                </span>
               </div>
-              <Link to={car.link} className="btn btn-primary">
+
+              <Link
+                to={`/listing-details/${car._id}`}
+                className="btn btn-primary"
+              >
                 Rent Now
               </Link>
             </div>

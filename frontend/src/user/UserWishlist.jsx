@@ -9,7 +9,7 @@ const UserWishlist = () => {
   const getWishList = async () => {
     try {
       const res = await apiService.getWishlist();
-      setWishlist(res.data.wishlist || []); // always array of car objects
+      setWishlist(res.data.wishlist ); 
     } catch (err) {
       console.error("Error fetching wishlist:", err);
     }
@@ -18,7 +18,7 @@ const UserWishlist = () => {
   const handleWishlist = async (carId) => {
     try {
       const res = await apiService.addWishlist({ carId });
-      setWishlist(res.data.wishlist || []); // always array of car objects
+      setWishlist(res.data.wishlist || []); 
     } catch (err) {
       console.error("Error toggling wishlist:", err);
     }

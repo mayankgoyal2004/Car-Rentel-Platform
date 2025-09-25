@@ -145,6 +145,9 @@ class apiServices {
       { headers: getAuthHeaders() }
     );
   }
+  getLatestBlog() {
+    return axios.get(BASE_URL + `blogs/latest`);
+  }
   getBlogsForUser({ search = "", category = "", page = 1, limit = 10 } = {}) {
     return axios.get(
       BASE_URL +
@@ -278,10 +281,13 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
-  getAllcustomerAdmin() {
-    return axios.get(BASE_URL + `get-all-customer-super-admin`, {
-      headers: getAuthHeaders(),
-    });
+  getAllcustomerSuperAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-customer-super-admin?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
   }
   getChat(receiverId) {
     return axios.get(BASE_URL + `chat/${receiverId}`, {
@@ -963,8 +969,19 @@ class apiServices {
       { headers: getAuthHeaders() }
     );
   }
+  getAllCarSuperAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-car-super-admin?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
   getAllCarInRental() {
     return axios.get(BASE_URL + `get-all-car-inRental`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteCar(id) {
+    return axios.delete(BASE_URL + `delete-cars/${id}`, {
       headers: getAuthHeaders(),
     });
   }
@@ -973,10 +990,23 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  toogleIsAvailableByAdmin(id, data) {
+    return axios.post(BASE_URL + `change-is-available-by-admin/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  toogleCarFeatured(id, data) {
+    return axios.post(BASE_URL + `cars/featured/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
   getNewlyAddedCars() {
     return axios.get(BASE_URL + `get-newly-added-car-admin`, {
       headers: getAuthHeaders(),
     });
+  }
+  getFeaturedCar() {
+    return axios.get(BASE_URL + `get-featured-car`);
   }
   getAllCarsForSuperAdmin({ search = "", page } = {}) {
     return axios.get(
@@ -1086,6 +1116,12 @@ class apiServices {
   getAllReservationAdmin({ search = "", page } = {}) {
     return axios.get(
       BASE_URL + `get-all-reservation?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  getAllReservationSuperAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-reservation-superAdmin?search=${search}&page=${page}`,
       { headers: getAuthHeaders() }
     );
   }

@@ -34,7 +34,7 @@ const getCommentBlog = async (req, res) => {
     const limit = parseInt(req.query.limit) || 3;
 
     const comments = await Comment.find({ blog: blogId, status: true })
-      .populate("createdBy", "name email image")
+      .populate("createdBy", "userName email image")
       .sort({ created_at: -1 })
       .skip((page - 1) * limit)
       .limit(limit);

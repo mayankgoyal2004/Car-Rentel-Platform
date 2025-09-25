@@ -1,12 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
-
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { Heart } from "react-feather";
 
 export const CarSection = () => {
-   const sliderSettings = {
+  const [cars, setCars] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+
+  const fetchCars = async () => {
+    try {
+      const res = await apiService.getFeaturedCar();
+      setCars(res.data.data);
+    } catch (err) {
+      console.error("Failed to fetch cars:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCars();
+  }, []);
+  const getWishList = async () => {
+    try {
+      const res = await apiService.getWishlist();
+      setWishlist(res.data.wishlist);
+    } catch (err) {
+      console.error("Error fetching wishlist:", err);
+    }
+  };
+
+  const handleWishlist = async (carId) => {
+    try {
+      const res = await apiService.addWishlist({ carId });
+      setWishlist(res.data.wishlist || []);
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+    }
+  };
+
+  useEffect(() => {
+    getWishList();
+  }, []);
+
+  // helper to check if car is in wishlist
+  const isInWishlist = (carId) =>
+    Array.isArray(wishlist) && wishlist.some((w) => w._id === carId);
+
+  const sliderSettings = {
     dots: true,
     arrows: true,
     infinite: true,
@@ -14,6 +56,7 @@ export const CarSection = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
   };
+
   return (
     <section className="car-section">
       <div className="container">
@@ -22,510 +65,113 @@ export const CarSection = () => {
           <p>Here's a list of some of the most popular cars globally</p>
         </div>
         <div className="row">
-          {/* Car List */}
-          <div className="col-lg-4 col-md-6">
-            <div className="listing-item listing-item-two">
-              <div className="listing-img">
-                <Slider {...sliderSettings}>
-                  <div className="slide-images">
-                    <Link to="/listing-details">
-                      <img
-                        src="/user-assets/img/cars/car-11.jpg"
-                        className="img-fluid"
-                        alt="Toyota"
+          {cars.slice(0, 6).map((car) => (
+            <div className="col-lg-4 col-md-6" key={car._id}>
+              <div className="listing-item listing-item-two">
+                <div className="listing-img">
+                  <Slider {...sliderSettings}>
+                    <div className="slide-images">
+                      <Link to={`/listing-details/${car._id}`}>
+                        <img
+                          src={BASE_URL_IMG + car.image}
+                          className="img-fluid"
+                          alt={car.carModel?.carModel || "Car"}
+                        />
+                      </Link>
+                    </div>
+                  </Slider>
+                  <div className="fav-item">
+                    <div className="d-flex align-items-center gap-2">
+                      <span className="featured-text">
+                        {car.carBrand?.brandName}
+                      </span>
+                      <span className="availability">
+                        {car.isAvailable ? "Available" : "Not Available"}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleWishlist(car._id)}
+                      className="btn btn-link p-0 border-0"
+                    >
+                      <Heart
+                        size={20}
+                        color={isInWishlist(car._id) ? "red" : "gray"}
+                        fill={isInWishlist(car._id) ? "red" : "none"}
                       />
-                    </Link>
+                    </button>
                   </div>
-                  <div className="slide-images">
-                    <Link to="/listing-details" >
-                      <img
-                        src="/user-assets/img/cars/car-12.jpg"
-                        className="img-fluid"
-                        alt="Toyota"
-                      />
-                    </Link>
-                  </div>
-                  <div className="slide-images">
-                     <Link to="/listing-details" >
-                      <img
-                        src="//user-assets/img/cars/car-11.jpg"
-                        className="img-fluid"
-                        alt="Toyota"
-                      />
-                    </Link>
-                  </div>
-                </Slider>
-                <div className="fav-item">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="featured-text">Toyota</span>
-                    <span className="availability">Available</span>
-                  </div>
-                  <a href="javascript:void(0)" className="fav-icon selected">
-                    <i className="feather-heart" />
-                  </a>
+                  <span className="location">
+                    <i className="bx bx-map me-1" />
+                    {car.mainLocation?.title}
+                  </span>
                 </div>
-                <span className="location">
-                  <i className="bx bx-map me-1" />
-                  Lasvegas
-                </span>
-              </div>
-              <div className="listing-content">
-                <div className="listing-features d-flex align-items-center justify-content-between">
-                  <div className="list-rating">
-                    <h3 className="listing-title">
-                      <Link to="/listing-details">Toyota Camry SE 350</Link>
-                    </h3>
+
+                <div className="listing-content">
+                  <div className="listing-features d-flex align-items-center justify-content-between">
                     <div className="list-rating">
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star" />
-                      <span>(4.0) 138 Reviews</span>
+                      <h3 className="listing-title">
+                        <Link to={`/listing-details/${car._id}`}>
+                          {car.carModel?.carModel}
+                        </Link>
+                      </h3>
+                      <div className="list-rating">
+                        {Array(5)
+                          .fill(0)
+                          .map((_, i) => (
+                            <i
+                              className={`fas fa-star ${
+                                i < car.rating ? "filled" : ""
+                              }`}
+                              key={i}
+                            />
+                          ))}
+                        <span>
+                          ({car.rating || 0}) {car.reviews || 0} Reviews
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="price">
+                        ${car.pricing?.prices?.daily || 0} <span>/ Day</span>
+                      </h4>
                     </div>
                   </div>
-                  <div>
-                    <h4 className="price">
-                      $160 <span>/ Day</span>
-                    </h4>
+
+                  <div className="listing-details-group">
+                    <ul>
+                      <li>
+                        <img
+                          src="/user-assets/img/icons/car-parts-01.svg"
+                          alt="Transmission"
+                        />
+                        <p>{car.carTransmission?.carTransmission}</p>
+                      </li>
+
+                      <li>
+                        <img
+                          src="/user-assets/img/icons/car-parts-03.svg"
+                          alt="Fuel"
+                        />
+                        <p>{car.carFuel?.carFuel}</p>
+                      </li>
+                      <li>
+                        <img
+                          src="/user-assets/img/icons/car-parts-05.svg"
+                          alt={car.year}
+                        />
+                        <p>{new Date(car.year).getFullYear()}</p>
+                      </li>
+                    </ul>
                   </div>
-                </div>
-                <div className="listing-details-group">
-                  <ul>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-01.svg" alt="Auto" />
-                      <p>Auto</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-02.svg"
-                        alt="10 KM"
-                      />
-                      <p>10 KM</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-03.svg"
-                        alt="Petrol"
-                      />
-                      <p>Diesel</p>
-                    </li>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-05.svg" alt={2018} />
-                      <p>2018</p>
-                    </li>
-                  </ul>
                 </div>
               </div>
             </div>
-          </div>
-          {/* /Car List */}
-          {/* Car List */}
-          <div className="col-lg-4 col-md-6">
-            <div className="listing-item listing-item-two">
-              <div className="listing-img">
-                <Link to="/listing-details" >
-                  <img
-                    src="/user-assets/img/cars/car-12.jpg"
-                    className="img-fluid"
-                    alt="Toyota"
-                  />
-                </Link>
-                <div className="fav-item">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="featured-text">Toyota</span>
-                    <span className="availability">Available</span>
-                  </div>
-                  <a href="javascript:void(0)" className="fav-icon selected">
-                    <i className="feather-heart" />
-                  </a>
-                </div>
-                <span className="location">
-                  <i className="bx bx-map me-1" />
-                  Lasvegas
-                </span>
-              </div>
-              <div className="listing-content">
-                <div className="listing-features d-flex align-items-center justify-content-between">
-                  <div className="list-rating">
-                    <h3 className="listing-title">
-                       <Link to="/listing-details" >Audi A3 2019 new</Link>
-                    </h3>
-                    <div className="list-rating">
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star" />
-                      <span>(4.0) 150 Reviews</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="price">
-                      $45 <span>/ Day</span>
-                    </h4>
-                  </div>
-                </div>
-                <div className="listing-details-group">
-                  <ul>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-01.svg" alt="Auto" />
-                      <p>Auto</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-02.svg"
-                        alt="10 KM"
-                      />
-                      <p>10 KM</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-03.svg"
-                        alt="Petrol"
-                      />
-                      <p>Diesel</p>
-                    </li>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-05.svg" alt={2018} />
-                      <p>2019</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* /Car List */}
-          {/* Car List */}
-          <div className="col-lg-4 col-md-6">
-            <div className="listing-item listing-item-two">
-              <div className="listing-img">
-                <Link to="/listing-details" >
-                  <img
-                    src="/user-assets/img/cars/car-13.jpg"
-                    className="img-fluid"
-                    alt="Toyota"
-                  />
-                </Link>
-                <div className="fav-item">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="featured-text">Toyota</span>
-                    <span className="availability">Available</span>
-                  </div>
-                  <a href="javascript:void(0)" className="fav-icon">
-                    <i className="feather-heart" />
-                  </a>
-                </div>
-                <span className="location">
-                  <i className="bx bx-map me-1" />
-                  Lasvegas
-                </span>
-              </div>
-              <div className="listing-content">
-                <div className="listing-features d-flex align-items-center justify-content-between">
-                  <div className="list-rating">
-                    <h3 className="listing-title">
-                      <Link to="/listing-details" >Ford Mustang 4.0 AT</Link>
-                    </h3>
-                    <div className="list-rating">
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star" />
-                      <span>(4.0) 170 Reviews</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="price">
-                      $90 <span>/ Day</span>
-                    </h4>
-                  </div>
-                </div>
-                <div className="listing-details-group">
-                  <ul>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-01.svg" alt="Auto" />
-                      <p>Auto</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-02.svg"
-                        alt="10 KM"
-                      />
-                      <p>10 KM</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-03.svg"
-                        alt="Petrol"
-                      />
-                      <p>Petrol</p>
-                    </li>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-05.svg" alt={2018} />
-                      <p>2021</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* /Car List */}
-          {/* Car List */}
-          <div className="col-lg-4 col-md-6">
-            <div className="listing-item listing-item-two">
-              <div className="listing-img">
-                <Slider {...sliderSettings}>
-                  <div className="slide-images">
-                    <Link to="/listing-details" >
-                      <img
-                        src="/user-assets/img/cars/car-14.jpg"
-                        className="img-fluid"
-                        alt="Toyota"
-                      />
-                    </Link>
-                  </div>
-                  <div className="slide-images">
-                    <Link to="/listing-details" >
-                      <img
-                        src="/user-assets/img/cars/car-13.jpg"
-                        className="img-fluid"
-                        alt="Toyota"
-                      />
-                    </Link>
-                  </div>
-                  <div className="slide-images">
-                    <Link to="/listing-details">
-                      <img
-                        src="/user-assets/img/cars/car-16.jpg"
-                        className="img-fluid"
-                        alt="Toyota"
-                      />
-                    </Link>
-                  </div>
-                </Slider>
-                <div className="fav-item">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="featured-text">Toyota</span>
-                    <span className="availability">Available</span>
-                  </div>
-                  <a href="javascript:void(0)" className="fav-icon">
-                    <i className="feather-heart" />
-                  </a>
-                </div>
-                <span className="location">
-                  <i className="bx bx-map me-1" />
-                  Spain
-                </span>
-              </div>
-              <div className="listing-content">
-                <div className="listing-features d-flex align-items-center justify-content-between">
-                  <div className="list-rating">
-                    <h3 className="listing-title">
-                      <Link to="/listing-details" >Chevrolet Picker</Link>
-                    </h3>
-                    <div className="list-rating">
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star" />
-                      <span>(4.0) 165 Reviews</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="price">
-                      $48 <span>/ Day</span>
-                    </h4>
-                  </div>
-                </div>
-                <div className="listing-details-group">
-                  <ul>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-01.svg" alt="Auto" />
-                      <p>Manual</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-02.svg"
-                        alt="10 KM"
-                      />
-                      <p>18 KM</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-03.svg"
-                        alt="Petrol"
-                      />
-                      <p>Diesel</p>
-                    </li>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-05.svg" alt={2018} />
-                      <p>2018</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* /Car List */}
-          {/* Car List */}
-          <div className="col-lg-4 col-md-6">
-            <div className="listing-item listing-item-two">
-              <div className="listing-img">
-                <Link to="/listing-details" >
-                  <img
-                    src="/user-assets/img/cars/car-15.jpg"
-                    className="img-fluid"
-                    alt="Toyota"
-                  />
-                </Link>
-                <div className="fav-item">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="featured-text">Toyota</span>
-                    <span className="availability">Available</span>
-                  </div>
-                  <a href="javascript:void(0)" className="fav-icon">
-                    <i className="feather-heart" />
-                  </a>
-                </div>
-                <span className="location">
-                  <i className="bx bx-map me-1" />
-                  Lasvegas
-                </span>
-              </div>
-              <div className="listing-content">
-                <div className="listing-features d-flex align-items-center justify-content-between">
-                  <div className="list-rating">
-                    <h3 className="listing-title">
-                      <Link to="/listing-details" >Ferrari 458 MM Special</Link>
-                    </h3>
-                    <div className="list-rating">
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star" />
-                      <span>(4.0) 160 Reviews</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="price">
-                      $95 <span>/ Day</span>
-                    </h4>
-                  </div>
-                </div>
-                <div className="listing-details-group">
-                  <ul>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-01.svg" alt="Auto" />
-                      <p>Auto</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-02.svg"
-                        alt="10 KM"
-                      />
-                      <p>16 KM</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-03.svg"
-                        alt="Petrol"
-                      />
-                      <p>Petrol</p>
-                    </li>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-05.svg" alt={2018} />
-                      <p>2021</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* /Car List */}
-          {/* Car List */}
-          <div className="col-lg-4 col-md-6">
-            <div className="listing-item listing-item-two">
-              <div className="listing-img">
-                <Link to="/listing-details" >
-                  <img
-                    src="/user-assets/img/cars/car-16.jpg"
-                    className="img-fluid"
-                    alt="Toyota"
-                  />
-                </Link>
-                <div className="fav-item">
-                  <div className="d-flex align-items-center gap-2">
-                    <span className="featured-text">Toyota</span>
-                    <span className="availability">Available</span>
-                  </div>
-                  <a href="javascript:void(0)" className="fav-icon">
-                    <i className="feather-heart" />
-                  </a>
-                </div>
-                <span className="location">
-                  <i className="bx bx-map me-1" />
-                  Newyork, USA
-                </span>
-              </div>
-              <div className="listing-content">
-                <div className="listing-features d-flex align-items-center justify-content-between">
-                  <div className="list-rating">
-                    <h3 className="listing-title">
-                      <Link to="/listing-details">2018 Chevrolet Camaro</Link>
-                    </h3>
-                    <div className="list-rating">
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star filled" />
-                      <i className="fas fa-star" />
-                      <span>(4.0) 150 Reviews</span>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="price">
-                      $120 <span>/ Day</span>
-                    </h4>
-                  </div>
-                </div>
-                <div className="listing-details-group">
-                  <ul>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-01.svg" alt="Auto" />
-                      <p>Auto</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-02.svg"
-                        alt="10 KM"
-                      />
-                      <p>10 KM</p>
-                    </li>
-                    <li>
-                      <img
-                        src="/user-assets/img/icons/car-parts-03.svg"
-                        alt="Petrol"
-                      />
-                      <p>Diesel</p>
-                    </li>
-                    <li>
-                      <img src="/user-assets/img/icons/car-parts-05.svg" alt={2018} />
-                      <p>2019</p>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* /Car List */}
+          ))}
         </div>
-        <div className="view-all-btn text-center aos">
-          <Link to="/listing"
-           
+
+        <div className="view-all-btn text-center">
+          <Link
+            to="/listing"
             className="btn btn-secondary d-inline-flex align-items-center"
           >
             View More Cars

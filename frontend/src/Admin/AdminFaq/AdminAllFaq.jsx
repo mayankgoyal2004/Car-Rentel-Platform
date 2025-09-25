@@ -194,7 +194,7 @@ const AdminAllFaq = () => {
                   <tr key={f._id}>
                     <td>{f.question}</td>
                     <td>{f.answer}</td>
-                    <td>{f.category_id?.categoryName || "N/A"}</td>
+                    <td>{f.category?.categoryName || "N/A"}</td>
                     <td>
                       <span
                         className={`badge badge-md ${

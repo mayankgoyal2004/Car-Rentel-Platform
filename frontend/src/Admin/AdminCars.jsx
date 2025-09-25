@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";import { useSelector } from "react-redux";
+import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 const AdminCars = () => {
   const [cars, setCars] = useState([]);
@@ -10,6 +11,7 @@ const AdminCars = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [deleteCar, setDeleteCar] = useState(null);
 
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
@@ -60,28 +62,60 @@ const AdminCars = () => {
     fetchAllCars(currentPage, search);
   }, [currentPage, search]);
 
-
-
   const handleToggleStatus = async (carId, currentStatus) => {
-  try {
-    const res = await apiService.toolgeStatusByAdmin(carId, {status:  !currentStatus});
+    try {
+      const res = await apiService.toolgeStatusByAdmin(carId, {
+        status: !currentStatus,
+      });
 
-    if (res.data.success) {
-      toast.success("Car status updated successfully");
+      if (res.data.success) {
+        toast.success("Car status updated successfully");
 
-      // Update state without refetch
-      setCars((prevCars) =>
-        prevCars.map((c) =>
-          c._id === carId ? { ...c, status: !currentStatus } : c
-        )
-      );
-    } else {
-      toast.error(res.data.message || "Failed to update status");
+        // Update state without refetch
+        setCars((prevCars) =>
+          prevCars.map((c) =>
+            c._id === carId ? { ...c, status: !currentStatus } : c
+          )
+        );
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Server error");
     }
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Server error");
-  }
-};
+  };
+
+  const handleToggleFeatured = async (carId, currentFeatured) => {
+    try {
+      const res = await apiService.toogleCarFeatured(carId, {
+        isFeatured: !currentFeatured,
+      });
+
+      if (res.data.success) {
+        toast.success("Car featured status updated");
+
+        setCars((prevCars) =>
+          prevCars.map((c) =>
+            c._id === carId ? { ...c, isFeatured: !currentFeatured } : c
+          )
+        );
+      } else {
+        toast.error(res.data.message || "Failed to update featured status");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Server error");
+    }
+  };
+
+  const handleDeleteCar = async () => {
+    if (!deleteCar) return;
+    try {
+      const res = await apiService.deleteCar(deleteCar._id);
+      toast.success(res.data.message);
+      setDeleteCar(null);
+      fetchAllCars(currentPage, search);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete Car");
+    }
+  };
 
   // Pagination
   const handlePageChange = (page) => {
@@ -111,7 +145,7 @@ const AdminCars = () => {
               </ol>
             </nav>
           </div>
-            <div className="dropdown me-3">
+          {/* <div className="dropdown me-3">
   <a href="javascript:void(0);" className="dropdown-toggle btn btn-white d-inline-flex align-items-center" data-bs-toggle="dropdown" data-bs-auto-close="outside">
     Status
   </a>
@@ -123,25 +157,18 @@ const AdminCars = () => {
       Inactive
     </li>
   </ul>
-</div>
+</div> */}
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-            <div className="mb-2 me-2">
-             
-            </div>
+            <div className="mb-2 me-2"></div>
             <div className="mb-2 me-2">
               <div className="dropdown">
-                <a
-                   
-                  className="btn btn-dark d-inline-flex align-items-center"
-                >
+                <a className="btn btn-dark d-inline-flex align-items-center">
                   <i className="ti ti-upload me-1" />
                   Export
                 </a>
               </div>
-           
-
             </div>
-            
+
             <div className="mb-2">
               <Link
                 to="/admin-dashboard/add-car"
@@ -153,7 +180,7 @@ const AdminCars = () => {
             </div>
           </div>
         </div>
-        
+
         {/* /Breadcrumb */}
         {/* Table Header */}
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
@@ -194,7 +221,7 @@ const AdminCars = () => {
                 <th>BASE LOCATION</th>
                 <th>PRICE (PER DAY)</th>
                 {/* <th>DAMAGES</th> */}
-                {/* <th>IS FEATURED</th> */}
+                {userType === 1 && <th>IS FEATURED</th>}
                 <th>CREATED DATE</th>
                 <th>STATUS</th>
                 <th />
@@ -239,12 +266,26 @@ const AdminCars = () => {
                       ${car.pricing}
                     </p>
                   </td>
-                  {/* <td>
-                    <p className="text-gray-9">01</p>
-                  </td>
-                  <td>
-                    <i className="ti ti-star-filled text-warning" />
-                  </td> */}
+
+                  {userType === 1 && (
+                    <td>
+                      <button
+                        className="btn border-0"
+                        onClick={() =>
+                          handleToggleFeatured(car._id, car.isFeatured)
+                        }
+                      >
+                        <i
+                          className={`ti ${
+                            car.isFeatured
+                              ? "ti-star-filled text-warning"
+                              : "ti-star"
+                          }`}
+                          style={{ fontSize: "18px" }}
+                        />
+                      </button>
+                    </td>
+                  )}
                   <td>
                     <h6 className="fs-14 fw-normal">
                       {new Date(car.createdAt).toLocaleDateString()}
@@ -294,34 +335,38 @@ const AdminCars = () => {
                             View Details
                           </Link>
                         </li>
-                      {userType !==1&&    (    <li>
-                          <Link
-                            to="/admin-dashboard/add-reservation"
-                            className="dropdown-item rounded-1"
-                          >
-                            <i className="ti ti-plus me-1" />
-                            Add Reservation
-                          </Link>
-                        </li> )}
-                  {userType !==1&&    (<li>
-                          <Link
-                            to={`/admin-dashboard/edit-car/${car._id}`}
-                            className="dropdown-item rounded-1"
-                          >
-                            <i className="ti ti-edit me-1" />
-                            Edit
-                          </Link>
-                        </li>) }  
+                        {userType !== 1 && (
+                          <li>
+                            <Link
+                              to="/admin-dashboard/add-reservation"
+                              className="dropdown-item rounded-1"
+                            >
+                              <i className="ti ti-plus me-1" />
+                              Add Reservation
+                            </Link>
+                          </li>
+                        )}
+                        {userType !== 1 && (
+                          <li>
+                            <Link
+                              to={`/admin-dashboard/edit-car/${car._id}`}
+                              className="dropdown-item rounded-1"
+                            >
+                              <i className="ti ti-edit me-1" />
+                              Edit
+                            </Link>
+                          </li>
+                        )}
                         <li>
-                          <a
+                          <button
                             className="dropdown-item rounded-1"
-                             
                             data-bs-toggle="modal"
-                            data-bs-target="#delete_extra_services"
+                            data-bs-target="#delete_car"
+                            onClick={() => setDeleteCar(car)}
                           >
                             <i className="ti ti-trash me-1" />
                             Delete
-                          </a>
+                          </button>
                         </li>
                       </ul>
                     </div>
@@ -376,21 +421,42 @@ const AdminCars = () => {
         {/* Custom Data Table */}
         <div className="table-footer" />
       </div>
-        <div>
-              {/* Your existing JSX */}
-      
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
+      <div className="modal fade" id="delete_car">
+        <div className="modal-dialog modal-dialog-centered modal-sm">
+          <div className="modal-content">
+            <div className="modal-body text-center">
+              <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
+                <i className="ti ti-trash-x fs-26" />
+              </span>
+              <h4 className="mb-1">Delete Car</h4>
+              <p className="mb-3">Are you sure you want to delete Car?</p>
+              <div className="d-flex justify-content-center">
+                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                  Cancel
+                </button>
+                <button className="btn btn-primary" onClick={handleDeleteCar}>
+                  Yes, Delete
+                </button>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        {/* Your existing JSX */}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

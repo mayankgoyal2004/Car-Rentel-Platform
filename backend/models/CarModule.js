@@ -79,10 +79,10 @@ const CarSchema = new mongoose.Schema(
       ref: "Location",
     },
 
-    status: { type: Boolean, default: false }, // superAdmin approves
+    status: { type: Boolean, default: false },
     isAvailable: { type: Boolean, default: true }, // admin toggle availability
     inRent: { type: Boolean, default: false }, // when car is rented
-
+    isFeatured: { type: Boolean, default: false },
     carVideo: [
       {
         type: String,

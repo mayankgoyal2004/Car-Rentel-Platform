@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick-theme.css";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Heart, Filter, Calendar, MapPin } from "react-feather";
 
 const ListingDetails = () => {
   const [carData, setCarData] = useState(null);
@@ -15,6 +16,8 @@ const ListingDetails = () => {
   const [error, setError] = useState(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
+
   const [reviewStats, setReviewStats] = useState({
     average: 0,
     total: 0,
@@ -83,7 +86,6 @@ const ListingDetails = () => {
               ) / totalReviews
             : 0;
 
-        // Calculate rating breakdown
         const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         res.data.reviews.forEach((review) => {
           const rating = Math.floor(review.carReview);
@@ -105,10 +107,32 @@ const ListingDetails = () => {
       setError("Failed to fetch reviews");
     }
   };
+
+  const getWishList = async () => {
+    try {
+      const res = await apiService.getWishlist();
+      setWishlist(res.data.wishlist);
+    } catch (err) {
+      console.error("Error fetching wishlist:", err);
+    }
+  };
   useEffect(() => {
     fetchCar();
     fetchReviews();
+    getWishList();
   }, [id]);
+
+  const handleWishlist = async (carId) => {
+    try {
+      const res = await apiService.addWishlist({ carId });
+      setWishlist(res.data.wishlist);
+    } catch (err) {
+      console.error("Error toggling wishlist:", err);
+    }
+  };
+
+  const isInWishlist = (carId) =>
+    Array.isArray(wishlist) && wishlist.some((w) => w._id === carId);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -421,10 +445,10 @@ const ListingDetails = () => {
               </div>
             </div>
             <div className="details-btn">
-              <span className="total-badge">
+              {/* <span className="total-badge">
                 <i className="bx bx-calendar-edit" />
                 Total Booking : 300
-              </span>
+              </span> */}
             </div>
           </div>
         </div>
@@ -438,9 +462,16 @@ const ListingDetails = () => {
                 <div className="detail-product">
                   <div className="pro-info">
                     <div className="pro-badge">
-                      <a href="#!" className="fav-icon">
-                        <i className="fa-regular fa-heart" />
-                      </a>
+                      <button
+                        onClick={() => handleWishlist(carData._id)}
+                        className="btn btn-link p-0 border-0"
+                      >
+                        <Heart
+                          size={20}
+                          color={isInWishlist(carData._id) ? "red" : "gray"}
+                          fill={isInWishlist(carData._id) ? "red" : "none"}
+                        />
+                      </button>
                     </div>
                     <ul className="delivery-options">
                       <li className="del-airport">
@@ -584,14 +615,7 @@ const ListingDetails = () => {
                           <h6>{carData.mileage}Km</h6>
                         </div>
                       </div>
-                      <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
-                        <div className="feature-img">
-                          <img
-                            src="/user-assets/img/specification/specification-icon-6.svg"
-                            alt="Icon"
-                          />
-                        </div>
-                      </div>
+
                       <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
                         <div className="feature-img">
                           <img
@@ -604,14 +628,7 @@ const ListingDetails = () => {
                           <h6>{new Date(carData.year).toLocaleDateString()}</h6>
                         </div>
                       </div>
-                      <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
-                        <div className="feature-img">
-                          <img
-                            src="/user-assets/img/specification/specification-icon-8.svg"
-                            alt="Icon"
-                          />
-                        </div>
-                      </div>
+
                       <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
                         <div className="feature-img">
                           <img
@@ -807,7 +824,7 @@ const ListingDetails = () => {
                               <button
                                 key={rating}
                                 type="button"
-                                className="btn btn-link p-0 me-1"
+                                className="btn btn p-0 me-1"
                                 onClick={() => {
                                   setFormData({
                                     ...formData,
@@ -823,16 +840,6 @@ const ListingDetails = () => {
                               </button>
                             ))}
                           </div>
-                          {errors.carReview && (
-                            <div className="text-danger">
-                              {errors.carReview}
-                            </div>
-                          )}
-                          <div className="mt-2 text-muted">
-                            <small>
-                              Selected rating: {formData.carReview} star(s)
-                            </small>
-                          </div>
                         </div>
 
                         <div className="mb-3">
@@ -840,16 +847,11 @@ const ListingDetails = () => {
                           <textarea
                             name="comment"
                             rows="4"
-                            className={`form-control ${
-                              errors.comment ? "is-invalid" : ""
-                            }`}
+                            className={`form-control `}
                             placeholder="Share your experience with this car"
-                            value={formData.comment}
+                            value={formData?.comment}
                             onChange={handleInputChange}
                           />
-                          {errors.comment && (
-                            <div className="text-danger">{errors.comment}</div>
-                          )}
                         </div>
 
                         <button
@@ -1168,7 +1170,7 @@ const ListingDetails = () => {
                             <div className="input-block-wrapp sidebar-form">
                               <div className="input-block  me-lg-2">
                                 <div className="group-img">
-                                  <div className="form-wrap">
+                                  <div className="form-wr-ap">
                                     <input
                                       type="text"
                                       className="form-control datetimepicker"

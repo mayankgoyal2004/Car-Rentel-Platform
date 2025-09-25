@@ -28,7 +28,7 @@ const driverStorage = multer.diskStorage({
   },
 });
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
+  const allowedTypes = /jpeg|jpg|png|pdf|doc|svg|docx/;
   const extname = allowedTypes.test(
     path.extname(file.originalname).toLowerCase()
   );

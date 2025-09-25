@@ -9,8 +9,6 @@ const BlogDetails = () => {
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState([]);
   const [commentForm, setCommentForm] = useState({
-    name: "",
-    email: "",
     message: "",
   });
 
@@ -34,14 +32,13 @@ const BlogDetails = () => {
     try {
       const res = await apiService.getAllblogsComment(blog?._id);
       if (res.data.success) {
-        setComments(res.data.comments); // ✅ use "comments" not "data"
+        setComments(res.data.comments);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Add comment
   const addComment = async (e) => {
     e.preventDefault();
     if (!commentForm.message) return;
@@ -49,8 +46,8 @@ const BlogDetails = () => {
     try {
       const res = await apiService.addblogComment(blog._id, commentForm);
       if (res.data.success) {
-        fetchComments(); // refresh comments
-        setCommentForm({ message: "" });
+        fetchComments();
+        setCommentForm((prev) => ({ ...prev, message: "" }));
       }
     } catch (err) {
       console.error(err);
@@ -133,11 +130,11 @@ const BlogDetails = () => {
                 </div>
 
                 <div className="review-design">
-                  <h6>{c.user?.name}</h6>
-                  <p>{new Date(c.createdAt).toLocaleDateString()}</p>
+                  <h6>{c.createdBy?.userName}</h6>
+                  <p>{new Date(c?.createdAt).toLocaleDateString()}</p>
                 </div>
               </div>
-              <p>{c.message}</p>
+              <p>{c?.message}</p>
             </div>
           ))}
 
@@ -152,7 +149,7 @@ const BlogDetails = () => {
                   <textarea
                     rows={4}
                     placeholder="Your Comment"
-                    value={commentForm.message}
+                    value={commentForm?.message}
                     onChange={(e) =>
                       setCommentForm({
                         ...commentForm,

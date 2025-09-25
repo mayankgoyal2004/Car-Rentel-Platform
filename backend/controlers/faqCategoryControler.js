@@ -46,7 +46,7 @@ const getAllFaqCategory = async (req, res) => {
 
     let filter = {};
     if (search) {
-      filter.TagName = { $regex: search, $options: "i" };
+      filter.categoryName = { $regex: search, $options: "i" };
     }
 
     const category = await FaqCategory.find(filter)

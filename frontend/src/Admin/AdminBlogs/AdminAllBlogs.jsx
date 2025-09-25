@@ -16,34 +16,35 @@ const AdminAllBlogs = () => {
   const [search, setSearch] = useState("");
 
   const userData = useSelector((store) => store.user);
-  const userType = userData?.userType; // superadmin = 1, admin/staff = 2/3
+  const userType = userData?.userType;
 
- const fetchBlog = async (searchQuery = "", page = 1, append = false) => {
-  setLoading(true);
-  try {
-    let res;
-    if (userType === 1) {
-      res = await apiService.getAllBlogSuperAdmin({ search: searchQuery, page });
-    } else {
-      res = await apiService.getAllBlog({ search: searchQuery, page });
+  const fetchBlog = async (searchQuery = "", page = 1) => {
+    setLoading(true);
+    try {
+      let res;
+      if (userType === 1) {
+        res = await apiService.getAllBlogSuperAdmin({
+          search: searchQuery,
+          page,
+        });
+      } else {
+        res = await apiService.getAllBlog({ search: searchQuery, page });
+      }
+
+      setBlogs(res.data.data);
+
+      setTotalPages(res.data.pagination?.totalPages || 1);
+      setCurrentPage(res.data.pagination?.currentPage || 1);
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setBlogs((prev) =>
-      append ? [...prev, ...(res.data.data || [])] : res.data.data || []
-    );
-
-    setTotalPages(res.data.pagination?.totalPages || 1);
-    setCurrentPage(res.data.pagination?.currentPage || 1);
-  } catch (err) {
-    console.error("Error fetching blogs:", err);
-  } finally {
-    setLoading(false);
-  }
-};
-
- useEffect(() => {
-  fetchBlog();
-}, [search]);
+  useEffect(() => {
+    fetchBlog(search, 1); 
+  }, [search]);
 
   const handleDeleteBlog = async () => {
     if (!deleteId) return;
@@ -64,16 +65,15 @@ const AdminAllBlogs = () => {
       }
     }
   };
-    const handleSearchChange = (e) => {
+  const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // ✅ good
+    setCurrentPage(1);
   };
   return (
     <div className="page-wrapper">
       <div className="content me-0 me-md-0 me-lg-4">
         {/* Breadcrumb */}
         <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
-          
           <div className="my-auto mb-2">
             <h4 className="mb-1">Blogs</h4>
             <nav>
@@ -89,33 +89,33 @@ const AdminAllBlogs = () => {
           </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
             <div className="mb-2">
-              <Link
+             {userType !== 1 &&( <Link
                 to="/admin-dashboard/add-blog"
                 className="btn btn-primary d-flex align-items-center"
               >
                 <i className="ti ti-plus me-2" />
                 Add Blogs
-              </Link>
+              </Link>)}
             </div>
           </div>
         </div>
         {/* /Breadcrumb */}
-   <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-            <div className="top-search me-2">
-              <div className="top-search-group">
-                <span className="input-icon">
-                  <i className="ti ti-search" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search"
-                  value={search}
-                  onChange={handleSearchChange}
-                />
-              </div>
+        <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
+          <div className="top-search me-2">
+            <div className="top-search-group">
+              <span className="input-icon">
+                <i className="ti ti-search" />
+              </span>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search"
+                value={search}
+                onChange={handleSearchChange}
+              />
             </div>
           </div>
+        </div>
         {/* Blogs */}
         {loading ? (
           <p>Loading blogs...</p>
@@ -142,14 +142,15 @@ const AdminAllBlogs = () => {
                       </Link>
                       <div className="edit-delete-btns d-flex align-items-center justify-content-between">
                         <div className="d-flex align-items-center">
-                          <Link
-                            to={`/admin-dashboard/edit-blog/${blog._id}`}
-                            className="blog-edit me-2"
-                          >
-                            <i className="ti ti-edit" />
-                          </Link>
+                          {userType !== 1 && (
+                            <Link
+                              to={`/admin-dashboard/edit-blog/${blog._id}`}
+                              className="blog-edit me-2"
+                            >
+                              <i className="ti ti-edit" />
+                            </Link>
+                          )}
                           <a
-                            href="javascript:void(0);"
                             className="blog-delete"
                             data-bs-toggle="modal"
                             data-bs-target="#delete_blogs"
@@ -198,16 +199,15 @@ const AdminAllBlogs = () => {
             <div className="d-flex align-items-center justify-content-center">
               {currentPage < totalPages && (
                 <button
-  className="load-btn btn btn-light"
-  onClick={() => {
-    const nextPage = currentPage + 1;
-    setCurrentPage(nextPage);
-    fetchBlog(search, nextPage, true); // ✅ append instead of replace
-  }}
->
-  <i className="ti ti-loader me-1" /> Load More
-</button>
-
+                  className="load-btn btn btn-light"
+                  onClick={() => {
+                    const nextPage = currentPage + 1;
+                    setCurrentPage(nextPage);
+                    fetchBlog(search, nextPage, true); // ✅ append instead of replace
+                  }}
+                >
+                  <i className="ti ti-loader me-1" /> Load More
+                </button>
               )}
             </div>
           </div>

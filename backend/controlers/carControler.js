@@ -319,8 +319,6 @@ const uploadCarFiles = async (req, res) => {
       return res.status(404).json({ success: false, message: "Car not found" });
     }
 
-    console.log("REQ.FILES:", req.files);
-
     if (req.files.documents) {
       req.files.documents.forEach((file) => {
         car.carDocuments.push(file.path); // just store the path
@@ -377,10 +375,9 @@ const updateCarStatusByAdmin = async (req, res) => {
   }
 };
 
-const toggleAvailability = async (req, res) => {
+const toggleAvailabilityByAdmin = async (req, res) => {
   try {
-    const car = await Car.findById(req.params.id);
-    if (!car.status) return res.status(400).json({ message: "Not approved" });
+    const car = await Car.findByIdAndUpdate(req.params.id);
 
     car.isAvailable = req.body.isAvailable;
     await car.save();
@@ -432,22 +429,6 @@ const updateCar = async (req, res) => {
   }
 };
 
-// DELETE /cars/:id
-const carDelete = async (req, res) => {
-  try {
-    const car = await Car.findByIdAndDelete(req.params.id);
-    if (!car) {
-      return res.status(404).json({ message: "Car not found" });
-    }
-    res.status(200).json({ message: "Car deleted successfully" });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error deleting car", error: error.message });
-  }
-};
-
-// GET /cars/created-by/:userId
 const getCar = async (req, res) => {
   try {
     const cars = await Car.find({ admin: req.user.admin });
@@ -480,16 +461,15 @@ const getAllCars = async (req, res) => {
       page = 1,
       limit = 10,
     } = req.query;
-    console.log(req.query)
 
     let filter = { status: true, isAvailable: true };
 
     if (search) {
-  filter.$or = [
-    { carName: { $regex: search, $options: "i" } },
-    { description: { $regex: search, $options: "i" } }
-  ];
-}
+      filter.$or = [
+        { carName: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
+    }
     if (carFuel) {
       const fuelNames = Array.isArray(carFuel)
         ? carFuel
@@ -557,63 +537,63 @@ const getAllCars = async (req, res) => {
         filter.carModel = modelDoc._id;
       }
     }
-   
- if (pickupLocation) {
-  const cities = await City.find({
-    cityName: { $regex: pickupLocation, $options: "i" },
-    status: true,
-  }).select("_id");
 
-  if (cities.length > 0) {
-    const pickupLocs = await Location.find({
-      city: { $in: cities.map((c) => c._id) },
-    }).select("_id");
+    if (pickupLocation) {
+      const cities = await City.find({
+        cityName: { $regex: pickupLocation, $options: "i" },
+        status: true,
+      }).select("_id");
 
-    const locIds = pickupLocs.map((loc) => loc._id);
+      if (cities.length > 0) {
+        const pickupLocs = await Location.find({
+          city: { $in: cities.map((c) => c._id) },
+        }).select("_id");
 
-    let cars = await Car.find({
-      ...filter,
-      mainLocation: { $in: locIds },
-    });
+        const locIds = pickupLocs.map((loc) => loc._id);
 
-    if (cars.length === 0) {
-      filter.otherLocations = { $in: locIds };
-      delete filter.mainLocation; 
-    } else {
-      filter.mainLocation = { $in: locIds }; 
+        let cars = await Car.find({
+          ...filter,
+          mainLocation: { $in: locIds },
+        });
+
+        if (cars.length === 0) {
+          filter.otherLocations = { $in: locIds };
+          delete filter.mainLocation;
+        } else {
+          filter.mainLocation = { $in: locIds };
+        }
+      } else {
+        filter.mainLocation = { $in: [] };
+      }
     }
-  } else {
-    filter.mainLocation = { $in: [] }; 
-  }
-}
- if (dropLocation) {
-  const cities = await City.find({
-    cityName: { $regex: dropLocation, $options: "i" },
-    status: true,
-  }).select("_id");
+    if (dropLocation) {
+      const cities = await City.find({
+        cityName: { $regex: dropLocation, $options: "i" },
+        status: true,
+      }).select("_id");
 
-  if (cities.length > 0) {
-    const dropLocs = await Location.find({
-      city: { $in: cities.map((c) => c._id) },
-    }).select("_id");
+      if (cities.length > 0) {
+        const dropLocs = await Location.find({
+          city: { $in: cities.map((c) => c._id) },
+        }).select("_id");
 
-    const locIds = dropLocs.map((loc) => loc._id);
+        const locIds = dropLocs.map((loc) => loc._id);
 
-    let cars = await Car.find({
-      ...filter,
-      mainLocation: { $in: locIds },
-    });
+        let cars = await Car.find({
+          ...filter,
+          mainLocation: { $in: locIds },
+        });
 
-    if (cars.length === 0) {
-      filter.otherLocations = { $in: locIds };
-      delete filter.mainLocation; 
-    } else {
-      filter.mainLocation = { $in: locIds }; 
+        if (cars.length === 0) {
+          filter.otherLocations = { $in: locIds };
+          delete filter.mainLocation;
+        } else {
+          filter.mainLocation = { $in: locIds };
+        }
+      } else {
+        filter.mainLocation = { $in: [] };
+      }
     }
-  } else {
-    filter.mainLocation = { $in: [] }; 
-  }
-}
 
     // Drop-off Location (search by cityId)
     // if (dropLocation) {
@@ -700,7 +680,6 @@ const getCarById = async (req, res) => {
       .populate("pricing")
       .populate("createdBy", "name email")
       .populate("admin", "name email");
-    console.log(car);
     res.status(200).json({ success: true, data: car });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -1163,6 +1142,67 @@ const getNewlyAddedCars = async (req, res) => {
   }
 };
 
+const toggleFeaturedBySuperAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isFeatured } = req.body;
+
+    const car = await Car.findByIdAndUpdate(id, { isFeatured }, { new: true });
+
+    if (!car)
+      return res.status(404).json({ success: false, message: "Car not found" });
+
+    res.json({ success: true, data: car });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+const getFeaturedCar = async (req, res) => {
+  try {
+    const car = await Car.find({ isFeatured: true })
+      .populate([
+        { path: "carBrand", select: "brandName" },
+        { path: "carModel", select: "carModel" },
+        { path: "carType", select: "carType" },
+        { path: "carFuel", select: "carFuel" },
+        { path: "carColor", select: "carColor" },
+        { path: "carTransmission", select: "carTransmission" },
+        { path: "pricing", select: "prices" },
+        { path: "carFeatures", select: "carFeature" },
+        { path: "carSeats", select: "carSeats" },
+        { path: "mainLocation", select: "title" },
+      ])
+      .sort({ createdAt: -1 })
+      .limit(6);
+
+    res.status(200).json({
+      success: true,
+      data: car,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+
+const DeleteCar = async (req, res) => {
+  try {
+    const car = await Car.findByIdAndDelete(req.params.id);
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+    res.status(200).json({ message: "Car deleted successfully" });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "Error deleting car", error: error.message });
+  }
+};
+
 module.exports = {
   addCar,
   updateCarFeatures,
@@ -1184,4 +1224,8 @@ module.exports = {
   getInRentalCars,
   getNewlyAddedCars,
   updateCarStatusByAdmin,
+  toggleFeaturedBySuperAdmin,
+  getFeaturedCar,
+  toggleAvailabilityByAdmin,
+  DeleteCar,
 };

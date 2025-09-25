@@ -50,7 +50,7 @@ route.post("/forgot-password", userRoute.forgotPassword);
 route.post("/reset-password", userRoute.resetPassword);
 route.post(
   "/register-admin",
-  upload.bussinessLogoUpload.single("logo"),
+  upload.bussinessLogoUpload.single("image"),
   userRoute.registerAdmin
 );
 route.post("/verify-email", userRoute.verifyEmail);
@@ -65,6 +65,7 @@ route.get("/blogs/get-all-comments-user/:blogId", blogComments.getCommentBlog);
 //!! car
 route.get("/car-details-user/:id", car.getSingleCarUser);
 route.get("/car-review/:carId", carReview.getCarReviews);
+route.get("/get-featured-car", car.getFeaturedCar);
 
 //!! get all faq for public without authentication
 route.get("/get-all-active-faq", faq.getActiveFaqs);
@@ -81,10 +82,11 @@ route.post("/add-constact", contact.addContact);
 
 //!! blog
 route.get("/blogs/user", blog.getBlogForUser);
+route.get("/blogs/latest", blog.getLatestBlog);
 route.get("/blogs/get-single-blog-user/:slug", blog.getsingleblogForUser);
 
 route.use(authUser);
-route.post("/logout", userRoute.logout);
+// route.post("/logout", userRoute.logout);
 
 route.post("/change-password", userRoute.changePassword);
 route.post(
@@ -122,11 +124,7 @@ route.delete(
 );
 
 // !!comment route for blogs
-route.post(
-  "/blogs/comments/:blogId",
-  checkPermission("Blog", "create"),
-  blogComments.createComment
-);
+route.post("/blogs/comments/:blogId", blogComments.createComment);
 route.get(
   "/blogs/get-comments-admin",
   checkPermission("Blog", "view"),
@@ -163,7 +161,7 @@ route.get("/blogs/all-active-category", BlogCategory.getAllActiveBlogCategory);
 route.get(
   "/blog-all-category-superadmin",
   checkPermission("Blog", "assignPackage", true),
-  blogTags.getAllBlogTagSuperAdmin
+  BlogCategory.getAllBlogCategorySuperAdmin
 );
 
 // !!teg route for blog
@@ -267,7 +265,7 @@ route.get(
 route.get(
   "/get-5-latest-driver",
   checkPermission("Driver", "view"),
-  driver.getAllDriver
+  driver.getTop5ActiveDrivers
 );
 route.get(
   "/get-all-active-driver",
@@ -860,6 +858,7 @@ route.post(
   car.editBasicCar
 );
 route.post("/update-cars/:id/pricing", pricing.updateCarPricing);
+route.delete("/delete-cars/:id", car.DeleteCar);
 route.put("/cars/:id/pricing", pricing.editCarPricing);
 route.put("/update-car/:id/features", car.updateCarFeatures);
 route.put("/update-car/:id/extraService", car.updateCarExtraService);
@@ -876,6 +875,7 @@ route.post("/cars/:carId/description", car.saveCarDescription);
 // route.put("/edit-car/:id/faq", carFaq.editFaq);
 route.get("/get-all-cars-super-admin", car.getAllCarsForSuperAdmin);
 route.post("/change-status-by-admin/:id", car.updateCarStatusByAdmin);
+route.post("/change-is-available-by-admin/:id", car.toggleAvailabilityByAdmin);
 route.get("/get-car-by-id/:id", car.getCarById);
 
 route.post(
@@ -894,6 +894,11 @@ route.get(
   car.getAllCarsForAdmin
 );
 route.get(
+  "/get-all-car-super-admin",
+  checkPermission("Car", "view"),
+  car.getAllCarsForSuperAdmin
+);
+route.get(
   "/get-newly-added-car-admin",
   checkPermission("Car", "view"),
   car.getNewlyAddedCars
@@ -909,6 +914,8 @@ route.get(
   checkPermission("Car", "view"),
   car.getCayByIdAdmin
 );
+
+route.post("/cars/featured/:id", car.toggleFeaturedBySuperAdmin);
 
 //!! wishlist
 route.post("/toggle-wishlist", wishlist.toggleWishlist);

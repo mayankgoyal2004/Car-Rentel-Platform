@@ -67,7 +67,8 @@ const getAllFaqsAdmin = async (req, res) => {
 
     let filter = {};
     if (search) {
-      filter.TagName = { $regex: search, $options: "i" };
+      (filter.question = { $regex: search, $options: "i" }),
+        (filter.answer = { $regex: search, $options: "i" });
     }
 
     const faqs = await Faq.find(filter)

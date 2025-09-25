@@ -1410,7 +1410,7 @@ const AdminAddCars = () => {
                   </div>
 
                   {/* Seasonal Pricing Section */}
-                  <div className="border-bottom mb-2 pb-2">
+                  {/* <div className="border-bottom mb-2 pb-2">
                     <div className="row row-gap-4">
                       <div className="col-xl-3">
                         <h6 className="mb-1">Seasonal Pricing</h6>
@@ -1429,15 +1429,13 @@ const AdminAddCars = () => {
                           </button>
                         </div>
 
-                        {/* Display selected seasonal pricing here */}
                         <div className="empty-data bg-light text-center mb-3">
                           <p className="fw-medium">No Seasonal Pricing Added</p>
                         </div>
 
-                        {/* You can display selected seasonal pricing here when available */}
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Insurance Section */}
                   {/* <div className="border-bottom mb-2 pb-2">

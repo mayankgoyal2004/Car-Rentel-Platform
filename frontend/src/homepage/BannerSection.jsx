@@ -56,7 +56,7 @@ function BannerSection() {
                     Rent a Car <i className="bx bx-right-arrow-alt ms-1" />
                   </button>
                   <button
-                    onClick={() => navigate("/add-car")}
+                    onClick={() => navigate("/business-register")}
                     className="btn btn-secondary d-inline-flex align-items-center"
                   >
                     <i className="bx bxs-plus-circle me-1" />

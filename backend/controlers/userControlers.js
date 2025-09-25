@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const customer = require("../models/customerModel");
 const Package = require("../models/packageModel");
 const bcrypt = require("bcrypt");
-const axios = require("axios")
+const axios = require("axios");
 const nodemailer = require("nodemailer");
 const saltround = 12;
 const secretKey = "Protect@@@@";
@@ -81,7 +81,7 @@ const register = async (req, res) => {
       `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
     );
 
-     if (!recaptchaResponse.data.success) {
+    if (!recaptchaResponse.data.success) {
       return res.status(400).json({
         status: 400,
         success: false,
@@ -145,16 +145,15 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     let validator = "";
-    const { email, password , recaptchaToken} = req.body;
+    const { email, password, recaptchaToken } = req.body;
     if (!password) validator += "Password is Required. ";
     if (!email) validator += "Email is Required. ";
 
-
-     const recaptchaResponse = await axios.post(
+    const recaptchaResponse = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
     );
 
-     if (!recaptchaResponse.data.success) {
+    if (!recaptchaResponse.data.success) {
       return res.status(400).json({
         status: 400,
         success: false,
@@ -218,18 +217,18 @@ const login = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   try {
-    const { email , recaptchaToken } = req.body;
+    const { email, recaptchaToken } = req.body;
     if (!email) {
       return res.status(400).json({
         success: false,
         message: "Email is required",
       });
     }
-     const recaptchaResponse = await axios.post(
+    const recaptchaResponse = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
     );
 
-     if (!recaptchaResponse.data.success) {
+    if (!recaptchaResponse.data.success) {
       return res.status(400).json({
         status: 400,
         success: false,
@@ -294,7 +293,7 @@ const forgotPassword = async (req, res) => {
 };
 const resetPassword = async (req, res) => {
   try {
-    const { email, otp, newPassword ,recaptchaToken } = req.body;
+    const { email, otp, newPassword, recaptchaToken } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) {
@@ -303,11 +302,11 @@ const resetPassword = async (req, res) => {
         message: "User not found",
       });
     }
-     const recaptchaResponse = await axios.post(
+    const recaptchaResponse = await axios.post(
       `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
     );
 
-     if (!recaptchaResponse.data.success) {
+    if (!recaptchaResponse.data.success) {
       return res.status(400).json({
         status: 400,
         success: false,
@@ -344,26 +343,26 @@ const resetPassword = async (req, res) => {
   }
 };
 
-const logout = async (req, res) => {
-  try {
-    // Clear token cookie
-    res.clearCookie("token", {
-      httpOnly: true,
-      sameSite: "strict",
-    });
+// const logout = async (req, res) => {
+//   try {
+//     // Clear token cookie
+//     res.clearCookie("token", {
+//       httpOnly: true,
+//       sameSite: "strict",
+//     });
 
-    return res.status(200).json({
-      success: true,
-      message: "Logged out successfully",
-    });
-  } catch (error) {
-    console.error("Logout Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Something went wrong while logging out",
-    });
-  }
-};
+//     return res.status(200).json({
+//       success: true,
+//       message: "Logged out successfully",
+//     });
+//   } catch (error) {
+//     console.error("Logout Error:", error);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Something went wrong while logging out",
+//     });
+//   }
+// };
 const verifyEmail = async (req, res) => {
   try {
     const { token } = req.query;
@@ -475,23 +474,26 @@ const changePassword = async (req, res) => {
 
 const updateUserDetails = async (req, res) => {
   try {
-    const { _id } = req.user; // logged in user id
+    const { _id } = req.user;
 
-    // Update user basic info
+
+
     const updateData = {
       userName: req.body.userName,
       email: req.body.email,
       contact: req.body.contact,
     };
 
+    let imagePath = null;
     if (req.file) {
-      updateData.image = req.file.path.replace(/\\/g, "/");
+      imagePath = req.file.path.replace(/\\/g, "/");
+      updateData.image = imagePath;
     }
 
     // Update user
     const user = await User.findByIdAndUpdate(_id, updateData, { new: true });
     if (!user) return res.status(404).json({ error: "User not found" });
-    // Save extra details in Customer schema
+
     const Customer = await customer.findOneAndUpdate(
       { userId: _id },
       {
@@ -505,6 +507,7 @@ const updateUserDetails = async (req, res) => {
         state: req.body.state,
         city: req.body.city,
         pincode: req.body.pincode,
+        image: imagePath,
       },
       { new: true, upsert: true }
     );
@@ -731,14 +734,7 @@ const deleteUserByAdmin = async (req, res) => {
 
 const registerAdmin = async (req, res) => {
   try {
-    const {
-      ownerName,
-      email,
-      password,
-      businessName,
-      address,
-      confirmPassword,
-    } = req.body;
+    const { ownerName, email, password, address, confirmPassword } = req.body;
 
     if (!ownerName) {
       return res
@@ -765,11 +761,6 @@ const registerAdmin = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Passwords do not match" });
     }
-    if (!businessName) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Business name is required" });
-    }
     if (!address) {
       return res
         .status(400)
@@ -795,9 +786,8 @@ const registerAdmin = async (req, res) => {
       password: hashedPassword,
       userType: 2,
       status: true,
-      businessName,
       address,
-      logo: imagePath,
+      image: imagePath,
     });
 
     newUser = await newUser.save();
@@ -920,7 +910,7 @@ module.exports = {
   login,
   forgotPassword,
   resetPassword,
-  logout,
+  // logout,
   verifyEmail,
   changePassword,
   updateUserDetails,

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const AdminCarDetails = () => {
   const [car, setCars] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const userData = useSelector((store) => store.user);
+  const userType = userData?.userType; //
   const { id } = useParams();
   const fetchAllCars = async () => {
     setLoading(true);
@@ -18,6 +21,22 @@ const AdminCarDetails = () => {
       toast.error(err.response?.data?.message || "Failed to fetch cars");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleStatus = async (currentStatus) => {
+    try {
+      const res = await apiService.toogleIsAvailableByAdmin(car._id, {
+        isAvailable: !currentStatus,
+      });
+
+      if (res.data.success) {
+        toast.success("Car status updated successfully");
+
+        setCars({ ...car, status: !currentStatus });
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Server error");
     }
   };
 
@@ -48,8 +67,18 @@ const AdminCarDetails = () => {
                     {car.status ? "Active" : "Inactive"}
                   </span>
                   <span className="badge badge-md bg-secondary-transparent">
-                    {car.inRent ? "In Rent" : "Available"}
+                    {car.inRent ? "In Rent" : "Not In Rent"}
                   </span>
+                  {userType !== 1 && (
+                    <button
+                      className={`badge border-0 ${
+                        car.isAvailable ? "bg-success" : "bg-danger"
+                      }`}
+                      onClick={() => handleToggleStatus(car.isAvailable)}
+                    >
+                      {car.isAvailable ? "Available" : "Not Available"}
+                    </button>
+                  )}
                 </div>
                 <p>Created {new Date(car.createdAt).toDateString()}</p>
               </div>
@@ -288,14 +317,6 @@ const AdminCarDetails = () => {
                               </a>
                             </div>
                           </div>
-                          <div className="d-flex align-items-center">
-                            <span className="me-2">
-                              <img
-                                src="/admin-assets/img/icons/pdf-icon.svg"
-                                alt="img"
-                              />
-                            </span>
-                          </div>
                         </div>
                       </div>
                       <div>
@@ -315,6 +336,7 @@ const AdminCarDetails = () => {
                         </div>
                       </div>
                     </div>
+
                     {/* /Car Info */}
                     {/* Car Price */}
                     <div className="tab-pane fade" id="car-price">
@@ -605,9 +627,7 @@ const AdminCarDetails = () => {
                                   <p className="fs-13">{damage.description}</p>
                                 </div>
                                 <div className="col-xxl-4 col-md-5">
-                                  <div className="d-flex align-items-center justify-content-md-end gap-2 flex-wrap">
-                                   
-                                  </div>
+                                  <div className="d-flex align-items-center justify-content-md-end gap-2 flex-wrap"></div>
                                 </div>
                               </div>
                             </div>
@@ -624,7 +644,7 @@ const AdminCarDetails = () => {
             </div>
             {/* /Car Details */}
             {/* Rent Summary */}
-         
+
             {/* /Rent Summary */}
           </div>
         </div>

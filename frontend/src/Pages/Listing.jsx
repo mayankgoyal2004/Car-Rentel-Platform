@@ -26,7 +26,7 @@ const Listing = () => {
     dropLocation: queryParams.get("dropLocation") || "",
     pickupDate: queryParams.get("pickupDate") || "",
     dropDate: queryParams.get("dropDate") || "",
-    city: queryParams.get("pickupLocation") || "", // Use pickupLocation as city
+    city: queryParams.get("pickupLocation") || "",
     page: 1,
     limit: 10,
     brand: [],
@@ -87,8 +87,12 @@ const Listing = () => {
   };
 
   const getWishList = async () => {
-    const res = await apiService.getWishlist();
-    setWishlist(res.data.wishlist); // already array of IDs
+    try {
+      const res = await apiService.getWishlist();
+      setWishlist(res.data.wishlist);
+    } catch (err) {
+      console.error("Error fetching wishlist:", err);
+    }
   };
 
   useEffect(() => {
@@ -100,7 +104,7 @@ const Listing = () => {
   const handleWishlist = async (carId) => {
     try {
       const res = await apiService.addWishlist({ carId });
-      setWishlist(res.data.wishlist.cars); // already array of IDs
+      setWishlist(res.data.wishlist);
     } catch (err) {
       console.error("Error toggling wishlist:", err);
     }
@@ -203,6 +207,8 @@ const Listing = () => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const isInWishlist = (carId) =>
+    Array.isArray(wishlist) && wishlist.some((w) => w._id === carId);
 
   const renderPagination = () => {
     const pages = [];
@@ -794,14 +800,10 @@ const Listing = () => {
                                   <Heart
                                     size={20}
                                     color={
-                                      wishlist.includes(car?._id)
-                                        ? "red"
-                                        : "gray"
+                                      isInWishlist(car._id) ? "red" : "gray"
                                     }
                                     fill={
-                                      wishlist.includes(car?._id)
-                                        ? "red"
-                                        : "none"
+                                      isInWishlist(car._id) ? "red" : "none"
                                     }
                                   />
                                 </button>

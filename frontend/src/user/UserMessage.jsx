@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useSelector } from "react-redux";
+import { ArrowLeft } from "react-feather";
 
 const socket = io("http://localhost:7777");
 
@@ -28,6 +29,7 @@ const UserMessage = () => {
           {
             sender: senderId,
             message,
+            createdAt: new Date(),
           },
         ]);
       }
@@ -68,7 +70,6 @@ const UserMessage = () => {
 
   const closeChat = () => {
     setChatOpen(false);
-   
   };
   const sendMessage = () => {
     if (!input || !selectedUser) return;
@@ -77,7 +78,15 @@ const UserMessage = () => {
       receiverId: selectedUser._id,
       message: input,
     });
-    setMessages((prev) => [...prev, { sender: currentUserId, message: input }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: currentUserId,
+        message: input,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+
     setInput("");
   };
 
@@ -106,13 +115,11 @@ const UserMessage = () => {
                       style={{ cursor: "pointer" }}
                     >
                       <div className="media-img-wrap flex-shrink-0">
-                       
                         <div className="avatar avatar-online">
                           <img
                             src={BASE_URL_IMG + user.image}
                             alt={user.userName}
                             className="avatar-img rounded-circle"
-                          
                           />
                         </div>
                       </div>
@@ -135,16 +142,23 @@ const UserMessage = () => {
           </div>
 
           {/* Chat Area */}
-          <div className="col-xl-8 chat-cont-right">
+          <div className="col-xl-8 chat-cont-right ">
             <div className="chat-header">
               <div className="notify-block d-flex">
                 {selectedUser ? (
                   <>
                     <div className="media-img-wrap flex-shrink-0">
+                      <button
+                        onClick={closeChat}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <ArrowLeft size={20} />
+                      </button>
                       <div className="avatar avatar-online">
-                         <button onClick={closeChat}>
-                          <i className="ti ti-close"></i>
-                        </button>
                         <img
                           src={
                             selectedUser.image
@@ -153,9 +167,6 @@ const UserMessage = () => {
                           }
                           alt={selectedUser.userName}
                           className="avatar-img rounded-circle"
-                          onError={(e) => {
-                            e.target.src = "/default-avatar.png";
-                          }}
                         />
                       </div>
                     </div>

@@ -15,14 +15,20 @@ const AdminMain = () => {
   const [rentalCars, setRentalCars] = useState([]);
   const [loading, setLoading] = useState(false);
   const [customerPegination, setCustomerPegination] = useState({});
+  const [reservationPegination, setreservationPagination] = useState({});
+  const [carPegination, setCarPegination] = useState({});
+  const [ownerPegination, setOwnerPegination] = useState({});
 
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
 
-  const fetchAllCars = async () => {
+  const fetchAllCars = async (page = 1, searchQuery = "") => {
     setLoading(true);
     try {
-      const res = await apiService.getAllCarAdmin();
+      const res = await apiService.getAllCarAdmin({
+        page,
+        search: searchQuery,
+      });
       if (res.data.success) {
         setCars(res.data.data);
       }
@@ -35,9 +41,38 @@ const AdminMain = () => {
   const fetchAllCarsSuperAdmin = async () => {
     setLoading(true);
     try {
-      const res = await apiService.getAllCarAdmin();
+      const res = await apiService.getAllCarSuperAdmin();
       if (res.data.success) {
         setCars(res.data.data);
+        setCarPegination(res.data.pagination);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to fetch cars");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchAllOwnerSuperAdmin = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getAllOwnerAdmin();
+      if (res.data.success) {
+        setOwnerPegination(res.data.pagination);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to fetch cars");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAllReservationSuperAdmin = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getAllReservationSuperAdmin();
+      if (res.data.success) {
+        setCars(res.data.data);
+        setreservationPagination(res.data.pagination);
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to fetch cars");
@@ -65,7 +100,6 @@ const AdminMain = () => {
       const res = await apiService.getLatest5Customer();
       if (res.data.success) {
         setCustomers(res.data.data);
-       
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to fetch cars");
@@ -77,10 +111,10 @@ const AdminMain = () => {
   const fetchCustomersSuperAdmin = async () => {
     setLoading(true);
     try {
-      const res = await apiService.getAllcustomerAdmin();
+      const res = await apiService.getAllcustomerSuperAdmin();
       if (res.data.success) {
         setCustomers(res.data.data);
-         setCustomerPegination(res.data.pagination);
+        setCustomerPegination(res.data.pagination);
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to fetch cars");
@@ -150,6 +184,8 @@ const AdminMain = () => {
     } else {
       fetchAllCarsSuperAdmin();
       fetchCustomersSuperAdmin();
+      fetchAllReservationSuperAdmin();
+      fetchAllOwnerSuperAdmin()
     }
   }, []);
 
@@ -225,7 +261,7 @@ const AdminMain = () => {
             {/* /Welcome Wrap */}
             <div className="row">
               {/* Total Reservations */}
-              <div className="col-md-4 d-flex">
+              <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
                 <div className="card flex-fill">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -238,16 +274,20 @@ const AdminMain = () => {
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                        <h5 className="mb-1">{reservations.length}</h5>
+                        <h5 className="mb-1">
+                          {userType === 1
+                            ? reservationPegination?.totalReservation
+                            : reservations.length}
+                        </h5>
                       </div>
                       <div id="reservation-chart" />
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> 
               {/* /Total Reservations */}
               {/* Total Earnings */}
-              <div className="col-md-4 d-flex">
+              <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
                 <div className="card flex-fill">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -262,11 +302,11 @@ const AdminMain = () => {
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                       <h5 className="mb-1">
-  {userType === 1 
-    ? customerPegination?.totalcustomer 
-    : drivers.length}
-</h5>
+                        <h5 className="mb-1">
+                          {userType === 1
+                            ? customerPegination?.totalcustomer
+                            : drivers.length}
+                        </h5>
                       </div>
                       <div id="earning-chart" />
                     </div>
@@ -275,7 +315,7 @@ const AdminMain = () => {
               </div>
               {/* /Total Earnings */}
               {/* Total Cars */}
-              <div className="col-md-4 d-flex">
+              <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
                 <div className="card flex-fill">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -288,13 +328,41 @@ const AdminMain = () => {
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                        <h5 className="mb-1">{cars.length}</h5>
+                        <h5 className="mb-1">
+                          {userType === 1
+                            ? carPegination?.totalCars
+                            : cars.length}
+                        </h5>
                       </div>
                       <div id="car-chart" />
                     </div>
                   </div>
                 </div>
               </div>
+              {userType === 1 && (
+                <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
+                  <div className="card flex-fill">
+                    <div className="card-body pb-1">
+                      <div className="border-bottom mb-0 pb-2">
+                        <div className="d-flex align-items-center">
+                          <span className="avatar avatar-sm bg-violet-100 text-violet me-2">
+                            <i className="ti ti-car fs-14" />
+                          </span>
+                          <p>Total Owner</p>
+                        </div>
+                      </div>
+                      <div className="d-flex align-items-center justify-content-between gap-2">
+                        <div className="py-2">
+                          <h5 className="mb-1">
+                            {ownerPegination?.totalUser}
+                          </h5>
+                        </div>
+                        <div id="car-chart" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               {/* /Total Cars */}
             </div>
           </div>

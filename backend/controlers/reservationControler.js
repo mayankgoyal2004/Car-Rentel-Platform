@@ -698,7 +698,7 @@ const editReservationStep3 = async (req, res) => {
 
         await customerRecord.save();
       }
-    } else if (driverType === "withDriver") {
+    } else {
       reservation.driverType = "withDriver";
     }
 
@@ -1089,5 +1089,5 @@ module.exports = {
   getLatest5ReservationsForAdmin,
   changetheStatusofReservationToConformed,
   reservationCancelledByAdmin,
-  getAllReservationSuperAdmin
+  getAllReservationSuperAdmin,
 };

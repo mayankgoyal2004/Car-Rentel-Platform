@@ -6,14 +6,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 const AdminRegister = () => {
   const [formData, setFormData] = useState({
-    businessName: "",
     ownerName: "",
     email: "",
     password: "",
     confirmPassword: "",
     contact: "",
     address: "",
-    logo: null,
+    image: null,
   });
 
   const navigate = useNavigate();
@@ -69,21 +68,6 @@ const AdminRegister = () => {
                       </p>
                     </div>
 
-                    {/* Business Name */}
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Business Name <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="businessName"
-                        className="form-control"
-                        value={formData.businessName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-
                     {/* Owner Name */}
                     <div className="mb-3">
                       <label className="form-label">
@@ -132,7 +116,7 @@ const AdminRegister = () => {
                     {/* Address */}
                     <div className="mb-3">
                       <label className="form-label">
-                        Business Address <span className="text-danger">*</span>
+                        Address <span className="text-danger">*</span>
                       </label>
                       <textarea
                         name="address"
@@ -175,10 +159,10 @@ const AdminRegister = () => {
 
                     {/* Upload Logo */}
                     <div className="mb-3">
-                      <label className="form-label">Business Logo</label>
+                      <label className="form-label">Image</label>
                       <input
                         type="file"
-                        name="logo"
+                        name="image"
                         className="form-control"
                         accept="image/*"
                         onChange={handleChange}
@@ -216,21 +200,21 @@ const AdminRegister = () => {
           className="login-bg-02"
         />
       </div>
-        <div>
-              {/* Your existing JSX */}
-      
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+      <div>
+        {/* Your existing JSX */}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

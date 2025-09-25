@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import apiService from "../../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Link } from "react-router-dom";
 
 const AdminSecuritySetting = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -65,9 +68,9 @@ const AdminSecuritySetting = () => {
                   <li>
                     <ul className="sidebar-links pb-3 mb-3 border-bottom">
                       <li>
-                        <a href="/admin-dashboard/profile-setting">
+                        <Link to="/admin-dashboard/profile-setting">
                           Profile
-                        </a>
+                        </Link>
                       </li>
                       <li className="active">
                         Security

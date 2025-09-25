@@ -131,6 +131,7 @@ import ProtectedRoute from "./authentication/ProtectedRoute";
 import EmailVerified from "./authentication/emailVerified";
 import ResetPassword from "./authentication/ResetPassword";
 import AdminRegister from "./Admin/AdminAuthentication/adminRegister";
+import AdminOwners from "./Admin/adminAllOwner";
 
 
 function App() {
@@ -226,6 +227,7 @@ function App() {
             <Route path="all-quotations" element={<AdminQuotations />} />
             <Route path="all-enquiries" element={<AdminEnquiries />} />
             <Route path="all-customers" element={<AdminCustomers />} />
+            <Route path="all-owners" element={<AdminOwners />} />
             <Route path="all-drivers" element={<AdminDrivers />} />
             <Route path="all-locations" element={<AdminLocations />} />
             <Route path="all-cars" element={<AdminCars />} />

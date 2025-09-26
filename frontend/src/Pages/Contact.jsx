@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { PhoneCall, Mail, MapPin, Clock } from "react-feather";
 import apiService from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +14,6 @@ const Contact = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   // Handle input change
   const handleChange = (e) => {
@@ -26,16 +27,19 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
     try {
-      const res = await apiService.addcontact(formData); // 👈 your backend route
+      const res = await apiService.addcontact(formData);
       if (res.data.success) {
-        setMessage("✅ Enquiry sent successfully!");
-        setFormData({ name: "", email: "", phone: "", comments: "" }); // reset
+        setFormData({ name: "", email: "", phone: "", comments: "" });
+        toast.success(res.data.message);
       }
     } catch (err) {
-      setMessage("❌ Failed to send enquiry, try again.");
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     } finally {
       setLoading(false);
     }
@@ -58,10 +62,7 @@ const Contact = () => {
                     <li className="breadcrumb-item">
                       <Link to="/about-us">About Us</Link>
                     </li>
-                    <li
-                      className="breadcrumb-item active"
-                      aria-current="page"
-                    >
+                    <li className="breadcrumb-item active" aria-current="page">
                       Contact Us
                     </li>
                   </ol>
@@ -191,7 +192,6 @@ const Contact = () => {
                     >
                       {loading ? "Sending..." : "Send Enquiry"}
                     </button>
-                    {message && <p className="mt-3">{message}</p>}
                   </form>
                 </div>
               </div>
@@ -200,6 +200,17 @@ const Contact = () => {
         </section>
         {/* /Contact us */}
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

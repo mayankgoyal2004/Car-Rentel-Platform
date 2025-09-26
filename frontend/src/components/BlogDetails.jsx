@@ -17,6 +17,8 @@ const BlogDetails = () => {
     setLoading(true);
     try {
       const res = await apiService.getSingleBlogUser(slug);
+      console.log("Blog response:", res.data);
+
       if (res.data.success) {
         setBlog(res.data.data);
       }
@@ -28,9 +30,10 @@ const BlogDetails = () => {
   };
 
   // Fetch comments
-  const fetchComments = async () => {
+  const fetchComments = async (blogId) => {
+    if (!blogId) return;
     try {
-      const res = await apiService.getAllblogsComment(blog?._id);
+      const res = await apiService.getAllblogsComment(blogId);
       if (res.data.success) {
         setComments(res.data.comments);
       }
@@ -46,7 +49,7 @@ const BlogDetails = () => {
     try {
       const res = await apiService.addblogComment(blog._id, commentForm);
       if (res.data.success) {
-        fetchComments();
+        fetchComments(blog._id);
         setCommentForm((prev) => ({ ...prev, message: "" }));
       }
     } catch (err) {
@@ -59,7 +62,7 @@ const BlogDetails = () => {
   }, [slug]);
 
   useEffect(() => {
-    if (blog?._id) fetchComments();
+    if (blog?._id) fetchComments(blog._id);
   }, [blog]);
 
   if (loading) return <p>Loading...</p>;

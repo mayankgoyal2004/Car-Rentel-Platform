@@ -5,74 +5,63 @@ const Customer = require("../models/customerModel");
 
 const createInvoice = async (req, res) => {
   try {
-    const { reservationId, Items, terms, notes, paymentMethod } = req.body;
-    const { _id } = req.user;
+    const {
+      reservationId,
+      invoiceNumber,
+
+      totalAmount,
+      issuedDate,
+      fromDate,
+      subtotal,
+      dueDate,
+      carId,
+      items,
+      terms,
+      notes,
+      status,
+      currency,
+      from,
+      to,
+      paymentMethod,
+    } = req.body;
     const reservation = await Reservation.findById(reservationId)
       .populate("car")
-      .populate("user");
-
-    const items = [];
-
-    items.push({
-      description: `${reservation.car.carName} Rental`,
-      quantity: reservation.noOfPassengers || 1,
-      netPrice: reservation.totalPrice,
-      tax: 0,
-      totalPrice: reservation.totalPrice,
-    });
-
-    // 3. Add extra charges (from admin)
-    if (extraItems && Array.isArray(extraItems)) {
-      extraItems.forEach((item) => {
-        items.push({
-          description: item.description,
-          quantity: item.quantity,
-          netPrice: item.netPrice,
-          tax: item.tax || 0,
-          totalPrice:
-            item.netPrice * item.quantity * (1 + (item.tax || 0) / 100),
-        });
-      });
+      .populate("customer")
+      .populate("extraServices");
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
     }
-
-    const subtotal = items.reduce(
-      (sum, item) => sum + item.netPrice * item.quantity,
-      0
-    );
-    const tax = items.reduce(
-      (sum, item) => sum + item.netPrice * item.quantity * (item.tax / 100),
-      0
-    );
-    const totalAmount = subtotal + tax;
-    const invoiceNumber = "INV-" + Math.floor(100000 + Math.random() * 900000);
 
     const invoice = new Invoice({
       invoiceNumber,
-      car: reservation.car._id,
-      customer: reservation.user._id,
-      reservation: reservation._id,
-      fromDate: reservation.pickupDate,
-      dueDate: reservation.dropDate,
+      car: reservation.car._id || carId,
+      customer: reservation.customer._id || to,
+      reservation: reservationId,
+      fromDate: fromDate,
+      dueDate: dueDate,
+      status: status,
       from: {
-        name: "DreamsRent",
-        address: "Flat8, Park View House, 7 high Street , US",
-        contact: "+447123456789",
-        email: "dreamsrent@example.com",
+        name: from,
       },
       to: {
-        name: reservation.user.name,
-        address: reservation.user.address || "",
-        contact: reservation.user.phone || "",
-        email: reservation.user.email,
+        name: to,
+        address: reservation.customer.address || "",
+        contact: reservation.customer.phone || "",
+        email: reservation.customer.email,
       },
+      issuedDate,
       items,
       paymentMethod,
       terms,
       notes,
       subtotal,
-      tax,
+
+      currency,
       totalAmount,
-      createdBy: _id,
+      createdBy: req.user._id,
+      admin: req.user.admin,
     });
 
     await invoice.save();
@@ -87,4 +76,154 @@ const createInvoice = async (req, res) => {
   }
 };
 
-module.exports = { createInvoice };
+const getAllInvoice = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId };
+    if (search) {
+      filter.name = { $regex: search, $options: "i" };
+    }
+
+    const invoice = await Invoice.find(filter)
+      .populate("car")
+      .populate("customer")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalInvoice = await Invoice.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: invoice,
+      pagination: {
+        totalInvoice,
+        currentPage: page,
+        totalPages: Math.ceil(totalInvoice / limit),
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: err.message,
+    });
+  }
+};
+const deleteInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const invoice = await Invoice.findById(id);
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({ success: false, message: "invoice not found" });
+    }
+
+    await Invoice.deleteOne({ _id: id });
+
+    res.json({
+      success: true,
+      message: "invoice deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const invoiceDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const invoice = await Invoice.findById(id)
+      .populate("customer")
+      .populate("reservation")
+      .populate("admin");
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({ success: false, message: "invoice not found" });
+    }
+    res.json({ success: true, data: invoice });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const invoice = await Invoice.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({ success: false, message: "invoice not found" });
+    }
+    res.json({ success: true, data: invoice });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getLatestInvoice = async (req, res) => {
+  try {
+    const invoice = await Invoice.find({ admin: req.user.admin }).populate("customer")
+      .sort({ createdAt: -1 })
+      .limit(5);
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({ success: false, message: "invoice not found" });
+    }
+    res.json({ success: true, data: invoice });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getInvoiceByReservationId = async (req, res) => {
+  try {
+    console.log(req.params)
+    const invoice = await Invoice.findOne({
+      reservation: req.params.reservationId,
+    })
+      .populate("customer", "userName email")
+      .populate("car", "name");
+
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "No invoice found for this reservation",
+        });
+    }
+
+    res.json({ success: true, data: invoice });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+module.exports = {
+  createInvoice,
+  deleteInvoice,
+  getAllInvoice,
+  invoiceDetails,
+  updateInvoice,
+  getLatestInvoice,
+  getInvoiceByReservationId
+};

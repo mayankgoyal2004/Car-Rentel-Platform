@@ -16,9 +16,13 @@ const createComment = async (req, res) => {
       createdBy: req.user._id,
       message,
     });
-
     await newComment.save();
-    res.status(201).json(newComment);
+
+    res.status(201).json({
+      success: true,
+      message: "Blog Comment created successfully",
+      data: newComment,
+    });
   } catch (err) {
     res
       .status(500)
@@ -35,7 +39,7 @@ const getCommentBlog = async (req, res) => {
 
     const comments = await Comment.find({ blog: blogId, status: true })
       .populate("createdBy", "userName email image")
-      .sort({ created_at: -1 })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 

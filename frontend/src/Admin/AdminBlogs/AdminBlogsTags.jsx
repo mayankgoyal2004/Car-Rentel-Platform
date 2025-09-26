@@ -64,12 +64,9 @@ const AdminBlogsTags = () => {
       setNewTag("");
       fetchTags();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "Tag already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -87,12 +84,9 @@ const AdminBlogsTags = () => {
       setEditTag(null);
       fetchTags();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "Tag already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -207,7 +201,7 @@ const AdminBlogsTags = () => {
                           tag.status ? "bg-success" : "bg-danger"
                         }`}
                       >
-                        {tag.status ? "Published" : "Unpublish"}
+                        {tag.status ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>

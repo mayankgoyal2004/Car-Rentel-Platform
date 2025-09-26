@@ -106,6 +106,7 @@ const AdminCustomers = () => {
     setCurrentPage(page);
   };
 
+
   const handleAddCustomer = async () => {
     try {
       const userFormData = new FormData();

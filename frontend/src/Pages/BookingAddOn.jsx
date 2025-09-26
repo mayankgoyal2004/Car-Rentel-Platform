@@ -46,11 +46,11 @@ const BookingAddOn = () => {
             pickupTime: reservationData.pickupTime || "10:00",
             returnTime: reservationData.dropTime || "10:00",
             doorStepDelivery: 0,
-            tripProtection: 25,
-            convenienceFee: 2,
+            tripProtection: 0,
+            convenienceFee: 0,
             tax: reservationData.pricingDetails?.tax || 0,
             deposit: reservationData.securityDeposit || 0,
-            insurance: 200
+           
           };
 
           setReservation(transformedData);

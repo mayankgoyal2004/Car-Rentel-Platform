@@ -281,6 +281,16 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  getOwnerDetails() {
+    return axios.get(BASE_URL + "get-owner-details", {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteOwner(id) {
+    return axios.delete(BASE_URL + `delete-owner/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
   getAllcustomerSuperAdmin({ search = "", page } = {}) {
     return axios.get(
       BASE_URL + `get-all-customer-super-admin?search=${search}&page=${page}`,
@@ -1191,9 +1201,23 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  delteReservation(id) {
+    return axios.delete(BASE_URL + `delete-reservation/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
   changeReservationStatusToConformed(id) {
     return axios.post(
       BASE_URL + `change-reservation-status-conformed/${id}`,
+      {},
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+  }
+  changeReservationStatusToComplete(id) {
+    return axios.post(
+      BASE_URL + `change-reservation-status-complete/${id}`,
       {},
       {
         headers: getAuthHeaders(),
@@ -1324,6 +1348,45 @@ class apiServices {
 
   deleteEnquiry(id) {
     return axios.delete(BASE_URL + `delete-enquiry/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!!  invoice api
+  addInvoice(data) {
+    return axios.post(BASE_URL + "add-invoice-admin", data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  editInvoice(id, data) {
+    return axios.post(BASE_URL + `edit-invoice-admin/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getAllInvoice() {
+    return axios.get(BASE_URL + `get-all-invoice-admin`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getInvoiceDetails(id) {
+    return axios.get(BASE_URL + `get-invoice-details/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getLatestInvoice() {
+    return axios.get(BASE_URL + `get-all-latest-invoice`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  deleteInvoice(id) {
+    return axios.delete(BASE_URL + `delete-invoice/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getInvoiceByReservationId(id) {
+    return axios.get(BASE_URL + `get-invoice-by-reservation/${id}`, {
       headers: getAuthHeaders(),
     });
   }

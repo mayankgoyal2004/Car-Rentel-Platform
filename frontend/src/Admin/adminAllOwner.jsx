@@ -10,7 +10,7 @@ const AdminOwners = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [search, setSearch] = useState("");
-
+  const [deleteowner, SetdeleteOwner] = useState(null);
 
   const fetchCustomers = async (searchQuery = "", page = 1) => {
     setLoading(true);
@@ -39,6 +39,16 @@ const AdminOwners = () => {
   useEffect(() => {
     fetchCustomers(search, currentPage);
   }, [currentPage, search]);
+
+  const handleDelete = async () => {
+    try {
+      await apiService.deleteOwner(deleteowner._id);
+      fetchCustomers(search, currentPage);
+      SetdeleteOwner("");
+    } catch (error) {
+      console.error("Error deleting owner:", error);
+    }
+  };
 
   return (
     <div className="page-wrapper">
@@ -81,7 +91,6 @@ const AdminOwners = () => {
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
           <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-           
             <div className="top-search me-2">
               <div className="top-search-group">
                 <span className="input-icon">
@@ -173,7 +182,9 @@ const AdminOwners = () => {
                       <p className="text-gray-9">{own.contact}</p>
                     </td>
                     <td>
-                      <p className="text-gray-9">
+                      <p className={`badge  ${
+                          own.status ? "bg-success" : "bg-danger"
+                        }`}>
                         {own.status ? "Active" : "Inactive"}
                       </p>
                     </td>
@@ -190,15 +201,15 @@ const AdminOwners = () => {
                         </button>
                         <ul className="dropdown-menu dropdown-menu-end p-2">
                           <li>
-                            <a
+                            <button
                               className="dropdown-item rounded-1"
-                            //   onClick={() => handleDeleteConfirm(customer)}
+                              onClick={() => SetdeleteOwner(own)}
                               data-bs-toggle="modal"
                               data-bs-target="#delete_modal"
                             >
                               <i className="ti ti-trash me-1" />
                               Delete
-                            </a>
+                            </button>
                           </li>
                         </ul>
                       </div>
@@ -278,9 +289,8 @@ const AdminOwners = () => {
         <div className="table-footer" />
       </div>
 
-
       {/* Delete Modal */}
-      {/* <div className="modal fade" id="delete_modal">
+      <div className="modal fade" id="delete_modal">
         <div className="modal-dialog modal-dialog-centered modal-sm">
           <div className="modal-content">
             <div className="modal-body text-center">
@@ -290,7 +300,7 @@ const AdminOwners = () => {
               <h4 className="mb-1">Delete Customer</h4>
               <p className="mb-3">
                 Are you sure you want to delete{" "}
-                {deleteCustomer?.name || "this customer"}?
+                {deleteowner?.name || "this customer"}?
               </p>
               <div className="d-flex justify-content-center">
                 <a className="btn btn-light me-3" data-bs-dismiss="modal">
@@ -308,7 +318,7 @@ const AdminOwners = () => {
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
       {/* /Delete Modal */}
     </div>
   );

@@ -482,9 +482,11 @@ const AdminDashboard = () => {
                               <NavLink to="blogs-comments">Comments</NavLink>
                             </li>
                           )}
-                          <li>
-                            <NavLink to="blogs-blogs-tags">Blog Tags</NavLink>
-                          </li>
+                          {userType === 1 && (
+                            <li>
+                              <NavLink to="blogs-blogs-tags">Blog Tags</NavLink>
+                            </li>
+                          )}
                         </ul>
                       )}
                     </li>

@@ -37,10 +37,11 @@ const AdminInvoice = () => {
   useEffect(() => {
     fetchInvoce(currentPage, search);
   }, [currentPage, search]);
+
   const handleDelete = async () => {
     if (!deleteinvoceId) return;
     try {
-      await apiService.deleteInvoice(deleteinvoceId);
+      await apiService.deleteInvoice(deleteinvoceId._id);
       fetchInvoce(search, currentPage);
       setDeleteInvoiceId(null);
     } catch (err) {
@@ -51,6 +52,7 @@ const AdminInvoice = () => {
       );
     }
   };
+
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -137,26 +139,26 @@ const AdminInvoice = () => {
                   </tr>
                 ) : (
                   invoice.map((inv) => (
-                    <tr key={inv._id}>
+                    <tr>
                       <td>
                         <Link
                           to={"/admin-dashboard/invoice-details/" + inv._id}
                           className="fs-12 fw-medium"
                         >
-                          #{inv.invoiceNumber}
+                          {inv?.invoiceNumber}
                         </Link>
                       </td>
                       <td>
                         <div className="d-flex align-items-center">
                           <Link
                             to={
-                              "/admin-dashboard/customer-details/" +
-                              inv.customer._id
+                              "/admin-dashboard/customer-details" +
+                              inv.customer?._id
                             }
                             className="avatar avatar-rounded me-2 flex-shrink-0"
                           >
                             <img
-                              src={BASE_URL_IMG + inv.customer.image}
+                              src={BASE_URL_IMG + inv.customer?.image}
                               alt="User Img"
                             />
                           </Link>
@@ -164,11 +166,11 @@ const AdminInvoice = () => {
                             <h6 className="fs-14">
                               <Link
                                 to={
-                                  "/admin-dashboard/customer-details/" +
-                                  inv.customer._id
+                                  "/admin-dashboard/customer-details" +
+                                  inv?.customer?._id
                                 }
                               >
-                                {inv.customer.name}
+                                {inv?.customer?.name}
                               </Link>
                             </h6>
                           </div>
@@ -176,24 +178,23 @@ const AdminInvoice = () => {
                       </td>
                       <td>
                         <a
-                          href={"mailto:" + inv.customer.email}
+                          href={"mailto:" + inv?.customer?.email}
                           className="__cf_email__"
-                          data-cfemail="c6a7a8a2b4a3b186a3bea7abb6aaa3e8a5a9ab"
                         >
-                          {inv.customer.email}
+                          {inv?.customer?.email}
                         </a>
                       </td>
                       <td>
                         <div>
                           <p className="mb-0">
-                            {new Date(inv.fromDate).toDateString()}
+                            {new Date(inv?.fromDate).toDateString()}
                           </p>
                         </div>
                       </td>
                       <td>
                         <div>
                           <p className="mb-0">
-                            {new Date(inv.dueDate).toDateString()}
+                            {new Date(inv?.dueDate).toDateString()}
                           </p>
                         </div>
                       </td>
@@ -201,7 +202,7 @@ const AdminInvoice = () => {
                       <td>
                         <span className="badge badge-soft-success d-inline-flex align-items-center badge-sm">
                           <i className="ti ti-point-filled me-1" />
-                          {inv.status}
+                          {inv?.status}
                         </span>
                       </td>
                       <td>
@@ -215,21 +216,21 @@ const AdminInvoice = () => {
                             <i className="ti ti-dots-vertical" />
                           </button>
                           <ul className="dropdown-menu dropdown-menu-end p-2">
-                            {/* <li>
+                            <li>
                               <Link
-                                to={"/admin-dashboard/edit-invoice/" + inv._id}
+                                to={`/admin-dashboard/edit-invoice/${inv?._id}`}
                                 className="dropdown-item rounded-1"
                               >
                                 <i className="ti ti-edit me-1" />
                                 Edit
                               </Link>
-                            </li> */}
+                            </li>
                             <li>
                               <button
                                 className="dropdown-item rounded-1"
                                 data-bs-toggle="modal"
-                                data-bs-target="#delete_modal_invoice"
-                                onClick={() => setDeleteInvoiceId(inv?._id)}
+                                data-bs-target="#delete_modal"
+                                onClick={setDeleteInvoiceId(inv?._id)}
                               >
                                 <i className="ti ti-trash me-1" />
                                 Delete
@@ -243,7 +244,7 @@ const AdminInvoice = () => {
                 )}
               </tbody>
             </table>
-            <nav aria-label="Page navigation" className="mt-3">
+            {/* <nav aria-label="Page navigation" className="mt-3">
               <ul className="pagination justify-content-center">
                 <li
                   className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
@@ -285,7 +286,7 @@ const AdminInvoice = () => {
                   </button>
                 </li>
               </ul>
-            </nav>
+            </nav> */}
           </div>
           {/* Custom Data Table */}
           <div className="table-footer" />
@@ -293,7 +294,7 @@ const AdminInvoice = () => {
       </div>
       {/* /Page Wrapper */}
       {/* Delete Modal  */}
-      <div className="modal fade" id="delete_modal_invoice">
+      <div className="modal fade" id="delete_modal">
         <div className="modal-dialog modal-dialog-centered modal-sm">
           <div className="modal-content">
             <div className="modal-body text-center">
@@ -306,11 +307,7 @@ const AdminInvoice = () => {
                 <a className="btn btn-light me-3" data-bs-dismiss="modal">
                   Cancel
                 </a>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={handleDelete}
-                >
+                <button onClick={handleDelete} className="btn btn-primary">
                   Yes, Delete
                 </button>
               </div>

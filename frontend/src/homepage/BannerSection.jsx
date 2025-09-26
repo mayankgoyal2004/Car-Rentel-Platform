@@ -99,7 +99,7 @@ function BannerSection() {
                   onChange={(e) => setPickupCity(e.target.value)}
                 >
                   <option value="">Choose City</option>
-                  <option value="Dubai">Dubai</option>
+                  <option value="New York City">New York City</option>
                   <option value="Sharjah">Sharjah</option>
                   <option value="Abu Dhabi">Abu Dhabi</option>
                   <option value="Ajman">Ajman</option>
@@ -118,7 +118,7 @@ function BannerSection() {
                   onChange={(e) => setDropCity(e.target.value)}
                 >
                   <option value="">Choose City</option>
-                  <option value="Dubai">Dubai</option>
+                  <option value="New York City">New York City</option>{" "}
                   <option value="Sharjah">Sharjah</option>
                   <option value="Abu Dhabi">Abu Dhabi</option>
                   <option value="Ajman">Ajman</option>

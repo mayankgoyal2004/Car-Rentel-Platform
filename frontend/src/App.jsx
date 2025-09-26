@@ -322,7 +322,7 @@ function App() {
               path="customer-companies"
               element={<AdminCustomersCumpanies />}
             />
-            <Route path="invoice-details" element={<AdminInvoiceDetails />} />
+            <Route path="invoice-details/:id" element={<AdminInvoiceDetails />} />
             <Route path="car-details/:id" element={<AdminCarDetails />} />
             <Route path="add-car" element={<AdminAddCars />} />
             <Route path="edit-car/:id" element={<AdminEditCar />} />
@@ -338,7 +338,7 @@ function App() {
             />
             <Route path="edit-quotations" element={<AdminEditQuatations />} />
             <Route path="add-quotations" element={<AdminAddQuotations />} />
-            <Route path="edit-invoice" element={<AdminEditEnvoice />} />
+            <Route path="edit-invoice/:id" element={<AdminEditEnvoice />} />
             <Route path="add-invoice" element={<AddInvoice />} />
             <Route path="add-pages" element={<AdminAddPages />} />
             <Route

@@ -28,7 +28,7 @@ const invoiceSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["unpaid", "partially_paid", "paid"],
+      enum: ["unpaid", "pending", "paid", "overdue", "unpaid"],
       default: "unpaid",
     },
     from: {
@@ -37,7 +37,7 @@ const invoiceSchema = new mongoose.Schema(
       contact: String,
       email: String,
     },
-     to: {
+    to: {
       name: String,
       address: String,
       contact: String,
@@ -56,6 +56,8 @@ const invoiceSchema = new mongoose.Schema(
     totalAmount: { type: Number, default: 0 },
 
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    admin: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+    issuedDate: { type: String },
   },
   { timestamps: true }
 );

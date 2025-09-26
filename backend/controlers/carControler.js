@@ -185,14 +185,7 @@ const editBasicCar = async (req, res) => {
       car.image = imagePath;
     }
 
-    // Keep status/isAvailable/inRent logic same
-    car.status = false; // on edit, set pending approval again
-    car.isAvailable = false;
-    car.inRent = false;
-
-    // Update meta info
-    car.updatedAt = Date.now();
-    car.updatedBy = req.user._id;
+    car.status = false;
 
     await car.save();
 

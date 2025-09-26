@@ -53,10 +53,8 @@ const addReservation = async (req, res) => {
     if (driverType === "withDriver") {
       if (driver_id) {
         assignedDriver = driver_id;
-        // Update status of the chosen driver
         await Driver.findByIdAndUpdate(driver_id, { status: "assigned" });
       } else {
-        // Auto-assign an available driver
         const availableDriver = await Driver.findOneAndUpdate(
           { status: "available", isActive: true, admin: req.user.admin },
           { status: "assigned" },
@@ -253,7 +251,7 @@ const updateReservation = async (req, res) => {
 const deleteReservation = async (req, res) => {
   try {
     const { id } = req.params;
-    const reservation = await reservation.findById(id);
+    const reservation = await Reservation.findById(id);
     if (!reservation) {
       return res
         .status(404)
@@ -329,8 +327,18 @@ const getAllReservationsForAdmin = async (req, res) => {
       });
     }
     const reservations = await Reservation.find({ car: { $in: carIds } })
-      .populate("car", "carName image")
+      .populate({
+        path: "car",
+        populate: [
+          { path: "pricing" },
+          { path: "extraService" },
+          { path: "mainLocation" },
+          { path: "carType" },
+        ],
+      })
       .populate("customer", "name image")
+      .populate("extraServices")
+      .populate("driver")
 
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
@@ -845,7 +853,8 @@ const reservationCancelledByAdmin = async (req, res) => {
     }
 
     const reservation = await Reservation.findById(id);
-
+    const driver = await Driver.findById(reservation.driver);
+    const car = await Car.findById(reservation.car);
     if (!reservation) {
       return res
         .status(404)
@@ -858,7 +867,12 @@ const reservationCancelledByAdmin = async (req, res) => {
     reservation.cancelledBy = "owner";
 
     await reservation.save();
-
+    car.inRent = false;
+    await car.save();
+    if (driver) {
+      driver.status = "available";
+      await driver.save();
+    }
     return res.status(200).json({
       success: true,
       message: "Reservation cancelled successfully",
@@ -1068,6 +1082,42 @@ const getAllReservationSuperAdmin = async (req, res) => {
   }
 };
 
+const bookingCompleteByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reservation = await Reservation.findById(id);
+    const driver = await Driver.findById(reservation.driver);
+    const car = await Car.findById(reservation.car);
+
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+
+    // Update status and cancellation reason
+    reservation.status = "completed";
+
+    await reservation.save();
+    car.inRent = false;
+    await car.save();
+    if (driver) {
+      driver.status = "available";
+      await driver.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Reservation Completed ",
+      data: reservation,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 module.exports = {
   addReservation,
   updateReservation,
@@ -1090,4 +1140,5 @@ module.exports = {
   changetheStatusofReservationToConformed,
   reservationCancelledByAdmin,
   getAllReservationSuperAdmin,
+  bookingCompleteByAdmin,
 };

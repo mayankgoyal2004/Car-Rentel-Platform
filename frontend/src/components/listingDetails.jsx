@@ -528,18 +528,7 @@ const ListingDetails = () => {
                   <p>{carData.description}</p>
 
                   <div className="read-more">
-                    <div className="more-text">
-                      <p>
-                        It was popularised in the 1960s with the release of
-                        Letraset sheets containing Lorem Ipsum passages, and
-                        more recently with desktop publishing software like
-                        Aldus PageMaker including versions of Lorem Ipsum.It was
-                        popularised in the 1960s with the release of Letraset
-                        sheets containing Lorem Ipsum passages, and more
-                        recently with desktop publishing software like Aldus
-                        PageMaker including versions of Lorem Ipsum.
-                      </p>
-                    </div>
+                   
                     <button className="more-link" onClick={toggleDescription}>
                       {showFullDescription ? "Show Less" : "Show More"}
                     </button>
@@ -1314,56 +1303,48 @@ const ListingDetails = () => {
                   </li>
                 </ul>
                 <div className="message-btn">
-                  <a href="#" className="btn btn-order">
+                  <Link to="/user-dashboard/user-message" className="btn btn-order">
                     Message to owner
-                  </a>
+                  </Link>
                   <a href="#" className="chat-link">
                     <i className="fa-brands fa-whatsapp" />
                     Chat Via Whatsapp
                   </a>
                 </div>
               </div>
-              <div className="review-sec share-car mt-0">
-                <div className="review-header">
-                  <h4>View Car Location</h4>
-                </div>
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6509170.989457427!2d-123.80081967108484!3d37.192957227641294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb9fe5f285e3d%3A0x8b5109a227086f55!2sCalifornia%2C%20USA!5e0!3m2!1sen!2sin!4v1669181581381!5m2!1sen!2sin"
-                  className="iframe-video"
-                />
-              </div>
+           
               <div className="review-sec share-car mt-0 mb-0">
                 <div className="review-header">
                   <h4>Share</h4>
                 </div>
                 <ul className="nav-social">
                   <li>
-                    <a href="javascript:void(0)">
+                    <a >
                       <i className="fa-brands fa-facebook-f fa-facebook fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0)">
+                    <a  >
                       <i className="fab fa-instagram fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0)">
+                    <a  >
                       <i className="fab fa-behance fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0)">
+                    <a  >
                       <i className="fa-brands fa-pinterest-p fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0)">
+                    <a  >
                       <i className="fab fa-twitter fi-icon" />{" "}
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0)">
+                    <a  >
                       <i className="fab fa-linkedin fi-icon" />
                     </a>
                   </li>

@@ -41,6 +41,7 @@ const faq = require("../controlers/faqControler");
 const checkSubscription = require("../middlewares/checkPermission");
 const reservation = require("../controlers/reservationControler");
 const contact = require("../controlers/contactUsControler");
+const invoice = require("../controlers/invoiceControler");
 
 const route = express.Router();
 
@@ -305,8 +306,20 @@ route.get(
 );
 route.get(
   "/get-all-customer-super-admin",
+  checkPermission("admin", "assignPackage", true),
 
   customer.getAllCustomerSuperAdmin
+);
+route.get(
+  "/get-owner-details",
+
+  customer.getOwnerDetails
+);
+route.delete(
+  "/delete-owner/:id",
+  checkPermission("admin", "assignPackage", true),
+
+  customer.deleteOwner
 );
 route.get(
   "/get-all-owner-super-admin",
@@ -1054,7 +1067,7 @@ route.get(
 );
 route.post(
   "/add-reservation-admin",
-  checkPermission("Reservation", "Create"),
+  checkPermission("Reservation", "create"),
   reservation.addReservation
 );
 route.post("/add-reservation-user-step-1/:id", reservation.addReservationStep1);
@@ -1085,6 +1098,11 @@ route.post(
   "/change-reservation-status-conformed/:id",
   checkPermission("Reservation", "edit"),
   reservation.changetheStatusofReservationToConformed
+);
+route.post(
+  "/change-reservation-status-complete/:id",
+  checkPermission("Reservation", "edit"),
+  reservation.bookingCompleteByAdmin
 );
 route.get(
   "/get-reservation-by/:id",
@@ -1129,4 +1147,31 @@ route.delete(
   contact.deleteContact
 );
 
+//!!! invoice api
+route.get(
+  "/get-all-invoice-admin",
+  checkPermission("Invoice", "view"),
+  invoice.getAllInvoice
+);
+route.delete(
+  "/delete-invoice/:id",
+  checkPermission("Invoice", "delete"),
+  invoice.deleteInvoice
+);
+route.get("/get-all-latest-invoice", invoice.getLatestInvoice);
+route.get("/get-invoice-details/:id", invoice.invoiceDetails);
+route.get(
+  "/get-invoice-by-reservation/:reservationId",
+  invoice.getInvoiceByReservationId
+);
+route.post(
+  "/add-invoice-admin",
+  checkPermission("Invoice", "create"),
+  invoice.createInvoice
+);
+route.post(
+  "/edit-invoice-admin/:id",
+  checkPermission("Invoice", "edit"),
+  invoice.createInvoice
+);
 module.exports = route;

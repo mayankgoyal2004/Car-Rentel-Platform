@@ -18,6 +18,7 @@ const AdminMain = () => {
   const [reservationPegination, setreservationPagination] = useState({});
   const [carPegination, setCarPegination] = useState({});
   const [ownerPegination, setOwnerPegination] = useState({});
+  const [invoice, setInvoices] = useState([]);
 
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
@@ -86,6 +87,19 @@ const AdminMain = () => {
       const res = await apiService.getAllCarInRental();
       if (res.data.success) {
         setRentalCars(res.data.data);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to fetch cars");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchLatestInvoices = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getLatestInvoice();
+      if (res.data.success) {
+        setInvoices(res.data.data);
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to fetch cars");
@@ -180,12 +194,13 @@ const AdminMain = () => {
       fetchDriver();
       fetchNewlyAddedCar();
       fetchCustomers();
+      fetchLatestInvoices();
       fetchlatestReservaton();
     } else {
       fetchAllCarsSuperAdmin();
       fetchCustomersSuperAdmin();
       fetchAllReservationSuperAdmin();
-      fetchAllOwnerSuperAdmin()
+      fetchAllOwnerSuperAdmin();
     }
   }, []);
 
@@ -261,7 +276,11 @@ const AdminMain = () => {
             {/* /Welcome Wrap */}
             <div className="row">
               {/* Total Reservations */}
-              <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
+              <div
+                className={`${
+                  userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
+                }`}
+              >
                 <div className="card flex-fill">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -284,10 +303,14 @@ const AdminMain = () => {
                     </div>
                   </div>
                 </div>
-              </div> 
+              </div>
               {/* /Total Reservations */}
               {/* Total Earnings */}
-              <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
+              <div
+                className={`${
+                  userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
+                }`}
+              >
                 <div className="card flex-fill">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -315,7 +338,11 @@ const AdminMain = () => {
               </div>
               {/* /Total Earnings */}
               {/* Total Cars */}
-              <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
+              <div
+                className={`${
+                  userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
+                }`}
+              >
                 <div className="card flex-fill">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -340,7 +367,11 @@ const AdminMain = () => {
                 </div>
               </div>
               {userType === 1 && (
-                <div className={`${userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"}`}>
+                <div
+                  className={`${
+                    userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
+                  }`}
+                >
                   <div className="card flex-fill">
                     <div className="card-body pb-1">
                       <div className="border-bottom mb-0 pb-2">
@@ -353,9 +384,7 @@ const AdminMain = () => {
                       </div>
                       <div className="d-flex align-items-center justify-content-between gap-2">
                         <div className="py-2">
-                          <h5 className="mb-1">
-                            {ownerPegination?.totalUser}
-                          </h5>
+                          <h5 className="mb-1">{ownerPegination?.totalUser}</h5>
                         </div>
                         <div id="car-chart" />
                       </div>
@@ -431,7 +460,7 @@ const AdminMain = () => {
                       </div>
                     </div>
                     <Link
-                      to={`/car-details/${newlyCar._id}`} // ✅ pass car id for details page
+                      to={`/admin-dashboard/car-details/${newlyCar._id}`} // ✅ pass car id for details page
                       className="btn btn-white d-flex align-items-center justify-content-center"
                     >
                       View Details
@@ -846,7 +875,7 @@ const AdminMain = () => {
                   <div className="d-flex align-items-center justify-content-between flex-wrap gap-1 mb-3">
                     <h5 className="mb-1">Recent Invoices</h5>
                     <Link
-                      Link="all-invoice"
+                      to="/admin-dashboard/all-invoice"
                       className="text-decoration-underline fw-medium mb-1"
                     >
                       View All
@@ -866,251 +895,70 @@ const AdminMain = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td>
-                            <Link
-                              to="invoice-details"
-                              className="fs-12 fw-medium"
-                            >
-                              #12345
-                            </Link>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link
-                                to="customers-details"
-                                className="avatar flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-20.jpg"
-                                  className="rounded-circle"
-                                  alt
-                                />
-                              </Link>
-                              <div className="flex-grow-1 ms-2">
-                                <h6 className="fs-14 fw-semibold mb-1">
-                                  <Link to="customers-details">
-                                    Andrew Simons{" "}
+                        {loading ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : invoice.length === 0 ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              No Invoice found
+                            </td>
+                          </tr>
+                        ) : (
+                          invoice.map((inv) => (
+                            <tr>
+                              <td>
+                                <Link
+                                  to={"invoice-details/" + inv.id}
+                                  className="fs-12 fw-medium"
+                                >
+                                  #{inv.invoiceNumber}
+                                </Link>
+                              </td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <Link
+                                    to={"customers-details/" + inv.customer}
+                                    className="avatar flex-shrink-0"
+                                  >
+                                    <img
+                                      src={BASE_URL_IMG + inv.customer.image}
+                                      className="rounded-circle"
+                                      alt
+                                    />
                                   </Link>
-                                </h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <a
-                              href="/cdn-cgi/l/email-protection"
-                              className="__cf_email__"
-                              data-cfemail="61000f05130416210419000c110d044f020e0c"
-                            >
-                              [email&nbsp;protected]
-                            </a>
-                          </td>
-                          <td>24 Jan 2025</td>
-                          <td>24 Jan 2025</td>
-                          <td>$120.00</td>
-                          <td>
-                            <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
-                              <i className="ti ti-circle-filled fs-6 me-2" />
-                              Paid
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <Link
-                              to="invoice-details"
-                              className="fs-12 fw-medium"
-                            >
-                              #12346
-                            </Link>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link
-                                to="customers-details"
-                                className="avatar flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-21.jpg"
-                                  className="rounded-circle"
-                                  alt
-                                />
-                              </Link>
-                              <div className="flex-grow-1 ms-2">
-                                <h6 className="fs-14 fw-semibold mb-1">
-                                  <Link to="customers-details">
-                                    David Steiger
-                                  </Link>
-                                </h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <a
-                              href="/cdn-cgi/l/email-protection"
-                              className="__cf_email__"
-                              data-cfemail="e68287908f82a6839e878b968a83c885898b"
-                            >
-                              [email&nbsp;protected]
-                            </a>
-                          </td>
-                          <td>19 Dec 2024</td>
-                          <td>19 Dec 2024</td>
-                          <td>$85.00</td>
-                          <td>
-                            <span className="badge badge-md bg-info-transparent d-inline-flex align-items-center">
-                              <i className="ti ti-circle-filled fs-6 me-2" />
-                              Pending
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <Link
-                              to="invoice-details"
-                              className="fs-12 fw-medium"
-                            >
-                              #12347
-                            </Link>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link
-                                to="customers-details"
-                                className="avatar flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-12.jpg"
-                                  className="rounded-circle"
-                                  alt
-                                />
-                              </Link>
-                              <div className="flex-grow-1 ms-2">
-                                <h6 className="fs-14 fw-semibold mb-1">
-                                  <Link to="customers-details">
-                                    Virginia Phu
-                                  </Link>
-                                </h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <a
-                              href="/cdn-cgi/l/email-protection"
-                              className="__cf_email__"
-                              data-cfemail="f0809885b09588919d809c95de939f9d"
-                            >
-                              [email&nbsp;protected]
-                            </a>
-                          </td>
-                          <td>11 Dec 2024</td>
-                          <td>11 Dec 2024</td>
-                          <td>$250.00</td>
-                          <td>
-                            <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
-                              <i className="ti ti-circle-filled fs-6 me-2" />
-                              Paid
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <Link
-                              to="invoice-details"
-                              className="fs-12 fw-medium"
-                            >
-                              #12348
-                            </Link>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link
-                                to="customers-details"
-                                className="avatar flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-03.jpg"
-                                  className="rounded-circle"
-                                  alt
-                                />
-                              </Link>
-                              <div className="flex-grow-1 ms-2">
-                                <h6 className="fs-14 fw-semibold mb-1">
-                                  <Link to="customers-details">
-                                    Walter Hartmann
-                                  </Link>
-                                </h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <a
-                              href="/cdn-cgi/l/email-protection"
-                              className="__cf_email__"
-                              data-cfemail="1463757860716654716c75796478713a777b79"
-                            >
-                              [email&nbsp;protected]
-                            </a>
-                          </td>
-                          <td>29 Nov 2024</td>
-                          <td>229 Nov 2024</td>
-                          <td>$175.00</td>
-                          <td>
-                            <span className="badge badge-md bg-purple-transparent d-inline-flex align-items-center">
-                              <i className="ti ti-circle-filled fs-6 me-2" />
-                              Overdue
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            <Link
-                              to="invoice-details"
-                              className="fs-12 fw-medium"
-                            >
-                              #12349
-                            </Link>
-                          </td>
-                          <td>
-                            <div className="d-flex align-items-center">
-                              <Link
-                                to="customers-details"
-                                className="avatar flex-shrink-0"
-                              >
-                                <img
-                                  src="/admin-assets/img/profiles/avatar-07.jpg"
-                                  className="rounded-circle"
-                                  alt
-                                />
-                              </Link>
-                              <div className="flex-grow-1 ms-2">
-                                <h6 className="fs-14 fw-semibold mb-1">
-                                  <Link to="customers-details">
-                                    Andrea Jermaine
-                                  </Link>
-                                </h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <a
-                              href="/cdn-cgi/l/email-protection"
-                              className="__cf_email__"
-                              data-cfemail="39535c4b545850575c795c41585449555c175a5654"
-                            >
-                              [email&nbsp;protected]
-                            </a>
-                          </td>
-                          <td>03 Nov 2024</td>
-                          <td>03 Nov 2024</td>
-                          <td>$200.00</td>
-                          <td>
-                            <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
-                              <i className="ti ti-circle-filled fs-6 me-2" />
-                              Paid
-                            </span>
-                          </td>
-                        </tr>
+                                  <div className="flex-grow-1 ms-2">
+                                    <h6 className="fs-14 fw-semibold mb-1">
+                                      <Link to="customers-details">
+                                        {inv.customer.name}{" "}
+                                      </Link>
+                                    </h6>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <a
+                                  href={`mailto:${inv.customer.email}`}
+                                  className="__cf_email__"
+                                >
+                                  {inv.customer.email}
+                                </a>
+                              </td>
+                              <td>{new Date(inv.fromDate).toDateString()}</td>
+                              <td>{new Date(inv.dueDate).toDateString()}</td>
+                              <td>${inv.totalAmount}</td>
+                              <td>
+                                <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
+                                  <i className="ti ti-circle-filled fs-6 me-2" />
+                                  {inv.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
                       </tbody>
                     </table>
                   </div>

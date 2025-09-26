@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminReservationDetails = () => {
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const navigate = useNavigate();
 
   const { id } = useParams();
   const fetchReservations = async () => {
@@ -144,18 +147,39 @@ const AdminReservationDetails = () => {
     await apiService.changeReservationStatusToConformed(reservations._id);
     setReservations({ ...reservations, status: "confirmed" });
   };
+  const handleComplete = async () => {
+    await apiService.changeReservationStatusToComplete(reservations._id);
+    setReservations({ ...reservations, status: "complete" });
+  };
+  const handlegetInvoiceId = async () => {
+    try {
+      const res = await apiService.getInvoiceByReservationId(reservations._id);
+
+      if (res.data.success) {
+        navigate("/admin-dashboard/invoice-details/" + res.data.data._id);
+      }
+    } catch (err) {
+      if (err.response) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
+    }
+  };
 
   const handleCancel = async () => {
     if (!cancelReason.trim()) {
       alert("Please enter cancellation reason");
       return;
     }
-    await apiService.cancelRideByAdmin(reservations._id, {cancellationReason: cancelReason});
+    await apiService.cancelRideByAdmin(reservations._id, {
+      cancellationReason: cancelReason,
+    });
     setReservations({ ...reservations, status: "cancelled", cancelReason });
     setCancelReason("");
   };
 
-    if (loading) {
+  if (loading) {
     return (
       <div className="main-wrapper">
         <div className="container">
@@ -178,7 +202,7 @@ const AdminReservationDetails = () => {
             <div className="col-md-10">
               <div className="mb-3">
                 <Link
-                  to="all-reservation"
+                  to="/admin-dashboard/all-reservation"
                   className="d-inline-flex align-items-center fw-medium"
                 >
                   <i className="ti ti-arrow-narrow-left me-2" />
@@ -208,17 +232,19 @@ const AdminReservationDetails = () => {
                         Reservation Info
                       </a>
                     </li>
-                   { reservations.cancellationReason &&(<li className="nav-item" role="presentation">
-                      <a
-                        className="nav-link"
-                        href="#solid-tab2"
-                        data-bs-toggle="tab"
-                        aria-selected="false"
-                        role="tab"
-                      >
-                        Cancellation Reasion
-                      </a>
-                    </li>)}
+                    {reservations.cancellationReason && (
+                      <li className="nav-item" role="presentation">
+                        <a
+                          className="nav-link"
+                          href="#solid-tab2"
+                          data-bs-toggle="tab"
+                          aria-selected="false"
+                          role="tab"
+                        >
+                          Cancellation Reasion
+                        </a>
+                      </li>
+                    )}
                   </ul>
                   <div className="tab-content">
                     <div
@@ -452,30 +478,27 @@ const AdminReservationDetails = () => {
                         </div>
                       </div>
                       <div>
-                        
                         <div className="d-flex align-items-center mb-3">
                           <div className="border rounded text-center flex-shrink-0 p-1 me-2">
                             <h5 className="mb-2">Cancellation Reason</h5>
                             <span className="fw-medium fs-12 bg-primary-transparent p-1 d-inline-block rounded-1 text-gray-9">
-                             {reservations.cancellationReason}
+                              {reservations.cancellationReason}
                             </span>
                           </div>
-                         
                         </div>
-                  
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="d-flex align-items-center justify-content-center flex-wrap row-gap-3">
-                <Link
-                  to="/admin-dashboard/invoice-details"
+                <button
+                  onClick={() => handlegetInvoiceId()}
                   className="btn btn-primary me-3"
                 >
                   <i className="ti ti-files me-1" />
                   View Invoice
-                </Link>
+                </button>
                 {reservations.status === "pending" && (
                   <button className="btn btn-success" onClick={handleConfirm}>
                     <i className="ti ti-check me-1" /> Confirm Booking
@@ -484,7 +507,7 @@ const AdminReservationDetails = () => {
                 {reservations.status === "confirmed" && (
                   <>
                     <button
-                      className="btn btn-danger"
+                      className="btn btn-danger me-3"
                       data-bs-toggle="modal"
                       data-bs-target="#cancelModal"
                     >
@@ -537,6 +560,14 @@ const AdminReservationDetails = () => {
                     </div>
                   </>
                 )}
+                {reservations.status === "confirmed" && (
+                  <button
+                    className="btn  btn-success me-3 "
+                    onClick={handleComplete}
+                  >
+                    <i className="ti ti-check me-1" /> Complete Booking
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -566,6 +597,21 @@ const AdminReservationDetails = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        {/* Your existing JSX */}
+
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

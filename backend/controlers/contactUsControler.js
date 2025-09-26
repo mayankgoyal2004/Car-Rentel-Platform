@@ -1,10 +1,8 @@
 const Contact = require("../models/contactusmodel");
 
-// 📌 Add Contact (user side)
 const addContact = async (req, res) => {
   try {
     const { name, email, phone, comments } = req.body;
-console.log("REQ BODY =>", req.body);
 
     if (!name || !email || !phone || !comments) {
       return res.status(400).json({ success: false, message: "All fields are required" });
@@ -23,7 +21,6 @@ console.log("REQ BODY =>", req.body);
   }
 };
 
-//  Get All Contacts (admin side)
 const getAllContacts = async (req, res) => {
   try {
     const contacts = await Contact.find().sort({ createdAt: -1 });

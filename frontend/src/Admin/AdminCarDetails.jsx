@@ -10,6 +10,7 @@ const AdminCarDetails = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
   const { id } = useParams();
+  
   const fetchAllCars = async () => {
     setLoading(true);
     try {
@@ -33,7 +34,7 @@ const AdminCarDetails = () => {
       if (res.data.success) {
         toast.success("Car status updated successfully");
 
-        setCars({ ...car, status: !currentStatus });
+        setCars({ ...car, isAvailable: !currentStatus });
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Server error");
@@ -71,7 +72,7 @@ const AdminCarDetails = () => {
                   </span>
                   {userType !== 1 && (
                     <button
-                      className={`badge border-0 ${
+                      className={`badge badge-md  ${
                         car.isAvailable ? "bg-success" : "bg-danger"
                       }`}
                       onClick={() => handleToggleStatus(car.isAvailable)}
@@ -82,7 +83,7 @@ const AdminCarDetails = () => {
                 </div>
                 <p>Created {new Date(car.createdAt).toDateString()}</p>
               </div>
-              <div className="d-flex align-items-center gap-3">
+            {userType !== 1 &&(  <div className="d-flex align-items-center gap-3">
                 <Link
                   to={`/admin-dashboard/edit-car/${car._id}`}
                   className="btn btn-dark btn-md d-flex align-items-center"
@@ -90,7 +91,7 @@ const AdminCarDetails = () => {
                   <i className="ti ti-edit me-1" />
                   Edit Car
                 </Link>
-              </div>
+              </div>)}
             </div>
           </div>
           <div className="row">
@@ -188,7 +189,6 @@ const AdminCarDetails = () => {
                             <div className="mb-3">
                               <h6 className="fs-14 fw-semibold mb-1">Color</h6>
                               <p className="d-inline-flex align-items-center fs-13">
-                                <i className="ti ti-square-filled text-warning me-1" />
                                 {car?.carColor?.carColor}
                               </p>
                             </div>
@@ -279,14 +279,7 @@ const AdminCarDetails = () => {
                               <p className="fs-13">{car.airbags}</p>
                             </div>
                           </div>
-                          <div className="col-lg-12">
-                            <Link
-                              to={`/admin-dashboard/edit-Car/${car._id}`}
-                              className="link-violet text-decoration-underline fw-medium"
-                            >
-                              Edit
-                            </Link>
-                          </div>
+                          
                         </div>
                       </div>
                       <div className="border-bottom mb-3 pb-3">
@@ -296,7 +289,6 @@ const AdminCarDetails = () => {
                             to="/admin-dashboard/edit-Car"
                             className="link-default"
                           >
-                            <i className="ti ti-edit" />
                           </Link>
                         </div>
                         <div className="d-flex align-items-center flex-wrap gap-4">

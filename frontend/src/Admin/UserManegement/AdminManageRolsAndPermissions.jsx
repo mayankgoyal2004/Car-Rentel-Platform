@@ -165,7 +165,7 @@ const AdminManageRolesAndPermissions = () => {
                     </td>
                     <td>
                       <div className="dropdown">
-                        <button
+                         <button
                           className="btn btn-icon btn-sm dropdown-toggle"
                           type="button"
                           data-bs-toggle="dropdown"

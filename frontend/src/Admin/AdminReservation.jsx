@@ -40,17 +40,14 @@ const AdminReservation = () => {
     fetchReservations(search, currentPage);
   }, [currentPage, search]);
 
-
-  const handleDeleteConfirm = (reservation) => {
-    setDeleteReservation(reservation);
-  };
-
   const handleDelete = async () => {
     if (!deleteReservation) return;
     try {
-      await apiService.deleteReservation(deleteReservation._id);
-      fetchReservations(search, currentPage);
-      setDeleteReservation(null);
+      const res = await apiService.delteReservation(deleteReservation._id);
+      if (res.data.success) {
+        fetchReservations(search, currentPage);
+        setDeleteReservation(null);
+      }
     } catch (err) {
       console.error("Error deleting Reservation:", err);
       alert(
@@ -104,20 +101,6 @@ const AdminReservation = () => {
         {/* /Breadcrumb */}
         {/* Table Header */}
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-          <div className="d-flex align-items-center flex-wrap row-gap-3">
-            <div className="me-2">
-              <div className="input-icon-start position-relative topdatepicker">
-                <span className="input-icon-addon">
-                  <i className="ti ti-calendar" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control date-range bookingrange"
-                  placeholder="dd/mm/yyyy - dd/mm/yyyy"
-                />
-              </div>
-            </div>
-          </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
             <div className="top-search me-2">
               <div className="top-search-group">
@@ -195,25 +178,22 @@ const AdminReservation = () => {
                   <td>
                     <div className="d-flex align-items-center">
                       <Link
-                        to={`/admin-dashboard/customer-details/${reservation.customerId}`}
+                        to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
                         className="avatar avatar-rounded me-2 flex-shrink-0"
                       >
                         <img
-                          src={
-                          BASE_URL_IMG+  reservation.customer.image
-                          }
+                          src={BASE_URL_IMG + reservation.customer.image}
                           alt={reservation.customer.name}
                         />
                       </Link>
                       <div>
                         <h6 className="mb-1 fs-14">
                           <Link
-                            to={`/admin-dashboard/customer-details/${reservation.customerId}`}
+                            to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
                           >
                             {reservation.customer.name}
                           </Link>
                         </h6>
-                     
                       </div>
                     </div>
                   </td>
@@ -254,12 +234,13 @@ const AdminReservation = () => {
                         </h5>
                         <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
                           {reservation.dropDate
-                            ? new Date(
-                                reservation.dropDate
-                              ).toLocaleDateString("en-US", {
-                                month: "short",
-                                year: "numeric",
-                              })
+                            ? new Date(reservation.dropDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )
                             : ""}
                         </span>
                       </div>
@@ -313,7 +294,7 @@ const AdminReservation = () => {
                           <a
                             className="dropdown-item rounded-1"
                             href="javascript:void(0);"
-                            onClick={() => handleDeleteConfirm(reservation)}
+                            onClick={() => setDeleteReservation(reservation)}
                             data-bs-toggle="modal"
                             data-bs-target="#delete_modal"
                           >

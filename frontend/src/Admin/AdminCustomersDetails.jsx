@@ -53,7 +53,7 @@ const AdminCustomersDetails = () => {
                         <img src={BASE_URL_IMG + customer?.image} alt="img" />
                       </span>
                       <div>
-                        <h6 className="mb-1">Adrian Mathews</h6>
+                        <h6 className="mb-1">{customer?.name}</h6>
                         <div className="d-flex align-items-center">
                           <p className="mb-0 me-2">
                             Added On :{" "}
@@ -66,9 +66,9 @@ const AdminCustomersDetails = () => {
                       <span className="badge badge-md bg-info-transparent">
                         License Number : {customer?.licenseNumber}
                       </span>
-                      <span className="badge badge-md bg-orange-transparent">
+                    {customer?.validTill &&(  <span className="badge badge-md bg-orange-transparent">
                         Valid Till : {new Date(customer?.validTill).toLocaleDateString()}
-                      </span>
+                      </span>)}
                     </div>
                   </div>
                 </div>

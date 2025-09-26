@@ -663,7 +663,7 @@ const Listing = () => {
                     </div>
 
                     {/* Rating Filter */}
-                    <div className="accordion" id="accordionMain10">
+                    {/* <div className="accordion" id="accordionMain10">
                       <div className="card-header-new" id="headingFive">
                         <h6 className="filter-title">
                           <a
@@ -727,7 +727,7 @@ const Listing = () => {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </div> */}
                   </div>
 
                   <button

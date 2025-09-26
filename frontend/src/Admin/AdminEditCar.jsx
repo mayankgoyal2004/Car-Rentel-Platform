@@ -213,11 +213,11 @@ const AdminEditCar = () => {
       const res = await apiService.getSingleCarById(id);
       if (res.data.success) {
         const carData = res.data.data;
-        console.log(carData)
-        
+        console.log(carData);
+
         // Pre-fill form data
         setFormData({
-          carName: carData.carName ,
+          carName: carData.carName,
           permalink: carData.permalink || "",
           carType: carData.carType?._id || "",
           carBrand: carData.carBrand?._id || "",
@@ -230,41 +230,42 @@ const AdminEditCar = () => {
           carFuel: carData.carFuel?._id || "",
           odometer: carData.odometer || "",
           carColor: carData.carColor?._id || "",
-          year: carData.year || "",
+          year: carData.year,
           carTransmission: carData.carTransmission?._id || "",
           mileage: carData.mileage || "",
           passengers: carData.passengers || "",
-          NoofSeats: carData.NoofSeats?._id || "",
+          NoofSeats: carData.carSeats?._id || "",
           airbags: carData.airbags || "",
           noOfDoors: carData.noOfDoors || "",
           image: null,
           description: carData.description || "",
-          // Set other fields as needed
         });
 
-        // Set selected features
         if (carData.carFeatures) {
-          setSelectedFeatures(carData.carFeatures.map(feature => feature._id));
+          setSelectedFeatures(
+            carData.carFeatures.map((feature) => feature._id)
+          );
         }
 
         // Set selected extra services
         if (carData.extraService) {
-          setSelectedExtraServices(carData.extraService.map(service => service._id));
+          setSelectedExtraServices(
+            carData.extraService.map((service) => service._id)
+          );
         }
 
         // Set pricing data
-      if (carData.pricing) {
-  setPricingData({
-    dailyPrice: carData.pricing.prices?.daily || "",
-    weeklyPrice: carData.pricing.prices?.weekly || "",
-    monthlyPrice: carData.pricing.prices?.monthly || "",
-    yearlyPrice: carData.pricing.prices?.yearly || "",
-    baseKilometers: carData.pricing.baseKilometers || "",
-    extraKmPrice: carData.pricing.extraKilometerPrice || "",
-    pricingTypes: ["daily", "weekly", "monthly", "yearly"], 
-  });
-}
-
+        if (carData.pricing) {
+          setPricingData({
+            dailyPrice: carData.pricing.prices?.daily || "",
+            weeklyPrice: carData.pricing.prices?.weekly || "",
+            monthlyPrice: carData.pricing.prices?.monthly || "",
+            yearlyPrice: carData.pricing.prices?.yearly || "",
+            baseKilometers: carData.pricing.baseKilometers || "",
+            extraKmPrice: carData.pricing.extraKilometerPrice || "",
+            pricingTypes: ["daily", "weekly", "monthly", "yearly"],
+          });
+        }
 
         // Set damages
         if (carData.damages) {
@@ -281,11 +282,10 @@ const AdminEditCar = () => {
           setPreviewImage(carData.image);
         }
 
-
         console.log("FORM DATA AFTER SET:", {
-  ...formData,
-  carName: carData.carName
-});
+          ...formData,
+          carName: carData.carName,
+        });
       }
     } catch (err) {
       console.error(err);
@@ -304,7 +304,7 @@ const AdminEditCar = () => {
     fetchLocations();
     fetCarFeatures();
     fetchcarExtraServices();
-    
+
     if (id) {
       fetchCarData();
     }
@@ -331,7 +331,7 @@ const AdminEditCar = () => {
         toast.success("Car basic info updated successfully!");
         nextStep();
       } else {
-        toast.error(res.data.message || "Failed to update car info");
+        toast.error(res.data.message);
       }
     } catch (err) {
       console.error(err);
@@ -698,7 +698,7 @@ const AdminEditCar = () => {
                   </li>
                 ))}
               </ul>
-              
+
               {/* Basic Info Step */}
               <fieldset id="first-field" style={showStep(0)}>
                 <form onSubmit={(e) => e.preventDefault()}>
@@ -719,16 +719,12 @@ const AdminEditCar = () => {
                           <div className="d-flex align-items-center justify-content-center avatar avatar-xxl me-3 flex-shrink-0 border rounded-circle frames">
                             {previewImage ? (
                               <img
-                                src={BASE_URL_IMG+ previewImage}
+                                src={BASE_URL_IMG + previewImage}
                                 alt="preview"
                                 className="img-fluid rounded-circle"
                               />
                             ) : (
-                              <img
-                                src="/admin-assets/img/car/car-02.jpg"
-                                alt="default"
-                                className="img-fluid rounded-circle"
-                              />
+                              "image"
                             )}
                           </div>
                           <div>
@@ -786,14 +782,6 @@ const AdminEditCar = () => {
                                   Car Type{" "}
                                   <span className="text-danger">*</span>
                                 </label>
-                                <a
-                                  href="javascript:void(0);"
-                                  className="link-info mb-2"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_type"
-                                >
-                                  Add New
-                                </a>
                               </div>
                               <select
                                 name="carType"
@@ -816,14 +804,6 @@ const AdminEditCar = () => {
                                 <label className="form-label">
                                   Brand <span className="text-danger">*</span>
                                 </label>
-                                <a
-                                  href="javascript:void(0);"
-                                  className="link-info mb-2"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_brand"
-                                >
-                                  Add New
-                                </a>
                               </div>
                               <select
                                 name="carBrand"
@@ -846,14 +826,6 @@ const AdminEditCar = () => {
                                 <label className="form-label">
                                   Model <span className="text-danger">*</span>
                                 </label>
-                                <a
-                                  href="javascript:void(0);"
-                                  className="link-info mb-2"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_model"
-                                >
-                                  Add New
-                                </a>
                               </div>
                               <select
                                 name="carModel"
@@ -877,9 +849,9 @@ const AdminEditCar = () => {
                               </label>
                               <select
                                 name="category"
+                                className="form-control"
                                 value={formData.category}
                                 onChange={handleChange}
-                                className="select"
                               >
                                 <option key={""}>Select</option>
                                 <option key={"Car"} value={"Car"}>
@@ -952,7 +924,6 @@ const AdminEditCar = () => {
                                 className="form-control"
                                 value={formData.otherLocations}
                                 onChange={handleChange}
-                                multiple
                               >
                                 <option value="">Select</option>
                                 {locations.map((location) => (
@@ -1030,9 +1001,7 @@ const AdminEditCar = () => {
                                   value={formData.year}
                                   onChange={handleChange}
                                 />
-                                <span className="input-icon-addon">
-                                  <i className="ti ti-calendar" />
-                                </span>
+                                <span className="input-icon-addon"></span>
                               </div>
                             </div>
                           </div>
@@ -1559,7 +1528,7 @@ const AdminEditCar = () => {
                       onClick={handleSaveExtraFeatures}
                     >
                       Upload Documents
-                                          <i className="ti ti-chevron-right ms-1" />
+                      <i className="ti ti-chevron-right ms-1" />
                     </button>
                   </div>
                 </form>
@@ -1594,13 +1563,16 @@ const AdminEditCar = () => {
                             />
                           </div>
                           <p>Upload car documents like RC, insurance, etc.</p>
-                          
+
                           {carDocuments.length > 0 && (
                             <div className="mt-3">
                               <h6>Selected Documents:</h6>
                               <ul className="list-group">
                                 {carDocuments.map((file, index) => (
-                                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                                  <li
+                                    key={index}
+                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                  >
                                     {file.name}
                                     <button
                                       type="button"
@@ -1618,7 +1590,7 @@ const AdminEditCar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="border-bottom mb-4 pb-4">
                     <div className="row row-gap-4">
                       <div className="col-xl-3">
@@ -1639,18 +1611,23 @@ const AdminEditCar = () => {
                             />
                           </div>
                           <p>Upload car policies and terms documents.</p>
-                          
+
                           {carPolicies.length > 0 && (
                             <div className="mt-3">
                               <h6>Selected Policies:</h6>
                               <ul className="list-group">
                                 {carPolicies.map((file, index) => (
-                                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                                  <li
+                                    key={index}
+                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                  >
                                     {file.name}
                                     <button
                                       type="button"
                                       className="btn btn-sm btn-danger"
-                                      onClick={() => handleRemove("policy", index)}
+                                      onClick={() =>
+                                        handleRemove("policy", index)
+                                      }
                                     >
                                       <i className="ti ti-x" />
                                     </button>
@@ -1663,7 +1640,7 @@ const AdminEditCar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="border-bottom mb-4 pb-4">
                     <div className="row row-gap-4">
                       <div className="col-xl-3">
@@ -1685,18 +1662,23 @@ const AdminEditCar = () => {
                             />
                           </div>
                           <p>Upload car videos for better showcasing.</p>
-                          
+
                           {carVideos.length > 0 && (
                             <div className="mt-3">
                               <h6>Selected Videos:</h6>
                               <ul className="list-group">
                                 {carVideos.map((file, index) => (
-                                  <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                                  <li
+                                    key={index}
+                                    className="list-group-item d-flex justify-content-between align-items-center"
+                                  >
                                     {file.name}
                                     <button
                                       type="button"
                                       className="btn btn-sm btn-danger"
-                                      onClick={() => handleRemove("video", index)}
+                                      onClick={() =>
+                                        handleRemove("video", index)
+                                      }
                                     >
                                       <i className="ti ti-x" />
                                     </button>
@@ -1706,9 +1688,11 @@ const AdminEditCar = () => {
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="mb-3">
-                          <label className="form-label">Or Add Video Link</label>
+                          <label className="form-label">
+                            Or Add Video Link
+                          </label>
                           <div className="row">
                             <div className="col-md-6">
                               <select
@@ -1737,7 +1721,7 @@ const AdminEditCar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
@@ -1782,7 +1766,12 @@ const AdminEditCar = () => {
                                 type="text"
                                 className="form-control"
                                 value={currentDamage.location}
-                                onChange={(e) => setCurrentDamage({...currentDamage, location: e.target.value})}
+                                onChange={(e) =>
+                                  setCurrentDamage({
+                                    ...currentDamage,
+                                    location: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Front bumper"
                               />
                             </div>
@@ -1794,7 +1783,12 @@ const AdminEditCar = () => {
                                 type="text"
                                 className="form-control"
                                 value={currentDamage.type}
-                                onChange={(e) => setCurrentDamage({...currentDamage, type: e.target.value})}
+                                onChange={(e) =>
+                                  setCurrentDamage({
+                                    ...currentDamage,
+                                    type: e.target.value,
+                                  })
+                                }
                                 placeholder="e.g., Scratch, Dent"
                               />
                             </div>
@@ -1806,21 +1800,28 @@ const AdminEditCar = () => {
                                 type="text"
                                 className="form-control"
                                 value={currentDamage.description}
-                                onChange={(e) => setCurrentDamage({...currentDamage, description: e.target.value})}
+                                onChange={(e) =>
+                                  setCurrentDamage({
+                                    ...currentDamage,
+                                    description: e.target.value,
+                                  })
+                                }
                                 placeholder="Optional description"
                               />
                             </div>
                           </div>
                         </div>
-                        
+
                         <button
                           type="button"
                           className="btn btn-primary mb-4"
                           onClick={handleAddDamage}
                         >
-                          {editingIndex !== null ? 'Update Damage' : 'Add Damage'}
+                          {editingIndex !== null
+                            ? "Update Damage"
+                            : "Add Damage"}
                         </button>
-                        
+
                         {damages.length > 0 ? (
                           <div className="table-responsive">
                             <table className="table table-striped">
@@ -1837,7 +1838,7 @@ const AdminEditCar = () => {
                                   <tr key={index}>
                                     <td>{damage.location}</td>
                                     <td>{damage.type}</td>
-                                    <td>{damage.description || '-'}</td>
+                                    <td>{damage.description || "-"}</td>
                                     <td>
                                       <button
                                         type="button"
@@ -1849,7 +1850,9 @@ const AdminEditCar = () => {
                                       <button
                                         type="button"
                                         className="btn btn-sm btn-danger"
-                                        onClick={() => handleRemoveDamage(index)}
+                                        onClick={() =>
+                                          handleRemoveDamage(index)
+                                        }
                                       >
                                         <i className="ti ti-trash" />
                                       </button>
@@ -1867,7 +1870,7 @@ const AdminEditCar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
@@ -1913,7 +1916,12 @@ const AdminEditCar = () => {
                                   type="text"
                                   className="form-control"
                                   value={currentFaq.question}
-                                  onChange={(e) => setCurrentFaq({...currentFaq, question: e.target.value})}
+                                  onChange={(e) =>
+                                    setCurrentFaq({
+                                      ...currentFaq,
+                                      question: e.target.value,
+                                    })
+                                  }
                                   placeholder="Enter question"
                                 />
                               </div>
@@ -1925,21 +1933,28 @@ const AdminEditCar = () => {
                                   type="text"
                                   className="form-control"
                                   value={currentFaq.answer}
-                                  onChange={(e) => setCurrentFaq({...currentFaq, answer: e.target.value})}
+                                  onChange={(e) =>
+                                    setCurrentFaq({
+                                      ...currentFaq,
+                                      answer: e.target.value,
+                                    })
+                                  }
                                   placeholder="Enter answer"
                                 />
                               </div>
                             </div>
                           </div>
-                          
+
                           <button
                             type="button"
                             className="btn btn-primary mb-4"
                             onClick={handleAddFaq}
                           >
-                            {editingFaqIndex !== null ? 'Update FAQ' : 'Add FAQ'}
+                            {editingFaqIndex !== null
+                              ? "Update FAQ"
+                              : "Add FAQ"}
                           </button>
-                          
+
                           {faqs.length > 0 ? (
                             <div className="accordion" id="faqAccordion">
                               {faqs.map((faq, index) => (
@@ -1991,7 +2006,7 @@ const AdminEditCar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
@@ -2042,7 +2057,7 @@ const AdminEditCar = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"

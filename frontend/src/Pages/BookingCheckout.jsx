@@ -35,11 +35,10 @@ const BookingCheckout = () => {
             pickupTime: reservationData.pickupTime || "10:00",
             returnTime: reservationData.dropTime || "10:00",
             doorStepDelivery: 0,
-            tripProtection: 25,
-            convenienceFee: 2,
+            tripProtection: 0,
+            convenienceFee: 0,
             tax: reservationData.pricingDetails?.tax || 0,
             deposit: reservationData.securityDeposit || 0,
-            insurance: 200,
           };
 
           setReservation(transformedData);
@@ -68,7 +67,6 @@ const BookingCheckout = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Transform formData to match backend enums
     const payload = {
       ...formData,
       rentalType:
@@ -103,7 +101,6 @@ const BookingCheckout = () => {
     return diffDays;
   };
 
-  // Calculate the rental rate based on selected rate type and number of days
   const calculateRentalRate = () => {
     if (!formData.priceRate || !formData.car?.pricing?.prices) return 0;
 
@@ -520,7 +517,7 @@ const BookingCheckout = () => {
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon">
-                                    <i className="bx bx-calendar" />
+                                  
                                   </span>
                                 </div>
                               </div>
@@ -537,7 +534,7 @@ const BookingCheckout = () => {
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon">
-                                    <i className="bx bx-time" />
+                                   
                                   </span>
                                 </div>
                               </div>
@@ -556,7 +553,7 @@ const BookingCheckout = () => {
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon">
-                                    <i className="bx bx-calendar" />
+                                  
                                   </span>
                                 </div>
                               </div>
@@ -575,7 +572,7 @@ const BookingCheckout = () => {
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon">
-                                    <i className="bx bx-time" />
+                                  
                                   </span>
                                 </div>
                               </div>

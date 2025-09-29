@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import apiService from "../../Apiservice/apiService";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
 import { CornerDownLeft } from "react-feather";
 import ReCAPTCHA from "react-google-recaptcha";
@@ -13,6 +13,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const [companySetting, setCompanySetting] = useState({});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,6 +49,21 @@ const ResetPassword = () => {
     }
   };
 
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
+
   return (
     <div className="main-wrapper login-body">
       {/* Header */}
@@ -55,7 +71,7 @@ const ResetPassword = () => {
         <Link to="/">
           <img
             className="img-fluid logo-dark"
-            src="/user-assets/img/logo.svg"
+            src={BASE_URL_IMG + companySetting?.profilePhoto}
             alt="Logo"
           />
         </Link>

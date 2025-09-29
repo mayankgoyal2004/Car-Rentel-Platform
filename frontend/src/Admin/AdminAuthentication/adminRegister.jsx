@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import apiService from "../../../Apiservice/apiService";
+import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,7 +14,7 @@ const AdminRegister = () => {
     address: "",
     image: null,
   });
-
+  const [companySetting, setCompanySetting] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,6 +25,21 @@ const AdminRegister = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
+
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -53,7 +68,7 @@ const AdminRegister = () => {
               <form onSubmit={handleSubmit} className="p-4">
                 <div className="mx-auto mb-4 text-center">
                   <img
-                    src="/admin-assets/img/logo.svg"
+                    src={  BASE_URL_IMG+ companySetting?.profilePhoto}
                     className="img-fluid"
                     alt="Logo"
                   />

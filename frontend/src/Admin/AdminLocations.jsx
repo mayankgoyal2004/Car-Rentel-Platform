@@ -196,7 +196,10 @@ const AdminLocations = () => {
       setImagePreview(URL.createObjectURL(file));
     }
   };
-
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
   return (
     <div>
       {/* Page Wrapper */}
@@ -249,19 +252,6 @@ const AdminLocations = () => {
           <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
             <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-              <div className="dropdown me-2">
-                <a
-                  className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                  data-bs-toggle="dropdown"
-                >
-                  <i className="ti ti-edit-circle me-1" /> Bulk Actions
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <a className="dropdown-item rounded-1">Delete</a>
-                  </li>
-                </ul>
-              </div>
               <div className="top-search me-2">
                 <div className="top-search-group">
                   <span className="input-icon">
@@ -412,6 +402,49 @@ const AdminLocations = () => {
                 ))}
               </tbody>
             </table>
+            <nav aria-label="Page navigation" className="mt-3">
+              <ul className="pagination justify-content-center">
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
+                    Prev
+                  </button>
+                </li>
+
+                {[...Array(totalPages)].map((_, idx) => (
+                  <li
+                    key={idx}
+                    className={`page-item ${
+                      currentPage === idx + 1 ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      className="page-link"
+                      onClick={() => handlePageChange(idx + 1)}
+                    >
+                      {idx + 1}
+                    </button>
+                  </li>
+                ))}
+
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
+                    Next
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
           {/* Custom Data Table */}
           <div className="table-footer" />

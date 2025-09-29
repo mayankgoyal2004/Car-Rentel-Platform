@@ -3,18 +3,33 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../assets/navbar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
-import { BASE_URL_IMG } from "../../Apiservice/apiService";
-
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const Header = () => {
   const [pageOpen, setPageOpen] = useState(false);
+  const [companySetting, setCompanySetting] = useState({});
   const [user, setUser] = useState(null);
   const [activePath, setActivePath] = useState("/");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Update active path when location changes
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
+
   useEffect(() => {
     setActivePath(location.pathname);
   }, [location.pathname]);
@@ -66,7 +81,7 @@ const Header = () => {
         <nav className="navbar navbar-expand-lg header-nav">
           {/* Logo */}
           <div className="navbar-header">
-            <a id="mobile_btn" href="javascript:void(0);">
+            <a id="mobile_btn">
               <span className="bar-icon">
                 <span />
                 <span />
@@ -75,19 +90,19 @@ const Header = () => {
             </a>
             <Link to="/" className="navbar-brand logo">
               <img
-                src="/user-assets/img/logo-white.svg"
+                src={BASE_URL_IMG + companySetting?.profilePhoto}
                 className="img-fluid white-logo"
                 alt="Logo"
               />
               <img
-                src="/user-assets/img/logo.svg"
+                src={BASE_URL_IMG + companySetting?.profilePhoto}
                 className="img-fluid dark-logo"
                 alt="Logo"
               />
             </Link>
             <Link to="/" className="navbar-brand logo-small">
               <img
-                src="/user-assets/img/logo-small.png"
+                src={BASE_URL_IMG + companySetting?.profilePhoto}
                 className="img-fluid"
                 alt="Logo"
               />
@@ -99,31 +114,36 @@ const Header = () => {
             <div className="menu-header">
               <Link to="/" className="menu-logo">
                 <img
-                  src="/user-assets/img/logo.svg"
+                  src={BASE_URL_IMG + companySetting?.profilePhoto}
                   className="img-fluid"
                   alt="Logo"
                 />
               </Link>
-              <a
-                id="menu_close"
-                className="menu-close"
-                href="javascript:void(0);"
-              >
+              <a id="menu_close" className="menu-close">
                 <i className="fas fa-times" />
               </a>
             </div>
 
             <ul className="main-nav">
-              <li className=
-               {`has-submenu   ${isActive("/") ? "active" : ""}`}>
+              <li className={`has-submenu   ${isActive("/") ? "active" : ""}`}>
                 <Link to="/">Home</Link>
               </li>
-              <li className={`has-submenu ${isActive("/listing") ? "active" : ""}`}>
+              <li
+                className={`has-submenu ${
+                  isActive("/listing") ? "active" : ""
+                }`}
+              >
                 <Link to="/listing">Listings</Link>
               </li>
-              <li className={`has-submenu ${pageOpen ? "submenu-open" : ""} ${
-                isActive("/about-us") || isActive("/contact-us") || isActive("/faq") ? "active" : ""
-              }`}>
+              <li
+                className={`has-submenu ${pageOpen ? "submenu-open" : ""} ${
+                  isActive("/about-us") ||
+                  isActive("/contact-us") ||
+                  isActive("/faq")
+                    ? "active"
+                    : ""
+                }`}
+              >
                 <a
                   href="#"
                   onClick={(e) => {
@@ -145,7 +165,11 @@ const Header = () => {
                   </li>
                 </ul>
               </li>
-              <li className={`has-submenu ${isActive("/blog-list") ? "active" : ""}`}>
+              <li
+                className={`has-submenu ${
+                  isActive("/blog-list") ? "active" : ""
+                }`}
+              >
                 <Link to="/blog-list">Blogs</Link>
               </li>
             </ul>
@@ -157,7 +181,6 @@ const Header = () => {
               // Profile dropdown (only when logged in)
               <li className="nav-item dropdown profile-dropdown">
                 <a
-                  href="javascript:void(0);"
                   className="d-flex align-items-center"
                   data-bs-toggle="dropdown"
                   data-bs-auto-close="outside"
@@ -173,10 +196,7 @@ const Header = () => {
                 <div className="dropdown-menu p-1">
                   <div className="profileset d-flex align-items-center">
                     <span className="user-img me-2">
-                      <img
-                        src={`${BASE_URL_IMG + user.image}`}
-                        alt="Profile"
-                      />
+                      <img src={`${BASE_URL_IMG + user.image}`} alt="Profile" />
                     </span>
                     <div>
                       <h6 className="fw-semibold mb-1">{user.userName}</h6>

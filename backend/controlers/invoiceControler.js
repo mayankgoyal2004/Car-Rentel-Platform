@@ -2,6 +2,7 @@ const Invoice = require("../models/invoiceModel");
 const Reservation = require("../models/reservationModel");
 const Car = require("../models/CarModule");
 const Customer = require("../models/customerModel");
+const InvoiceSetting = require("../models/invoiceSetting");
 
 const createInvoice = async (req, res) => {
   try {
@@ -83,6 +84,7 @@ const getAllInvoice = async (req, res) => {
 
     const adminId = req.user.admin;
     const search = req.query.search || "";
+
     if (!adminId) {
       return res.status(400).json({
         success: false,
@@ -91,8 +93,8 @@ const getAllInvoice = async (req, res) => {
       });
     }
     let filter = { admin: adminId };
-    if (search) {
-      filter.name = { $regex: search, $options: "i" };
+    if (search ) {
+      filter.invoiceNumber = { $regex: search, $options: "i" };
     }
 
     const invoice = await Invoice.find(filter)
@@ -180,7 +182,8 @@ const updateInvoice = async (req, res) => {
 
 const getLatestInvoice = async (req, res) => {
   try {
-    const invoice = await Invoice.find({ admin: req.user.admin }).populate("customer")
+    const invoice = await Invoice.find({ admin: req.user.admin })
+      .populate("customer")
       .sort({ createdAt: -1 })
       .limit(5);
     if (!invoice) {
@@ -196,7 +199,7 @@ const getLatestInvoice = async (req, res) => {
 
 const getInvoiceByReservationId = async (req, res) => {
   try {
-    console.log(req.params)
+    console.log(req.params);
     const invoice = await Invoice.findOne({
       reservation: req.params.reservationId,
     })
@@ -204,15 +207,57 @@ const getInvoiceByReservationId = async (req, res) => {
       .populate("car", "name");
 
     if (!invoice) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "No invoice found for this reservation",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "No invoice found for this reservation",
+      });
     }
 
     res.json({ success: true, data: invoice });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const addInvoiceLogo = async (req, res) => {
+  try {
+    const imagePath = req.file ? req.file.path.replace(/\\/g, "/") : null;
+
+    if (!imagePath) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Image is required" });
+    }
+
+    let invoiceSetting = await InvoiceSetting.findOne();
+
+    if (invoiceSetting) {
+      invoiceSetting.logo = imagePath;
+      await invoiceSetting.save();
+    } else {
+      invoiceSetting = new InvoiceSetting({ logo: imagePath });
+      await invoiceSetting.save();
+    }
+
+    res.json({
+      success: true,
+      message: "Invoice logo updated successfully",
+      data: invoiceSetting,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const getInvoiceLogo = async (req, res) => {
+  try {
+    const invoiceSetting = await InvoiceSetting.findOne();
+    if (!invoiceSetting) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invoice logo not found" });
+    }
+    res.json({ success: true, data: invoiceSetting });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -225,5 +270,7 @@ module.exports = {
   invoiceDetails,
   updateInvoice,
   getLatestInvoice,
-  getInvoiceByReservationId
+  getInvoiceByReservationId,
+  addInvoiceLogo,
+  getInvoiceLogo,
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { PhoneCall, Mail, MapPin, Clock } from "react-feather";
 import apiService from "../../Apiservice/apiService";
@@ -6,6 +6,22 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Contact = () => {
+  const [companySetting, setCompanySetting] = useState([]);
+
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -82,30 +98,32 @@ const Contact = () => {
                   <div className="single-contact-info flex-fill">
                     <PhoneCall size={24} />
                     <h3>Phone Number</h3>
-                    <a href="tel:(888)888-8888">(888) 888-8888</a>
+                    <a href={`tel:${companySetting?.phone}`}>
+                      {companySetting?.phone}
+                    </a>
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-6 col-12 d-flex">
                   <div className="single-contact-info flex-fill">
                     <Mail size={24} />
                     <h3>Email Address</h3>
-                    <a href="mailto:info@example.com">info@example.com</a>
+                    <a href={`mailto:${companySetting?.email}`}>
+                      {companySetting?.email}
+                    </a>
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-6 col-12 d-flex">
                   <div className="single-contact-info flex-fill">
                     <MapPin size={24} />
                     <h3>Location</h3>
-                    <a href="javascript:void(0);">367 Hillcrest Lane, USA</a>
+                    <a>{companySetting?.addressLine}</a>
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-6 col-12 d-flex">
                   <div className="single-contact-info flex-fill">
                     <Clock size={24} />
                     <h3>Opening Hours</h3>
-                    <a href="javascript:void(0);">
-                      Mon - Sat (10.00AM - 05.30PM)
-                    </a>
+                    <a>Mon - Sat (10.00AM - 05.30PM)</a>
                   </div>
                 </div>
               </div>

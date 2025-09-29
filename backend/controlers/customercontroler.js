@@ -239,9 +239,17 @@ const getAllcustomer = async (req, res) => {
 
     const bookedCustomerIds = reservations.map((r) => r.customer);
 
-    // Step 3: Get customers I created OR who booked my cars
     const query = {
-      $or: [filter, { _id: { $in: bookedCustomerIds } }],
+      $or: [
+        {
+          admin: adminId,
+          ...(search && { name: { $regex: search, $options: "i" } }),
+        },
+        {
+          _id: { $in: bookedCustomerIds },
+          ...(search && { name: { $regex: search, $options: "i" } }),
+        },
+      ],
     };
 
     const customers = await customer
@@ -539,5 +547,5 @@ module.exports = {
   getCustomerByMessage,
   getMessage,
   getOwnerDetails,
-  deleteOwner
+  deleteOwner,
 };

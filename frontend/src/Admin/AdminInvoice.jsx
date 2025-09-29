@@ -14,12 +14,9 @@ const AdminInvoice = () => {
     setLoading(true);
 
     try {
-      const res = await apiService.getAllInvoice({
-        page,
-        search: searchQuery,
-      });
+      const res = await apiService.getAllInvoice({ search: searchQuery, page });
       setInvoice(res.data.data);
-      setTotalPages(res.data.pagination?.totalPages);
+      setTotalPages(res.data.pagination?.totalPages || 1);
 
       if (
         res.data.pagination?.currentPage &&
@@ -33,10 +30,9 @@ const AdminInvoice = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchInvoce(currentPage, search);
-  }, [currentPage, search]);
+useEffect(() => {
+  fetchInvoce(search, currentPage); 
+}, [currentPage, search]);
   const handleDelete = async () => {
     if (!deleteinvoceId) return;
     try {
@@ -54,6 +50,11 @@ const AdminInvoice = () => {
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1); // ✅ good
   };
   return (
     <div>
@@ -100,7 +101,7 @@ const AdminInvoice = () => {
                     className="form-control"
                     placeholder="Search"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={handleSearchChange}
                   />
                 </div>
               </div>

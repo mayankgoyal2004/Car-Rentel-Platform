@@ -11,7 +11,7 @@ const AdminProfileSetting = () => {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [image, setImage] = useState(null); // file or string
+  const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -130,6 +130,52 @@ const AdminProfileSetting = () => {
                         </Link>
                       </li>
                     </ul>
+                    <li className="menu-title">
+                      <span>WEBSITE SETTING</span>
+                    </li>
+                    <li>
+                      <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                        <li>
+                          <a href="company-setting.html">
+                            <i className="ti ti-building me-2" />
+                            <span>Company Settings</span>
+                            <span className="track-icon" />
+                          </a>
+                        </li>
+                        <li>
+                          <a href="localization-setting.html">
+                            <i className="ti ti-settings-2 me-2" />
+                            <span>Localization</span>
+                          </a>
+                        </li>
+
+                        <li>
+                          <a href="language-setting.html">
+                            <i className="ti ti-language me-2" />
+                            <span>Language</span>
+                          </a>
+                        </li>
+                        <li>
+                          <Link to="/admin-dashboard/invoice-setting">
+                            <i className="ti ti-file-invoice me-2" />
+                            <span>Invoice Settings</span>
+                            <span className="track-icon" />
+                          </Link>
+                        </li>
+                        <li>
+                          <a href="signatures-setting.html">
+                            <i className="ti ti-signature me-2" />
+                            <span>Signatures</span>
+                          </a>
+                        </li>
+                        <li>
+                          <Link to="bank-account-setting">
+                            <i class="ti ti-file-dollar me-2" />
+                            <span>Bank Accounts</span>
+                          </Link>
+                        </li>
+                      </ul>
+                    </li>
                   </li>
                 </ul>
               </div>

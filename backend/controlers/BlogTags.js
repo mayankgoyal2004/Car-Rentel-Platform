@@ -96,7 +96,7 @@ const getAllBlogTag = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const adminId = req.user.admin;
-    const search = req.query.search || ""; 
+    const search = req.query.search ; 
     if (!adminId) {
       return res.status(400).json({
         success: false,

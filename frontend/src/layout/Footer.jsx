@@ -1,12 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { Link } from "react-router-dom";
-import { PhoneCall, Mail, Send } from "react-feather"; 
+import { PhoneCall, Mail, Send } from "react-feather";
+import apiService from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const Footer = () => {
+  const [companySetting, setCompanySetting] = useState([]);
   useEffect(() => {
     AOS.init();
+  }, []);
+
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
   }, []);
 
   return (
@@ -23,19 +41,28 @@ const Footer = () => {
                     <h5 className="footer-title">About Company</h5>
                     <ul>
                       <li>
-                        <Link to="/about-us" >Our Company</Link>
+                        <Link to="/about-us">Our Company</Link>
                       </li>
                       <li>
-                        <Link to="/our-team" href="javascript:void(0)">Our Team</Link>
+                        <Link to="/our-team" href="javascript:void(0)">
+                          Our Team
+                        </Link>
                       </li>
                       <li>
                         <Link to="/gallery">Gallery</Link>
                       </li>
                       <li>
-                        <Link to="/terms-and-condition" href="javascript:void(0)">Terms and conditions</Link>
+                        <Link
+                          to="/terms-and-condition"
+                          href="javascript:void(0)"
+                        >
+                          Terms and conditions
+                        </Link>
                       </li>
                       <li>
-                        <Link to="/privacy-policy" href="javascript:void(0)">Privacy Policy</Link>
+                        <Link to="/privacy-policy" href="javascript:void(0)">
+                          Privacy Policy
+                        </Link>
                       </li>
                     </ul>
                   </div>
@@ -47,19 +74,19 @@ const Footer = () => {
                     <h5 className="footer-title">Vehicles Type</h5>
                     <ul>
                       <li>
-                        <Link to="/listing" >All Vehicles</Link>
+                        <Link to="/listing">All Vehicles</Link>
                       </li>
                       <li>
-                        <Link to="/listing" >SUVs</Link>
+                        <Link to="/listing">SUVs</Link>
                       </li>
                       <li>
-                        <Link to="/listing" >Trucks</Link>
+                        <Link to="/listing">Trucks</Link>
                       </li>
                       <li>
-                        <Link to="/listing" >Cars</Link>
+                        <Link to="/listing">Cars</Link>
                       </li>
                       <li>
-                        <Link to="/listing" >Crossovers</Link>
+                        <Link to="/listing">Crossovers</Link>
                       </li>
                     </ul>
                   </div>
@@ -77,15 +104,16 @@ const Footer = () => {
                         <Link to="/listing">All vehicles</Link>
                       </li>
                       <li>
-                        <Link to="/blog-list" href="javascript:void(0)">Blogs</Link>
+                        <Link to="/blog-list" href="javascript:void(0)">
+                          Blogs
+                        </Link>
                       </li>
                       <li>
-                        <Link to="/faq" >FAQ</Link>
+                        <Link to="/faq">FAQ</Link>
                       </li>
                       <li>
                         <Link to="/contact-us">Contact Us</Link>
                       </li>
-                      
                     </ul>
                   </div>
                   {/* /Footer Widget */}
@@ -98,24 +126,26 @@ const Footer = () => {
                 <div className="footer-contact-info">
                   <div className="footer-address">
                     <span>
-                       <PhoneCall size={18} />
+                      <PhoneCall size={18} />
                     </span>
                     <div className="addr-info">
-                      <a href="tel:+1(888)7601940">+ 1 (888) 760 1940</a>
+                      <a href={`tel:${companySetting?.phone}`}>{companySetting?.phone}</a>
                     </div>
                   </div>
                   <div className="footer-address">
                     <span>
-                       <Mail size={18} />
+                      <Mail size={18} />
                     </span>
                     <div className="addr-info">
-                      <a href="mailto:support@example.com">support@example.com</a>
+                      <a href={`mailto:${companySetting?.email}`}>
+                      {companySetting?.email}
+                      </a>
                     </div>
                   </div>
                   <div className="update-form">
                     <form action="#">
                       <span>
-                      <Mail size={18} />
+                        <Mail size={18} />
                       </span>
                       <input
                         type="email"

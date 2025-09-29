@@ -184,6 +184,54 @@ const bussinessLogoUpload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter,
 });
+const invoiceLogo = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/invoiceLogo");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/\s+/g, "_");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + "-" + baseName + ext);
+  },
+});
+const InvoiceLogoUpload = multer({
+  storage: invoiceLogo,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter,
+});
+const signatureImage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/signature");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/\s+/g, "_");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + "-" + baseName + ext);
+  },
+});
+const signatureUpload = multer({
+  storage: signatureImage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter,
+});
+const companyImage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/company");
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const baseName = path.basename(file.originalname, ext).replace(/\s+/g, "_");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, file.fieldname + "-" + uniqueSuffix + "-" + baseName + ext);
+  },
+});
+const companyImageUpload = multer({
+  storage: companyImage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter,
+});
 const carfiles = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/carFiles");
@@ -230,5 +278,8 @@ module.exports = {
   carImageUpload,
   userImageUpload,
   testimonialUpload,
-  bussinessLogoUpload
+  bussinessLogoUpload,
+  InvoiceLogoUpload,
+  signatureUpload,
+  companyImageUpload,
 };

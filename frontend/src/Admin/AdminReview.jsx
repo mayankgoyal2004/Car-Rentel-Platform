@@ -5,69 +5,68 @@ import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
 
-
 const AdminReview = () => {
-   const [ reveiw,  setReview] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [selectedId, setSelectedId] = useState(null);
-    const [search, setSearch] = useState("");
-      const [currentPage, setCurrentPage] = useState(1);
-      const [totalPages, setTotalPages] = useState(1);
-  
-    // Fetch all contacts
-    const fetchCarReview = async (searchQuery = "", page = 1) => {
-      try {
-        setLoading(true);
-        const res = await apiService.getCarReviewAdmin({
-            search: searchQuery,
-            page,
-          }); 
-        if (res.data.success) {
-           setReview(res.data.data);
-                setTotalPages(res.data.pagination?.totalPages || 1);
-                if (
-                  res.data.pagination?.currentPage &&
-                  res.data.pagination.currentPage !== currentPage
-                ) {
-                  setCurrentPage(res.data.pagination.currentPage);
-                }
+  const [reveiw, setReview] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Fetch all contacts
+  const fetchCarReview = async (searchQuery = "", page = 1) => {
+    try {
+      setLoading(true);
+      const res = await apiService.getCarReviewAdmin({
+        search: searchQuery,
+        page,
+      });
+      if (res.data.success) {
+        setReview(res.data.data);
+        setTotalPages(res.data.pagination?.totalPages || 1);
+        if (
+          res.data.pagination?.currentPage &&
+          res.data.pagination.currentPage !== currentPage
+        ) {
+          setCurrentPage(res.data.pagination.currentPage);
         }
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to fetch contacts");
-      } finally {
-        setLoading(false);
       }
-    };
-  
-    const handleDelete = async () => {
-      try {
-        if (!selectedId) return;
-        const res = await apiService.deleteCarReviewAdmin(selectedId); // <-- your DELETE route
-        if (res.data.success) {
-          toast.success("Contact deleted successfully");
-           setReview( reveiw.filter((c) => c._id !== selectedId));
-        }
-      } catch (error) {
-        console.error(error);
-        toast.error("Failed to delete contact");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch contacts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      if (!selectedId) return;
+      const res = await apiService.deleteCarReviewAdmin(selectedId);
+      if (res.data.success) {
+        toast.success("Contact deleted successfully");
+        setReview(reveiw.filter((c) => c._id !== selectedId));
       }
-    };
-  
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete contact");
+    }
+  };
+
   useEffect(() => {
     fetchCarReview(search, currentPage);
   }, [currentPage, search]);
-    
-    const handlePageChange = (page) => {
-      if (page < 1 || page > totalPages) return;
-      setCurrentPage(page);
-    };
-  
-    // Search input
-    const handleSearchChange = (e) => {
-      setSearch(e.target.value);
-      setCurrentPage(1); // ✅ good
-    };
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  // Search input
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1); // ✅ good
+  };
   return (
     <div>
       {/* Page Wrapper */}
@@ -90,20 +89,14 @@ const AdminReview = () => {
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
               <div className="mb-2 me-2">
-                <a
-                  
-                  className="btn btn-white d-flex align-items-center"
-                >
+                <a className="btn btn-white d-flex align-items-center">
                   <i className="ti ti-printer me-2" />
                   Print
                 </a>
               </div>
               <div className="mb-2 me-2">
                 <div className="dropdown">
-                  <a
-                    
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
+                  <a className="btn btn-dark d-inline-flex align-items-center">
                     <i className="ti ti-upload me-1" />
                     Export
                   </a>
@@ -124,8 +117,8 @@ const AdminReview = () => {
                     type="text"
                     className="form-control"
                     placeholder="Search"
-                     value={search}
-                  onChange={handleSearchChange}
+                    value={search}
+                    onChange={handleSearchChange}
                   />
                 </div>
               </div>
@@ -154,95 +147,91 @@ const AdminReview = () => {
                 </tr>
               </thead>
               <tbody>
-
-                  {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    Loading...
-                  </td>
-                </tr>
-              ) : reveiw.length > 0 ? (
-                reveiw.map((re) => (
-                <tr>
-                  <td>
-                    <div className="form-check form-check-md">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <a
-                        
-                        className="avatar me-2 flex-shrink-0"
-                      >
-                        <img
-                          className="rounded-circle"
-                          src={BASE_URL_IMG + re.user.image}
-                          alt
-                        />
-                      </a>
-                      <div>
-                        <a
-                         
-                          className="fw-semibold d-block"
-                        >
-                        {re.user.userName}
-                        </a>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <p className="text-gray-9 mb-0">{new Date(re.createdAt).toDateString()}</p>
-                  </td>
-                  <td>
-  <div>
-    {Array.from({ length: re.carReview }).map((_, i) => (
-      <i key={i} className="ti ti-star-filled text-warning" />
-    ))}
-  </div>
-</td>
-                  <td>
-                    <p className="text-gray-9 mb-0">
-                     {re.comment}
-                    </p>
-                  </td>
-                  <td>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-icon btn-sm"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <i className="ti ti-dots-vertical" />
-                      </button>
-                      <ul className="dropdown-menu dropdown-menu-end p-2">
-                        <li>
-                          <a
-                            className="dropdown-item rounded-1"
-                            onClick={() => setSelectedId(re._id)}
-                            data-bs-toggle="modal"
-                            data-bs-target="#delete_review"
-                          >
-                            <i className="ti ti-trash me-1" />
-                            Delete
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : reveiw.length > 0 ? (
+                  reveiw.map((re) => (
+                    <tr>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <a className="avatar me-2 flex-shrink-0">
+                            <img
+                              className="rounded-circle"
+                              src={BASE_URL_IMG + re.user.image}
+                              alt
+                            />
                           </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-                 ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    No contacts found
-                  </td>
-                </tr>
-              )}
+                          <div>
+                            <a className="fw-semibold d-block">
+                              {re.user.userName}
+                            </a>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <p className="text-gray-9 mb-0">
+                          {new Date(re.createdAt).toDateString()}
+                        </p>
+                      </td>
+                      <td>
+                        <div>
+                          {Array.from({ length: re.carReview }).map((_, i) => (
+                            <i
+                              key={i}
+                              className="ti ti-star-filled text-warning"
+                            />
+                          ))}
+                        </div>
+                      </td>
+                      <td>
+                        <p className="text-gray-9 mb-0">{re.comment}</p>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <a
+                                className="dropdown-item rounded-1"
+                                onClick={() => setSelectedId(re._id)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_review"
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="text-center">
+                      No contacts found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
-             <nav aria-label="Page navigation" className="mt-3">
+            <nav aria-label="Page navigation" className="mt-3">
               <ul className="pagination justify-content-center">
                 <li
                   className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
@@ -291,7 +280,7 @@ const AdminReview = () => {
         </div>
       </div>
       {/* /Page Wrapper */}
-    
+
       <div className="modal fade" id="delete_review">
         <div className="modal-dialog modal-dialog-centered modal-sm">
           <div className="modal-content">
@@ -302,11 +291,7 @@ const AdminReview = () => {
               <h4 className="mb-1">Delete Review</h4>
               <p className="mb-3">Are you sure you want to delete Review?</p>
               <div className="d-flex justify-content-center">
-                <a
-                  
-                  className="btn btn-light me-3"
-                  data-bs-dismiss="modal"
-                >
+                <a className="btn btn-light me-3" data-bs-dismiss="modal">
                   Cancel
                 </a>
                 <button

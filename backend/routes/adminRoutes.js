@@ -42,6 +42,9 @@ const checkSubscription = require("../middlewares/checkPermission");
 const reservation = require("../controlers/reservationControler");
 const contact = require("../controlers/contactUsControler");
 const invoice = require("../controlers/invoiceControler");
+const signature = require("../controlers/signatureController");
+const bankAccount = require("../controlers/bankaccountControler");
+const companySetting = require("../controlers/companySettingControler");
 
 const route = express.Router();
 
@@ -80,6 +83,9 @@ route.get(
 route.get("/all-cars-home-page", car.getAllCars);
 //!!contact
 route.post("/add-constact", contact.addContact);
+
+//!! get compnay settings
+route.get("/get-company-setting", companySetting.getCompanySetting);
 
 //!! blog
 route.get("/blogs/user", blog.getBlogForUser);
@@ -1174,4 +1180,60 @@ route.post(
   checkPermission("Invoice", "edit"),
   invoice.createInvoice
 );
+
+//!!! invoice setting
+route.post(
+  "/add-invoice-logo",
+  upload.InvoiceLogoUpload.single("image"),
+  invoice.addInvoiceLogo
+);
+route.get("/get-invoice-logo", invoice.getInvoiceLogo);
+//!! signature setting
+route.post(
+  "/add-signature",
+  upload.signatureUpload.single("image"),
+  signature.addSignature
+);
+route.post(
+  "/update-signature/:id",
+  upload.signatureUpload.single("image"),
+  signature.updateSignature
+);
+route.get(
+  "/get-all-signature",
+
+  signature.getSignatures
+);
+route.get(
+  "/get-all-active-signature",
+
+  signature.getActiveSignature
+);
+
+route.delete("/delete-signature/:id", signature.deleteSignature);
+
+//!! bank account settting
+route.post("/add-bank-account", bankAccount.addBankAccount);
+route.post("/update-bank-account/:id", bankAccount.updateBankAccount);
+route.get(
+  "/get-all-bank-account",
+
+  bankAccount.getBankAccount
+);
+route.get(
+  "/get-all-active-bank-account",
+
+  bankAccount.getActiveBankAccount
+);
+
+route.delete("/delete-bank-account/:id", bankAccount.deleteBankAccount);
+
+//!! company setting
+
+route.post(
+  "/add-company-setting",
+  upload.companyImageUpload.single("image"),
+  companySetting.addCompanySetting
+);
+
 module.exports = route;

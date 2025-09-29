@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import "./assets/logo.css";
 // import "./assets/css/admin-style.css"
 import "./assets/css/admin-style.css";
@@ -12,11 +12,12 @@ import { removeUser } from "../utils/userSlice";
 
 const AdminDashboard = () => {
   const [open, setOpen] = useState(false);
+  const [rentalSettingOpen, setReantalSettingOpen] = useState(false);
   const [blogOpen, setblogOpen] = useState(false);
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
-  const [isMini, setIsMini] = useState(true); // default collapsed
+  const [isMini, setIsMini] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const userData = useSelector((store) => store.user);
@@ -611,30 +612,60 @@ const AdminDashboard = () => {
                   <span>SETTINGS &amp; CONFIGURATION</span>
                 </li>
                 <li>
-                  {userType === 1 ||
-                    (userType === 2 && (
-                      <ul>
-                        <li>
-                          <a onClick={() => SetSettingOpen(!SettingOpen)}>
-                            <i className="ti ti-user-cog" />
-                            <span>Account Settings</span>
-                            <span className="menu-arrow" />
-                          </a>
-                          {SettingOpen && (
-                            <ul>
-                              <li>
-                                <NavLink to="profile-setting">Profile</NavLink>
-                              </li>
-                              <li>
-                                <NavLink to="security-setting">
-                                  Security
-                                </NavLink>
-                              </li>
-                            </ul>
-                          )}
-                        </li>
-                      </ul>
-                    ))}
+                  <ul>
+                    <li>
+                      <a onClick={() => SetSettingOpen(!SettingOpen)}>
+                        <i className="ti ti-user-cog" />
+                        <span>Account Settings</span>
+                        <span className="menu-arrow" />
+                      </a>
+                      {SettingOpen && (
+                        <ul>
+                          <li>
+                            <NavLink to="profile-setting">Profile</NavLink>
+                          </li>
+                          <li>
+                            <NavLink to="security-setting">Security</NavLink>
+                          </li>
+                        </ul>
+                      )}
+                    </li>
+                    <li>
+                      <a
+                        onClick={() =>
+                          setReantalSettingOpen(!rentalSettingOpen)
+                        }
+                      >
+                        <i className="ti ti-clock-cog" />
+                        <span>Website Setting </span>
+                        <span className="menu-arrow" />
+                      </a>
+                      {rentalSettingOpen && (
+                        <ul>
+                          <li>
+                            <Link to="invoice-setting">Invoice Settings</Link>
+                          </li>
+
+                          <li>
+                            <Link to="signature-setting">Signatures</Link>
+                          </li>
+                          <li>
+                            <Link to="bank-account-setting">Bank Accounts</Link>
+                          </li>
+                          <li>
+                            <Link to="company-setting">
+                              Company Settings
+                            </Link>
+                          </li>
+                          <li>
+                            <Link to="login-setting">
+                              Login Settings
+                            </Link>
+                          </li>
+                        </ul>
+                      )}
+                    </li>
+                  </ul>
                 </li>
               </ul>
             </div>

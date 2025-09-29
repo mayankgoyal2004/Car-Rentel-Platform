@@ -57,6 +57,16 @@ const AdminReservation = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1); // ✅ good
+  };
+    const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+
   return (
     <div className="page-wrapper">
       <div className="content me-4">
@@ -77,20 +87,14 @@ const AdminReservation = () => {
           </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
             <div className="mb-2 me-2">
-              <a
-                href="javascript:void(0);"
-                className="btn btn-white d-flex align-items-center"
-              >
+              <a className="btn btn-white d-flex align-items-center">
                 <i className="ti ti-printer me-2" />
                 Print
               </a>
             </div>
             <div className="mb-2">
               <div className="dropdown">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-dark d-inline-flex align-items-center"
-                >
+                <a className="btn btn-dark d-inline-flex align-items-center">
                   <i className="ti ti-upload me-1" />
                   Export
                 </a>
@@ -111,6 +115,8 @@ const AdminReservation = () => {
                   type="text"
                   className="form-control"
                   placeholder="Search"
+                  value={search}
+                  onChange={handleSearchChange}
                 />
               </div>
             </div>
@@ -293,7 +299,6 @@ const AdminReservation = () => {
                         <li>
                           <a
                             className="dropdown-item rounded-1"
-                            href="javascript:void(0);"
                             onClick={() => setDeleteReservation(reservation)}
                             data-bs-toggle="modal"
                             data-bs-target="#delete_modal"
@@ -309,6 +314,50 @@ const AdminReservation = () => {
               ))}
             </tbody>
           </table>
+          {/* Pagination */}
+          <nav aria-label="Page navigation" className="mt-3">
+            <ul className="pagination justify-content-center">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Prev
+                </button>
+              </li>
+
+              {[...Array(totalPages)].map((_, idx) => (
+                <li
+                  key={idx}
+                  className={`page-item ${
+                    currentPage === idx + 1 ? "active" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(idx + 1)}
+                  >
+                    {idx + 1}
+                  </button>
+                </li>
+              ))}
+
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
         {/* Custom Data Table */}
         <div className="table-footer" />

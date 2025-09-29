@@ -132,11 +132,13 @@ import EmailVerified from "./authentication/emailVerified";
 import ResetPassword from "./authentication/ResetPassword";
 import AdminRegister from "./Admin/AdminAuthentication/adminRegister";
 import AdminOwners from "./Admin/adminAllOwner";
-
+import InvoiceSetting from "./Admin/invoiceSetting";
+import SignatureSetting from "./Admin/SignatureSetting";
+import BankAccountSetting from "./Admin/BankAccountSetting";
+import CompanySetting from "./Admin/CompanySetting";
+import LoginSettingAdmin from "./Admin/LoginSettingAdmin";
 
 function App() {
-  
-
   return (
     <BrowserRouter>
       <ScrollToTop />
@@ -302,6 +304,14 @@ function App() {
             />
             <Route path="profile-setting" element={<AdminProfileSetting />} />
             <Route path="security-setting" element={<AdminSecuritySetting />} />
+            <Route path="invoice-setting" element={<InvoiceSetting />} />
+            <Route path="signature-setting" element={<SignatureSetting />} />
+            <Route path="login-setting" element={<LoginSettingAdmin />} />
+            <Route path="company-setting" element={<CompanySetting />} />
+            <Route
+              path="bank-account-setting"
+              element={<BankAccountSetting />}
+            />
             <Route
               path="notification-setting"
               element={<AdminNotificationSetting />}
@@ -322,7 +332,10 @@ function App() {
               path="customer-companies"
               element={<AdminCustomersCumpanies />}
             />
-            <Route path="invoice-details/:id" element={<AdminInvoiceDetails />} />
+            <Route
+              path="invoice-details/:id"
+              element={<AdminInvoiceDetails />}
+            />
             <Route path="car-details/:id" element={<AdminCarDetails />} />
             <Route path="add-car" element={<AdminAddCars />} />
             <Route path="edit-car/:id" element={<AdminEditCar />} />
@@ -331,7 +344,10 @@ function App() {
               element={<AdminReservationDetails />}
             />
             <Route path="company-details" element={<AdminCompaniesDetails />} />
-            <Route path="edit-reservation/:id" element={<AdminEditReservation />} />
+            <Route
+              path="edit-reservation/:id"
+              element={<AdminEditReservation />}
+            />
             <Route
               path="quotation-details"
               element={<AdminQuatationDetails />}

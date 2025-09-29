@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import apiService from "../../Apiservice/apiService";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
 
 const AdminInvoiceDetails = () => {
@@ -9,12 +9,34 @@ const AdminInvoiceDetails = () => {
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
   const [printing, setPrinting] = useState(false);
+  const [logo, setLogo] = useState(null);
+  const [signature, setSignature] = useState(null);
+  const [bankAcount, setBankAccount] = useState(null);
+
+  const getInvoiceLogo = async () => {
+    const res = await apiService.getInvoiceLogo();
+    if (res.data.data) {
+      setLogo(res.data.data.logo);
+    }
+  };
+  const getInvoiceSignature = async () => {
+    const res = await apiService.getActiveSignature();
+    if (res.data.data) {
+      setSignature(res.data.data);
+    }
+  };
+  const getBankAccount = async () => {
+    const res = await apiService.getActiveBankAccount();
+    if (res.data.data) {
+      setBankAccount(res.data.data);
+    }
+  };
 
   useEffect(() => {
-    if (id) {
-      fetchInvoiceDetails();
-    }
-  }, [id]);
+    getInvoiceSignature();
+    getInvoiceLogo();
+    getBankAccount();
+  }, []);
 
   const fetchInvoiceDetails = async () => {
     setLoading(true);
@@ -28,6 +50,12 @@ const AdminInvoiceDetails = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      fetchInvoiceDetails();
+    }
+  }, [id]);
 
   const handlePrint = () => {
     setPrinting(true);
@@ -101,7 +129,7 @@ const AdminInvoiceDetails = () => {
             <i className="ti ti-menu-2 me-2" />
             Invoice Details
           </h4>
-          {invoice.status}
+          <h4 className=" badge badge-success"> {invoice.status}</h4>
         </div>
 
         <div className="card car-invoice">
@@ -128,12 +156,12 @@ const AdminInvoiceDetails = () => {
               <div className="col-md-6">
                 <div className="text-end mb-2">
                   <img
-                    src="/admin-assets/img/logo.svg"
+                    src={BASE_URL_IMG + logo}
                     className="invoice-logo img-fluid"
                     alt="logo"
                   />
                   <p className="mb-2">{invoice.from.name}</p>
-                  {invoice.status}
+                  <h4 className=" badge badge-success"> {invoice.status}</h4>
                 </div>
               </div>
             </div>
@@ -235,15 +263,11 @@ const AdminInvoiceDetails = () => {
                 <div className="py-4">
                   <div className="mb-3">
                     <h6 className="mb-1">Terms and Conditions</h6>
-                    <p>
-                      {invoice.terms }
-                    </p>
+                    <p>{invoice.terms}</p>
                   </div>
                   <div className="mb-3">
                     <h6 className="mb-1">Notes</h6>
-                    <p>
-                      {invoice.notes }
-                    </p>
+                    <p>{invoice.notes}</p>
                   </div>
                 </div>
               </div>
@@ -251,7 +275,7 @@ const AdminInvoiceDetails = () => {
                 <div className="d-flex justify-content-between align-items-center mb-2 pe-3">
                   <p className="mb-0">Sub Total</p>
                   <p className="text-dark fw-medium mb-2">
-                   $ {invoice.subtotal}
+                    $ {invoice.subtotal}
                   </p>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-2 pe-3">
@@ -262,15 +286,11 @@ const AdminInvoiceDetails = () => {
                 </div>
                 <div className="d-flex justify-content-between border-bottom align-items-center pb-2 mb-2 pe-3">
                   <p className="mb-0">Discount</p>
-                  <p className="text-danger fw-medium mb-2">
-                   $ {0}
-                  </p>
+                  <p className="text-danger fw-medium mb-2">$ {0}</p>
                 </div>
                 <div className="d-flex justify-content-between align-items-center mb-2 pe-3">
                   <h5>Total Amount</h5>
-                  <h5>
-                   $ {invoice.totalAmount}
-                  </h5>
+                  <h5>$ {invoice.totalAmount}</h5>
                 </div>
               </div>
             </div>
@@ -280,11 +300,7 @@ const AdminInvoiceDetails = () => {
               <div className="col-md-9">
                 <div className="d-flex align-items-center">
                   <div className="me-4">
-                    <p className="mb-2 text-center">Scan to pay</p>
-                    <img
-                      src="/admin-assets/img/icons/qr-img.svg"
-                      alt="QR Code"
-                    />
+                  
                   </div>
                   <div>
                     <h5 className="mb-2">Bank Details</h5>
@@ -292,19 +308,19 @@ const AdminInvoiceDetails = () => {
                       <span className="text-dark min-width-150 d-flex">
                         Bank Name
                       </span>
-                      ABC Bank
+                      {bankAcount.bankName}
                     </p>
                     <p className="mb-2 d-flex">
                       <span className="text-dark min-width-150 d-flex">
                         Account Number
                       </span>
-                      782459739212
+                      {bankAcount.accountNumber}
                     </p>
                     <p className="mb-2 d-flex">
                       <span className="text-dark min-width-150 d-flex">
                         IFSC Code
                       </span>
-                      ABC0001345
+                      {bankAcount.ifsc}
                     </p>
                     <p className="mb-0 d-flex">
                       <span className="text-dark min-width-150 d-flex">
@@ -318,13 +334,13 @@ const AdminInvoiceDetails = () => {
               <div className="col-md-3">
                 <div className="text-end">
                   <img
-                    src="/admin-assets/img/icons/sign-2.svg"
+                    src={BASE_URL_IMG + signature?.image}
                     className="img-fluid"
                     alt="signature"
                   />
                 </div>
                 <div className="text-end mb-3">
-                  <h6 className="fs-14 fw-medium pe-3">Ted M. Davis</h6>
+                  <h6 className="fs-14 fw-medium pe-3">{signature.name}</h6>
                   <p>Assistant Manager</p>
                 </div>
               </div>

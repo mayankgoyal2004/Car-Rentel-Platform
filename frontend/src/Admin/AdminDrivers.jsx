@@ -250,25 +250,6 @@ const AdminDrivers = () => {
           <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
             <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-              <div className="dropdown me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="dropdown-toggle btn btn-white d-inline-flex align-items-center"
-                  data-bs-toggle="dropdown"
-                >
-                  <i className="ti ti-edit-circle me-1" /> Bulk Actions
-                </a>
-                <ul className="dropdown-menu dropdown-menu-end p-2">
-                  <li>
-                    <a
-                      href="javascript:void(0);"
-                      className="dropdown-item rounded-1"
-                    >
-                      Delete
-                    </a>
-                  </li>
-                </ul>
-              </div>
               <div className="top-search me-2">
                 <div className="top-search-group">
                   <span className="input-icon">

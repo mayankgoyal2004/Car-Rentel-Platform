@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import apiServices from "../../Apiservice/apiService";
+import apiServices, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { CornerDownLeft } from "react-feather";
@@ -13,10 +13,27 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [companySetting, setCompanySetting] = useState([]);
+
   const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiServices.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
 
   // Handle form submit
   const handleSubmit = async (e) => {
@@ -74,7 +91,7 @@ const Login = () => {
         <Link to="/">
           <img
             className="img-fluid logo-dark"
-            src="/user-assets/img/logo.svg"
+            src={ BASE_URL_IMG+  companySetting?.profilePhoto}
             alt="Logo"
           />
         </Link>

@@ -314,19 +314,38 @@ const getAllReservationsForAdmin = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search.trim() || "";
 
     const cars = await Car.find({ admin: req.user.admin }).select("_id");
-
     const carIds = cars.map((c) => c._id);
 
     if (carIds.length === 0) {
       return res.status(200).json({
         success: true,
         data: [],
-        pagination: { totalReservations: 0, currentPage: page, totalPages: 0 },
+        pagination: { totalReservations: 0, currentPage: page, totalPages: 0, limit },
       });
     }
-    const reservations = await Reservation.find({ car: { $in: carIds } })
+
+    let filter = { car: { $in: carIds } };
+
+    if (search) {
+      const matchingCustomers = await customer.find({
+        name: { $regex: search, $options: "i" },
+      }).select("_id");
+
+      const matchingCars = await Car.find({
+        _id: { $in: carIds },
+        carName: { $regex: search, $options: "i" },
+      }).select("_id");
+
+      filter.$or = [
+        { customer: { $in: matchingCustomers.map((c) => c._id) } },
+        { car: { $in: matchingCars.map((c) => c._id) } },
+      ];
+    }
+
+    const reservations = await Reservation.find(filter)
       .populate({
         path: "car",
         populate: [
@@ -339,14 +358,11 @@ const getAllReservationsForAdmin = async (req, res) => {
       .populate("customer", "name image")
       .populate("extraServices")
       .populate("driver")
-
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalReservations = await Reservation.countDocuments({
-      car: { $in: carIds },
-    });
+    const totalReservations = await Reservation.countDocuments(filter);
 
     res.status(200).json({
       success: true,
@@ -355,6 +371,7 @@ const getAllReservationsForAdmin = async (req, res) => {
         totalReservations,
         currentPage: page,
         totalPages: Math.ceil(totalReservations / limit),
+        limit,
       },
     });
   } catch (err) {
@@ -363,9 +380,9 @@ const getAllReservationsForAdmin = async (req, res) => {
       message: "Server Error",
       error: err.message,
     });
-    c;
   }
 };
+
 
 const getLatest5ReservationsForAdmin = async (req, res) => {
   try {

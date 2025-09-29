@@ -1358,15 +1358,23 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  addInvoiceLogo(data) {
+    return axios.post(BASE_URL + "add-invoice-logo", data, {
+      headers: getAuthHeaders(),
+    });
+  }
   editInvoice(id, data) {
     return axios.post(BASE_URL + `edit-invoice-admin/${id}`, data, {
       headers: getAuthHeaders(),
     });
   }
-  getAllInvoice() {
-    return axios.get(BASE_URL + `get-all-invoice-admin`, {
-      headers: getAuthHeaders(),
-    });
+  getAllInvoice({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-invoice-admin?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
   }
 
   getInvoiceDetails(id) {
@@ -1389,6 +1397,79 @@ class apiServices {
     return axios.get(BASE_URL + `get-invoice-by-reservation/${id}`, {
       headers: getAuthHeaders(),
     });
+  }
+  getInvoiceLogo() {
+    return axios.get(BASE_URL + `get-invoice-logo`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!! signature api
+
+  getActiveSignature() {
+    return axios.get(BASE_URL + `get-all-active-signature`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addSignature(data) {
+    return axios.post(BASE_URL + `add-signature`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllSignature({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-signature?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  updateSignature(id, data) {
+    return axios.post(BASE_URL + `update-signature/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteSignature(data) {
+    return axios.delete(BASE_URL + `delete-signature/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  //!!! bank account api
+  getActiveBankAccount() {
+    return axios.get(BASE_URL + `get-all-active-bank-account`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  addBankAccount(data) {
+    return axios.post(BASE_URL + `add-bank-account`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllBankAccount({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-bank-account?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  updateBankAccount(id, data) {
+    return axios.post(BASE_URL + `update-bank-account/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteBankAccount(data) {
+    return axios.delete(BASE_URL + `delete-bank-account/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!! company setting
+  addCompanySetting(data) {
+    return axios.post(BASE_URL + `add-company-setting`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getCompanySettings() {
+    return axios.get(BASE_URL + `get-company-setting`);
   }
 }
 

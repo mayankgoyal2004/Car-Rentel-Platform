@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import apiServices from "../../Apiservice/apiService"; // 👈 your API helper
+import apiServices, { BASE_URL_IMG } from "../../Apiservice/apiService"; // 👈 your API helper
 import { CornerDownLeft } from "react-feather";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -18,6 +18,21 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
+  const [companySetting, setCompanySetting] = useState({});
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiServices.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
 
   // handle input
   const handleChange = (e) => {
@@ -84,7 +99,7 @@ const Register = () => {
         <Link to="/">
           <img
             className="img-fluid logo-dark"
-            src="/user-assets/img/logo.svg"
+            src={BASE_URL_IMG + companySetting?.profilePhoto}
             alt="Logo"
           />
         </Link>
@@ -254,19 +269,18 @@ const Register = () => {
           </div>
         </div>
       </footer>
-     
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-   
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

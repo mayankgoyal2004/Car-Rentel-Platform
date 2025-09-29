@@ -1,10 +1,89 @@
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import apiService from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const LoginSettingAdmin = () => {
+  const [captchaSetting, setCaptchaSetting] = useState({
+    status: false,
+    siteKey: "",
+    secretKey: "",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const getLoginSetting = async () => {
+    try {
+      setLoading(true);
+      const res = await apiService.getCaptchaSetting();
+      if (res.data.data) {
+        setCaptchaSetting({
+          status: res.data.data.status || false,
+          siteKey: res.data.data.siteKey || "",
+          secretKey: res.data.data.secretKey || "",
+        });
+      }
+    } catch (err) {
+      toast.error("Failed to load captcha settings");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getLoginSetting();
+  }, []);
+
+  const updateCaptchaSetting = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (
+        captchaSetting.status &&
+        (!captchaSetting.siteKey || !captchaSetting.secretKey)
+      ) {
+        toast.error(
+          "Site Key and Secret Key are required when captcha is enabled"
+        );
+        return;
+      }
+
+      await apiService.updatecaptchaSetting(captchaSetting);
+      toast.success("Captcha settings updated successfully");
+    } catch (err) {
+      toast.error("Failed to update captcha settings");
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCaptchaSetting((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const toggleCaptchaStatus = async (newStatus) => {
+    try {
+      const updatedSettings = {
+        ...captchaSetting,
+        status: newStatus,
+      };
+
+      if (!newStatus || (captchaSetting.siteKey && captchaSetting.secretKey)) {
+        await apiService.updatecaptchaSetting(updatedSettings);
+        setCaptchaSetting(updatedSettings);
+        toast.success(
+          `Captcha ${newStatus ? "enabled" : "disabled"} successfully`
+        );
+      } else {
+        document.getElementById("configureCaptcha").click();
+      }
+    } catch (err) {
+      toast.error("Failed to update captcha status");
+    }
+  };
+
   return (
     <div className="page-wrapper">
       <div className="content me-0 pb-0 me-lg-4">
@@ -15,7 +94,7 @@ const LoginSettingAdmin = () => {
             <nav>
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <a href="index.html">Home</a>
+                  <Link to="/admin-dashboard">Home</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
                   Settings
@@ -29,7 +108,6 @@ const LoginSettingAdmin = () => {
         {/* Settings Prefix */}
         <div className="row">
           <div className="col-lg-3">
-            {/* inner sidebar - unchanged */}
             <div className="settings-sidebar slimscroll">
               <div className="sidebar-menu">
                 <ul>
@@ -58,6 +136,15 @@ const LoginSettingAdmin = () => {
                   </li>
                   <li>
                     <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                      <li className="active">
+                        <Link
+                          to="/admin-dashboard/login-setting"
+                          className="active"
+                        >
+                          <i className="ti ti-lock-bolt me-2"></i>
+                          <span>Login & Register</span>
+                        </Link>
+                      </li>
                       <li>
                         <a href="company-setting.html">
                           <i className="ti ti-building me-2" />
@@ -85,9 +172,15 @@ const LoginSettingAdmin = () => {
                         </Link>
                       </li>
                       <li>
-                        <Link className="active">
+                        <Link to="/admin-dashboard/signature-setting">
                           <i className="ti ti-signature me-2" />
                           <span>Signatures</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="/admin-dashboard/bank-account-setting">
+                          <i className="ti ti-file-dollar me-2" />
+                          <span>Bank Accounts</span>
                         </Link>
                       </li>
                     </ul>
@@ -133,15 +226,9 @@ const LoginSettingAdmin = () => {
                   <li>
                     <ul className="sidebar-links pb-3 mb-3 border-bottom">
                       <li>
-                        <a href="bank-accounts.html">
+                        <Link to="/admin-dashboard/bank-account-setting">
                           <i className="ti ti-file-dollar me-2" />
                           <span>Bank Accounts</span>
-                        </a>
-                      </li>
-                      <li className="active">
-                        <Link>
-                          <i class="ti ti-lock-bolt me-2"></i>
-                          <span>Login & Register</span>
                         </Link>
                       </li>
                     </ul>
@@ -167,10 +254,13 @@ const LoginSettingAdmin = () => {
                               className="p-2 bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
                               data-bs-toggle="modal"
                               data-bs-target="#google_login"
+                              id="configureCaptcha"
                             >
                               <img
                                 src="/admin-assets/img/brands/google.svg"
-                                alt="img"
+                                alt="Google reCAPTCHA"
+                                width="20"
+                                height="20"
                               />
                             </a>
                             <a
@@ -178,17 +268,30 @@ const LoginSettingAdmin = () => {
                               data-bs-toggle="modal"
                               data-bs-target="#google_login"
                             >
-                              Google
+                              Google reCAPTCHA
                             </a>
                           </div>
-                          <span className="badge badge-dark-transparent d-inline-flex align-items-center fs-12">
-                            <i className="ti ti-point-filled text-success" />
-                            Connected
+                          <span
+                            className={`badge ${
+                              captchaSetting.status
+                                ? "badge-success-transparent"
+                                : "badge-danger-transparent"
+                            } d-inline-flex align-items-center fs-12`}
+                          >
+                            <i
+                              className={`ti ti-point-filled me-1 ${
+                                captchaSetting.status
+                                  ? "text-success"
+                                  : "text-danger"
+                              }`}
+                            />
+                            {captchaSetting.status ? "Enabled" : "Disabled"}
                           </span>
                         </div>
                         <p className="fs-14">
-                          Streamline your access using your Google Captcha for
-                          secure and efficient login.
+                          {captchaSetting.status
+                            ? "Google reCAPTCHA is enabled for secure login and registration."
+                            : "Enable Google reCAPTCHA to protect your forms from spam and abuse."}
                         </p>
                       </div>
                       <div className="card-footer py-2">
@@ -203,10 +306,13 @@ const LoginSettingAdmin = () => {
                           </a>
                           <div className="form-check form-check-md form-switch">
                             <input
-                              className="form-check-input form-label"
+                              className="form-check-input"
                               type="checkbox"
-                              role="switch"
-                              defaultChecked
+                              checked={captchaSetting.status}
+                              onChange={(e) =>
+                                toggleCaptchaStatus(e.target.checked)
+                              }
+                              disabled={loading}
                             />
                           </div>
                         </div>
@@ -219,55 +325,89 @@ const LoginSettingAdmin = () => {
           </div>
         </div>
 
+        {/* Google reCAPTCHA Configuration Modal */}
         <div className="modal fade" id="google_login">
           <div className="modal-dialog modal-dialog-centered modal-md">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="mb-0">Google Login Settings</h5>
+                <h5 className="mb-0">Google reCAPTCHA Settings</h5>
                 <button
                   type="button"
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="modalClose"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>
               </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label className="form-label">
-                    Client ID<span className="text-danger ms-1">*</span>
-                  </label>
-                  <input type="text" className="form-control" />
+              <form onSubmit={updateCaptchaSetting}>
+                <div className="modal-body">
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Site Key{" "}
+                      {captchaSetting.status && (
+                        <span className="text-danger">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="siteKey"
+                      value={captchaSetting.siteKey}
+                      onChange={handleInputChange}
+                      placeholder="Enter your reCAPTCHA site key"
+                    />
+                    
+                  </div>
+
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Secret Key{" "}
+                      {captchaSetting.status && (
+                        <span className="text-danger">*</span>
+                      )}
+                    </label>
+                    <input
+                      type="test"
+                      className="form-control"
+                      name="secretKey"
+                      value={captchaSetting.secretKey}
+                      onChange={handleInputChange}
+                      placeholder="Enter your reCAPTCHA secret key"
+                    />
+                  
+                  </div>
+
+                  <div className="form-check form-switch">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      name="status"
+                      checked={captchaSetting.status}
+                      onChange={handleInputChange}
+                    />
+                    <label className="form-check-label fw-medium">
+                      Enable Google reCAPTCHA
+                    </label>
+                  </div>
                 </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Client Secret Key<span className="text-danger ms-1">*</span>
-                  </label>
-                  <input type="text" className="form-control" />
+                <div className="modal-footer">
+                  <div className="d-flex justify-content-center w-100">
+                    <button
+                      type="button"
+                      className="btn btn-light me-3"
+                      data-bs-dismiss="modal"
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Save Settings
+                    </button>
+                  </div>
                 </div>
-                <div className="mb-0">
-                  <label className="form-label">
-                    Login Redirect URL
-                    <span className="text-danger ms-1">*</span>
-                  </label>
-                  <input type="text" className="form-control" />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <div className="d-flex justify-content-center">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-light me-3"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </a>
-                  <a href="javascript:void(0);" className="btn btn-primary">
-                    Submit
-                  </a>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>

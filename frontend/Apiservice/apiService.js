@@ -1471,6 +1471,17 @@ class apiServices {
   getCompanySettings() {
     return axios.get(BASE_URL + `get-company-setting`);
   }
+  //!! captcha setting
+  updatecaptchaSetting(data) {
+    return axios.post(BASE_URL + `add-captcha-setting`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  getCaptchaSetting() {
+    return axios.get(BASE_URL + `get-captcha-setting`, {
+      headers: getAuthHeaders(),
+    });
+  }
 }
 
 export default new apiServices();

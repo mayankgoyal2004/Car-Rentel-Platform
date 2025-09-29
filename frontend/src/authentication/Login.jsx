@@ -162,8 +162,7 @@ const Login = () => {
                 </div>
                 <div className="my-3">
                   <ReCAPTCHA
-                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
-" //
+                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL" //
                     onChange={(token) => setRecaptchaToken(token)}
                     onExpired={() => setRecaptchaToken(null)}
                   />

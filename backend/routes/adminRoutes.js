@@ -45,6 +45,7 @@ const invoice = require("../controlers/invoiceControler");
 const signature = require("../controlers/signatureController");
 const bankAccount = require("../controlers/bankaccountControler");
 const companySetting = require("../controlers/companySettingControler");
+const recaptchaSetting = require("../controlers/googleCaptchaControler");
 
 const route = express.Router();
 
@@ -1234,6 +1235,18 @@ route.post(
   "/add-company-setting",
   upload.companyImageUpload.single("image"),
   companySetting.addCompanySetting
+);
+
+//!! captcha settings
+route.post(
+  "/add-captcha-setting",
+
+  recaptchaSetting.updateCaptchaSetting
+);
+route.get(
+  "/get-captcha-setting",
+
+  recaptchaSetting.getCaptchaSetting
 );
 
 module.exports = route;

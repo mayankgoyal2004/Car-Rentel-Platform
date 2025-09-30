@@ -8,7 +8,7 @@ const blog = require("../controlers/blogControler");
 const upload = require("../middlewares/upload");
 const driver = require("../controlers/driverControler");
 const customer = require("../controlers/customercontroler");
-const company = require("../controlers/CompanyControler");
+
 const country = require("../controlers/countryControler");
 const state = require("../controlers/stateControler");
 const carBrand = require("../controlers/CarAtributesControler/carBrandControler");
@@ -21,11 +21,10 @@ const carColor = require("../controlers/CarAtributesControler/carColorControler"
 const carSteering = require("../controlers/CarAtributesControler/carSteeringControler");
 const carSeats = require("../controlers/CarAtributesControler/carSeatsControler");
 const carCylinder = require("../controlers/CarAtributesControler/carCylinderControler");
-const carDoors = require("../controlers/CarAtributesControler/carDoorsControler");
+
 const carFeatures = require("../controlers/CarAtributesControler/carFeaturesControler");
-const carSafetyFeature = require("../controlers/CarAtributesControler/carSafetyFeatureController");
 const extraService = require("../controlers/extraServiceControler");
-const seasonalPricing = require("../controlers/seasonalPricingControler");
+
 const location = require("../controlers/locationControler");
 const pricing = require("../controlers/PricingControler");
 const damage = require("../controlers/damageController");
@@ -366,28 +365,6 @@ route.get(
   checkPermission("Customer", "view"),
   customer.getallActiveCustomers
 );
-
-// !! company routes
-
-route.post(
-  "/add-company",
-  authUser,
-  upload.companyUpload.fields([
-    { name: "image", maxCount: 1 }, // 1 profile image
-    { name: "file", maxCount: 1 }, // 1 license image
-  ]),
-  company.addCompany
-);
-route.post(
-  "/update-company/:id",
-  upload.companyUpload.fields([
-    { name: "image", maxCount: 1 }, // 1 profile image
-    { name: "file", maxCount: 1 }, // 1 license image
-  ]),
-  company.updateCompany
-);
-route.delete("/delete-company/:id", authUser, company.deleteCompany);
-route.get("/get-all-company", authUser, company.getAllCompany);
 
 // !! country routes
 
@@ -756,12 +733,6 @@ route.get(
   carCylinder.getAllActiveCarCylinder
 );
 
-//!! car doors routes
-route.post("/add-car-doors", carDoors.addCarDoors);
-route.post("/update-car-doors/:id", carDoors.updateCarDoors);
-route.delete("/delete-car-doors/:id", carDoors.deleteCarDoors);
-route.get("/get-all-car-doors", carDoors.getAllCarDoors);
-
 //!! car features routes
 route.post(
   "/add-car-feature",
@@ -787,33 +758,6 @@ route.get(
   "/get-all-acitve-car-features",
   checkPermission("Car", "view"),
   carFeatures.getAllActiveCarFeatures
-);
-
-//!! car safety features routes
-route.post(
-  "/add-safety-feature",
-  checkPermission("Car", "create"),
-  carSafetyFeature.addSafetyFeature
-);
-route.post(
-  "/update-safety-feature/:id",
-  checkPermission("Car", "edit"),
-  carSafetyFeature.updateSafetyFeature
-);
-route.delete(
-  "/delete-safety-feature/:id",
-  checkPermission("Car", "delete"),
-  carSafetyFeature.deleteSafetyFeature
-);
-route.get(
-  "/get-all-safety-features",
-  checkPermission("Car", "view"),
-  carSafetyFeature.getAllSafetyFeatures
-);
-route.get(
-  "/get-all-active-safety-features",
-  checkPermission("Car", "view"),
-  carSafetyFeature.getAllSafetyFeatures
 );
 
 //!extra service
@@ -842,33 +786,6 @@ route.get(
   "/get-all-active-extra-services",
   checkPermission("Car", "view"),
   extraService.getAllActiveExtraService
-);
-
-//! seasional pricing route
-route.post(
-  "/add-seasonal-pricing",
-  checkPermission("Car", "create"),
-  seasonalPricing.addSeasonalPricing
-);
-route.post(
-  "/update-seasonal-pricing/:id",
-  checkPermission("Car", "edit"),
-  seasonalPricing.updateSeasonalPricing
-);
-route.delete(
-  "/delete-seasonal-pricing/:id",
-  checkPermission("Car", "delete"),
-  seasonalPricing.deleteSeasonalPricing
-);
-route.get(
-  "/get-all-seasonal-pricing",
-  checkPermission("Car", "view"),
-  seasonalPricing.getAllSeasonalPricing
-);
-route.get(
-  "/get-all-active-seasonal-pricing",
-  checkPermission("Car", "view"),
-  seasonalPricing.getAllActiveSeasionlaPricing
 );
 
 //!! car controler

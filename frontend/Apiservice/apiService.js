@@ -536,39 +536,7 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
-  //!!! seasional pricing
 
-  getAllSeasionalPricing({ search = "", page } = {}) {
-    return axios.get(
-      BASE_URL + `get-all-seasonal-pricing?search=${search}&page=${page}`,
-      {
-        headers: getAuthHeaders(),
-      }
-    );
-  }
-
-  getAllActiveSeasionalPricing() {
-    return axios.get(BASE_URL + `get-all-active-seasonal-pricing`, {
-      headers: getAuthHeaders(),
-    });
-  }
-
-  addSeasionalPricing(data) {
-    return axios.post(BASE_URL + "add-seasonal-pricing", data, {
-      headers: getAuthHeaders(),
-    });
-  }
-
-  deleteSeasionalPricing(data) {
-    return axios.delete(BASE_URL + `delete-seasonal-pricing/${data}`, {
-      headers: getAuthHeaders(),
-    });
-  }
-  updateSeasionalPricing(id, data) {
-    return axios.post(BASE_URL + `update-seasonal-pricing/${id}`, data, {
-      headers: getAuthHeaders(),
-    });
-  }
 
   //!!! extra services
   getAllExtraServices({ search = "", page } = {}) {
@@ -636,36 +604,7 @@ class apiServices {
     });
   }
 
-  //!! car Safety features
 
-  getAllSafetyFeatures({ search = "", page } = {}) {
-    return axios.get(
-      BASE_URL + `get-all-safety-features?search=${search}&page=${page}`,
-      { headers: getAuthHeaders() }
-    );
-  }
-  getAllActiveSafetyFeatures() {
-    return axios.get(BASE_URL + `get-all-active-safety-features`, {
-      headers: getAuthHeaders(),
-    });
-  }
-
-  addSafetyFeatures(data) {
-    return axios.post(BASE_URL + "add-safety-feature", data, {
-      headers: getAuthHeaders(),
-    });
-  }
-  updateSafetyFeature(id, data) {
-    return axios.post(BASE_URL + `update-safety-feature/${id}`, data, {
-      headers: getAuthHeaders(),
-    });
-  }
-
-  deleteSafetyFeatures(data) {
-    return axios.delete(BASE_URL + `delete-safety-feature/${data}`, {
-      headers: getAuthHeaders(),
-    });
-  }
 
   //!! car features
   getAllCarFeatures({ search = "", page } = {}) {

@@ -52,7 +52,7 @@ import AdminMain from "./Admin/adminMain";
 import AdminCalender from "./Admin/AdminCalender";
 import AddAdminReservation from "./Admin/AddAdminReservation";
 import AdminReservation from "./Admin/AdminReservation";
-import AdminQuotations from "./Admin/AdminQuotations";
+
 import AdminCustomers from "./Admin/AdminCustomers";
 import AdminDrivers from "./Admin/AdminDrivers";
 import AdminLocations from "./Admin/AdminLocations";
@@ -68,20 +68,15 @@ import AdminCarSteering from "./Admin/adminCarAttribute/AdminCarStreaing";
 import AdminCarSeats from "./Admin/adminCarAttribute/AdminCarSeats";
 import AdminCarCylinders from "./Admin/adminCarAttribute/AdminCarCyllanders";
 import AdminCarFeatures from "./Admin/adminCarAttribute/AdminCarFeatures";
-import AdminCarSafetyFeatures from "./Admin/adminCarAttribute/AdminCarSafetyFeatures";
 import AdminCarExtraFeatures from "./Admin/AdminCarExtraFeatures";
-import AdminCarPricing from "./Admin/AdminSeasionalPricing";
-import AdminInspection from "./Admin/AdminInspection";
-import AdminTracking from "./Admin/AdminTracking";
-import AdminMaintenance from "./Admin/AdminMaintenance";
+
 import AdminReview from "./Admin/AdminReview";
 import AdminInvoice from "./Admin/AdminInvoice";
 import AdminPayment from "./Admin/AdminPayment";
 import AdminMessage from "./Admin/AdminMessage";
-import AdminCoupons from "./Admin/AdminCoupons";
+
 import AdminNewsLetter from "./Admin/AdminNewsLetter";
 import AdminPages from "./Admin/AdminPages";
-import AdminMenuManagement from "./Admin/AdminMenuManagement";
 import AdminAllBlogs from "./Admin/AdminBlogs/AdminAllBlogs";
 import AdminBlogsComments from "./Admin/AdminBlogs/AdminBlogsComments";
 import AdminBlogsTags from "./Admin/AdminBlogs/AdminBlogsTags";
@@ -90,38 +85,27 @@ import AdminLocationStates from "./Admin/AdminLocation/AdminLocationStates";
 import AdminAllFaq from "./Admin/AdminFaq/AdminAllFaq";
 import AdminFaqCategories from "./Admin/AdminFaq/AdminFaqCategories";
 import AdminContactMessage from "./Admin/AdminSupports/AdminContactMessage";
-import AdminAnnouncements from "./Admin/AdminSupports/AdminAnnouncements";
-import AdminTickets from "./Admin/AdminSupports/AdminTickets";
 import AdminAllUser from "./Admin/UserManegement/AdminAllUser";
 import AdminManageRolsAndPermissions from "./Admin/UserManegement/AdminManageRolsAndPermissions";
-import IncomeVsExpenses from "./Admin/AdminReports/IncomeVsExpenses";
-import EarningReports from "./Admin/AdminReports/EarningReports";
-import RentalReport from "./Admin/AdminReports/RentalReport";
 import AdminForgotPassword from "./Admin/AdminAuthentication/AdminForgotPassword";
 import AdminOtp from "./Admin/AdminAuthentication/AdminOtp";
 import AdminResetPassword from "./Admin/AdminAuthentication/AdminResetPassword";
-import AdminProfileSetting from "./Admin/SETTINGS & CONFIGURATION/AdminProfileSetting";
-import AdminSecuritySetting from "./Admin/SETTINGS & CONFIGURATION/AdminSecuritySetting";
-import AdminNotificationSetting from "./Admin/SETTINGS & CONFIGURATION/AdminNotificationSetting";
-import AdminIntegrationSetting from "./Admin/SETTINGS & CONFIGURATION/AdminIntegrationSetting";
+import AdminProfileSetting from "./Admin/SettingCONFIGURATION/AdminProfileSetting";
+import AdminSecuritySetting from "./Admin/SettingCONFIGURATION/AdminSecuritySetting";
+
 import AdminCustomersDetails from "./Admin/AdminCustomersDetails";
-import AdminCustomersCumpanies from "./Admin/AdminCustomersCumpanies";
 import AdminInvoiceDetails from "./Admin/AdminInvoiceDetails";
 import AdminCarDetails from "./Admin/AdminCarDetails";
 import AdminAddCars from "./Admin/AdminAddCars";
 import AdminEditCar from "./Admin/AdminEditCar";
 import AdminReservationDetails from "./Admin/AdminReservationDetails";
-import AdminCompaniesDetails from "./Admin/AdminCumpaniesDetails";
 import AdminEditReservation from "./Admin/EditReservation";
-import AdminQuatationDetails from "./Admin/AdminQuatationDetails";
-import AdminEditQuatations from "./Admin/AdminEditQuatations";
 import AdminEnquiries from "./Admin/AdminEnquiries";
-import AdminAddQuotations from "./Admin/AdminAddQuatations";
+
 import AdminTestimonials from "./Admin/AdminTestromonials";
 import AdminLocationCities from "./Admin/AdminLocation/AdminLocationCities";
 import AdminEditEnvoice from "./Admin/AdminEditEnvoice";
 import AddInvoice from "./Admin/AddInvoice";
-import AdminAddPages from "./Admin/AdminAddPages";
 import AdminBlogDetails from "./Admin/AdminBlogDetails";
 import { AdminEditBlog } from "./Admin/AdminBlogs/AdminEditBlog";
 import AdminAddBlogs from "./Admin/AdminBlogs/AdminAddBlogs";
@@ -227,7 +211,6 @@ function App() {
             <Route path="add-reservation" element={<AddAdminReservation />} />
             <Route path="admin-calender" element={<AdminCalender />} />
             <Route path="all-reservation" element={<AdminReservation />} />
-            <Route path="all-quotations" element={<AdminQuotations />} />
             <Route path="all-enquiries" element={<AdminEnquiries />} />
             <Route path="all-customers" element={<AdminCustomers />} />
             <Route path="all-owners" element={<AdminOwners />} />
@@ -248,28 +231,15 @@ function App() {
             <Route path="car-cylinders" element={<AdminCarCylinders />} />
             <Route path="car-features" element={<AdminCarFeatures />} />
             <Route
-              path="car-safety-features"
-              element={<AdminCarSafetyFeatures />}
-            />
-            <Route
               path="car-extra-features"
               element={<AdminCarExtraFeatures />}
             />
-            <Route path="car-pricing" element={<AdminCarPricing />} />
-            <Route path="car-inspection" element={<AdminInspection />} />
-            <Route path="car-tracking" element={<AdminTracking />} />
-            <Route path="car-maintenance" element={<AdminMaintenance />} />
             <Route path="car-review" element={<AdminReview />} />
             <Route path="all-invoice" element={<AdminInvoice />} />
             <Route path="account-payment" element={<AdminPayment />} />
             <Route path="admin-message" element={<AdminMessage />} />
-            <Route path="admin-coupons" element={<AdminCoupons />} />
             <Route path="admin-news-letter" element={<AdminNewsLetter />} />
             <Route path="admin-pages" element={<AdminPages />} />
-            <Route
-              path="admin-menu-management"
-              element={<AdminMenuManagement />}
-            />
             <Route path="all-blogs" element={<AdminAllBlogs />} />
             <Route path="blogs-categories" element={<AdminBlogsCategories />} />
             <Route path="blogs-comments" element={<AdminBlogsComments />} />
@@ -284,16 +254,11 @@ function App() {
             <Route path="all-faq" element={<AdminAllFaq />} />\{" "}
             <Route path="all-faq-categories" element={<AdminFaqCategories />} />
             <Route path="contact-message" element={<AdminContactMessage />} />
-            <Route path="all-announcements" element={<AdminAnnouncements />} />
-            <Route path="all-tickets" element={<AdminTickets />} />
             <Route path="all-user" element={<AdminAllUser />} />
             <Route
               path="roles-permissions"
               element={<AdminManageRolsAndPermissions />}
             />
-            <Route path="income-vs-expenses" element={<IncomeVsExpenses />} />
-            <Route path="earning-reports" element={<EarningReports />} />
-            <Route path="rental-report" element={<RentalReport />} />
             <Route
               path="admin-forgot-password"
               element={<AdminForgotPassword />}
@@ -315,25 +280,10 @@ function App() {
               element={<BankAccountSetting />}
             />
             <Route
-              path="notification-setting"
-              element={<AdminNotificationSetting />}
-            />
-            <Route
-              path="integration-setting"
-              element={<AdminIntegrationSetting />}
-            />
-            <Route
-              path="tracker-setting"
-              element={<AdminIntegrationSetting />}
-            />
-            <Route
               path="customer-details/:id"
               element={<AdminCustomersDetails />}
             />
-            <Route
-              path="customer-companies"
-              element={<AdminCustomersCumpanies />}
-            />
+         
             <Route
               path="invoice-details/:id"
               element={<AdminInvoiceDetails />}
@@ -345,20 +295,12 @@ function App() {
               path="reservation-details/:id"
               element={<AdminReservationDetails />}
             />
-            <Route path="company-details" element={<AdminCompaniesDetails />} />
             <Route
               path="edit-reservation/:id"
               element={<AdminEditReservation />}
             />
-            <Route
-              path="quotation-details"
-              element={<AdminQuatationDetails />}
-            />
-            <Route path="edit-quotations" element={<AdminEditQuatations />} />
-            <Route path="add-quotations" element={<AdminAddQuotations />} />
             <Route path="edit-invoice/:id" element={<AdminEditEnvoice />} />
             <Route path="add-invoice" element={<AddInvoice />} />
-            <Route path="add-pages" element={<AdminAddPages />} />
             <Route
               path="admin-blog-details/:id"
               element={<AdminBlogDetails />}

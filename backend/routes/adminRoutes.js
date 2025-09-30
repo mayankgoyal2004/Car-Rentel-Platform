@@ -326,28 +326,23 @@ route.get(
 );
 route.get(
   "/get-owner-details",
-
   customer.getOwnerDetails
 );
 route.delete(
   "/delete-owner/:id",
   checkPermission("admin", "assignPackage", true),
-
   customer.deleteOwner
 );
+route.get("/get-all-owner-super-admin", customer.getAllOwner);
+route.get("/chat/:receiverId", customer.getMessage);
 route.get(
-  "/get-all-owner-super-admin",
-
-  customer.getAllOwner
-);
-route.get(
-  "/chat/:receiverId",
-
+  "/chat-admin/:receiverId",
+  checkPermission("Message", "view"),
   customer.getMessage
 );
 route.get(
   "/get-all-message-by-customer",
-
+  checkPermission("Message", "view"),
   customer.getCustomerByMessage
 );
 route.get(
@@ -370,114 +365,102 @@ route.get(
 
 route.post(
   "/add-country",
-  checkPermission("location", "create"),
+  checkPermission("Car", "create"),
   country.addCountry
 );
 route.post(
   "/update-country/:id",
-  checkPermission("location", "edit"),
+  checkPermission("Car", "edit"),
   country.updateCountry
 );
 route.delete(
   "/delete-country/:id",
-  checkPermission("location", "delete"),
+  checkPermission("Car", "delete"),
   country.deleteCountry
 );
 route.get(
   "/get-all-country",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   country.getAllCountry
 );
 route.get(
   "/get-all-active-country",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   country.getAllActiveCountry
 );
 
 //!! state  routes
 
-route.post("/add-state", checkPermission("location", "create"), state.addState);
+route.post("/add-state", checkPermission("Car", "create"), state.addState);
 route.post(
   "/update-state/:id",
-  checkPermission("location", "edit"),
+  checkPermission("Car", "edit"),
   state.updateState
 );
 route.delete(
   "/delete-state/:id",
-  checkPermission("location", "delete"),
+  checkPermission("Car", "delete"),
   state.deleteState
 );
-route.get(
-  "/get-all-state",
-  checkPermission("location", "view"),
-  state.getAllState
-);
+route.get("/get-all-state", checkPermission("Car", "view"), state.getAllState);
 route.get(
   "/get-state-by-country/:countryId",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   state.getStatesByCountry
 );
 route.get(
   "/get-all-active-state",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   state.getAllActiveState
 );
 
 //!city routes
-route.post("/add-city", checkPermission("location", "create"), city.addCity);
-route.post(
-  "/update-city/:id",
-  checkPermission("location", "edit"),
-  city.updateCity
-);
+route.post("/add-city", checkPermission("Car", "create"), city.addCity);
+route.post("/update-city/:id", checkPermission("Car", "edit"), city.updateCity);
 route.delete(
   "/delete-city/:id",
-  checkPermission("location", "delete"),
+  checkPermission("Car", "delete"),
   city.deleteCity
 );
-route.get(
-  "/get-all-city",
-  checkPermission("location", "view"),
-  city.getAllCity
-);
+route.get("/get-all-city", checkPermission("Car", "view"), city.getAllCity);
 route.get(
   "/get-city-by-state/:stateId",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   city.getCitiesByState
 );
 route.get(
   "/get-all-active-city",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   city.getAllActiveCity
 );
 
 //!!location route
 route.post(
   "/add-location",
-  checkPermission("location", "create"),
+  checkPermission("Car", "create"),
   upload.locationUpload.single("image"),
   location.addLocation
 );
 route.post(
   "/update-location/:id",
-  checkPermission("location", "edit"),
+  checkPermission("Car", "edit"),
   upload.locationUpload.single("image"),
   location.updateLocation
 );
 
 route.delete(
   "/delete-location/:id",
-  checkPermission("location", "delete"),
+  checkPermission("Car", "delete"),
   location.deleteLocation
 );
 route.get(
   "/get-all-location",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   location.getAllLocation
 );
 route.get(
   "/get-all-active-location",
-  checkPermission("location", "view"),
+  checkPermission("Car", "view"),
   location.getAllActiveLocation
 );
 
@@ -665,7 +648,6 @@ route.post(
 route.delete(
   "/delete-car-steering/:id",
   checkPermission("Car", "delete"),
-
   carSteering.deleteCarSteering
 );
 route.get(
@@ -869,8 +851,16 @@ route.get("/get-wishlist", wishlist.getWishlist);
 //!! Enquiry
 
 route.post("/add-enquiry/:id", enquiry.addEnquiry);
-route.get("/get-enquiry", enquiry.getallEnquiry);
-route.delete("/delete-enquiry/:id", enquiry.deleteEnquiry);
+route.get(
+  "/get-enquiry",
+  checkPermission("Enquiries", "view"),
+  enquiry.getallEnquiry
+);
+route.delete(
+  "/delete-enquiry/:id",
+  checkPermission("Enquiries", "delete"),
+  enquiry.deleteEnquiry
+);
 
 //!! carReview
 
@@ -881,29 +871,33 @@ route.delete("/delete-car-review/:id", carReview.deleteCarReview);
 
 //!! role route
 
-route.post("/add-roll", checkPermission("role", "create"), role.addRole);
+route.post("/add-roll", checkPermission("Permissions", "create"), role.addRole);
 route.post(
   "/roles/:roleId/permissions",
-  checkPermission("role", "create"),
+  checkPermission("Permissions", "create"),
   role.updatePermissions
 );
 
-route.post("/update-role", checkPermission("role", "edit"), role.updateRole);
-route.get("/get-role", checkPermission("role", "view"), role.getAllRole);
+route.post(
+  "/update-role",
+  checkPermission("Permissions", "edit"),
+  role.updateRole
+);
+route.get("/get-role", checkPermission("Permissions", "view"), role.getAllRole);
 route.get(
   "/get-all-active-role",
-  checkPermission("role", "view"),
+  checkPermission("Permissions", "view"),
   role.getAllActiveRole
 );
 
 route.delete(
   "/delete-role/:id",
-  checkPermission("role", "delete"),
+  checkPermission("Permissions", "delete"),
   role.deleteRole
 );
 route.get(
   "/get-role-id/:id",
-  checkPermission("role", "view"),
+  checkPermission("Permissions", "view"),
   role.getRoleById
 );
 
@@ -960,13 +954,17 @@ route.get(
 );
 route.delete(
   "/delete-faq-category/:id",
-  checkPermission("faqCategory", "delete"),
+  checkPermission("admin", "assignPackage", true),
   faqCategory.deleteFaqCategory
 );
 
 //!! faq router
 
-route.post("/add-faq", checkPermission("faqCategory", "create"), faq.addFaq);
+route.post(
+  "/add-faq",
+  checkPermission("admin", "assignPackage", true),
+  faq.addFaq
+);
 route.post(
   "/update-faq/:id",
   checkPermission("admin", "assignPackage", true),
@@ -1009,6 +1007,7 @@ route.post(
 );
 route.post(
   "/cancel-reservation-admin/:id",
+  checkPermission("Reservation", "edit"),
   reservation.reservationCancelledByAdmin
 );
 route.post(
@@ -1044,10 +1043,14 @@ route.get(
 route.get("/get-last-5-reservation", reservation.getLast5Reservations);
 route.get(
   "/get-last-5-reservation-admin",
+  checkPermission("Reservation", "view"),
+
   reservation.getLatest5ReservationsForAdmin
 );
 route.get(
   "/get-all-calender-reservation",
+  checkPermission("Reservation", "view"),
+
   reservation.getAllReservationCalender
 );
 route.get("/get-all-reservation-user", reservation.getAllReservationUser);
@@ -1090,7 +1093,11 @@ route.delete(
   checkPermission("Invoice", "delete"),
   invoice.deleteInvoice
 );
-route.get("/get-all-latest-invoice", invoice.getLatestInvoice);
+route.get(
+  "/get-all-latest-invoice",
+  checkPermission("Invoice", "view"),
+  invoice.getLatestInvoice
+);
 route.get("/get-invoice-details/:id", invoice.invoiceDetails);
 route.get(
   "/get-invoice-by-reservation/:reservationId",
@@ -1110,6 +1117,7 @@ route.post(
 //!!! invoice setting
 route.post(
   "/add-invoice-logo",
+  checkPermission("Setting", "edit"),
   upload.InvoiceLogoUpload.single("image"),
   invoice.addInvoiceLogo
 );
@@ -1117,17 +1125,19 @@ route.get("/get-invoice-logo", invoice.getInvoiceLogo);
 //!! signature setting
 route.post(
   "/add-signature",
+  checkPermission("Setting", "edit"),
   upload.signatureUpload.single("image"),
   signature.addSignature
 );
 route.post(
   "/update-signature/:id",
+  checkPermission("Setting", "edit"),
   upload.signatureUpload.single("image"),
   signature.updateSignature
 );
 route.get(
   "/get-all-signature",
-
+  checkPermission("Setting", "edit"),
   signature.getSignatures
 );
 route.get(
@@ -1136,28 +1146,41 @@ route.get(
   signature.getActiveSignature
 );
 
-route.delete("/delete-signature/:id", signature.deleteSignature);
+route.delete(
+  "/delete-signature/:id",
+  checkPermission("Setting", "edit"),
+  signature.deleteSignature
+);
 
 //!! bank account settting
-route.post("/add-bank-account", bankAccount.addBankAccount);
-route.post("/update-bank-account/:id", bankAccount.updateBankAccount);
+route.post(
+  "/add-bank-account",
+  checkPermission("Setting", "edit"),
+  bankAccount.addBankAccount
+);
+route.post(
+  "/update-bank-account/:id",
+  checkPermission("Setting", "edit"),
+  bankAccount.updateBankAccount
+);
 route.get(
   "/get-all-bank-account",
-
+  checkPermission("Setting", "edit"),
   bankAccount.getBankAccount
 );
-route.get(
-  "/get-all-active-bank-account",
+route.get("/get-all-active-bank-account", bankAccount.getActiveBankAccount);
 
-  bankAccount.getActiveBankAccount
+route.delete(
+  "/delete-bank-account/:id",
+  checkPermission("Setting", "edit"),
+  bankAccount.deleteBankAccount
 );
-
-route.delete("/delete-bank-account/:id", bankAccount.deleteBankAccount);
 
 //!! company setting
 
 route.post(
   "/add-company-setting",
+  checkPermission("Setting", "edit"),
   upload.companyImageUpload.single("image"),
   companySetting.addCompanySetting
 );
@@ -1165,18 +1188,26 @@ route.post(
 //!! captcha settings
 route.post(
   "/add-captcha-setting",
-
+  checkPermission("admin", "assignPackage", true),
   recaptchaSetting.updateCaptchaSetting
 );
 route.get(
   "/get-captcha-setting",
-
+  checkPermission("admin", "assignPackage", true),
   recaptchaSetting.getCaptchaSetting
 );
 
 //!! smtp setting
-route.get("/get-smtp-setting", smtpSetting.getSmtpSetting);
+route.get(
+  "/get-smtp-setting",
+  checkPermission("admin", "assignPackage", true),
+  smtpSetting.getSmtpSetting
+);
 
-route.post("/add-smtp-setting", smtpSetting.updateSmtpSetting);
+route.post(
+  "/add-smtp-setting",
+  checkPermission("admin", "assignPackage", true),
+  smtpSetting.updateSmtpSetting
+);
 
 module.exports = route;

@@ -304,6 +304,11 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  getChatAdmin(receiverId) {
+    return axios.get(BASE_URL + `chat-admin/${receiverId}`, {
+      headers: getAuthHeaders(),
+    });
+  }
   getAllOwnerAdmin() {
     return axios.get(BASE_URL + `get-all-owner-super-admin`, {
       headers: getAuthHeaders(),

@@ -424,7 +424,7 @@ const getAllOwner = async (req, res) => {
 const getOwnerDetails = async (req, res) => {
   try {
     const users = await User.findById(req.user.admin);
-
+    
     res.json({
       success: true,
       data: users,

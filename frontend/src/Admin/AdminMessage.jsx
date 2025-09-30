@@ -62,7 +62,7 @@ const AdminMessage = () => {
     setSelectedUser(user);
     setChatOpen(true);
     try {
-      const res = await apiService.getChat(user._id);
+      const res = await apiService.getChatAdmin(user._id);
       if (res.data.success) {
         setMessages(res.data.data || []);
       }

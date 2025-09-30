@@ -5,6 +5,7 @@ import apiService from "../../Apiservice/apiService";
 
 const MODULES = [
   "Reservations",
+  "Car",
   "Calendar",
   "Blog",
   "Enquiries",

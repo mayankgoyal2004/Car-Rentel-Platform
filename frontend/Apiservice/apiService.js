@@ -1482,6 +1482,22 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  getCaptchaFrontend() {
+    return axios.get(BASE_URL + `get-captcha-frontend`);
+  }
+
+  //!! smtp setting
+  updatesmtpSetting(data) {
+    return axios.post(BASE_URL + `add-smtp-setting`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getSmtpSetting() {
+    return axios.get(BASE_URL + `get-smtp-setting`, {
+      headers: getAuthHeaders(),
+    });
+  }
 }
 
 export default new apiServices();

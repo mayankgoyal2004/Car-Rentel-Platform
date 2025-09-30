@@ -19,6 +19,19 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [companySetting, setCompanySetting] = useState({});
+  const [captchaSetting, setCaptchaSetting] = useState({
+    status: false,
+    siteKey: "",
+  });
+
+  const fetchgoogleCaptcha = async () => {
+    try {
+      const res = await apiServices.getCaptchaFrontend();
+      if (res.data.data) setCaptchaSetting(res.data.data);
+    } catch (err) {
+      toast.error("Failed to load settings");
+    }
+  };
   const fetchCompanySetting = async () => {
     try {
       const res = await apiServices.getCompanySettings();
@@ -32,6 +45,7 @@ const Register = () => {
 
   useEffect(() => {
     fetchCompanySetting();
+    fetchgoogleCaptcha();
   }, []);
 
   // handle input
@@ -69,15 +83,18 @@ const Register = () => {
       );
       return;
     }
-
-    if (!recaptchaToken) {
+    if (captchaSetting.status && !recaptchaToken) {
       toast.error("Please complete the reCAPTCHA!");
       return;
     }
     setLoading(true);
 
     try {
-      const res = await apiServices.register({ ...formData, recaptchaToken });
+        const payload = { ...formData };
+    if (captchaSetting.status) {
+      payload.recaptchaToken = recaptchaToken;
+    }
+      const res = await apiServices.register(payload);
       toast.success(res.data.message);
 
       if (res.data.success) {
@@ -193,19 +210,21 @@ const Register = () => {
                     />
                   </div>
                 </div>
-                <div className="my-3">
-                  <ReCAPTCHA
-                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
-" //
-                    onChange={(token) => setRecaptchaToken(token)}
-                    onExpired={() => setRecaptchaToken(null)}
-                  />
-                </div>
-
+                {captchaSetting.status && captchaSetting.siteKey && (
+                  <div className="my-3">
+                    <ReCAPTCHA
+                      sitekey={captchaSetting.siteKey}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="btn btn-outline-light w-100 btn-size mt-1"
-                  disabled={loading || !recaptchaToken}
+                  className="btn btn-outline-light w-100 btn-size mt-1 text-light"
+                  disabled={
+                    loading || (captchaSetting.status && !recaptchaToken)
+                  }
                 >
                   {loading ? "Registering..." : "Sign Up"}
                 </button>
@@ -217,39 +236,6 @@ const Register = () => {
                   Or, Create an account with your email
                 </span>
               </div>
-
-              {/* Social Login */}
-              {/* <div className="social-login">
-                <a
-                  href="#"
-                  className="d-flex align-items-center justify-content-center input-block btn google-login w-100"
-                >
-                  <span>
-                    <img
-                      src="/user-assets/img/icons/google.svg"
-                      className="img-fluid"
-                      alt="Google"
-                    />
-                  </span>
-                  Log in with Google
-                </a>
-              </div>
-
-              <div className="social-login">
-                <a
-                  href="#"
-                  className="d-flex align-items-center justify-content-center input-block btn google-login w-100"
-                >
-                  <span>
-                    <img
-                      src="/user-assets/img/icons/facebook.svg"
-                      className="img-fluid"
-                      alt="Facebook"
-                    />
-                  </span>
-                  Log in with Facebook
-                </a>
-              </div> */}
 
               <div className="text-center dont-have">
                 Already have an Account? <Link to="/login">Sign In</Link>

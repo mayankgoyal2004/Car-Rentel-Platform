@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Master from "./layout/Master";
 import Main from "./homepage/Main";
 import "aos/dist/aos.css";
@@ -137,6 +137,7 @@ import SignatureSetting from "./Admin/SignatureSetting";
 import BankAccountSetting from "./Admin/BankAccountSetting";
 import CompanySetting from "./Admin/CompanySetting";
 import LoginSettingAdmin from "./Admin/LoginSettingAdmin";
+import EmailSetting from "./Admin/EmailSetting";
 
 function App() {
   return (
@@ -308,6 +309,7 @@ function App() {
             <Route path="signature-setting" element={<SignatureSetting />} />
             <Route path="login-setting" element={<LoginSettingAdmin />} />
             <Route path="company-setting" element={<CompanySetting />} />
+            <Route path="email-setting" element={<EmailSetting />} />
             <Route
               path="bank-account-setting"
               element={<BankAccountSetting />}

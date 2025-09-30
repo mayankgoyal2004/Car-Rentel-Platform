@@ -9,6 +9,23 @@ const getCaptchaSetting = async (req, res) => {
   }
 };
 
+const getCaptchaFrontend = async (req, res) => {
+  try {
+    const setting = await RecaptchaSetting.findOne({});
+    if (!setting)
+      return res.json({ success: true, data: { status: false, siteKey: "" } });
+    res.json({
+      success: true,
+      data: {
+        status: setting.status,
+        siteKey: setting.siteKey,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 const updateCaptchaSetting = async (req, res) => {
   try {
     const { siteKey, secretKey, status } = req.body;
@@ -37,4 +54,5 @@ const updateCaptchaSetting = async (req, res) => {
 module.exports = {
   getCaptchaSetting,
   updateCaptchaSetting,
+  getCaptchaFrontend,
 };

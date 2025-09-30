@@ -11,7 +11,8 @@ const AdminSecuritySetting = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const user = useSelector((state) => state.user); // get current admin info
+  const userData = useSelector((store) => store.user);
+  const userType = userData?.userType;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,42 +65,74 @@ const AdminSecuritySetting = () => {
             <div className="settings-sidebar slimscroll">
               <div className="sidebar-menu">
                 <ul>
-                  <li className="menu-title">ACCOUNT SETTING</li>
-                  <li>
-                    <ul className="sidebar-links pb-3 mb-3 border-bottom">
-                      <li>
-                        <Link to="/admin-dashboard/profile-setting">
-                          Profile
-                        </Link>
-                      </li>
-                      <li className="active">Security</li>
-                    </ul>
+                  {/* Account Setting */}
+                  <li className="menu-title">
+                    <span>ACCOUNT SETTING</span>
                   </li>
+                  <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                    <li>
+                      <Link to="/admin-dashboard/profile-setting">
+                        <i className="ti ti-user-edit me-2" />
+                        Profile
+                      </Link>
+                    </li>
+                    <li className="active">
+                      <Link to="/admin-dashboard/security-setting">
+                        <i className="ti ti-lock me-2" />
+                        Security
+                      </Link>
+                    </li>
+                  </ul>
+
+                  {/* Website Setting */}
                   <li className="menu-title">
                     <span>WEBSITE SETTING</span>
                   </li>
-                  <li>
-                    <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                  <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                    {userType === 1 && (
                       <li>
-                        <a href="company-setting.html">
+                        <Link to="/admin-dashboard/login-setting">
+                          <i className="ti ti-lock-bolt me-2"></i>
+                          <span>Login & Register</span>
+                        </Link>
+                      </li>
+                    )}
+                    {userType === 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/company-setting">
                           <i className="ti ti-building me-2" />
                           <span>Company Settings</span>
                           <span className="track-icon" />
-                        </a>
+                        </Link>
                       </li>
+                    )}
+                    {userType === 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/email-setting">
+                          <i className="ti ti-mail me-2" />
+                          <span>Email Settings</span>
+                          <span className="track-icon" />
+                        </Link>
+                      </li>
+                    )}
+                    {userType === 1 && (
                       <li>
                         <a href="localization-setting.html">
                           <i className="ti ti-settings-2 me-2" />
                           <span>Localization</span>
                         </a>
                       </li>
-
+                    )}
+                    {userType === 1 && (
                       <li>
                         <a href="language-setting.html">
                           <i className="ti ti-language me-2" />
                           <span>Language</span>
                         </a>
                       </li>
+                    )}
+
+                    {userType !== 1 && (
                       <li>
                         <Link to="/admin-dashboard/invoice-setting">
                           <i className="ti ti-file-invoice me-2" />
@@ -107,14 +140,24 @@ const AdminSecuritySetting = () => {
                           <span className="track-icon" />
                         </Link>
                       </li>
+                    )}
+                    {userType !== 1 && (
                       <li>
-                        <a href="signatures-setting.html">
+                        <Link to="/admin-dashboard/signature-setting">
                           <i className="ti ti-signature me-2" />
                           <span>Signatures</span>
-                        </a>
+                        </Link>
                       </li>
-                    </ul>
-                  </li>
+                    )}
+                    {userType !== 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/bank-account-setting">
+                          <i className="ti ti-file-dollar me-2" />
+                          <span>Bank Accounts</span>
+                        </Link>
+                      </li>
+                    )}
+                  </ul>
                 </ul>
               </div>
             </div>

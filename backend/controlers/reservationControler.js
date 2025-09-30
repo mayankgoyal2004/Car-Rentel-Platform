@@ -693,16 +693,14 @@ const editReservationStep3 = async (req, res) => {
             ? new mongoose.Types.ObjectId(id)
             : null;
         })
-        .filter(Boolean); // remove invalid IDs
+        .filter(Boolean); 
     }
 
-    // 3️⃣ Update driver details
     if (driverType === "self") {
       reservation.driverType = "self";
 
       const driverDetails = req.body.driverDetails || {};
 
-      // Map incoming driverDetails to customer schema fields
       const driverData = {
         firstName: driverDetails.firstName || null,
         lastName: driverDetails.lastName || null,
@@ -727,7 +725,6 @@ const editReservationStep3 = async (req, res) => {
       reservation.driverType = "withDriver";
     }
 
-    // Save reservation
     await reservation.save();
 
     return res.status(200).json({

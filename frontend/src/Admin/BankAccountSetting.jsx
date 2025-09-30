@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -14,6 +15,8 @@ const BankAccountSetting = () => {
     isDefault: false,
   });
   const [editingBankAccount, setEditingBankAccount] = useState(null);
+  const userData = useSelector((store) => store.user);
+  const userType = userData?.userType; //
   const fetchBankAccount = async () => {
     try {
       const res = await apiService.getAllBankAccount();
@@ -124,50 +127,74 @@ const BankAccountSetting = () => {
             <div className="settings-sidebar slimscroll">
               <div className="sidebar-menu">
                 <ul>
+                  {/* Account Setting */}
                   <li className="menu-title">
                     <span>ACCOUNT SETTING</span>
                   </li>
-                  <li>
-                    <ul className="sidebar-links pb-3 mb-3 border-bottom">
-                      <li>
-                        <a href="profile-setting.html">
-                          <i className="ti ti-user-edit me-2" />
-                          <span>Profile</span>
-                          <span className="track-icon" />
-                        </a>
-                      </li>
-                      <li>
-                        <a href="security-setting.html">
-                          <i className="ti ti-lock me-2" />
-                          <span>Security</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
+                  <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                    <li>
+                      <Link to="/admin-dashboard/profile-setting">
+                        <i className="ti ti-user-edit me-2" />
+                        Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <Link to="/admin-dashboard/security-setting">
+                        <i className="ti ti-lock me-2" />
+                        Security
+                      </Link>
+                    </li>
+                  </ul>
+
+                  {/* Website Setting */}
                   <li className="menu-title">
                     <span>WEBSITE SETTING</span>
                   </li>
-                  <li>
-                    <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                  <ul className="sidebar-links pb-3 mb-3 border-bottom">
+                    {userType === 1 && (
                       <li>
-                        <a href="company-setting.html">
+                        <Link to="/admin-dashboard/login-setting">
+                          <i className="ti ti-lock-bolt me-2"></i>
+                          <span>Login & Register</span>
+                        </Link>
+                      </li>
+                    )}
+                    {userType === 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/company-setting">
                           <i className="ti ti-building me-2" />
                           <span>Company Settings</span>
                           <span className="track-icon" />
-                        </a>
+                        </Link>
                       </li>
+                    )}
+                    {userType === 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/email-setting">
+                          <i className="ti ti-mail me-2" />
+                          <span>Email Settings</span>
+                          <span className="track-icon" />
+                        </Link>
+                      </li>
+                    )}
+                    {userType === 1 && (
                       <li>
                         <a href="localization-setting.html">
                           <i className="ti ti-settings-2 me-2" />
                           <span>Localization</span>
                         </a>
                       </li>
+                    )}
+                    {userType === 1 && (
                       <li>
                         <a href="language-setting.html">
                           <i className="ti ti-language me-2" />
                           <span>Language</span>
                         </a>
                       </li>
+                    )}
+
+                    {userType !== 1 && (
                       <li>
                         <Link to="/admin-dashboard/invoice-setting">
                           <i className="ti ti-file-invoice me-2" />
@@ -175,68 +202,24 @@ const BankAccountSetting = () => {
                           <span className="track-icon" />
                         </Link>
                       </li>
+                    )}
+                    {userType !== 1 && (
                       <li>
-                        <Link>
+                        <Link to="/admin-dashboard/signature-setting">
                           <i className="ti ti-signature me-2" />
                           <span>Signatures</span>
                         </Link>
                       </li>
-                      <li>
-                        <Link to="bank-account-setting" className="active">
-                          <i class="ti ti-file-dollar me-2" />
+                    )}
+                    {userType !== 1 && (
+                      <li className="active">
+                        <Link to="/admin-dashboard/bank-account-setting">
+                          <i className="ti ti-file-dollar me-2" />
                           <span>Bank Accounts</span>
                         </Link>
                       </li>
-                    </ul>
-                  </li>
-                  <li className="menu-title">
-                    <span>SYSTEM SETTINGS</span>
-                  </li>
-                  <li>
-                    <ul className="sidebar-links pb-3 mb-3 border-bottom">
-                      <li>
-                        <a href="email-setting.html">
-                          <i className="ti ti-mail me-2" />
-                          <span>Email Settings</span>
-                          <span className="track-icon" />
-                        </a>
-                      </li>
-                      <li>
-                        <a href="email-templates.html">
-                          <i className="ti ti-mail-fast me-2" />
-                          <span>Email Templates</span>
-                          <span className="track-icon" />
-                        </a>
-                      </li>
-                      <li>
-                        <a href="sms-gateways.html">
-                          <i className="ti ti-messages me-2" />
-                          <span>SMS Gateways</span>
-                          <span className="track-icon" />
-                        </a>
-                      </li>
-                      <li>
-                        <a href="gdpr-cookies.html">
-                          <i className="ti ti-cookie me-2" />
-                          <span>GDPR Cookies</span>
-                          <span className="track-icon" />
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li className="menu-title">
-                    <span>FINANCE SETTINGS</span>
-                  </li>
-                  <li>
-                    <ul className="sidebar-links pb-3 mb-3 border-bottom">
-                      <li>
-                        <a href="bank-accounts.html">
-                          <i className="ti ti-file-dollar me-2" />
-                          <span>Bank Accounts</span>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
+                    )}
+                  </ul>
                 </ul>
               </div>
             </div>
@@ -314,16 +297,16 @@ const BankAccountSetting = () => {
                               </p>
                             </td>
                             <td>
-                             <span
-                              className={`badge ${
-                                bank.status
-                                  ? "badge-success-transparent"
-                                  : "badge-danger-transparent"
-                              } d-inline-flex align-items-center badge-sm`}
-                            >
-                              <i className="ti ti-point-filled me-1" />
-                              {bank.status ? "Active" : "Inactive"}
-                            </span>
+                              <span
+                                className={`badge ${
+                                  bank.status
+                                    ? "badge-success-transparent"
+                                    : "badge-danger-transparent"
+                                } d-inline-flex align-items-center badge-sm`}
+                              >
+                                <i className="ti ti-point-filled me-1" />
+                                {bank.status ? "Active" : "Inactive"}
+                              </span>
                             </td>
                             <td>
                               <div className="dropdown">

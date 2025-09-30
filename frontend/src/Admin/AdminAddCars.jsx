@@ -817,9 +817,10 @@ const AdminAddCars = () => {
                               </label>
                               <select
                                 name="category"
+                                
                                 value={formData.category}
                                 onChange={handleChange}
-                                className="select"
+                                className="select form-control"
                               >
                                 <option key={""}>Select</option>
                                 <option key={"Car"} value={"Car"}>

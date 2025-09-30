@@ -9,8 +9,8 @@ const saltround = 12;
 const secretKey = "Protect@@@@";
 const emailSecret = "EmailVerifySecret@@@";
 const otpGenerator = require("otp-generator");
-
-const secretKeyGoogle = "6LcdLNMrAAAAAHDxeu6icIVsGhraE2G43DtRraOc";
+const RecaptchaSetting = require("../models/googleCaptchaModel");
+const smtpSetting = require("../models/SMTPModel");
 
 const generateVerificationToken = (user) => {
   const token = jwt.sign({ userId: user._id }, emailSecret, {
@@ -19,19 +19,22 @@ const generateVerificationToken = (user) => {
   return token;
 };
 async function sendVerifyMail({ name, email, token }) {
+  const SMTPSetting = await smtpSetting.findOne({});
+
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
+    host: SMTPSetting.smtpHost,
+    port: SMTPSetting.smtpPort,
+    secure: true, // true for 465, false for 587
     auth: {
-      user: "mayankgoyal6595@gmail.com",
-      pass: "bmpzntwmrgtxbnum",
+      user: SMTPSetting.fromEmail,
+      pass: SMTPSetting.smtpPassword,
     },
   });
 
   const verificationLink = `http://localhost:5173/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: "mayankgoyal6595@gmail.com",
+    from: SMTPSetting.fromEmail,
     to: email,
     subject: "Email Verification Link - Dream rents",
     html: `
@@ -76,19 +79,27 @@ const register = async (req, res) => {
         message: validator.trim(),
       });
     }
+    const SMTPSetting = await smtpSetting.findOne({});
+    const setting = await RecaptchaSetting.findOne({});
+    if (setting?.status) {
+      if (!recaptchaToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Captcha required",
+        });
+      }
+      const recaptchaResponse = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${setting.secretKey}&response=${recaptchaToken}`
+      );
 
-    const recaptchaResponse = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
-    );
-
-    if (!recaptchaResponse.data.success) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: "reCAPTCHA verification failed",
-      });
+      if (!recaptchaResponse.data.success) {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "reCAPTCHA verification failed",
+        });
+      }
     }
-
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(409).json({
@@ -99,17 +110,20 @@ const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, saltround);
+    const userStatus = SMTPSetting?.status ? false : true;
 
     const newUser = new User({
       userName: name,
       email,
       password: hashedPassword,
-      status: false,
+      status: userStatus,
     });
 
-    const verificationToken = generateVerificationToken(newUser);
-    newUser.verificationToken = verificationToken;
-    newUser.tokenExpirationTime = Date.now() + 24 * 60 * 60 * 1000;
+    if (SMTPSetting?.status) {
+      const verificationToken = generateVerificationToken(newUser);
+      newUser.verificationToken = verificationToken;
+      newUser.tokenExpirationTime = Date.now() + 24 * 60 * 60 * 1000;
+    }
 
     await newUser.save();
     const customerobj = new customer({
@@ -121,16 +135,20 @@ const register = async (req, res) => {
     });
 
     await customerobj.save();
+    if (SMTPSetting?.status) {
+      sendVerifyMail({
+        name: newUser.userName,
+        email: newUser.email,
+        token: verificationToken,
+      });
+    }
 
-    sendVerifyMail({
-      name: newUser.userName,
-      email: newUser.email,
-      token: verificationToken,
-    });
     return res.json({
       status: 201,
       success: true,
-      message: "User registered successfully. Verification email sent.",
+      message: SMTPSetting?.status
+        ? "User registered successfully. Verification email sent."
+        : "User registered successfully",
     });
   } catch (error) {
     console.error(error);
@@ -148,17 +166,26 @@ const login = async (req, res) => {
     const { email, password, recaptchaToken } = req.body;
     if (!password) validator += "Password is Required. ";
     if (!email) validator += "Email is Required. ";
+    const setting = await RecaptchaSetting.findOne({});
+    if (setting?.status) {
+      if (!recaptchaToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Captcha required",
+        });
+      }
 
-    const recaptchaResponse = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
-    );
+      const recaptchaResponse = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${setting.secretKey}&response=${recaptchaToken}`
+      );
 
-    if (!recaptchaResponse.data.success) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: "reCAPTCHA verification failed",
-      });
+      if (!recaptchaResponse.data.success) {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "reCAPTCHA verification failed",
+        });
+      }
     }
     if (validator) {
       return res.json({
@@ -224,16 +251,26 @@ const forgotPassword = async (req, res) => {
         message: "Email is required",
       });
     }
-    const recaptchaResponse = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
-    );
+    const setting = await RecaptchaSetting.findOne({});
+    if (setting?.status) {
+      if (!recaptchaToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Captcha required",
+        });
+      }
 
-    if (!recaptchaResponse.data.success) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: "reCAPTCHA verification failed",
-      });
+      const recaptchaResponse = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${setting.secretKey}&response=${recaptchaToken}`
+      );
+
+      if (!recaptchaResponse.data.success) {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "reCAPTCHA verification failed",
+        });
+      }
     }
 
     const user = await User.findOne({ email });
@@ -254,18 +291,24 @@ const forgotPassword = async (req, res) => {
     user.otp = otp;
     user.otpExpiration = Date.now() + 10 * 60 * 1000; // 10 minutes
     await user.save();
-
+    const SMTPSetting = await smtpSetting.findOne({});
+    if (!SMTPSetting?.status) {
+      return res.status(400).json({
+        success: false,
+        message: "Password reset is disabled",
+      });
+    }
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
+      host: SMTPSetting.smtpHost,
+      port: SMTPSetting.smtpPort,
       auth: {
-        user: "mayankgoyal6595@gmail.com",
-        pass: "bmpzntwmrgtxbnum",
+        user: SMTPSetting.fromEmail,
+        pass: SMTPSetting.smtpPassword,
       },
     });
 
     const mailOptions = {
-      from: `"Dream rents" <${"mayankgoyal@gmail.com"}>`,
+      from: SMTPSetting.fromEmail,
       to: email,
       subject: "Forget Password Verification Code",
       html: `
@@ -302,16 +345,26 @@ const resetPassword = async (req, res) => {
         message: "User not found",
       });
     }
-    const recaptchaResponse = await axios.post(
-      `https://www.google.com/recaptcha/api/siteverify?secret=${secretKeyGoogle}&response=${recaptchaToken}`
-    );
+    const setting = await RecaptchaSetting.findOne({});
+    if (setting?.status) {
+      if (!recaptchaToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Captcha required",
+        });
+      }
 
-    if (!recaptchaResponse.data.success) {
-      return res.status(400).json({
-        status: 400,
-        success: false,
-        message: "reCAPTCHA verification failed",
-      });
+      const recaptchaResponse = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${setting.secretKey}&response=${recaptchaToken}`
+      );
+
+      if (!recaptchaResponse.data.success) {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "reCAPTCHA verification failed",
+        });
+      }
     }
 
     if (user.otp !== otp || user.otpExpiration < Date.now()) {
@@ -475,8 +528,6 @@ const changePassword = async (req, res) => {
 const updateUserDetails = async (req, res) => {
   try {
     const { _id } = req.user;
-
-
 
     const updateData = {
       userName: req.body.userName,
@@ -734,7 +785,14 @@ const deleteUserByAdmin = async (req, res) => {
 
 const registerAdmin = async (req, res) => {
   try {
-    const { ownerName, email, password, address, confirmPassword } = req.body;
+    const {
+      ownerName,
+      email,
+      password,
+      address,
+      confirmPassword,
+      recaptchaToken,
+    } = req.body;
 
     if (!ownerName) {
       return res
@@ -778,6 +836,27 @@ const registerAdmin = async (req, res) => {
       ? req.file.path.replace(/\\/g, "/")
       : "/uploads/businessImage/default.jpg";
 
+    const setting = await RecaptchaSetting.findOne({});
+    if (setting?.status) {
+      if (!recaptchaToken) {
+        return res.status(400).json({
+          success: false,
+          message: "Captcha required",
+        });
+      }
+
+      const recaptchaResponse = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify?secret=${setting.secretKey}&response=${recaptchaToken}`
+      );
+
+      if (!recaptchaResponse.data.success) {
+        return res.status(400).json({
+          status: 400,
+          success: false,
+          message: "reCAPTCHA verification failed",
+        });
+      }
+    }
     const hashedPassword = await bcrypt.hash(password, saltround);
 
     let newUser = new User({

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
+import apiServices, { BASE_URL_IMG } from "../../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const AdminRegister = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,15 @@ const AdminRegister = () => {
     address: "",
     image: null,
   });
+  const [loading, setLoading] = useState(false);
+
   const [companySetting, setCompanySetting] = useState({});
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
+  const [captchaSetting, setCaptchaSetting] = useState({
+    status: false,
+    siteKey: "",
+  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -25,10 +34,26 @@ const AdminRegister = () => {
       setFormData({ ...formData, [name]: value });
     }
   };
-
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+  const validatePassword = (password) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
+  const fetchgoogleCaptcha = async () => {
+    try {
+      const res = await apiServices.getCaptchaFrontend();
+      if (res.data.data) setCaptchaSetting(res.data.data);
+    } catch (err) {
+      toast.error("Failed to load settings");
+    }
+  };
   const fetchCompanySetting = async () => {
     try {
-      const res = await apiService.getCompanySettings();
+      const res = await apiServices.getCompanySettings();
       if (res.data.data) {
         setCompanySetting(res.data.data);
       }
@@ -39,13 +64,39 @@ const AdminRegister = () => {
 
   useEffect(() => {
     fetchCompanySetting();
+    fetchgoogleCaptcha();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateEmail(formData.email)) {
+      toast.error("Please enter a valid email address!");
+      return;
+    }
+    if (!validatePassword(formData.password)) {
+      toast.error(
+        "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
+      );
+      return;
+    }
 
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    if (captchaSetting.status && !recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA!");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const res = await apiService.adminRegister(formData);
+      const payload = { ...formData };
+      if (captchaSetting.status) {
+        payload.recaptchaToken = recaptchaToken;
+      }
+      const res = await apiServices.adminRegister(payload);
       toast.success(res.data.message);
       if (res.data.success) {
         setTimeout(() => navigate("/login"), 2000);
@@ -68,7 +119,7 @@ const AdminRegister = () => {
               <form onSubmit={handleSubmit} className="p-4">
                 <div className="mx-auto mb-4 text-center">
                   <img
-                    src={  BASE_URL_IMG+ companySetting?.profilePhoto}
+                    src={BASE_URL_IMG + companySetting?.profilePhoto}
                     className="img-fluid"
                     alt="Logo"
                   />
@@ -183,10 +234,24 @@ const AdminRegister = () => {
                         onChange={handleChange}
                       />
                     </div>
-
+                    {captchaSetting.status && captchaSetting.siteKey && (
+                      <div className="my-3">
+                        <ReCAPTCHA
+                          sitekey={captchaSetting.siteKey}
+                          onChange={(token) => setRecaptchaToken(token)}
+                          onExpired={() => setRecaptchaToken(null)}
+                        />
+                      </div>
+                    )}
                     <div className="mt-3">
-                      <button type="submit" className="btn btn-dark w-100">
-                        Register
+                      <button
+                        type="submit"
+                        disabled={
+                          loading || (captchaSetting.status && !recaptchaToken)
+                        }
+                        className="btn btn-dark w-100"
+                      >
+                        {loading ? "Registering..." : "Sign Up"}
                       </button>
                     </div>
 

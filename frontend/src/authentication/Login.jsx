@@ -14,11 +14,24 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [companySetting, setCompanySetting] = useState([]);
+  const [captchaSetting, setCaptchaSetting] = useState({
+    status: false,
+    siteKey: "",
+  });
 
   const [recaptchaToken, setRecaptchaToken] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const fetchgoogleCaptcha = async () => {
+    try {
+      const res = await apiServices.getCaptchaFrontend();
+      if (res.data.data) setCaptchaSetting(res.data.data);
+    } catch (err) {
+      toast.error("Failed to load settings");
+    }
+  };
 
   const fetchCompanySetting = async () => {
     try {
@@ -33,13 +46,14 @@ const Login = () => {
 
   useEffect(() => {
     fetchCompanySetting();
+    fetchgoogleCaptcha();
   }, []);
 
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!recaptchaToken) {
+    if (captchaSetting.status && !recaptchaToken) {
       toast.error("Please complete the reCAPTCHA!");
       return;
     }
@@ -47,7 +61,9 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const data = { email, password, recaptchaToken };
+      const data = { email, password };
+      if (captchaSetting.status) data.recaptchaToken = recaptchaToken;
+
       const res = await apiServices.login(data);
       toast.success(res.data.message);
 
@@ -91,7 +107,7 @@ const Login = () => {
         <Link to="/">
           <img
             className="img-fluid logo-dark"
-            src={ BASE_URL_IMG+  companySetting?.profilePhoto}
+            src={BASE_URL_IMG + companySetting?.profilePhoto}
             alt="Logo"
           />
         </Link>
@@ -160,17 +176,21 @@ const Login = () => {
                     Forgot Password ?
                   </Link>
                 </div>
-                <div className="my-3">
-                  <ReCAPTCHA
-                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL" //
-                    onChange={(token) => setRecaptchaToken(token)}
-                    onExpired={() => setRecaptchaToken(null)}
-                  />
-                </div>
+                {captchaSetting.status && captchaSetting.siteKey && (
+                  <div className="my-3">
+                    <ReCAPTCHA
+                      sitekey={captchaSetting.siteKey}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="btn btn-outline-light w-100 btn-size mt-1"
-                  disabled={loading || !recaptchaToken}
+                  className="btn btn-outline-light w-100 btn-size mt-1 text-light"
+                  disabled={
+                    loading || (captchaSetting.status && !recaptchaToken)
+                  }
                 >
                   {loading ? "Signing In..." : "Sign In"}
                 </button>

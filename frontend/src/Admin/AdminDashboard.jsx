@@ -17,7 +17,6 @@ const AdminDashboard = () => {
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
-  const [isMini, setIsMini] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const userData = useSelector((store) => store.user);
@@ -37,7 +36,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className={`main-wrapper `}>
+    <div className={`main-wrapper`}>
       {/* Header */}
       <div className="header ">
         <div className="main-header">
@@ -642,26 +641,37 @@ const AdminDashboard = () => {
                       </a>
                       {rentalSettingOpen && (
                         <ul>
-                          <li>
+                         {userType !== 1 &&( <li>
                             <Link to="invoice-setting">Invoice Settings</Link>
-                          </li>
+                          </li>)}
 
-                          <li>
-                            <Link to="signature-setting">Signatures</Link>
-                          </li>
-                          <li>
-                            <Link to="bank-account-setting">Bank Accounts</Link>
-                          </li>
-                          <li>
-                            <Link to="company-setting">
-                              Company Settings
-                            </Link>
-                          </li>
-                          <li>
-                            <Link to="login-setting">
-                              Login Settings
-                            </Link>
-                          </li>
+                          {userType !== 1 && (
+                            <li>
+                              <Link to="signature-setting">Signatures</Link>
+                            </li>
+                          )}
+                          {userType !== 1 && (
+                            <li>
+                              <Link to="bank-account-setting">
+                                Bank Accounts
+                              </Link>
+                            </li>
+                          )}
+                          {userType === 1 && (
+                            <li>
+                              <Link to="company-setting">Company Settings</Link>
+                            </li>
+                          )}
+                          {userType === 1 && (
+                            <li>
+                              <Link to="login-setting">Login Settings</Link>
+                            </li>
+                          )}
+                          {userType === 1 && (
+                            <li>
+                              <Link to="email-setting">Email Settings</Link>
+                            </li>
+                          )}
                         </ul>
                       )}
                     </li>

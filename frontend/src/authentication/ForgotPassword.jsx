@@ -13,9 +13,12 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const [companySetting, setCompanySetting] = useState({});
-
+  const [captchaSetting, setCaptchaSetting] = useState({
+    status: false,
+    siteKey: "",
+  });
   const handleFormSubmit = async (e) => {
-    if (!recaptchaToken) {
+    if (captchaSetting.status && !recaptchaToken) {
       toast.error("Please complete the reCAPTCHA!");
       return;
     }
@@ -24,7 +27,11 @@ const ForgotPassword = () => {
     setLoading(true);
 
     try {
-      const res = await apiService.forgotPassword({ email, recaptchaToken });
+      const payload = { email };
+    if (captchaSetting.status) {
+      payload.recaptchaToken = recaptchaToken;
+    }
+      const res = await apiService.forgotPassword(payload);
 
       if (res.data.success) {
         toast.success("Reset link has been sent to your email!");
@@ -51,8 +58,17 @@ const ForgotPassword = () => {
     }
   };
 
+  const fetchgoogleCaptcha = async () => {
+    try {
+      const res = await apiService.getCaptchaFrontend();
+      if (res.data.data) setCaptchaSetting(res.data.data);
+    } catch (err) {
+      toast.error("Failed to load settings");
+    }
+  };
   useEffect(() => {
     fetchCompanySetting();
+    fetchgoogleCaptcha();
   }, []);
 
   return (
@@ -100,18 +116,23 @@ const ForgotPassword = () => {
                     className="form-control"
                   />
                 </div>
-                <div className="my-3">
-                  <ReCAPTCHA
-                    sitekey="6LcdLNMrAAAAAIQiqcyFmZiRANaY6NdRUaxSMjJL
-" //
-                    onChange={(token) => setRecaptchaToken(token)}
-                    onExpired={() => setRecaptchaToken(null)}
-                  />
-                </div>
+                {captchaSetting.status && captchaSetting.siteKey && (
+                  <div className="my-3">
+                    <ReCAPTCHA
+                      sitekey={captchaSetting.siteKey}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+                )}
                 <button
                   type="submit"
-                  className="btn btn-outline-light w-100 btn-size"
-                  disabled={loading || !recaptchaToken}
+                  className="btn btn-outline-light w-100 btn-size text-light
+
+"
+                  disabled={
+                    loading || (captchaSetting.status && !recaptchaToken)
+                  }
                 >
                   {loading ? "Sending..." : "Send Reset Link"}
                 </button>

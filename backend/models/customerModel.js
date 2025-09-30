@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const customerschema = new mongoose.Schema(
   {
-    name:{
+    name: {
       type: String,
     },
     firstName: { type: String, default: null },
@@ -17,7 +17,6 @@ const customerschema = new mongoose.Schema(
     age: { type: Number },
     licenseNumber: {
       type: String,
-      unique: true,
     },
     licenseImage: { type: String },
     dateOfIssue: {

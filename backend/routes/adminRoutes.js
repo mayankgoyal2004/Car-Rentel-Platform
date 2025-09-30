@@ -46,6 +46,7 @@ const signature = require("../controlers/signatureController");
 const bankAccount = require("../controlers/bankaccountControler");
 const companySetting = require("../controlers/companySettingControler");
 const recaptchaSetting = require("../controlers/googleCaptchaControler");
+const smtpSetting = require("../controlers/smtpSettingControler");
 
 const route = express.Router();
 
@@ -84,6 +85,13 @@ route.get(
 route.get("/all-cars-home-page", car.getAllCars);
 //!!contact
 route.post("/add-constact", contact.addContact);
+
+//!!! google captcha frontend
+route.get(
+  "/get-captcha-frontend",
+
+  recaptchaSetting.getCaptchaFrontend
+);
 
 //!! get compnay settings
 route.get("/get-company-setting", companySetting.getCompanySetting);
@@ -1248,5 +1256,10 @@ route.get(
 
   recaptchaSetting.getCaptchaSetting
 );
+
+//!! smtp setting
+route.get("/get-smtp-setting", smtpSetting.getSmtpSetting);
+
+route.post("/add-smtp-setting", smtpSetting.updateSmtpSetting);
 
 module.exports = route;

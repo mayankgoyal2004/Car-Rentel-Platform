@@ -1,9 +1,242 @@
-import React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 
 const BookingDetals = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [reservation, setReservation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    userName: "",
+    phone: "",
+    email: "",
+    address: "",
+    country: "",
+    state: "",
+    city: "",
+    pincode: "",
+    company: "",
+    additionalInfo: "",
+    passengers: "1 passenger",
+  });
+
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  useEffect(() => {
+    const fetchReservation = async () => {
+      try {
+        const res = await apiService.getReservationByIdBooking(id);
+
+        if (res.data && res.data.success && res.data.data) {
+          const reservationData = res.data.data;
+
+          const transformedData = {
+            ...reservationData,
+            rentalType: reservationData.rentalType || "delivery",
+            priceRate: reservationData.bookingType || "daily",
+            pickupAddress: reservationData.pickupAddress || "",
+            extraServices: reservationData.extraServices || "",
+            adminPickupAddress: reservationData.car.admin.address || "",
+            dropAddress: reservationData.dropAddress || "",
+            returnToSame:
+              !reservationData.dropAddress ||
+              reservationData.pickupAddress === reservationData.dropAddress,
+            pickupDate: reservationData.pickupDate
+              ? new Date(reservationData.pickupDate).toISOString().split("T")[0]
+              : "",
+            returnDate: reservationData.dropDate
+              ? new Date(reservationData.dropDate).toISOString().split("T")[0]
+              : "",
+            pickupTime: reservationData.pickupTime || "10:00",
+            returnTime: reservationData.dropTime || "10:00",
+            doorStepDelivery: 0,
+            tripProtection: 0,
+            convenienceFee: 0,
+            tax: reservationData.pricingDetails?.tax || 0,
+            deposit: reservationData.securityDeposit || 0,
+          };
+
+          setReservation(transformedData);
+        } else {
+          console.error("Invalid response structure:", res.data);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching reservation:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchReservation();
+  }, [id]);
+
+  const fetchUser = async () => {
+    try {
+      const res = await apiService.getUerDetails();
+      const { Customer, user } = res.data;
+
+      const userDetails = {
+        firstName: Customer?.firstName || "",
+        lastName: Customer?.lastName || "",
+        userName: user?.userName || "",
+        phone: Customer?.contact || user?.contact || "",
+        email: Customer?.email || user?.email || "",
+        address: Customer?.address || user?.address || "",
+        country: Customer?.country || "",
+        state: Customer?.state || "",
+        city: Customer?.city || "",
+        pincode: Customer?.pincode || "",
+        company: Customer?.company || "",
+        additionalInfo: Customer?.additionalInfo || "",
+      };
+
+      setUserData(userDetails);
+    } catch (err) {
+      console.error("Error fetching user details:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+  const handleUserInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setUserData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleTermsChange = (e) => {
+    setTermsAccepted(e.target.checked);
+  };
+
+  const calculateNumberOfDays = () => {
+    if (!reservation || !reservation.pickupDate || !reservation.returnDate)
+      return 0;
+
+    const start = new Date(reservation.pickupDate);
+    const end = new Date(reservation.returnDate);
+    const diffTime = Math.abs(end - start);
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  };
+
+  // Calculate rental rate
+  const calculateRentalRate = () => {
+    if (
+      !reservation ||
+      !reservation.priceRate ||
+      !reservation.car?.pricing?.prices
+    )
+      return 0;
+
+    const days = calculateNumberOfDays();
+    const rateType = reservation.priceRate;
+    const ratePrices = reservation.car.pricing.prices;
+
+    switch (rateType) {
+      case "daily":
+        return days * ratePrices.daily;
+      case "weekly":
+        return Math.ceil(days / 7) * ratePrices.weekly;
+      case "monthly":
+        return Math.ceil(days / 30) * ratePrices.monthly;
+      case "yearly":
+        return Math.ceil(days / 365) * ratePrices.yearly;
+      default:
+        return days * ratePrices.daily;
+    }
+  };
+
+  // Calculate extra services total
+  const calculateExtraServicesTotal = () => {
+    if (!reservation?.extraServices) return 0;
+    return reservation.extraServices.reduce(
+      (total, service) => total + (service.price || 0),
+      0
+    );
+  };
+
+  // Calculate total amount
+  const calculateTotal = () => {
+    const rentalRate = calculateRentalRate();
+    const extraServicesTotal = calculateExtraServicesTotal();
+    const additionalFees =
+      (reservation?.doorStepDelivery || 0) +
+      (reservation?.tripProtection || 0) +
+      (reservation?.convenienceFee || 0) +
+      (reservation?.tax || 0);
+
+    return rentalRate + extraServicesTotal + additionalFees;
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!termsAccepted) {
+      alert("Please accept the Terms & Conditions to continue.");
+      return;
+    }
+
+    try {
+      // Update user details
+      const updateData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        contact: userData.phone,
+        email: userData.email,
+        address: userData.address,
+        country: userData.country,
+        state: userData.state,
+        city: userData.city,
+        pincode: userData.pincode,
+      };
+
+      await apiService.updateuserDetials(updateData);
+
+      // Navigate to payment page
+      navigate(`/booking-payment/${id}`);
+    } catch (error) {
+      console.error("Error updating user details:", error);
+      alert("Failed to update user details. Please try again.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="main-wrapper">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 text-center py-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-3">Loading reservation details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (!reservation) {
+    return (
+      <div className="main-wrapper">
+        <div className="container">
+          <div className="row">
+            <div className="col-12 text-center py-5">
+              <h3>Reservation not found</h3>
+              <p>The reservation you're looking for doesn't exist.</p>
+              <Link to="/" className="btn btn-primary">
+                Return Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -96,7 +329,7 @@ const BookingDetals = () => {
               <div className="row">
                 <div className="col-lg-8">
                   <div className="booking-information-main">
-                    <form action={`/booking-payment/${id}`}>
+                    <form onSubmit={handleSubmit}>
                       <div className="booking-information-card">
                         <div className="booking-info-head justify-content-between">
                           <div className="d-flex align-items-center">
@@ -104,18 +337,6 @@ const BookingDetals = () => {
                               <i className="bx bx-add-to-queue" />
                             </span>
                             <h5>Billing Info</h5>
-                          </div>
-                          <div className="d-flex align-items-center">
-                            <h6>Returning customer?</h6>
-                            <a
-                              href="javascript:void(0);"
-                              className="btn btn-secondary ms-3"
-                              data-bs-toggle="modal"
-                              data-bs-target="#sign_in_modal"
-                            >
-                              <i className="bx bx-user me-2" />
-                              Sign In
-                            </a>
                           </div>
                         </div>
                         <div className="booking-info-body">
@@ -130,6 +351,10 @@ const BookingDetals = () => {
                                   type="text"
                                   className="form-control"
                                   placeholder="Enter First Name"
+                                  name="firstName"
+                                  value={userData.firstName}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
@@ -143,31 +368,14 @@ const BookingDetals = () => {
                                   type="text"
                                   className="form-control"
                                   placeholder="Enter Last Name"
+                                  name="lastName"
+                                  value={userData.lastName}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
-                            <div className="col-md-6">
-                              <div className="input-block">
-                                <label className="form-label">
-                                  No of Persons{" "}
-                                  <span className="text-danger"> *</span>
-                                </label>
-                                <select className="form-control select">
-                                  <option>2 Adults, 1 Child</option>
-                                  <option>5 Adults, 2 Child</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="input-block">
-                                <label className="form-label">Company</label>
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  placeholder="Enter Company Name"
-                                />
-                              </div>
-                            </div>
+
                             <div className="col-md-12">
                               <div className="input-block">
                                 <label className="form-label">
@@ -178,6 +386,10 @@ const BookingDetals = () => {
                                   type="text"
                                   className="form-control"
                                   placeholder="Enter Address"
+                                  name="address"
+                                  value={userData.address}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
@@ -187,11 +399,15 @@ const BookingDetals = () => {
                                   Country{" "}
                                   <span className="text-danger"> *</span>
                                 </label>
-                                <select className="form-control select">
-                                  <option>Country</option>
-                                  <option>USA</option>
-                                  <option>UK</option>
-                                </select>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Enter State"
+                                  name="country"
+                                  value={userData.country}
+                                  onChange={handleUserInputChange}
+                                  required
+                                />
                               </div>
                             </div>
                             <div className="col-md-4">
@@ -203,7 +419,11 @@ const BookingDetals = () => {
                                 <input
                                   type="text"
                                   className="form-control"
-                                  placeholder="City"
+                                  placeholder="Enter City"
+                                  name="city"
+                                  value={userData.city}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
@@ -217,6 +437,10 @@ const BookingDetals = () => {
                                   type="text"
                                   className="form-control"
                                   placeholder="Enter Pincode"
+                                  name="pincode"
+                                  value={userData.pincode}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
@@ -227,9 +451,13 @@ const BookingDetals = () => {
                                   <span className="text-danger"> *</span>
                                 </label>
                                 <input
-                                  type="text"
+                                  type="email"
                                   className="form-control"
                                   placeholder="Enter Email"
+                                  name="email"
+                                  value={userData.email}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
@@ -240,25 +468,17 @@ const BookingDetals = () => {
                                   <span className="text-danger"> *</span>
                                 </label>
                                 <input
-                                  type="text"
+                                  type="tel"
                                   className="form-control"
                                   placeholder="Enter Phone Number"
+                                  name="phone"
+                                  value={userData.phone}
+                                  onChange={handleUserInputChange}
+                                  required
                                 />
                               </div>
                             </div>
-                            <div className="col-md-12">
-                              <div className="input-block">
-                                <label className="form-label">
-                                  Additional Information
-                                </label>
-                                <textarea
-                                  className="form-control"
-                                  placeholder="Enter Additional Information"
-                                  rows={5}
-                                  defaultValue={""}
-                                />
-                              </div>
-                            </div>
+                            <div className="col-md-12"></div>
                             <div className="col-md-12">
                               <div className="input-block m-0">
                                 <label className="custom_check d-inline-flex location-check m-0">
@@ -267,7 +487,13 @@ const BookingDetals = () => {
                                     Conditions
                                   </span>{" "}
                                   <span className="text-danger"> *</span>
-                                  <input type="checkbox" name="remeber" />
+                                  <input
+                                    type="checkbox"
+                                    name="termsAccepted"
+                                    checked={termsAccepted}
+                                    onChange={handleTermsChange}
+                                    required
+                                  />
                                   <span className="checkmark" />
                                 </label>
                               </div>
@@ -277,7 +503,7 @@ const BookingDetals = () => {
                       </div>
                       <div className="booking-info-btns d-flex justify-content-end">
                         <Link
-                          to="/booking-add-on"
+                          to={`/booking-add-on/${id}`}
                           className="btn btn-secondary"
                         >
                           Back to Extra Services
@@ -320,17 +546,17 @@ const BookingDetals = () => {
                             <div className="booking-car-detail">
                               <span className="car-img">
                                 <img
-                                  src="/user-assets/img/car-list-4.jpg"
+                                  src={BASE_URL_IMG + reservation?.car?.image}
                                   className="img-fluid"
                                   alt="Car"
                                 />
                               </span>
                               <div className="care-more-info">
-                                <h5>Chevrolet Camaro</h5>
-                                <p>Miami St, Destin, FL 32550, USA</p>
-                                <Link to="/listing-details">
-                                  View Car Details
-                                </Link>
+                                <h5>{reservation?.car?.carName}</h5>
+                                <p>
+                                  {" "}
+                                  <p>{reservation.car?.mainLocation?.title}</p>
+                                </p>
                               </div>
                             </div>
                             <div className="booking-vehicle-rates">
@@ -338,14 +564,24 @@ const BookingDetals = () => {
                                 <li>
                                   <div className="rental-charge">
                                     <h6>
-                                      Rental Charges Rate <span> (1 day )</span>
+                                      Rental Charges Rate{" "}
+                                      <span>
+                                        ({calculateNumberOfDays()} days)
+                                      </span>
                                     </h6>
+
                                     <span className="text-danger">
                                       (This does not include fuel)
                                     </span>
                                   </div>
-                                  <h5>+ $300</h5>
+                                  <h5>+ ${calculateRentalRate()}</h5>
                                 </li>
+                                {reservation.extraServices?.map((service) => (
+                                  <li key={service._id}>
+                                    <h6>{service.name}</h6>
+                                    <h5>+ ${service.price || 0}</h5>
+                                  </li>
+                                ))}
                                 <li>
                                   <h6>Doorstep delivery</h6>
                                   <h5>+ $0</h5>
@@ -369,7 +605,7 @@ const BookingDetals = () => {
 
                                 <li className="total-rate">
                                   <h6>Subtotal</h6>
-                                  <h5>+$1604</h5>
+                                  <h5>+${calculateTotal()}</h5>
                                 </li>
                               </ul>
                             </div>
@@ -395,7 +631,7 @@ const BookingDetals = () => {
                             </div>
                           </div>
                           <Link
-                            to="/booking-checkout"
+                            to={`/booking-checkout/${id}`}
                             className="d-flex align-items-center sidebar-edit"
                           >
                             <i className="bx bx-edit-alt me-2" />
@@ -410,24 +646,34 @@ const BookingDetals = () => {
                             <ul className="location-address-info">
                               <li>
                                 <h6>Rental Type</h6>
-                                <p>Delivery</p>
+                                <p>
+                                  {reservation.rentalType === "delivery"
+                                    ? "Delivery"
+                                    : "Pickup"}
+                                </p>
                               </li>
                               <li>
                                 <h6>Booking Type</h6>
-                                <p>Days</p>
+                                <p>{reservation.bookingType}</p>
                               </li>
                               <li>
                                 <h6>Delivery Location &amp; time</h6>
-                                <p>1230 E Springs Rd, Los Angeles, CA, USA</p>
-                                <p>04/18/2024 - 14:00</p>
+                                <p>{reservation.pickupAddress}</p>
+                                <p>
+                                  {reservation.pickupDate} -{" "}
+                                  {reservation.pickupTime}
+                                </p>
                               </li>
                               <li>
                                 <h6>Return Location &amp; time</h6>
                                 <p>
-                                  Norwegian Caribbean Cruise Los Angeles, CA
-                                  90025
+                                  {reservation.dropAddress ||
+                                    reservation.pickupAddress}
                                 </p>
-                                <p>04/27/2024 - 03:00</p>
+                                <p>
+                                  {reservation.returnDate} -{" "}
+                                  {reservation.returnTime}
+                                </p>
                               </li>
                             </ul>
                           </div>
@@ -451,7 +697,7 @@ const BookingDetals = () => {
                               </h5>
                             </div>
                             <Link
-                              to="/booking-add-on"
+                              to={`/booking-add-on/${id}`}
                               className="d-flex align-items-center sidebar-edit"
                             >
                               <i className="bx bx-edit-alt me-2" />
@@ -466,52 +712,22 @@ const BookingDetals = () => {
                           <div className="booking-sidebar-body">
                             <div className="booking-vehicle-rates">
                               <ul className="mt-0">
-                                <li>
-                                  <h6>GPS Navigation Systems</h6>
-                                  <h5> $25</h5>
-                                </li>
-                                <li>
-                                  <h6>Wi-Fi Hotspot</h6>
-                                  <h5> $25</h5>
-                                </li>
-                                <li>
-                                  <h6>Child Safety Seats</h6>
-                                  <h5> $50</h5>
-                                </li>
+                                {reservation.extraServices?.map((service) => (
+                                  <li key={service._id}>
+                                    <h6>{service.name}</h6>
+                                    <h5>${service.price || 0}</h5>
+                                  </li>
+                                ))}
+                                {(!reservation.extraServices ||
+                                  reservation.extraServices.length === 0) && (
+                                  <li>
+                                    <h6>No extra services selected</h6>
+                                    <h5>$0</h5>
+                                  </li>
+                                )}
                                 <li className="total-rate">
                                   <h6>Extra Services Charges Rate</h6>
-                                  <h5>$1200</h5>
-                                </li>
-                              </ul>
-                            </div>
-                            <div className="book-our-drivers">
-                              <h4 className="title-head">Driver</h4>
-                              <ul className="acting-driver-list">
-                                <li className="d-block">
-                                  <div className="driver-profile-info">
-                                    <span className="driver-profile">
-                                      <img
-                                        src="/user-assets/img/drivers/driver-02.jpg"
-                                        alt="Img"
-                                      />
-                                    </span>
-                                    <div className="driver-name">
-                                      <h5>Ruban</h5>
-                                      <ul>
-                                        <li>No of Rides Completed : 32</li>
-                                        <li>Price : $100</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div className="change-driver">
-                                    <a
-                                      href="javascript:void(0);"
-                                      className="btn btn-secondary d-inline-flex align-items-center"
-                                    >
-                                      <i className="bx bx-check-circle me-2" />
-                                      Change Driver
-                                    </a>
-                                  </div>
+                                  <h5>${calculateExtraServicesTotal()}</h5>
                                 </li>
                               </ul>
                             </div>
@@ -523,7 +739,7 @@ const BookingDetals = () => {
                     <div className="total-rate-card">
                       <div className="vehicle-total-price">
                         <h5>Estimated Total</h5>
-                        <span>$3541</span>
+                        <span>${calculateTotal()}</span>
                       </div>
                     </div>
                   </div>

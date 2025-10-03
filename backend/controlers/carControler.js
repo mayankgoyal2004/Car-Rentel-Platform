@@ -5,6 +5,7 @@ const CarModel = require("../models/caratributes/CarModelModel");
 const CarBrand = require("../models/caratributes/carBrandModel");
 const CarTransmission = require("../models/caratributes/carTransmissionsModel");
 const CarFuel = require("../models/caratributes/carFuelModel");
+const Review = require("../models/carReviewmodel");
 
 const addCar = async (req, res) => {
   try {
@@ -455,7 +456,7 @@ const getAllCars = async (req, res) => {
       limit = 10,
     } = req.query;
 
-    let filter = { status: true, isAvailable: true };
+    let filter = { status: true, isAvailable: true, inRent: false };
 
     if (search) {
       filter.$or = [
@@ -611,26 +612,47 @@ const getAllCars = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const cars = await Car.find(filter)
-      .populate("carType", "carType")
-      .populate("carBrand", "brandName")
-      .populate("carModel", "carModel")
-      .populate("carCylinder", "carCylinder")
-      .populate("carFeatures", "carFeature")
-      .populate("carColor", "carColor")
-      .populate("carFuel", "carFuel")
-      .populate("carSeats", "carSeats")
-      .populate("carTransmission", "carTransmission")
-      .populate("carSafetyFeature", "safetyFeatureName")
-      .populate("carSteering", "steeringType")
-      .populate("extraService", "serviceName price")
-      .populate("mainLocation", "title")
-      .populate("otherLocations", "title")
-      .populate("pricing")
-      .populate("createdBy", "name email")
-      .populate("admin", "name email")
-      .skip(skip)
-      .limit(parseInt(limit));
+    let cars = await Car.aggregate([
+      { $match: filter },
+
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "car",
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          avgRating: { $ifNull: [{ $avg: "$reviews.carReview" }, 0] },
+          reviewCount: { $size: "$reviews" },
+        },
+      },
+      { $project: { reviews: 0 } },
+      { $skip: skip },
+      { $limit: parseInt(limit) },
+    ]);
+
+    // Re-populate refs (hybrid approach)
+    cars = await Car.populate(cars, [
+      { path: "carType", select: "carType" },
+      { path: "carBrand", select: "brandName" },
+      { path: "carModel", select: "carModel" },
+      { path: "carCylinder", select: "carCylinder" },
+      { path: "carFeatures", select: "carFeature" },
+      { path: "carColor", select: "carColor" },
+      { path: "carFuel", select: "carFuel" },
+      { path: "carSeats", select: "carSeats" },
+      { path: "carTransmission", select: "carTransmission" },
+      { path: "carSteering", select: "steeringType" },
+      { path: "extraService", select: "serviceName price" },
+      { path: "mainLocation", select: "title" },
+      { path: "otherLocations", select: "title" },
+      { path: "pricing" },
+      { path: "createdBy", select: "name email" },
+      { path: "admin", select: "name email" },
+    ]);
 
     const total = await Car.countDocuments(filter);
 
@@ -651,10 +673,12 @@ const getAllCars = async (req, res) => {
 const getCarById = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!id)
+    if (!id) {
       return res
         .status(400)
         .json({ success: false, message: "Car id is required" });
+    }
+
     const car = await Car.findById(id)
       .populate("carType", "carType")
       .populate("carBrand", "brandName")
@@ -665,7 +689,6 @@ const getCarById = async (req, res) => {
       .populate("carFuel", "carFuel")
       .populate("carSeats", "carSeats")
       .populate("carTransmission", "carTransmission")
-      .populate("carSafetyFeature", "safetyFeatureName")
       .populate("carSteering", "steeringType")
       .populate("extraService", "name price")
       .populate("mainLocation", "title")
@@ -673,6 +696,9 @@ const getCarById = async (req, res) => {
       .populate("pricing")
       .populate("createdBy", "name email")
       .populate("admin", "name email");
+    if (!car) {
+      return res.status(404).json({ success: false, message: "Car not found" });
+    }
     res.status(200).json({ success: true, data: car });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -963,13 +989,18 @@ const getSingleCarUser = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-      res.json({
+      return res.json({
         status: 409,
         success: false,
         message: "id is Required!",
       });
     }
-    const carData = await Car.findById(id).populate([
+
+    const carData = await Car.findByIdAndUpdate(
+      id,
+      { $inc: { views: 1 } },
+      { new: true }
+    ).populate([
       { path: "carBrand", select: "brandName" },
       { path: "carModel", select: "carModel" },
       { path: "carType", select: "carType" },
@@ -984,20 +1015,15 @@ const getSingleCarUser = async (req, res) => {
         path: "extraService",
         select: "name quantity price type description status",
       },
-      {
-        path: "carFeatures",
-        select: "carFeature",
-      },
-      {
-        path: "pricing",
-        select: "prices baseKilometers  extraKilometerPrice",
-      },
+      { path: "carFeatures", select: "carFeature" },
+      { path: "pricing", select: "prices baseKilometers extraKilometerPrice" },
     ]);
+
     if (!carData) {
       return res.status(404).json({
         status: 404,
         success: false,
-        message: "CAr not found!",
+        message: "Car not found!",
       });
     }
 

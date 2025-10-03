@@ -1,47 +1,359 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiService from "../../Apiservice/apiService";
 
 const AdminEditEnvoice = () => {
   const { id } = useParams();
   const [reservation, setReservation] = useState();
-    const [invoiceData, setInvoiceData] = useState({
-      invoiceNumber: "",
-      carId: "",
-      reservationId: "",
-      fromDate: "",
-      dueDate: "",
-      currency: "USD",
-      status: "pending",
-      from: "",
-      to: "",
-      paymentMethod: "",
-      terms: "",
-      notes: "",
+  const [invoice, setInvoice] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [owner, setOwner] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [car, setCars] = useState([]);
+  const navigate = useNavigate();
+  const [invoiceData, setInvoiceData] = useState({
+    invoiceNumber: "",
+    carId: "",
+    reservationId: "",
+    fromDate: "",
+    dueDate: "",
+    currency: "USD",
+    status: "pending",
+    from: "",
+    to: "",
+    paymentMethod: "",
+    terms: "",
+    notes: "",
+    items: [
+      {
+        description: "Car Rental",
+        quantity: 1,
+        netPrice: 0,
+        tax: 0,
+        totalPrice: 0,
+      },
+    ],
+  });
+  const calculateTotals = () => {
+    const subtotal = invoiceData.items.reduce(
+      (sum, item) => sum + item.netPrice * item.quantity,
+      0
+    );
+    const taxTotal = invoiceData.items.reduce(
+      (sum, item) => sum + item.tax * item.quantity,
+      0
+    );
+    const total = subtotal + taxTotal;
+
+    return { subtotal, taxTotal, total };
+  };
+
+  const { subtotal, taxTotal, total } = calculateTotals();
+
+  const fetchReservations = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getAllReservationAdmin();
+      setReservation(res.data.data);
+    } catch (err) {
+      console.error("Error fetching Reservations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getOwnerDetails = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getOwnerDetails();
+      setOwner(res.data.data);
+      setInvoiceData((prevData) => ({
+        ...prevData,
+        from: res.data.data.businessName,
+      }));
+    } catch (err) {
+      console.error("Error fetching Reservations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const getCustoemrs = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getAllCustomerAdmin();
+      setCustomers(res.data.data);
+    } catch (err) {
+      console.error("Error fetching Reservations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const getCars = async () => {
+    try {
+      const res = await apiService.getAllCarAdmin();
+      setCars(res.data.data);
+    } catch (err) {
+      console.error("Error fetching Cars:", err);
+      toast.error("Failed to load cars");
+    }
+  };
+
+  useEffect(() => {
+    fetchReservations();
+    getOwnerDetails();
+    getCustoemrs();
+    getCars();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setInvoiceData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...invoiceData.items];
+    updatedItems[index] = {
+      ...updatedItems[index],
+      [field]: field === "description" ? value : parseFloat(value) || 0,
+    };
+
+    // Recalculate total price for numeric fields
+    if (field !== "description") {
+      updatedItems[index].totalPrice =
+        updatedItems[index].netPrice * updatedItems[index].quantity +
+        updatedItems[index].tax * updatedItems[index].quantity;
+    }
+
+    setInvoiceData((prev) => ({
+      ...prev,
+      items: updatedItems,
+    }));
+  };
+  const addNewItem = () => {
+    setInvoiceData((prev) => ({
+      ...prev,
       items: [
+        ...prev.items,
         {
-          description: "Car Rental",
+          description: "",
           quantity: 1,
           netPrice: 0,
           tax: 0,
           totalPrice: 0,
         },
       ],
-    });
+    }));
+  };
+  const removeItem = (index) => {
+    if (invoiceData.items.length > 1) {
+      const updatedItems = invoiceData.items.filter((_, i) => i !== index);
+      setInvoiceData((prev) => ({
+        ...prev,
+        items: updatedItems,
+      }));
+    }
+  };
+  const getRentalPeriod = (reservation) => {
+    if (!reservation?.pickupDate || !reservation?.dropDate) return 1;
 
-  const fetchReservation = async () => {
-    try {
-      const res = await apiService.getInvoiceDetails(id);
-      setReservation(res.data.data);
-    } catch (err) {
-      console.error(err.message);
+    const start = new Date(reservation.pickupDate);
+    const end = new Date(reservation.dropDate);
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 1;
+  };
+
+  const getCarPrice = (reservation) => {
+    if (!reservation?.car?.pricing?.prices) return 0;
+    const prices = reservation.car.pricing.prices;
+
+    switch (reservation.bookingType) {
+      case "daily":
+        return prices.daily || 0;
+      case "weekly":
+        return prices.weekly || 0;
+      case "monthly":
+        return prices.monthly || 0;
+      case "yearly":
+        return prices.yearly || 0;
+      default:
+        return prices.daily || 0;
+    }
+  };
+
+  const getTotalCarPricing = (reservation) => {
+    if (!reservation?.car?.pricing?.prices) return 0;
+
+    const rentalDays = getRentalPeriod(reservation);
+    const prices = reservation.car.pricing.prices;
+
+    let carPrice = 0;
+
+    switch (reservation.bookingType) {
+      case "daily":
+        carPrice = (prices.daily || 0) * rentalDays;
+        break;
+      case "weekly": {
+        const weeks = Math.ceil(rentalDays / 7);
+        carPrice = (prices.weekly || 0) * weeks;
+        break;
+      }
+      case "monthly": {
+        const months = Math.ceil(rentalDays / 30);
+        carPrice = (prices.monthly || 0) * months;
+        break;
+      }
+      case "yearly": {
+        const years = Math.ceil(rentalDays / 365);
+        carPrice = (prices.yearly || 0) * years;
+        break;
+      }
+      default:
+        carPrice = (prices.daily || 0) * rentalDays;
     }
 
-  
+    return carPrice;
   };
-    useEffect(() => {
-      fetchReservation();
-    }, []);
+
+  const getExtraServicesTotal = (reservation) => {
+    if (
+      !reservation?.extraServices ||
+      !Array.isArray(reservation.extraServices)
+    )
+      return 0;
+
+    return reservation.extraServices.reduce(
+      (total, service) =>
+        total + (service.price || 0) * (service.quantity || 1),
+      0
+    );
+  };
+  const handleReservationSelect = (reservation) => {
+    const selectedReservation = reservations.find(
+      (r) => r._id === reservation._id
+    );
+    if (selectedReservation) {
+      const rentalDays = getRentalPeriod(selectedReservation);
+      const carPrice = getCarPrice(selectedReservation);
+      const totalCarPricing = getTotalCarPricing(selectedReservation);
+      const extraServicesTotal = getExtraServicesTotal(selectedReservation);
+      const items = [];
+      items.push({
+        description: `Car Rental - ${
+          selectedReservation.car?.carName || "Car"
+        }`,
+        quantity: rentalDays,
+        netPrice: carPrice,
+        tax: 0,
+        totalPrice: totalCarPricing,
+      });
+      if (selectedReservation.extraServices) {
+        selectedReservation.extraServices.forEach((service, index) => {
+          if (service && service.name) {
+            items.push({
+              description: `Extra Service - ${service.name}`,
+              quantity: service.quantity || 1,
+              netPrice: service.price || 0,
+              tax: 0,
+              totalPrice: service.price * service.quantity,
+            });
+          }
+        });
+      }
+      if (
+        selectedReservation.securityDeposit &&
+        selectedReservation.securityDeposit > 0
+      ) {
+        items.push({
+          description: "Security Deposit",
+          quantity: 1,
+          netPrice: selectedReservation.securityDeposit,
+          tax: 0,
+          totalPrice: selectedReservation.securityDeposit,
+        });
+      }
+      if (
+        selectedReservation.driverPrice &&
+        selectedReservation.driverPrice > 0
+      ) {
+        items.push({
+          description: "Driver Service",
+          quantity: rentalDays,
+          netPrice: selectedReservation.driverPrice,
+          tax: 0,
+          totalPrice: selectedReservation.driverPrice * rentalDays,
+        });
+      }
+      setInvoiceData((prev) => ({
+        ...prev,
+        reservationId: selectedReservation._id,
+        carId: selectedReservation.car?._id || "",
+        to: selectedReservation.customer?._id || "",
+        fromDate: selectedReservation.pickupDate
+          ? selectedReservation.pickupDate.split("T")[0]
+          : "",
+        dueDate: selectedReservation.dropDate
+          ? selectedReservation.dropDate.split("T")[0]
+          : "",
+        items: items,
+      }));
+      const modal = document.getElementById("link_reservation");
+      const bootstrapModal = window.bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
+    }
+  };
+
+  const fetchinvoice = async () => {
+    const res = await apiService.getInvoiceDetails(id);
+    setInvoice(res.data.data);
+invoiceData.invoiceNumber = invoice.invoiceNumber
+
+
+
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const invoicePayload = {
+        ...invoiceData,
+        subtotal,
+        taxTotal,
+        totalAmount: total,
+        issuedDate: new Date().toISOString(),
+        items: invoiceData.items.map((item) => ({
+          ...item,
+          quantity: Number(item.quantity),
+          netPrice: Number(item.netPrice),
+          tax: Number(item.tax),
+          totalPrice: Number(item.totalPrice),
+        })),
+      };
+
+      const res = await apiService.editInvoice(id, invoicePayload);
+
+      if (res.data.success) {
+        toast.success("Invoice created successfully!");
+        navigate("/admin-dashboard-invoices");
+      }
+    } catch (err) {
+      console.error("Error creating invoice:", err);
+      toast.error("Failed to create invoice");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = () => {
+    navigate("/admin-dashboard");
+  };
+
   return (
     <div>
       {/* Page Wrapper */}
@@ -85,7 +397,7 @@ const AdminEditEnvoice = () => {
                           <div className="mb-4">
                             <label className="form-label">Car</label>
                             <select className="select">
-                              <option >{reservation}</option>
+                              <option>{reservation}</option>
                               <option>Ford Endeavour</option>
                               <option selected>Ferrari 458 MM</option>
                               <option>Ford Mustang</option>

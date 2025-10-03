@@ -6,7 +6,6 @@ import Testiminorial from "./TestiminorialSection";
 import BestPricing from "./BestPricing";
 import BlogSection from "./BlogSection";
 import Faq from "./FaqSection";
-import AllCarCategory from "./allCarCategory";
 import FactNumberSection from "./FactNumberSection";
 import PopularSection from "./PopularSection";
 
@@ -26,7 +25,7 @@ const Main = () => {
       <BestPricing />
       <BlogSection />
       <Faq />
-      <AllCarCategory />
+
 
       
     </div>

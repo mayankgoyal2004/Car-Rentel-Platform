@@ -1,5 +1,6 @@
 const { City } = require("../models/citymodels");
 const Location = require("../models/locationModel");
+const CountrySetting = require("../models/countrySettingModel");
 
 const addLocation = async (req, res) => {
   try {
@@ -288,10 +289,167 @@ const getAllActiveLocation = async (req, res) => {
       .json({ success: false, message: "Server Error", error: err.message });
   }
 };
+
+const addLocationSetting = async (req, res) => {
+  try {
+    let { countryName } = req.body;
+    countryName = countryName?.trim();
+    if (!countryName) {
+      return res
+        .status(400)
+        .json({ success: false, message: "countryName is required" });
+    }
+
+    const existingCountry = await CountrySetting.findOne({ countryName });
+    if (existingCountry) {
+      return res.status(409).json({
+        success: false,
+        status: 409,
+        message: "Country already exists",
+      });
+    }
+
+    const country = new CountrySetting({
+      countryName,
+    });
+
+    await country.save();
+
+    res.status(201).json({
+      success: true,
+      message: "country added successfully",
+      data: country,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+const updateLocationSetting = async (req, res) => {
+  const { id } = req.params;
+  let { countryName, status } = req.body;
+  countryName = countryName?.trim();
+
+  if (!id || !countryName) {
+    return res.status(400).json({
+      success: false,
+      status: 400,
+      message: "Both Id and countryName are required",
+    });
+  }
+  if (status === undefined || status === null) {
+    return res.status(400).json({
+      success: false,
+      status: 400,
+      message: "Status is required",
+    });
+  }
+
+  const country = await CountrySetting.findById(id);
+  try {
+    if (!country) {
+      return res
+        .status(404)
+        .json({ success: false, message: "country not found" });
+    }
+    country.countryName = countryName;
+    country.status = status;
+
+    await country.save();
+    res.json({
+      success: true,
+      message: "country updated successfully",
+      data: country,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+const deleteLocationSetting = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    const country = await CountrySetting.findById(id);
+    if (!country) {
+      return res
+        .status(404)
+        .json({ success: false, message: "country not found" });
+    }
+
+    await CountrySetting.deleteOne({ _id: id });
+
+    res.json({
+      success: true,
+      message: "country deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+const getAllLocationSetting = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const search = req.query.search || "";
+
+    let filter = {};
+    if (search) {
+      filter.countryName = { $regex: search, $options: "i" };
+    }
+    const country = await CountrySetting.find(filter)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+    const totalCountry = await CountrySetting.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: country,
+      pagination: {
+        totalCountry,
+        currentPage: page,
+        totalPages: Math.ceil(totalCountry / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+const getActiveLocationSetting = async (req, res) => {
+  try {
+    const country = await CountrySetting.find({ status: true }).sort({
+      createdAt: -1,
+    });
+    res.json({
+      success: true,
+      data: country,
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
+
 module.exports = {
   addLocation,
   updateLocation,
   deleteLocation,
   getAllLocation,
-  getAllActiveLocation
+  getAllActiveLocation,
+  addLocationSetting,
+  updateLocationSetting,
+  deleteLocationSetting,
+  getAllLocationSetting,
+  getActiveLocationSetting,
 };

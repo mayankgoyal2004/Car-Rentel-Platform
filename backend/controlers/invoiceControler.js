@@ -9,7 +9,6 @@ const createInvoice = async (req, res) => {
     const {
       reservationId,
       invoiceNumber,
-
       totalAmount,
       issuedDate,
       fromDate,

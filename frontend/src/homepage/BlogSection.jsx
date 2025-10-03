@@ -5,7 +5,7 @@ import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useEffect, useState } from "react";
 const BlogSection = () => {
   const [blog, setBlogs] = useState([]);
-  const fetchLatestCar = async () => {
+  const fetchLatestBlogs = async () => {
     try {
       const res = await apiService.getLatestBlog();
       setBlogs(res.data.data);
@@ -17,7 +17,7 @@ const BlogSection = () => {
     AOS.init();
   }, []);
   useEffect(() => {
-    fetchLatestCar();
+    fetchLatestBlogs();
   }, []);
   return (
     <section className="blog-section news-section pt-0">

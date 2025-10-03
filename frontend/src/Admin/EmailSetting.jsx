@@ -153,7 +153,7 @@ const EmailSetting = () => {
                       </li>
                     )}
                     {userType === 1 && (
-                      <li  className="active">
+                      <li className="active">
                         <Link to="/admin-dashboard/email-setting">
                           <i className="ti ti-mail me-2" />
                           <span>Email Settings</span>
@@ -217,14 +217,6 @@ const EmailSetting = () => {
               <div className="card-body pb-0">
                 <div className="d-flex align-items-center justify-content-between">
                   <h6 className="mb-3">Email Settings</h6>
-                  <a
-                    className="btn btn-primary mb-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#sendgrid"
-                  >
-                    <i className="ti ti-send me-1" />
-                    Send Test Email
-                  </a>
                 </div>
                 <div className="row">
                   <div className="col-md-6 d-flex">
@@ -371,52 +363,6 @@ const EmailSetting = () => {
                         onChange={handleInputChange}
                         placeholder="Enter your Email "
                       />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <div className="d-flex align-items-center justify-content-end">
-                  <button
-                    type="button"
-                    className="btn btn-outline-light border me-3"
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    Submit
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <div className="modal fade" id="sendgrid">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="mb-0">Test Mail</h5>
-              <button
-                type="button"
-                className="btn-close custom-btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              >
-                <i className="ti ti-x fs-16" />
-              </button>
-            </div>
-            <form>
-              <div className="modal-body pb-1">
-                <div className="row">
-                  <div className="col-md-12">
-                    <div className="mb-3">
-                      <label className="form-label">
-                        Enter Email Address{" "}
-                        <span className="text-danger">*</span>
-                      </label>
-                      <input className="form-control" type="text" />
                     </div>
                   </div>
                 </div>

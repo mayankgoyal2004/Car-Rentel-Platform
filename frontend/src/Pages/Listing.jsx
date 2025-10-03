@@ -729,7 +729,7 @@ const Listing = () => {
                       </div>
                     </div> */}
                   </div>
-
+                  {/* 
                   <button
                     type="button"
                     className="d-inline-flex align-items-center justify-content-center btn w-100 btn-primary filter-btn"
@@ -739,7 +739,7 @@ const Listing = () => {
                       <Filter size={18} className="me-2" />
                     </span>
                     Apply Filters
-                  </button>
+                  </button> */}
 
                   <a
                     href="#javascript"
@@ -825,13 +825,15 @@ const Listing = () => {
                                       <i
                                         key={i}
                                         className={`fas fa-star ${
-                                          i < Math.floor(car.rating || 0)
+                                          i < Math.floor(car.avgRating || 0)
                                             ? "filled"
                                             : ""
                                         }`}
                                       />
                                     ))}
-                                    <span>({car?.rating || 0}) Reviews</span>
+                                    <span>
+                                      ({car?.reviewCount || 0}) Reviews
+                                    </span>
                                   </div>
                                 </div>
                                 <div className="list-km">

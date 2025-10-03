@@ -105,6 +105,7 @@ const CarSchema = new mongoose.Schema(
     ],
 
     description: { type: String },
+    views: { type: Number, default: 0 },
     videoPlatform: { type: String },
     pricing: { type: mongoose.Schema.Types.ObjectId, ref: "Pricing" },
     damages: [

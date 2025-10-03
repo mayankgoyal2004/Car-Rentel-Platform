@@ -542,7 +542,6 @@ class apiServices {
     });
   }
 
-
   //!!! extra services
   getAllExtraServices({ search = "", page } = {}) {
     return axios.get(
@@ -608,8 +607,6 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
-
-
 
   //!! car features
   getAllCarFeatures({ search = "", page } = {}) {
@@ -1403,6 +1400,32 @@ class apiServices {
   }
   deleteBankAccount(data) {
     return axios.delete(BASE_URL + `delete-bank-account/${data}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  //!!! Location Setting Api  api
+  getActiveLocationsSetting() {
+    return axios.get(BASE_URL + `get-all-active-location-Setting`);
+  }
+  addLocationSetting(data) {
+    return axios.post(BASE_URL + `add-location-Setting`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getAllLocationSetting({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-location-Setting?search=${search}&page=${page}`,
+      { headers: getAuthHeaders() }
+    );
+  }
+  updateLocationSetting(id, data) {
+    return axios.post(BASE_URL + `update-location-Setting/${id}`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deleteLocationSetting(data) {
+    return axios.delete(BASE_URL + `delete-location-Setting/${data}`, {
       headers: getAuthHeaders(),
     });
   }

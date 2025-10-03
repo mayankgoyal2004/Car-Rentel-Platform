@@ -16,7 +16,7 @@
 }
 
 @media (min-width: 992px) {
-  .header {
+  .custom-header {
     left: 0 !important;
     width: 100% !important;
   }
@@ -54,7 +54,7 @@
 }
 
 @media (max-width: 991.96px) {
-  .header .main-menu-wrapper .main-nav .has-submenu.submenu-open > .submenu {
+  .custom-header .main-menu-wrapper .main-nav .has-submenu.submenu-open > .submenu {
     display: block !important; /* override the mobile "display:none" */
   }
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import "../assets/navbar.css";
+import "../assets/navb\ar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
@@ -68,7 +68,7 @@ const Header = () => {
     navigate("/");
   };
 
-  // Helper function to check if a path is active
+  // Helper function tocheck if a path is active
   const isActive = (path) => {
     if (path === "/" && activePath === "/") return true;
     if (path !== "/" && activePath.startsWith(path)) return true;
@@ -76,7 +76,7 @@ const Header = () => {
   };
 
   return (
-    <header className="header header-four">
+    <header className="header header-four  custom-header">
       <div className="container">
         <nav className="navbar navbar-expand-lg header-nav">
           {/* Logo */}
@@ -176,9 +176,8 @@ const Header = () => {
           </div>
 
           {/* ✅ Right Side Buttons */}
-          <ul className="nav header-navbar-rht">
+          <ul className="nav header-navbar-rht  ">
             {user ? (
-              // Profile dropdown (only when logged in)
               <li className="nav-item dropdown profile-dropdown">
                 <a
                   className="d-flex align-items-center"

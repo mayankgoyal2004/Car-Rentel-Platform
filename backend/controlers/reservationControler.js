@@ -323,16 +323,23 @@ const getAllReservationsForAdmin = async (req, res) => {
       return res.status(200).json({
         success: true,
         data: [],
-        pagination: { totalReservations: 0, currentPage: page, totalPages: 0, limit },
+        pagination: {
+          totalReservations: 0,
+          currentPage: page,
+          totalPages: 0,
+          limit,
+        },
       });
     }
 
     let filter = { car: { $in: carIds } };
 
     if (search) {
-      const matchingCustomers = await customer.find({
-        name: { $regex: search, $options: "i" },
-      }).select("_id");
+      const matchingCustomers = await customer
+        .find({
+          name: { $regex: search, $options: "i" },
+        })
+        .select("_id");
 
       const matchingCars = await Car.find({
         _id: { $in: carIds },
@@ -382,7 +389,6 @@ const getAllReservationsForAdmin = async (req, res) => {
     });
   }
 };
-
 
 const getLatest5ReservationsForAdmin = async (req, res) => {
   try {
@@ -646,6 +652,7 @@ const getReservationById = async (req, res) => {
           { path: "extraService" },
           { path: "mainLocation" },
           { path: "carType" },
+          { path: "admin" },
         ],
       })
       .populate("customer")
@@ -693,7 +700,7 @@ const editReservationStep3 = async (req, res) => {
             ? new mongoose.Types.ObjectId(id)
             : null;
         })
-        .filter(Boolean); 
+        .filter(Boolean);
     }
 
     if (driverType === "self") {

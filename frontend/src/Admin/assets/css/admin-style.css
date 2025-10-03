@@ -18134,9 +18134,9 @@ input[type=password]::-ms-clear {
   cursor: pointer;
 }
 
-.progress-wrap {
+/* .progress-wrap {
   min-width: 147px;
-}
+} */
 
 .uploaded-img {
   position: relative;

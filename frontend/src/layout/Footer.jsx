@@ -30,7 +30,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       {/* Footer Top */}
-      <div className="footer-top aos" data-aos="fade-down">
+      <div className="footer-top aos" >
         <div className="container">
           <div className="row">
             <div className="col-lg-7">
@@ -208,7 +208,7 @@ const Footer = () => {
               </div>
               <div className="col-md-6">
                 {/* Copyright Menu */}
-                <div className="copyright-menu">
+                {/* <div className="copyright-menu">
                   <div className="vistors-details">
                     <ul className="d-flex">
                       <li>
@@ -249,7 +249,7 @@ const Footer = () => {
                       </li>
                     </ul>
                   </div>
-                </div>
+                </div> */}
                 {/* /Copyright Menu */}
               </div>
             </div>

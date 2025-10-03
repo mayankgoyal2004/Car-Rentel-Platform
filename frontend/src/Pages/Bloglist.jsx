@@ -14,6 +14,20 @@ const Bloglist = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [latestBlogs, setLatestBlogs] = useState([]);
+  const fetchLatestBlogs = async () => {
+    try {
+      const res = await apiService.getLatestBlog();
+      setLatestBlogs(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchLatestBlogs();
+  }, []);
+
   const fetchCategories = async () => {
     try {
       const res = await apiService.getAllActiveBlogCategoryHomepage();
@@ -297,74 +311,35 @@ const Bloglist = () => {
 
                   <div className="card mb-0">
                     <h4>
-                      <Tag /> Top Article
+                      <Tag /> Latest Article
                     </h4>
-                    <div className="article">
-                      <div className="article-blog">
-                        <Link to="/blog-details">
-                          <img
-                            className="img-fluid"
-                            src="/user-assets/img/blog/blog-3.jpg"
-                            alt="Blog"
-                          />
-                        </Link>
-                      </div>
-                      <div className="article-content">
-                        <h5>
-                          <Link to="/blog-details">
-                            Great Business Tips in 2023
+
+                    {latestBlogs.map((blog) => (
+                      <div className="article" key={blog._id}>
+                        <div className="article-blog">
+                          <Link to={`/blog-details/${blog.slug}`}>
+                            <img
+                              className="img-fluid"
+                              src={BASE_URL_IMG + blog.image}
+                              alt="Blog"
+                            />
                           </Link>
-                        </h5>
-                        <div className="article-date">
-                          <i className="fa-solid fa-calendar-days" />
-                          <span>Jan 6, 2023</span>
+                        </div>
+                        <div className="article-content">
+                          <h5>
+                            <Link to={`/blog-details/${blog?.slug}`}>
+                              {blog?.title}
+                            </Link>
+                          </h5>
+                          <div className="article-date">
+                            <i className="fa-solid fa-calendar-days" />
+                            <span>
+                              {new Date(blog.createdAt).toDateString()}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="article">
-                      <div className="article-blog">
-                        <Link to="/blog-details">
-                          <img
-                            className="img-fluid"
-                            src="/user-assets/img/blog/blog-4.jpg"
-                            alt="Blog"
-                          />
-                        </Link>
-                      </div>
-                      <div className="article-content">
-                        <h5>
-                          <Link to="/blog-details">
-                            Excited News About Cars.
-                          </Link>
-                        </h5>
-                        <div className="article-date">
-                          <i className="fa-solid fa-calendar-days" />
-                          <span>Feb 5, 2023</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="article">
-                      <div className="article-blog">
-                        <Link to="/blog-details">
-                          <img
-                            className="img-fluid"
-                            src="/user-assets/img/blog/blog-5.jpg"
-                            alt="Blog"
-                          />
-                        </Link>
-                      </div>
-                      <div className="article-content">
-                        <h5>
-                          <Link to="/blog-details">
-                            8 Amazing Tricks About Business
-                          </Link>
-                        </h5>
-                        <div className="article-date">
-                          <i className="fa-solid fa-calendar-days" />
-                          <span>March 10, 2023</span>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>

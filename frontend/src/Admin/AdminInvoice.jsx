@@ -30,9 +30,9 @@ const AdminInvoice = () => {
       setLoading(false);
     }
   };
-useEffect(() => {
-  fetchInvoce(search, currentPage); 
-}, [currentPage, search]);
+  useEffect(() => {
+    fetchInvoce(search, currentPage);
+  }, [currentPage, search]);
   const handleDelete = async () => {
     if (!deleteinvoceId) return;
     try {
@@ -216,7 +216,18 @@ useEffect(() => {
                             <i className="ti ti-dots-vertical" />
                           </button>
                           <ul className="dropdown-menu dropdown-menu-end p-2">
-                            {/* <li>
+                            <li>
+                              <Link
+                                to={
+                                  "/admin-dashboard/invoice-details/" + inv._id
+                                }
+                                className="dropdown-item rounded-1"
+                              >
+                                <i className="ti ti-edit me-1" />
+                                View Details
+                              </Link>
+                            </li>
+                            <li>
                               <Link
                                 to={"/admin-dashboard/edit-invoice/" + inv._id}
                                 className="dropdown-item rounded-1"
@@ -224,7 +235,7 @@ useEffect(() => {
                                 <i className="ti ti-edit me-1" />
                                 Edit
                               </Link>
-                            </li> */}
+                            </li>
                             <li>
                               <button
                                 className="dropdown-item rounded-1"

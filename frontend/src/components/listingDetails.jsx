@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-
-import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
@@ -72,11 +70,9 @@ const ListingDetails = () => {
       const res = await apiService.getCarReview(id);
       console.log("Reviews response:", res.data); // Debug log
 
-      // Check if reviews are in the response data.reviews array
       if (res.data && res.data.success && Array.isArray(res.data.reviews)) {
         setReviews(res.data.reviews);
 
-        // Calculate review statistics
         const totalReviews = res.data.reviews.length;
         const averageRating =
           totalReviews > 0
@@ -316,9 +312,15 @@ const ListingDetails = () => {
       setSubmitting(false);
     }
   };
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription);
-  };
+  const previewLength = 150;
+  const description = carData?.description || "";
+
+  const toggleDescription = () => setShowFullDescription(!showFullDescription);
+
+  const displayedText = showFullDescription
+    ? description
+    : description.slice(0, previewLength) +
+      (description.length > previewLength ? "..." : "");
 
   const renderStarRating = (rating) => {
     return [...Array(5)].map((_, i) => (
@@ -365,7 +367,7 @@ const ListingDetails = () => {
         <div className="container">
           <div className="row align-items-center text-center">
             <div className="col-md-12 col-12">
-              <h2 className="breadcrumb-title">{carData.carName}</h2>
+              <h2 className="breadcrumb-title">{carData?.carName}</h2>
               <nav aria-label="breadcrumb" className="page-breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
@@ -375,7 +377,7 @@ const ListingDetails = () => {
                     <Link to="/listings">Listings</Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
-                    {carData.carName}
+                    {carData?.carName}
                   </li>
                 </ol>
               </nav>
@@ -399,39 +401,26 @@ const ListingDetails = () => {
                           alt="img"
                         />
                       </span>
-                      {carData.carType.carType}
+                      {carData?.carType?.carType}
                     </div>
                   </li>
                   <li>
                     <span className="year">
                       {" "}
-                      {new Date(carData.year).toLocaleDateString()}
-                    </span>
-                  </li>
-                  <li className="ratings">
-                    {[...Array(5)].map((_, i) => (
-                      <i
-                        key={i}
-                        className={`fas fa-star ${
-                          i < Math.floor(carData.rating) ? "filled" : ""
-                        }`}
-                      />
-                    ))}
-                    <span className="d-inline-block average-list-rating">
-                      ({carData.rating})
+                      {new Date(carData?.year).toLocaleDateString()}
                     </span>
                   </li>
                 </ul>
                 <div className="camaro-info">
-                  <h3>{carData.carName}</h3>
+                  <h3>{carData?.carName}</h3>
                   <div className="camaro-location">
                     <div className="camaro-location-inner">
                       <i className="bx bx-map" />
-                      <span>Location: {carData.mainLocation.title} </span>
+                      <span>Location: {carData?.mainLocation?.title} </span>
                     </div>
                     <div className="camaro-location-inner">
                       <i className="bx bx-show" />
-                      <span>Views : 250 </span>
+                      <span>{carData?.views}</span>
                     </div>
                     <div className="camaro-location-inner">
                       <i className="bx bx-car" />
@@ -525,14 +514,15 @@ const ListingDetails = () => {
                   <h4>Description of Listing</h4>
                 </div>
                 <div className="description-list">
-                  <p>{carData.description}</p>
+                  <p>{displayedText}</p>
 
-                  <div className="read-more">
-                   
-                    <button className="more-link" onClick={toggleDescription}>
-                      {showFullDescription ? "Show Less" : "Show More"}
-                    </button>
-                  </div>
+                  {description.length > previewLength && (
+                    <div className="read-more">
+                      <button className="more-link" onClick={toggleDescription}>
+                        {showFullDescription ? "Show Less" : "Show More"}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               {/* /Listing Section */}
@@ -565,7 +555,7 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Make </span>
-                          <h6> {carData.carBrand.carBrand}</h6>
+                          <h6> {carData.carBrand?.brandName}</h6>
                         </div>
                       </div>
                       <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
@@ -577,7 +567,7 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Transmission </span>
-                          <h6> {carData.carTransmission.carTransmission}</h6>
+                          <h6> {carData.carTransmission?.carTransmission}</h6>
                         </div>
                       </div>
                       <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
@@ -639,9 +629,10 @@ const ListingDetails = () => {
                             alt="Icon"
                           />
                         </div>
+
                         <div className="featues-info">
-                          <span>{carData.noOfDoors} </span>
-                          <h6></h6>
+                          <span>Doors</span>
+                          <h6>{carData.noOfDoors} </h6>
                         </div>
                       </div>
                     </div>
@@ -1303,7 +1294,10 @@ const ListingDetails = () => {
                   </li>
                 </ul>
                 <div className="message-btn">
-                  <Link to="/user-dashboard/user-message" className="btn btn-order">
+                  <Link
+                    to="/user-dashboard/user-message"
+                    className="btn btn-order"
+                  >
                     Message to owner
                   </Link>
                   <a href="#" className="chat-link">
@@ -1312,39 +1306,39 @@ const ListingDetails = () => {
                   </a>
                 </div>
               </div>
-           
+
               <div className="review-sec share-car mt-0 mb-0">
                 <div className="review-header">
                   <h4>Share</h4>
                 </div>
                 <ul className="nav-social">
                   <li>
-                    <a >
+                    <a>
                       <i className="fa-brands fa-facebook-f fa-facebook fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a  >
+                    <a>
                       <i className="fab fa-instagram fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a  >
+                    <a>
                       <i className="fab fa-behance fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a  >
+                    <a>
                       <i className="fa-brands fa-pinterest-p fi-icon" />
                     </a>
                   </li>
                   <li>
-                    <a  >
+                    <a>
                       <i className="fab fa-twitter fi-icon" />{" "}
                     </a>
                   </li>
                   <li>
-                    <a  >
+                    <a>
                       <i className="fab fa-linkedin fi-icon" />
                     </a>
                   </li>

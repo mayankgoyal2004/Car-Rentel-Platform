@@ -92,6 +92,14 @@ route.get(
   recaptchaSetting.getCaptchaFrontend
 );
 
+
+//!! location setting
+route.get(
+  "/get-all-active-location-Setting",
+
+  location.getActiveLocationSetting
+);
+
 //!! get compnay settings
 route.get("/get-company-setting", companySetting.getCompanySetting);
 
@@ -324,10 +332,7 @@ route.get(
 
   customer.getAllCustomerSuperAdmin
 );
-route.get(
-  "/get-owner-details",
-  customer.getOwnerDetails
-);
+route.get("/get-owner-details", customer.getOwnerDetails);
 route.delete(
   "/delete-owner/:id",
   checkPermission("admin", "assignPackage", true),
@@ -1209,5 +1214,27 @@ route.post(
   checkPermission("admin", "assignPackage", true),
   smtpSetting.updateSmtpSetting
 );
+
+//!!! location settings
+
+route.post(
+  "/add-location-Setting",
+  checkPermission("admin", "assignPackage", true),
+  location.addLocationSetting
+);
+route.post(
+  "/update-location-Setting/:id",
+  checkPermission("admin", "assignPackage", true),
+  location.updateLocationSetting
+);
+route.get(
+  "/get-all-location-Setting",
+  checkPermission("admin", "assignPackage", true),
+  location.getAllLocationSetting
+);
+
+
+route.delete("/delete-location-Setting/:id",  checkPermission("admin", "assignPackage", true),
+ location.deleteLocationSetting);
 
 module.exports = route;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import "./assets/logo.css";
 import "./assets/css/admin-style.css";
 import "./assets/plugins/tabler-icons/tabler-icons.min.css";
 import { useDispatch, useSelector } from "react-redux";
-import { BASE_URL_IMG } from "../../Apiservice/apiService";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { removeUser } from "../utils/userSlice";
 
 const AdminDashboard = () => {
@@ -18,6 +18,36 @@ const AdminDashboard = () => {
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [companySetting, setCompanySetting] = useState({});
+
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings();
+      if (res.data.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      toast.error("Failed to load company settings");
+    }
+  };
+
+  useEffect(() => {
+    fetchCompanySetting();
+  }, []);
+
+  const [theme, setTheme] = useState("light-mode");
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme") || "light-mode";
+    setTheme(savedTheme);
+    document.documentElement.classList.add(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.remove("light-mode", "dark-mode");
+    document.documentElement.classList.add(theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
@@ -42,10 +72,10 @@ const AdminDashboard = () => {
         <div className="main-header">
           <div className="header-left">
             <NavLink to="/admin-dashboard" className="logo">
-              <img src="/admin-assets/img/logo.svg" alt="Logo" />
+              <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
             </NavLink>
             <NavLink to="/admin-dashboard" className="dark-logo">
-              <img src="/admin-assets/img/logo-white.svg" alt="Logo" />
+              <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
             </NavLink>
           </div>
           <a id="mobile_btn" className="mobile_btn" onClick={toggleSidebar}>
@@ -55,8 +85,8 @@ const AdminDashboard = () => {
               <span />
             </span>
           </a>
-          <div className=" header-user custom-admin">
-            <div className="nav custom-admin user-menu nav-list navouter">
+          <div className=" header-user ">
+            <div className="nav custamize-nav user-menu nav-list ">
               <div
                 className="me-auto d-flex align-items-center"
                 id="header-search"
@@ -75,6 +105,26 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <div className="d-flex align-items-center header-icons">
+                <div className="theme-item">
+                  {/* Dark Mode */}
+                  <a
+                    id="dark-mode-toggle"
+                    className="theme-toggle btn btn-menubar"
+                    onClick={() => setTheme("dark-mode")}
+                  >
+                    <i className="ti ti-moon"></i>
+                  </a>
+
+                  {/* Light Mode */}
+                  <a
+                    id="light-mode-toggle"
+                    className="theme-toggle btn btn-menubar"
+                    onClick={() => setTheme("light-mode")}
+                  >
+                    <i className="ti ti-sun-high"></i>
+                  </a>
+                </div>
+
                 <div className="dropdown">
                   <a
                     className="btn btn-menubar"
@@ -137,12 +187,7 @@ const AdminDashboard = () => {
                           {userData.userName}
                         </h6>
                         <p className="fs-13">
-                          <a
-                            className="__cf_email__"
-                            data-cfemail="f7969993859280b7928f969a879b92d994989a"
-                          >
-                            {userData.email}
-                          </a>
+                          <a>{userData.email}</a>
                         </p>
                       </div>
                     </div>
@@ -188,15 +233,20 @@ const AdminDashboard = () => {
               <i className="fa fa-ellipsis-v" />
             </a>
             <div className="dropdown-menu dropdown-menu-end">
-              <a className="dropdown-item" href="profile.html">
-                My Profile
-              </a>
+              <a className="dropdown-item">My Profile</a>
               <NavLink to="profile-setting" className="dropdown-item">
                 Settings
               </NavLink>
-              <NavLink to="/login" className="dropdown-item">
-                Logout
-              </NavLink>
+              <button
+                onClick={handleLogout}
+                className="dropdown-item logout d-flex align-items-center justify-content-between"
+              >
+                <span>
+                  <i className="ti ti-logout me-2" />
+                  Logout Account
+                </span>{" "}
+                <i className="ti ti-chevron-right" />
+              </button>
             </div>
           </div>
           {/* /Mobile Menu */}
@@ -214,13 +264,13 @@ const AdminDashboard = () => {
         {/* Logo */}
         <div className="sidebar-logo navbar-1">
           <NavLink to="/admin-dashboard" className="logo logo-normal">
-            <img src="/admin-assets/img/logo.svg" alt="Logo" />
+            <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
           </NavLink>
           <NavLink to="/admin-dashboard" className="logo-small">
-            <img src="/admin-assets/img/logo-small.svg" alt="Logo" />
+            <img src={BASE_URL_IMG + companySetting.profilePhoto}  alt="Logo" />
           </NavLink>
           <NavLink to="/admin-dashboard" className="dark-logo">
-            <img src="/admin-assets/img/logo-white.svg" alt="Logo" />
+            <img src={BASE_URL_IMG + companySetting.profilePhoto}  alt="Logo" />
           </NavLink>
         </div>
         {/* /Logo */}
@@ -641,9 +691,11 @@ const AdminDashboard = () => {
                       </a>
                       {rentalSettingOpen && (
                         <ul>
-                         {userType !== 1 &&( <li>
-                            <Link to="invoice-setting">Invoice Settings</Link>
-                          </li>)}
+                          {userType !== 1 && (
+                            <li>
+                              <Link to="invoice-setting">Invoice Settings</Link>
+                            </li>
+                          )}
 
                           {userType !== 1 && (
                             <li>
@@ -670,6 +722,13 @@ const AdminDashboard = () => {
                           {userType === 1 && (
                             <li>
                               <Link to="email-setting">Email Settings</Link>
+                            </li>
+                          )}
+                          {userType === 1 && (
+                            <li>
+                              <Link to="location-setting">
+                                Location Settings
+                              </Link>
                             </li>
                           )}
                         </ul>

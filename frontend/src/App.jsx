@@ -122,6 +122,7 @@ import BankAccountSetting from "./Admin/BankAccountSetting";
 import CompanySetting from "./Admin/CompanySetting";
 import LoginSettingAdmin from "./Admin/LoginSettingAdmin";
 import EmailSetting from "./Admin/EmailSetting";
+import LocationSetting from "./Admin/LocationSetting";
 
 function App() {
   return (
@@ -272,6 +273,7 @@ function App() {
             <Route path="security-setting" element={<AdminSecuritySetting />} />
             <Route path="invoice-setting" element={<InvoiceSetting />} />
             <Route path="signature-setting" element={<SignatureSetting />} />
+            <Route path="location-setting" element={<LocationSetting />} />
             <Route path="login-setting" element={<LoginSettingAdmin />} />
             <Route path="company-setting" element={<CompanySetting />} />
             <Route path="email-setting" element={<EmailSetting />} />
@@ -283,7 +285,6 @@ function App() {
               path="customer-details/:id"
               element={<AdminCustomersDetails />}
             />
-         
             <Route
               path="invoice-details/:id"
               element={<AdminInvoiceDetails />}

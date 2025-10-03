@@ -5,17 +5,30 @@ import "aos/dist/aos.css";
 import Flatpickr from "react-flatpickr"; // ✅ date time picker
 import "flatpickr/dist/flatpickr.css";
 import "../assets/banner.css";
+import apiService from "../../Apiservice/apiService";
 
 function BannerSection() {
   const [pickupCity, setPickupCity] = useState("");
   const [dropCity, setDropCity] = useState("");
   const [pickupDate, setPickupDate] = useState(null);
+  const [locationSetting, setLocationSetting] = useState([]);
   const [dropDate, setDropDate] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     AOS.init();
+  }, []);
+
+  const fetchLocationSetting = async () => {
+    const res = await apiService.getActiveLocationsSetting();
+    if (res.data.success) {
+      setLocationSetting(res.data.data);
+    }
+  };
+
+  useEffect(() => {
+    fetchLocationSetting();
   }, []);
 
   const handleSearch = (e) => {
@@ -94,16 +107,16 @@ function BannerSection() {
               <div className="input-block">
                 <label>Pickup Location</label>
                 <select
-                  className="select"
+                  className="form-select bg-transparent border-0"
                   value={pickupCity}
                   onChange={(e) => setPickupCity(e.target.value)}
                 >
                   <option value="">Choose City</option>
-                  <option value="New York City">New York City</option>
-                  <option value="Sharjah">Sharjah</option>
-                  <option value="Abu Dhabi">Abu Dhabi</option>
-                  <option value="Ajman">Ajman</option>
-                  <option value="Mohali">Mohali</option>
+                  {locationSetting.map((loc) => (
+                    <option key={loc._id} value={loc.countryName}>
+                      {loc.countryName}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -113,20 +126,19 @@ function BannerSection() {
               <div className="input-block">
                 <label>Drop Location</label>
                 <select
-                  className="select"
+                  className="form-select bg-transparent border-0"
                   value={dropCity}
                   onChange={(e) => setDropCity(e.target.value)}
                 >
                   <option value="">Choose City</option>
-                  <option value="New York City">New York City</option>{" "}
-                  <option value="Sharjah">Sharjah</option>
-                  <option value="Abu Dhabi">Abu Dhabi</option>
-                  <option value="Ajman">Ajman</option>
-                  <option value="Mohali">Mohali</option>
+                  {locationSetting.map((loc) => (
+                    <option key={loc._id} value={loc.countryName}>
+                      {loc.countryName}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
-
             {/* Pickup Date */}
             <div className="search-input">
               <div className="input-block">

@@ -257,7 +257,7 @@ const BookingSuccess = () => {
                   <i className="fa-solid fa-check-double" />
                 </span>
                 <h5>Thank you! Your Order has been Received</h5>
-                <h5 className="order-no">Order Number : <span>#{reservation.bookingId }</span></h5>
+                <h5 className="order-no">Order Number : <span>{reservation.bookingId }</span></h5>
               </div>
               
               <div className="booking-header">

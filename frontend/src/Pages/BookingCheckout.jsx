@@ -22,6 +22,7 @@ const BookingCheckout = () => {
             rentalType: reservationData.rentalType || "delivery",
             priceRate: reservationData.bookingType || "daily",
             pickupAddress: reservationData.pickupAddress || "",
+            adminPickupAddress: reservationData.car.admin.address || "",
             dropAddress: reservationData.dropAddress || "",
             returnToSame:
               !reservationData.dropAddress ||
@@ -96,7 +97,7 @@ const BookingCheckout = () => {
     const end = new Date(formData.returnDate);
 
     const diffTime = Math.abs(end - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) ;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
   };
@@ -109,21 +110,21 @@ const BookingCheckout = () => {
     const ratePrices = formData.car.pricing.prices;
 
     switch (rateType) {
-      case "daily":{
+      case "daily": {
         return days * ratePrices.daily;
-}
-      case "weekly":{
+      }
+      case "weekly": {
         const weeks = Math.ceil(days / 7);
         return weeks * ratePrices.weekly;
-}
-      case "monthly":{
+      }
+      case "monthly": {
         const months = Math.ceil(days / 30);
         return months * ratePrices.monthly;
-}
-      case "yearly":{
+      }
+      case "yearly": {
         const years = Math.ceil(days / 365);
         return years * ratePrices.yearly;
-}
+      }
       default:
         return days * ratePrices.daily;
     }
@@ -151,17 +152,19 @@ const BookingCheckout = () => {
       case "daily":
         return `${days} ${days === 1 ? "day" : "days"}`;
 
-      case "weekly":{
-        const weeks = Math.ceil(days / 7)
-        return `${weeks} ${weeks === 1 ? "week" : "weeks"}`;}
+      case "weekly": {
+        const weeks = Math.ceil(days / 7);
+        return `${weeks} ${weeks === 1 ? "week" : "weeks"}`;
+      }
 
-      case "monthly":{
+      case "monthly": {
         const months = Math.ceil(days / 30);
         return `${months} ${months === 1 ? "month" : "months"}`;
-}
-      case "yearly":{
+      }
+      case "yearly": {
         const years = Math.ceil(days / 365);
-        return `${years} ${years === 1 ? "year" : "years"}`;}
+        return `${years} ${years === 1 ? "year" : "years"}`;
+      }
 
       default:
         return `${days} ${days === 1 ? "day" : "days"}`;
@@ -426,7 +429,7 @@ const BookingCheckout = () => {
                                 type="text"
                                 name="pickupAddress"
                                 className="form-control mb-0"
-                                value={formData.pickupAddress || ""}
+                                value={formData.adminPickupAddress || ""}
                                 onChange={handleInputChange}
                               />
                             </div>
@@ -516,9 +519,7 @@ const BookingCheckout = () => {
                                     value={formData.pickupDate || ""}
                                     onChange={handleInputChange}
                                   />
-                                  <span className="input-cal-icon">
-                                  
-                                  </span>
+                                  <span className="input-cal-icon"></span>
                                 </div>
                               </div>
                             </div>
@@ -533,9 +534,7 @@ const BookingCheckout = () => {
                                     value={formData.pickupTime || ""}
                                     onChange={handleInputChange}
                                   />
-                                  <span className="input-cal-icon">
-                                   
-                                  </span>
+                                  <span className="input-cal-icon"></span>
                                 </div>
                               </div>
                             </div>
@@ -552,9 +551,7 @@ const BookingCheckout = () => {
                                     value={formData.returnDate || ""}
                                     onChange={handleInputChange}
                                   />
-                                  <span className="input-cal-icon">
-                                  
-                                  </span>
+                                  <span className="input-cal-icon"></span>
                                 </div>
                               </div>
                             </div>
@@ -571,9 +568,7 @@ const BookingCheckout = () => {
                                     value={formData.returnTime || ""}
                                     onChange={handleInputChange}
                                   />
-                                  <span className="input-cal-icon">
-                                  
-                                  </span>
+                                  <span className="input-cal-icon"></span>
                                 </div>
                               </div>
                             </div>

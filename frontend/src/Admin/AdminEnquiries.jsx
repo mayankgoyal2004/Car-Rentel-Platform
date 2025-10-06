@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 import { CSVLink } from "react-csv";
 
@@ -32,9 +32,8 @@ const AdminEnquiries = () => {
           setCurrentPage(res.data.pagination.currentPage);
         }
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch contacts");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to fetch Enquiries");
     } finally {
       setLoading(false);
     }
@@ -43,9 +42,9 @@ const AdminEnquiries = () => {
   const handleDelete = async () => {
     try {
       if (!selectedId) return;
-      const res = await apiService.deleteEnquiry(selectedId); // <-- your DELETE route
+      const res = await apiService.deleteEnquiry(selectedId);
       if (res.data.success) {
-        toast.success("Contact deleted successfully");
+        toast.success("Enquire deleted successfully");
         setEnquiry(enquiry.filter((c) => c._id !== selectedId));
       }
     } catch (error) {
@@ -90,7 +89,7 @@ const AdminEnquiries = () => {
   // Search input
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // ✅ good
+    setCurrentPage(1);
   };
   return (
     <div className="page-wrapper">
@@ -173,20 +172,20 @@ const AdminEnquiries = () => {
                     <td>
                       <div className="d-flex align-items-center">
                         <Link
-                          to={`/admin-dashboard/car-details/${enquiry.car._id}`}
+                          to={`/admin-dashboard/car-details/${enquiry.car?._id}`}
                           className="avatar me-2 flex-shrink-0"
                         >
-                          <img src={BASE_URL_IMG + enquiry.car.image} alt />
+                          <img src={BASE_URL_IMG + enquiry?.car?.image} alt />
                         </Link>
                         <div>
                           <Link
                             to="/admin-dashboard/car-details"
                             className="fw-semibold d-block"
                           >
-                            {enquiry.car.carName}
+                            {enquiry?.car?.carName}
                           </Link>
                           <span className="fs-13">
-                            {enquiry.car.carType.carType}
+                            {enquiry.car?.carType?.carType}
                           </span>
                         </div>
                       </div>
@@ -208,16 +207,16 @@ const AdminEnquiries = () => {
                             className="__cf_email__"
                             data-cfemail="4537203027202b2e20202b05203d24283529206b262a28"
                           >
-                            {enquiry.email}
+                            {enquiry?.email}
                           </span>
                         </a>
                       </div>
                     </td>
-                    <td>{enquiry.phoneNumber}</td>
+                    <td>{enquiry?.phoneNumber}</td>
                     <td>
                       <div>
                         <p className="text-gray-9 mb-0">
-                          {new Date(enquiry.createdAt).toDateString()}
+                          {new Date(enquiry?.createdAt).toDateString()}
                         </p>
                       </div>
                     </td>
@@ -237,7 +236,7 @@ const AdminEnquiries = () => {
                         >
                           <li>
                             <p className="mb-0 text-start text-wrap">
-                              {enquiry.message || "No message"}
+                              {enquiry?.message || "No message"}
                             </p>
                           </li>
                         </ul>
@@ -355,6 +354,19 @@ const AdminEnquiries = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

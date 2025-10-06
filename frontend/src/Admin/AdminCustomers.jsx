@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { CSVLink } from "react-csv";
+import { ToastContainer, toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
 
@@ -57,7 +58,7 @@ const AdminCustomers = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching Customers:", err);
+      toast.error(err.response?.data?.message || "Failed to customers");
     } finally {
       setLoading(false);
     }
@@ -130,12 +131,17 @@ const AdminCustomers = () => {
         userFormData.append("file", formData.file);
       }
 
-      await apiService.addCustomer(userFormData);
-      fetchCustomers(search, currentPage);
-      resetFormData();
+      const res = await apiService.addCustomer(userFormData);
+
+      if (res.data.success) {
+        toast.success("Customer added successfully!");
+        fetchCustomers(search, currentPage);
+        resetFormData();
+      } else {
+        toast.error(res.data.message || "Failed to add customer");
+      }
     } catch (err) {
-      console.error("Error adding Customer:", err);
-      alert(
+      toast.error(
         "Error adding customer: " + (err.response?.data?.message || err.message)
       );
     }
@@ -183,12 +189,17 @@ const AdminCustomers = () => {
         userFormData.append("file", formData.file);
       }
 
-      await apiService.updateCustomer(selectedCustomer._id, userFormData);
-      fetchCustomers(search, currentPage);
-      resetFormData();
+      const res = await apiService.updateCustomer(
+        selectedCustomer._id,
+        userFormData
+      );
+      if (res.data.success) {
+        toast.success("Customer updated successfully!");
+        fetchCustomers(search, currentPage);
+        resetFormData();
+      }
     } catch (err) {
-      console.error("Error updating Customer:", err);
-      alert(
+      toast.error(
         "Error updating customer: " +
           (err.response?.data?.message || err.message)
       );
@@ -237,12 +248,17 @@ const AdminCustomers = () => {
   const handleDelete = async () => {
     if (!deleteCustomer) return;
     try {
-      await apiService.deleteCustomer(deleteCustomer._id);
-      fetchCustomers(search, currentPage);
-      setDeleteCustomer(null);
+      const res = await apiService.deleteCustomer(deleteCustomer._id);
+
+      if (res.data.success) {
+        toast.success("Customer deleted successfully!");
+        fetchCustomers(search, currentPage);
+        setDeleteCustomer(null);
+      } else {
+        toast.error(res.data.message || "Failed to delete customer");
+      }
     } catch (err) {
-      console.error("Error deleting Customer:", err);
-      alert(
+      toast.error(
         "Error deleting customer: " +
           (err.response?.data?.message || err.message)
       );
@@ -296,20 +312,21 @@ const AdminCustomers = () => {
 
         {/* Table Header */}
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-          <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-            <div className="top-search me-2">
-              <div className="top-search-group">
-                <span className="input-icon">
-                  <i className="ti ti-search" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+              <div className="top-search me-2">
+                <div className="top-search-group">
+                  <span className="input-icon">
+                    <i className="ti ti-search" />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -857,7 +874,7 @@ const AdminCustomers = () => {
                       Gender <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="form-select"
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
@@ -1051,6 +1068,19 @@ const AdminCustomers = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Modal */}
     </div>

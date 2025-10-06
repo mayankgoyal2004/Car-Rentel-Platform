@@ -9,12 +9,12 @@ import "./assets/plugins/tabler-icons/tabler-icons.min.css";
 import { useDispatch, useSelector } from "react-redux";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { removeUser } from "../utils/userSlice";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminDashboard = () => {
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const [companySetting, setCompanySetting] = useState({});
   const [openMenu, setOpenMenu] = useState("");
 
@@ -28,7 +28,7 @@ const AdminDashboard = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings"+err.message);
     }
   };
 
@@ -202,11 +202,9 @@ const AdminDashboard = () => {
                           className="dropdown-item d-inline-flex align-items-center"
                         >
                           <i className="ti ti-script-plus me-2" />
-                         Reservation
+                          Reservation
                         </NavLink>
                       </li>
-
-                      
                     </ul>
                   </div>
                 </div>
@@ -816,6 +814,19 @@ const AdminDashboard = () => {
         {" "}
         <Outlet />
       </div>
+       <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
     </div>
   );
 };

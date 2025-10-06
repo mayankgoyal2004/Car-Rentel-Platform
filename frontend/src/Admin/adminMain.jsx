@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 import { useSelector } from "react-redux";
 
@@ -32,6 +32,7 @@ const AdminMain = () => {
       });
       if (res.data.success) {
         setCars(res.data.data);
+        setCarPegination(res.data.pagination);
       }
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to fetch cars");
@@ -412,8 +413,8 @@ const AdminMain = () => {
                     </div>
                     <div className="mb-2">
                       <img
-                        src={BASE_URL_IMG + newlyCar.image}
-                        alt={newlyCar.carName}
+                        src={BASE_URL_IMG + newlyCar?.image}
+                        alt={newlyCar?.carName}
                         className="rounded w-100"
                       />
                     </div>
@@ -831,14 +832,14 @@ const AdminMain = () => {
                           </tr>
                         ) : (
                           drivers.map((dr) => (
-                            <tr>
+                            <tr key={dr._id}>
                               <td>
                                 <div className="d-flex align-items-center">
                                   <a className="avatar flex-shrink-0">
                                     <img
-                                      src={BASE_URL_IMG + dr.image}
+                                      src={BASE_URL_IMG + dr?.image}
                                       className="rounded-circle"
-                                      alt
+                                      alt="driver"
                                     />
                                   </a>
                                   <div className="flex-grow-1 ms-2">
@@ -909,10 +910,10 @@ const AdminMain = () => {
                           </tr>
                         ) : (
                           invoice.map((inv) => (
-                            <tr>
+                            <tr key={inv._id}>
                               <td>
                                 <Link
-                                  to={"invoice-details/" + inv.id}
+                                  to={"invoice-details/" + inv._id}
                                   className="fs-12 fw-medium"
                                 >
                                   #{inv.invoiceNumber}
@@ -921,13 +922,13 @@ const AdminMain = () => {
                               <td>
                                 <div className="d-flex align-items-center">
                                   <Link
-                                    to={"customers-details/" + inv.customer}
+                                    to={"customers-details/" + inv.customer._id}
                                     className="avatar flex-shrink-0"
                                   >
                                     <img
                                       src={BASE_URL_IMG + inv.customer.image}
                                       className="rounded-circle"
-                                      alt
+                                      alt="img"
                                     />
                                   </Link>
                                   <div className="flex-grow-1 ms-2">
@@ -968,6 +969,19 @@ const AdminMain = () => {
             {/* /Recent Invoices */}
           </div>
         )}
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

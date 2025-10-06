@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { CSVLink } from "react-csv";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminReservation = () => {
   const [reservations, setReservations] = useState([]);
@@ -31,7 +32,7 @@ const AdminReservation = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching Reservations:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch cars");
     } finally {
       setLoading(false);
     }
@@ -43,21 +44,24 @@ const AdminReservation = () => {
 
   const handleDelete = async () => {
     if (!deleteReservation) return;
+
     try {
       const res = await apiService.delteReservation(deleteReservation._id);
       if (res.data.success) {
         fetchReservations(search, currentPage);
         setDeleteReservation(null);
+        toast.success("Reservation deleted successfully!");
+      } else {
+        toast.error("Failed to delete reservation.");
       }
     } catch (err) {
       console.error("Error deleting Reservation:", err);
-      alert(
+      toast.error(
         "Error deleting reservation: " +
           (err.response?.data?.message || err.message)
       );
     }
   };
-
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1); // ✅ good
@@ -88,7 +92,7 @@ const AdminReservation = () => {
     pickupAddress: res.pickupAddress,
     dropDate: res.dropDate ? new Date(res.dropDate).toLocaleDateString() : "",
     dropAddress: res.dropAddress,
-    status: res.status ,
+    status: res.status,
   }));
 
   return (
@@ -167,172 +171,193 @@ const AdminReservation = () => {
               </tr>
             </thead>
             <tbody>
-              {reservations.map((reservation) => (
-                <tr key={reservation._id}>
-                  <td>
-                    <div className="form-check form-check-md">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <Link
-                        to={`/admin-dashboard/car-details/${reservation.car._id}`}
-                        className="avatar me-2 flex-shrink-0"
-                      >
-                        <img
-                          src={BASE_URL_IMG + reservation.car.image}
-                          alt={reservation.car.carName}
-                        />
-                      </Link>
-                      <div>
-                        <Link
-                          to={`/admin-dashboard/reservation-details/${reservation._id}`}
-                          className="text-info d-block mb-1"
-                        >
-                          {reservation.bookingId}
-                        </Link>
-                        <h6 className="fs-14">
-                          <Link
-                            to={`/admin-dashboard/car-details/${reservation.car._id}`}
-                          >
-                            {reservation.car.carName}
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <Link
-                        to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
-                        className="avatar avatar-rounded me-2 flex-shrink-0"
-                      >
-                        <img
-                          src={BASE_URL_IMG + reservation.customer.image}
-                          alt={reservation.customer.name}
-                        />
-                      </Link>
-                      <div>
-                        <h6 className="mb-1 fs-14">
-                          <Link
-                            to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
-                          >
-                            {reservation.customer.name}
-                          </Link>
-                        </h6>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="border rounded text-center flex-shrink-0 p-1 me-2">
-                        <h5 className="mb-2 fs-16">
-                          {reservation.pickupDate
-                            ? new Date(reservation.pickupDate).getDate()
-                            : ""}
-                        </h5>
-                        <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
-                          {reservation.pickupDate
-                            ? new Date(
-                                reservation.pickupDate
-                              ).toLocaleDateString("en-US", {
-                                month: "short",
-                                year: "numeric",
-                              })
-                            : ""}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-gray-9 mb-0">
-                          {reservation.pickupAddress}
-                        </p>
-                        <span className="fs-13">{reservation.pickupTime}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <div className="border rounded text-center flex-shrink-0 p-1 me-2">
-                        <h5 className="mb-2 fs-16">
-                          {reservation.dropDate
-                            ? new Date(reservation.dropDate).getDate()
-                            : ""}
-                        </h5>
-                        <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
-                          {reservation.dropDate
-                            ? new Date(reservation.dropDate).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )
-                            : ""}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-gray-9 mb-0">
-                          {reservation.dropAddress}
-                        </p>
-                        <span className="fs-13">{reservation.dropTime}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className={`badge  ${
-                        reservation.status ? "bg-success" : "bg-danger"
-                      }`}
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    <div
+                      className="spinner-border text-primary me-2"
+                      role="status"
                     >
-                      {reservation.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-icon btn-sm"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <i className="ti ti-dots-vertical" />
-                      </button>
-                      <ul className="dropdown-menu dropdown-menu-end p-2">
-                        <li>
-                          <Link
-                            to={`/admin-dashboard/reservation-details/${reservation._id}`}
-                            className="dropdown-item rounded-1"
-                          >
-                            <i className="ti ti-eye me-1" />
-                            View Details
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={`/admin-dashboard/edit-reservation/${reservation._id}`}
-                            className="dropdown-item rounded-1"
-                          >
-                            <i className="ti ti-eye me-1" />
-                            Edit Reservation{" "}
-                          </Link>
-                        </li>
-                        <li>
-                          <a
-                            className="dropdown-item rounded-1"
-                            onClick={() => setDeleteReservation(reservation)}
-                            data-bs-toggle="modal"
-                            data-bs-target="#delete_modal"
-                          >
-                            <i className="ti ti-trash me-1" />
-                            Delete
-                          </a>
-                        </li>
-                      </ul>
+                      <span className="visually-hidden">Loading...</span>
                     </div>
+                    Loading reservations... Please wait
                   </td>
                 </tr>
-              ))}
+              ) : reservations.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No reservations found.
+                  </td>
+                </tr>
+              ) : (
+                reservations.map((reservation) => (
+                  <tr key={reservation._id}>
+                    <td>
+                      <div className="form-check form-check-md">
+                        <input className="form-check-input" type="checkbox" />
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <Link
+                          to={`/admin-dashboard/car-details/${reservation.car._id}`}
+                          className="avatar me-2 flex-shrink-0"
+                        >
+                          <img
+                            src={BASE_URL_IMG + reservation.car.image}
+                            alt={reservation.car.carName}
+                          />
+                        </Link>
+                        <div>
+                          <Link
+                            to={`/admin-dashboard/reservation-details/${reservation._id}`}
+                            className="text-info d-block mb-1"
+                          >
+                            {reservation.bookingId}
+                          </Link>
+                          <h6 className="fs-14">
+                            <Link
+                              to={`/admin-dashboard/car-details/${reservation.car._id}`}
+                            >
+                              {reservation.car.carName}
+                            </Link>
+                          </h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <Link
+                          to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
+                          className="avatar avatar-rounded me-2 flex-shrink-0"
+                        >
+                          <img
+                            src={BASE_URL_IMG + reservation.customer.image}
+                            alt={reservation.customer.name}
+                          />
+                        </Link>
+                        <div>
+                          <h6 className="mb-1 fs-14">
+                            <Link
+                              to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
+                            >
+                              {reservation.customer.name}
+                            </Link>
+                          </h6>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <div className="border rounded text-center flex-shrink-0 p-1 me-2">
+                          <h5 className="mb-2 fs-16">
+                            {reservation.pickupDate
+                              ? new Date(reservation.pickupDate).getDate()
+                              : ""}
+                          </h5>
+                          <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
+                            {reservation.pickupDate
+                              ? new Date(
+                                  reservation.pickupDate
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : ""}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-gray-9 mb-0">
+                            {reservation.pickupAddress}
+                          </p>
+                          <span className="fs-13">
+                            {reservation.pickupTime}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <div className="border rounded text-center flex-shrink-0 p-1 me-2">
+                          <h5 className="mb-2 fs-16">
+                            {reservation.dropDate
+                              ? new Date(reservation.dropDate).getDate()
+                              : ""}
+                          </h5>
+                          <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
+                            {reservation.dropDate
+                              ? new Date(
+                                  reservation.dropDate
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : ""}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-gray-9 mb-0">
+                            {reservation.dropAddress}
+                          </p>
+                          <span className="fs-13">{reservation.dropTime}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`badge  ${
+                          reservation.status ? "bg-success" : "bg-danger"
+                        }`}
+                      >
+                        {reservation.status}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-icon btn-sm"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <i className="ti ti-dots-vertical" />
+                        </button>
+                        <ul className="dropdown-menu dropdown-menu-end p-2">
+                          <li>
+                            <Link
+                              to={`/admin-dashboard/reservation-details/${reservation._id}`}
+                              className="dropdown-item rounded-1"
+                            >
+                              <i className="ti ti-eye me-1" />
+                              View Details
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              to={`/admin-dashboard/edit-reservation/${reservation._id}`}
+                              className="dropdown-item rounded-1"
+                            >
+                              <i className="ti ti-eye me-1" />
+                              Edit Reservation{" "}
+                            </Link>
+                          </li>
+                          <li>
+                            <a
+                              className="dropdown-item rounded-1"
+                              onClick={() => setDeleteReservation(reservation)}
+                              data-bs-toggle="modal"
+                              data-bs-target="#delete_modal"
+                            >
+                              <i className="ti ti-trash me-1" />
+                              Delete
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
           {/* Pagination */}
@@ -409,6 +434,19 @@ const AdminReservation = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

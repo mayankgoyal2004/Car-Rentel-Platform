@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import apiService from "../../Apiservice/apiService";
 
 const MODULES = [
-  "Reservations",
+  "Reservation",
   "Car",
   "Calendar",
   "Blog",

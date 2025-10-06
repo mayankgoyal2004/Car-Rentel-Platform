@@ -4,7 +4,7 @@ import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useSelector } from "react-redux";
 import { ArrowLeft } from "react-feather";
 
-const socket = io("http://localhost:7777");
+const socket = io(BASE_URL_IMG);
 
 const UserMessage = () => {
   const [users, setUsers] = useState([]);

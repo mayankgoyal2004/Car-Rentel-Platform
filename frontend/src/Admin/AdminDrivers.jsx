@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { CSVLink } from "react-csv";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminDrivers = () => {
   const [drivers, setDrivers] = useState([]);
@@ -47,7 +48,7 @@ const AdminDrivers = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching Driver:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch drivers");
     } finally {
       setLoading(false);
     }
@@ -111,12 +112,14 @@ const AdminDrivers = () => {
         userFormData.append("file", formData.file);
       }
 
-      await apiService.addDriver(userFormData);
-      fetchDriver(search, currentPage);
-      resetFormData();
+      const res = await apiService.addDriver(userFormData);
+      if (res.data.success) {
+        toast.success("Driver added successfully!");
+        fetchDriver(search, currentPage);
+        resetFormData();
+      }
     } catch (err) {
-      console.error("Error adding Driver:", err);
-      alert(
+      toast.error(
         "Error adding driver: " + (err.response?.data?.message || err.message)
       );
     }
@@ -163,13 +166,19 @@ const AdminDrivers = () => {
         userFormData.append("file", formData.file);
       }
 
-      await apiService.updateDriver(selectedDriver._id, userFormData);
-      fetchDriver(search, currentPage);
-      resetFormData();
+      const res = await apiService.updateDriver(
+        selectedDriver._id,
+        userFormData
+      );
+      if (res.data.success) {
+        toast.success("Driver updated successfully!");
+
+        fetchDriver(search, currentPage);
+        resetFormData();
+      }
     } catch (err) {
-      console.error("Error updating Driver:", err);
-      alert(
-        "Error updating driver: " + (err.response?.data?.message || err.message)
+      toast.error(
+        "Error updating Driver: " + (err.response?.data?.message || err.message)
       );
     }
   };
@@ -209,12 +218,15 @@ const AdminDrivers = () => {
   const handleDelete = async () => {
     if (!deleteDriver) return;
     try {
-      await apiService.deleteDriver(deleteDriver._id);
-      fetchDriver(search, currentPage);
-      setDeleteDriver(null);
+      const res = await apiService.deleteDriver(deleteDriver._id);
+      if (res.data.success) {
+        toast.success("Driver deleted successfully!");
+
+        fetchDriver(search, currentPage);
+        setDeleteDriver(null);
+      }
     } catch (err) {
-      console.error("Error deleting Driver:", err);
-      alert(
+      toast.error(
         "Error deleting driver: " + (err.response?.data?.message || err.message)
       );
     }
@@ -267,20 +279,21 @@ const AdminDrivers = () => {
           {/* /Breadcrumb */}
           {/* Table Header */}
           <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-            <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
-            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-              <div className="top-search me-2">
-                <div className="top-search-group">
-                  <span className="input-icon">
-                    <i className="ti ti-search" />
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
+            <div className="d-flex align-items-center flex-wrap row-gap-3">
+              <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+                <div className="top-search me-2">
+                  <div className="top-search-group">
+                    <span className="input-icon">
+                      <i className="ti ti-search" />
+                    </span>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Search"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -995,6 +1008,19 @@ const AdminDrivers = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete */}
     </div>

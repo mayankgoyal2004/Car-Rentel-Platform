@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "react-feather";
 
-const socket = io("http://localhost:7777");
+const socket = io(BASE_URL_IMG);
 
 const AdminMessage = () => {
   const [users, setUsers] = useState([]);
@@ -186,7 +186,8 @@ const AdminMessage = () => {
                     {selectedUser ? (
                       <>
                         <div className="media-img-wrap flex-shrink-0">
-                          <button onClick={closeChat}
+                          <button
+                            onClick={closeChat}
                             style={{
                               border: "none",
                               background: "transparent",

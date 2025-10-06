@@ -1076,7 +1076,7 @@ route.get(
   reservation.getCancelledReservationsUser
 );
 route.get("/get-reservation-by-booking/:id", reservation.getReservationById);
-route.delete("/delete-reservation/:id", reservation.deleteReservation);
+route.delete("/delete-reservation/:id",checkPermission("Reservation", "delete"), reservation.deleteReservation);
 route.get("/get-all-active-car-admin", car.getApprovedCarsAdminReservation);
 
 //!!! contact api

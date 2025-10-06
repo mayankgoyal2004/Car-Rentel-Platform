@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
-const mongoDB = "mongodb://127.0.0.1/DreamsRent";
+const mongoDB =
+  "mongodb+srv://mayankgoyal6595_db_user:ISqnr282y5sMfMyz@cluster0.efzvaya.mongodb.net/";
 
 const connectDB = async () => {
   try {

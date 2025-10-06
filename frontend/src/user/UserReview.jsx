@@ -4,14 +4,7 @@ import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useState } from "react";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import {
-  PlusCircle,
-  AlertCircle,
-  MapPin,
-  Trash2,
-  Edit3,
-  Eye,
-} from "react-feather";
+
 const UserReview = () => {
   const [review, setReview] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,19 +25,19 @@ const UserReview = () => {
     getAllReservationUser();
   }, []);
 
-    const handleDelete = async () => {
-        try {
-          if (!selectedReveiw) return;
-          const res = await apiService.deleteCarReviewAdmin(selectedReveiw); // <-- your DELETE route
-          if (res.data.success) {
-            toast.success("Contact deleted successfully");
-             setReview( review.filter((c) => c._id !== selectedReveiw));
-          }
-        } catch (error) {
-          console.error(error);
-          toast.error("Failed to delete contact");
-        }
-      };
+  const handleDelete = async () => {
+    try {
+      if (!selectedReveiw) return;
+      const res = await apiService.deleteCarReviewAdmin(selectedReveiw); // <-- your DELETE route
+      if (res.data.success) {
+        toast.success("Review deleted successfully");
+        setReview(review.filter((c) => c._id !== selectedReveiw));
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete Review");
+    }
+  };
   return (
     <div className="content">
       <div className="container">
@@ -72,7 +65,7 @@ const UserReview = () => {
                 <div className="row align-items-center">
                   <div className="col-md-5">
                     <h4>
-                      All Reviews <span>{review.length}</span>
+                      All Reviews <span>{review?.length}</span>
                     </h4>
                   </div>
                   <div className="col-md-7 text-md-end">
@@ -118,10 +111,9 @@ const UserReview = () => {
                             </td>
                             <td>
                               <div className="table-avatar">
-                                <a
-                                  href="#"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_review"
+                                <Link
+                                  to={`/listing-details/${rev.car.permalink}`}
+                                 
                                   className="avatar avatar-lg flex-shrink-0"
                                 >
                                   <img
@@ -129,13 +121,13 @@ const UserReview = () => {
                                     src={BASE_URL_IMG + rev?.car?.image}
                                     alt="Booking"
                                   />
-                                </a>
+                                </Link>
                                 <div className="table-head-name flex-grow-1">
-                                  <a
-                                    href="#"
+                                  <Link
+                                    to={`/listing-details/${rev.car.permalink}`}
                                     data-bs-toggle="modal"
                                     data-bs-target="#add_review"
-                                  ></a>
+                                  ></Link>
                                   <p>{rev?.car?.carName}</p>
                                 </div>
                               </div>
@@ -146,7 +138,7 @@ const UserReview = () => {
                             </td>
                             <td>
                               <div>
-                                {Array.from({ length: rev.carReview }).map(
+                                {Array.from({ length: rev?.carReview }).map(
                                   (_, i) => (
                                     <i
                                       key={i}
@@ -170,7 +162,7 @@ const UserReview = () => {
                                     className="dropdown-item"
                                     data-bs-toggle="modal"
                                     data-bs-target="#delete_review"
-                                      onClick={() => setSelectedreview(rev._id)}
+                                    onClick={() => setSelectedreview(rev?._id)}
                                   >
                                     <i className="feather-trash-2" /> Delete
                                   </a>
@@ -182,7 +174,7 @@ const UserReview = () => {
                       ) : (
                         <tr>
                           <td colSpan="6" className="text-center">
-                            No Reservation found
+                            No Review found
                           </td>
                         </tr>
                       )}
@@ -203,35 +195,33 @@ const UserReview = () => {
             </div>
           </div>
           {/* /Reviews */}
-            <div className="modal fade" id="delete_review">
-        <div className="modal-dialog modal-dialog-centered modal-sm">
-          <div className="modal-content">
-            <div className="modal-body text-center">
-              <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
-                <i className="ti ti-trash-x fs-26" />
-              </span>
-              <h4 className="mb-1">Delete Review</h4>
-              <p className="mb-3">Are you sure you want to delete Review?</p>
-              <div className="d-flex justify-content-center">
-                <a
-                  
-                  className="btn btn-light me-3"
-                  data-bs-dismiss="modal"
-                >
-                  Cancel
-                </a>
-                <button
-                  onClick={handleDelete}
-                  className="btn btn-primary"
-                  data-bs-dismiss="modal"
-                >
-                  Yes, Delete
-                </button>
+          <div className="modal fade" id="delete_review">
+            <div className="modal-dialog modal-dialog-centered modal-sm">
+              <div className="modal-content">
+                <div className="modal-body text-center">
+                  <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
+                    <i className="ti ti-trash-x fs-26" />
+                  </span>
+                  <h4 className="mb-1">Delete Review</h4>
+                  <p className="mb-3">
+                    Are you sure you want to delete Review?
+                  </p>
+                  <div className="d-flex justify-content-center">
+                    <a className="btn btn-light me-3" data-bs-dismiss="modal">
+                      Cancel
+                    </a>
+                    <button
+                      onClick={handleDelete}
+                      className="btn btn-primary"
+                      data-bs-dismiss="modal"
+                    >
+                      Yes, Delete
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
         </div>
       </div>
     </div>

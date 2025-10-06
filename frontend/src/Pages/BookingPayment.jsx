@@ -1,8 +1,17 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import apiService from "../../Apiservice/apiService";
 
 const BookingPayment = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+
+  const payment = async () => {
+    const res = await apiService.editPaymentStatusofUser(id);
+    if (res.status.success === true) {
+      navigate(`/booking-success/${id}`);
+    }
+  };
 
   return (
     <div>
@@ -317,13 +326,12 @@ const BookingPayment = () => {
                       >
                         Back to billing info
                       </Link>
-                      <Link
-                        to={`/booking-success/${id}`}
+                      <button
+                        onClick={() => payment()}
                         className="btn btn-primary continue-book-btn"
-                        type="submit"
                       >
-                        Pay $4700 &amp; Place Reservation
-                      </Link>
+                        Place Reservation
+                      </button>
                     </div>
                   </form>
                 </div>

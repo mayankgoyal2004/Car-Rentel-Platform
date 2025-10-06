@@ -118,25 +118,9 @@ const AdminCarColor = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
-                >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
+           
               <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
+              
               </div>
               <div className="mb-2">
                 <a

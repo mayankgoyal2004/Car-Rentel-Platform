@@ -54,7 +54,7 @@ const ForgotPassword = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings"+err.message);
     }
   };
 
@@ -63,7 +63,7 @@ const ForgotPassword = () => {
       const res = await apiService.getCaptchaFrontend();
       if (res.data.data) setCaptchaSetting(res.data.data);
     } catch (err) {
-      toast.error("Failed to load settings");
+      toast.error("Failed to load settings"+err.message);
     }
   };
   useEffect(() => {

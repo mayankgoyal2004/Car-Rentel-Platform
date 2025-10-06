@@ -28,7 +28,9 @@ const AdminCarTransmissions = () => {
         setCurrentPage(res.data.pagination.currentPage || 1);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to fetch car transmissions");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch car transmissions"
+      );
     } finally {
       setLoading(false);
     }
@@ -51,7 +53,9 @@ const AdminCarTransmissions = () => {
       setnewCarTransmission("");
       fetchAllCarTransmissions();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to add car transmission");
+      toast.error(
+        err.response?.data?.message || "Failed to add car transmission"
+      );
     }
   };
 
@@ -62,15 +66,20 @@ const AdminCarTransmissions = () => {
       return;
     }
     try {
-      const res = await apiService.updateCarTransmission(editCarTransmission?._id, {
-        carTransmission: editCarTransmission?.carTransmission.trim(),
-        status: editCarTransmission.status,
-      });
+      const res = await apiService.updateCarTransmission(
+        editCarTransmission?._id,
+        {
+          carTransmission: editCarTransmission?.carTransmission.trim(),
+          status: editCarTransmission.status,
+        }
+      );
       toast.success(res.data.message);
       setEditCarTransmission(null);
       fetchAllCarTransmissions(currentPage, search);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update car transmission");
+      toast.error(
+        err.response?.data?.message || "Failed to update car transmission"
+      );
     }
   };
 
@@ -86,7 +95,9 @@ const AdminCarTransmissions = () => {
       fetchAllCarTransmissions(currentPage, search);
       document.getElementById("delete_transmission_close")?.click();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete car transmission");
+      toast.error(
+        err.response?.data?.message || "Failed to delete car transmission"
+      );
     }
   };
 
@@ -121,29 +132,8 @@ const AdminCarTransmissions = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
-                >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
-              </div>
               <div className="mb-2">
                 <a
-                  href="javascript:void(0);"
                   data-bs-toggle="modal"
                   data-bs-target="#add_transmission"
                   className="btn btn-primary d-flex align-items-center"
@@ -230,7 +220,9 @@ const AdminCarTransmissions = () => {
                               className="dropdown-item rounded-1"
                               data-bs-toggle="modal"
                               data-bs-target="#edit_transmission"
-                              onClick={() => setEditCarTransmission(transmission)}
+                              onClick={() =>
+                                setEditCarTransmission(transmission)
+                              }
                             >
                               <i className="ti ti-edit me-1" />
                               Edit
@@ -241,7 +233,9 @@ const AdminCarTransmissions = () => {
                               className="dropdown-item rounded-1"
                               data-bs-toggle="modal"
                               data-bs-target="#delete_transmission"
-                              onClick={() => setDeleteCarTransmission(transmission)}
+                              onClick={() =>
+                                setDeleteCarTransmission(transmission)
+                              }
                             >
                               <i className="ti ti-trash me-1" />
                               Delete
@@ -443,7 +437,11 @@ const AdminCarTransmissions = () => {
                 Are you sure you want to delete transmission?
               </p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal" id="delete_transmission_close">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_transmission_close"
+                >
                   Cancel
                 </button>
                 <button

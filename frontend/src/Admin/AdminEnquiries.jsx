@@ -4,32 +4,33 @@ import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import { CSVLink } from "react-csv";
 
 const AdminEnquiries = () => {
   const [enquiry, setEnquiry] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const [search, setSearch] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Fetch all contacts
   const fetchEnquiry = async (searchQuery = "", page = 1) => {
     try {
       setLoading(true);
       const res = await apiService.getEnquiry({
-          search: searchQuery,
-          page,
-        }); 
+        search: searchQuery,
+        page,
+      });
       if (res.data.success) {
         setEnquiry(res.data.data);
-              setTotalPages(res.data.pagination?.totalPages || 1);
-              if (
-                res.data.pagination?.currentPage &&
-                res.data.pagination.currentPage !== currentPage
-              ) {
-                setCurrentPage(res.data.pagination.currentPage);
-              }
+        setTotalPages(res.data.pagination?.totalPages || 1);
+        if (
+          res.data.pagination?.currentPage &&
+          res.data.pagination.currentPage !== currentPage
+        ) {
+          setCurrentPage(res.data.pagination.currentPage);
+        }
       }
     } catch (error) {
       console.error(error);
@@ -53,14 +54,38 @@ const AdminEnquiries = () => {
     }
   };
 
-useEffect(() => {
-  fetchEnquiry(search, currentPage);
-}, [currentPage, search]);
-  
+  useEffect(() => {
+    fetchEnquiry(search, currentPage);
+  }, [currentPage, search]);
+
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
+
+  // CSV headers
+  const csvHeaders = [
+    { label: "Car Name", key: "carName" },
+    { label: "Car Type", key: "carType" },
+    { label: "Customer Name", key: "customerName" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phoneNumber" },
+    { label: "Date", key: "createdAt" },
+    { label: "Enquiry Message", key: "message" },
+  ];
+
+  // CSV data
+  const csvData = enquiry.map((enq) => ({
+    carName: enq.car?.carName,
+    carType: enq.car?.carType?.carType,
+    customerName: enq.customer?.name,
+    email: enq.email,
+    phoneNumber: enq.phoneNumber,
+    createdAt: enq.createdAt
+      ? new Date(enq.createdAt).toLocaleDateString()
+      : "",
+    message: enq.message || "No message",
+  }));
 
   // Search input
   const handleSearchChange = (e) => {
@@ -87,22 +112,15 @@ useEffect(() => {
           </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
             <div className="mb-2 me-2">
-              <a
-                className="btn btn-white d-flex align-items-center"
+              <CSVLink
+                data={csvData}
+                headers={csvHeaders}
+                filename={"enquiries.csv"}
+                className="btn btn-dark d-inline-flex align-items-center"
               >
-                <i className="ti ti-printer me-2" />
-                Print
-              </a>
-            </div>
-            <div className="mb-2 me-2">
-              <div className="dropdown">
-                <a
-                  className="btn btn-dark d-inline-flex align-items-center"
-                >
-                  <i className="ti ti-upload me-1" />
-                  Export
-                </a>
-              </div>
+                <i className="ti ti-upload me-1" />
+                Export
+              </CSVLink>
             </div>
           </div>
         </div>
@@ -119,7 +137,7 @@ useEffect(() => {
                   type="text"
                   className="form-control"
                   placeholder="Search"
-                     value={search}
+                  value={search}
                   onChange={handleSearchChange}
                 />
               </div>
@@ -263,49 +281,49 @@ useEffect(() => {
             </tbody>
           </table>
 
-            <nav aria-label="Page navigation" className="mt-3">
-              <ul className="pagination justify-content-center">
-                <li
-                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+          <nav aria-label="Page navigation" className="mt-3">
+            <ul className="pagination justify-content-center">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  <button
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
-                    Prev
-                  </button>
-                </li>
+                  Prev
+                </button>
+              </li>
 
-                {[...Array(totalPages)].map((_, idx) => (
-                  <li
-                    key={idx}
-                    className={`page-item ${
-                      currentPage === idx + 1 ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      className="page-link"
-                      onClick={() => handlePageChange(idx + 1)}
-                    >
-                      {idx + 1}
-                    </button>
-                  </li>
-                ))}
-
+              {[...Array(totalPages)].map((_, idx) => (
                 <li
+                  key={idx}
                   className={`page-item ${
-                    currentPage === totalPages ? "disabled" : ""
+                    currentPage === idx + 1 ? "active" : ""
                   }`}
                 >
                   <button
                     className="page-link"
-                    onClick={() => handlePageChange(currentPage + 1)}
+                    onClick={() => handlePageChange(idx + 1)}
                   >
-                    Next
+                    {idx + 1}
                   </button>
                 </li>
-              </ul>
-            </nav>
+              ))}
+
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
         {/* Custom Data Table */}
         <div className="table-footer" />

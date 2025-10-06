@@ -257,7 +257,15 @@ const deleteReservation = async (req, res) => {
         .status(404)
         .json({ success: false, message: "reservation not found" });
     }
+    const driver = await Driver.findById(reservation.driver);
+    const car = await Car.findById(reservation.car);
     await Reservation.deleteOne({ _id: id });
+    car.inRent = false;
+    await car.save();
+    if (driver) {
+      driver.status = "available";
+      await driver.save();
+    }
     res.json({
       success: true,
       message: "reservation deleted successfully",
@@ -674,8 +682,6 @@ const editReservationStep3 = async (req, res) => {
   const { id } = req.params;
   const { extraServices, driverType, totalPrice } = req.body;
 
-  console.log("data", req.body);
-
   try {
     const reservation = await Reservation.findById(id);
     if (!reservation) {
@@ -684,10 +690,8 @@ const editReservationStep3 = async (req, res) => {
         .json({ success: false, message: "Reservation not found" });
     }
 
-    // 1️⃣ Update total price
     if (totalPrice !== undefined) reservation.totalPrice = totalPrice;
 
-    // 2️⃣ Update extra services
     if (extraServices) {
       const extrasArray = Array.isArray(extraServices)
         ? extraServices
@@ -724,12 +728,36 @@ const editReservationStep3 = async (req, res) => {
         customerRecord.age = driverData.age;
         customerRecord.contact = driverData.contact;
         customerRecord.licenseNumber = driverData.licenseNumber;
-        if (driverData.file) customerRecord.file = driverData.file; // <-- FIXED
+        if (driverData.file) customerRecord.file = driverData.file;
 
         await customerRecord.save();
       }
     } else {
       reservation.driverType = "withDriver";
+
+      const carData = await Car.findById(reservation.car).select("admin");
+      if (!carData || !carData.admin) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Could not determine car's admin. Please check the car record.",
+        });
+      }
+
+      const availableDriver = await Driver.findOneAndUpdate(
+        { status: "available", isActive: true, admin: carData.admin },
+        { status: "assigned" },
+        { new: true }
+      );
+
+      if (!availableDriver) {
+        return res.status(400).json({
+          success: false,
+          message: "No available driver found at the moment",
+        });
+      }
+
+      reservation.driver = availableDriver._id;
     }
 
     await reservation.save();
@@ -836,21 +864,26 @@ const reservationCancelledByUser = async (req, res) => {
         message: "Reservation ID and cancellation reason are required",
       });
     }
-
     const reservation = await Reservation.findById(id);
-
+    const driver = await Driver.findById(reservation.driver);
+    const car = await Car.findById(reservation.car);
     if (!reservation) {
       return res
         .status(404)
         .json({ success: false, message: "Reservation not found" });
     }
 
-    // Update status and cancellation reason
     reservation.status = "cancelled";
     reservation.cancellationReason = cancellationReason;
     reservation.cancelledBy = "user";
 
     await reservation.save();
+    car.inRent = false;
+    await car.save();
+    if (driver) {
+      driver.status = "available";
+      await driver.save();
+    }
 
     return res.status(200).json({
       success: true,
@@ -1138,6 +1171,32 @@ const bookingCompleteByAdmin = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+const paymanetCompletedByUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const reservation = await Reservation.findById(id);
+    const car = await Car.findById(reservation.car);
+
+    if (!reservation) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Reservation not found" });
+    }
+
+    car.inRent = true;
+    await car.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Reservation Completed ",
+      data: reservation,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
 
 module.exports = {
   addReservation,
@@ -1162,4 +1221,5 @@ module.exports = {
   reservationCancelledByAdmin,
   getAllReservationSuperAdmin,
   bookingCompleteByAdmin,
+  paymanetCompletedByUser,
 };

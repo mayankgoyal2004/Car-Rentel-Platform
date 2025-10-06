@@ -19,7 +19,7 @@ const Footer = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 
@@ -30,7 +30,7 @@ const Footer = () => {
   return (
     <footer className="footer">
       {/* Footer Top */}
-      <div className="footer-top aos" >
+      <div className="footer-top aos">
         <div className="container">
           <div className="row">
             <div className="col-lg-7">
@@ -129,7 +129,9 @@ const Footer = () => {
                       <PhoneCall size={18} />
                     </span>
                     <div className="addr-info">
-                      <a href={`tel:${companySetting?.phone}`}>{companySetting?.phone}</a>
+                      <a href={`tel:${companySetting?.phone}`}>
+                        {companySetting?.phone}
+                      </a>
                     </div>
                   </div>
                   <div className="footer-address">
@@ -138,26 +140,9 @@ const Footer = () => {
                     </span>
                     <div className="addr-info">
                       <a href={`mailto:${companySetting?.email}`}>
-                      {companySetting?.email}
+                        {companySetting?.email}
                       </a>
                     </div>
-                  </div>
-                  <div className="update-form">
-                    <form action="#">
-                      <span>
-                        <Mail size={18} />
-                      </span>
-                      <input
-                        type="email"
-                        className="form-control"
-                        placeholder="Enter You Email Here"
-                      />
-                      <button type="submit" className="btn btn-subscribe">
-                        <span>
-                          <Send size={18} />
-                        </span>
-                      </button>
-                    </form>
                   </div>
                 </div>
                 <div className="footer-social-widget">

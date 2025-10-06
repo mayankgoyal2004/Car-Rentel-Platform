@@ -7,6 +7,7 @@ const CarTransmission = require("../models/caratributes/carTransmissionsModel");
 const CarFuel = require("../models/caratributes/carFuelModel");
 const Review = require("../models/carReviewmodel");
 
+const CarColor = require("../models/caratributes/carColorModel");
 const addCar = async (req, res) => {
   try {
     const {
@@ -274,36 +275,6 @@ const updateCarExtraService = async (req, res) => {
   }
 };
 
-const updateCarVideo = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { videoPlatform, videoLink } = req.body;
-
-    const car = await Car.findById(id);
-    if (!car) {
-      return res.status(404).json({ success: false, message: "Car not found" });
-    }
-
-    if (videoPlatform) car.videoPlatform = videoPlatform;
-    if (videoLink) car.videoLink = videoLink;
-
-    await car.save();
-
-    res.status(200).json({
-      success: true,
-      message: "Car video updated successfully",
-      car,
-    });
-  } catch (error) {
-    console.error("Update Car Video Error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error updating video",
-      error: error.message,
-    });
-  }
-};
-
 const uploadCarFiles = async (req, res) => {
   try {
     const { carId } = req.params;
@@ -484,12 +455,10 @@ const getAllCars = async (req, res) => {
 
     if (carType) filter.carType = carType;
     if (carTransmission) {
-      // Normalize to array
       const transmissionNames = Array.isArray(carTransmission)
         ? carTransmission
         : carTransmission.split(",").map((t) => t.trim());
 
-      // Build regex OR query (case-insensitive)
       const regexQueries = transmissionNames.map((t) => ({
         carTransmission: { $regex: new RegExp(t, "i") },
       }));
@@ -501,10 +470,28 @@ const getAllCars = async (req, res) => {
       if (transmissions.length > 0) {
         filter.carTransmission = { $in: transmissions.map((t) => t._id) };
       } else {
-        filter.carTransmission = { $in: [] }; // no match
+        filter.carTransmission = { $in: [] };
       }
     }
-    if (carColor) filter.carColor = carColor;
+    if (carColor) {
+      // Normalize to array
+      const colorNames = Array.isArray(carColor)
+        ? carColor
+        : carColor.split(",").map((c) => c.trim());
+
+      // Build regex OR query for case-insensitive match
+      const regexQueries = colorNames.map((c) => ({
+        carColor: { $regex: new RegExp(c, "i") },
+      }));
+
+      const colors = await CarColor.find({ $or: regexQueries }).select("_id");
+
+      if (colors.length > 0) {
+        filter.carColor = { $in: colors.map((c) => c._id) };
+      } else {
+        filter.carColor = { $in: [] }; // ensures no cars returned
+      }
+    }
     if (carBrand) {
       // Always normalize to array
       const brandNames = Array.isArray(carBrand)
@@ -586,6 +573,49 @@ const getAllCars = async (req, res) => {
         }
       } else {
         filter.mainLocation = { $in: [] };
+      }
+    }
+
+    if (pickupDate || dropDate) {
+      const getDayName = (dateString) => {
+        const days = [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ];
+        const date = new Date(dateString);
+        return days[date.getDay()];
+      };
+
+      const pickupDay = pickupDate ? getDayName(pickupDate) : null;
+      const dropDay = dropDate ? getDayName(dropDate) : null;
+
+      const locationDayQuery = [];
+      if (pickupDay)
+        locationDayQuery.push({ [`workingDays.${pickupDay}.active`]: true });
+      if (dropDay)
+        locationDayQuery.push({ [`workingDays.${dropDay}.active`]: true });
+
+      if (locationDayQuery.length > 0) {
+        const activeLocations = await Location.find({
+          $and: locationDayQuery,
+          status: true,
+        }).select("_id");
+
+        if (activeLocations.length > 0) {
+          const locIds = activeLocations.map((loc) => loc._id);
+
+          filter.$or = [
+            { mainLocation: { $in: locIds } },
+            { otherLocations: { $in: locIds } },
+          ];
+        } else {
+          filter.$or = [{ mainLocation: { $in: [] } }];
+        }
       }
     }
 
@@ -986,9 +1016,9 @@ const getApprovedCarsAdminReservation = async (req, res) => {
 
 const getSingleCarUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { permalink } = req.params;
 
-    if (!id) {
+    if (!permalink) {
       return res.json({
         status: 409,
         success: false,
@@ -996,8 +1026,8 @@ const getSingleCarUser = async (req, res) => {
       });
     }
 
-    const carData = await Car.findByIdAndUpdate(
-      id,
+    const carData = await Car.findOneAndUpdate(
+      { permalink },
       { $inc: { views: 1 } },
       { new: true }
     ).populate([
@@ -1179,27 +1209,64 @@ const toggleFeaturedBySuperAdmin = async (req, res) => {
 
 const getFeaturedCar = async (req, res) => {
   try {
-    const car = await Car.find({ isFeatured: true })
-      .populate([
-        { path: "carBrand", select: "brandName" },
-        { path: "carModel", select: "carModel" },
-        { path: "carType", select: "carType" },
-        { path: "carFuel", select: "carFuel" },
-        { path: "carColor", select: "carColor" },
-        { path: "carTransmission", select: "carTransmission" },
-        { path: "pricing", select: "prices" },
-        { path: "carFeatures", select: "carFeature" },
-        { path: "carSeats", select: "carSeats" },
-        { path: "mainLocation", select: "title" },
-      ])
-      .sort({ createdAt: -1 })
-      .limit(6);
+    // Step 1️⃣ - Match featured cars
+    const cars = await Car.aggregate([
+      {
+        $match: {
+          isFeatured: true,
+          status: true,
+          isAvailable: true,
+          inRent: false,
+        },
+      },
 
+      // Step 2️⃣ - Lookup reviews
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "car",
+          as: "reviews",
+        },
+      },
+
+      // Step 3️⃣ - Add avgRating and reviewCount fields
+      {
+        $addFields: {
+          avgRating: { $ifNull: [{ $avg: "$reviews.carReview" }, 0] },
+          reviewCount: { $size: "$reviews" },
+        },
+      },
+
+      // Step 4️⃣ - Sort and limit
+      { $sort: { createdAt: -1 } },
+      { $limit: 6 },
+
+      // Step 5️⃣ - Remove full reviews array for cleaner response
+      { $project: { reviews: 0 } },
+    ]);
+
+    // Step 6️⃣ - Populate referenced data
+    const populatedCars = await Car.populate(cars, [
+      { path: "carBrand", select: "brandName" },
+      { path: "carModel", select: "carModel" },
+      { path: "carType", select: "carType" },
+      { path: "carFuel", select: "carFuel" },
+      { path: "carColor", select: "carColor" },
+      { path: "carTransmission", select: "carTransmission" },
+      { path: "pricing", select: "prices" },
+      { path: "carFeatures", select: "carFeature" },
+      { path: "carSeats", select: "carSeats" },
+      { path: "mainLocation", select: "title" },
+    ]);
+
+    // ✅ Success response
     res.status(200).json({
       success: true,
-      data: car,
+      data: populatedCars,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       success: false,
       message: "Server Error",

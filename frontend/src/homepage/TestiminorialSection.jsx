@@ -9,8 +9,8 @@ const Testimonial = () => {
 useEffect(() => {
   const fetchTestimonials = async () => {
     try {
-      const response = await apiService.getTestominialHomePage(); // ✅ await
-      setTestimonials(response.data.testimonials || []); // ✅ correct path
+      const response = await apiService.getTestominialHomePage(); 
+      setTestimonials(response.data.testimonials || []); 
     } catch (error) {
       console.error("Error fetching testimonials:", error);
     } finally {

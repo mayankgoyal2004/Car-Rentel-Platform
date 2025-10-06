@@ -7,7 +7,7 @@ const getWishlist = async (req, res) => {
 
     const wishlist = await Wishlist.findOne({ userId }).populate({
       path: "cars",
-      select: "carName image mileage year", // ✅ use select instead of putting "carName" in path
+      select: "carName image mileage year permalink",
       populate: [
         { path: "carTransmission", model: "CarTransmission" },
         { path: "pricing", model: "Pricing" },
@@ -38,9 +38,10 @@ const toggleWishlist = async (req, res) => {
   try {
     const { carId } = req.body;
     const userId = req.user._id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     if (!carId) {
-      return res.status(400).json({ error: "carId is required" });
+      return res.status(400).json({ message: "carId is required" });
     }
 
     let wishlist = await Wishlist.findOne({ userId });

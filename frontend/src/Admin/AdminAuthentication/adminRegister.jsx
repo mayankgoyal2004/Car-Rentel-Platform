@@ -48,7 +48,7 @@ const AdminRegister = () => {
       const res = await apiServices.getCaptchaFrontend();
       if (res.data.data) setCaptchaSetting(res.data.data);
     } catch (err) {
-      toast.error("Failed to load settings");
+      toast.error("Failed to load settings"+err.message);
     }
   };
   const fetchCompanySetting = async () => {
@@ -58,7 +58,7 @@ const AdminRegister = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings"+err.message);
     }
   };
 

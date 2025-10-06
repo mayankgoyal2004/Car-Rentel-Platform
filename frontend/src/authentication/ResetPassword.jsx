@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { CornerDownLeft } from "react-feather";
 import ReCAPTCHA from "react-google-recaptcha";
 
@@ -38,7 +39,9 @@ const ResetPassword = () => {
       console.log(res);
       if (res.data.success) {
         toast.success(res.data.message);
-        nav("/login");
+       setTimeout(() => {
+          nav("/login");
+       },1000)
       }
 
       setMessage({ type: "success", text: res.data.message });
@@ -57,7 +60,7 @@ const ResetPassword = () => {
       const res = await apiService.getCaptchaFrontend();
       if (res.data.data) setCaptchaSetting(res.data.data);
     } catch (err) {
-      toast.error("Failed to load settings");
+      toast.error("Failed to load settings" + err.message);
     }
   };
 
@@ -68,7 +71,7 @@ const ResetPassword = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 

@@ -46,7 +46,6 @@ const createInvoice = async (req, res) => {
         name: from,
       },
       to: {
-        name: to,
         address: reservation.customer.address || "",
         contact: reservation.customer.phone || "",
         email: reservation.customer.email,
@@ -76,6 +75,85 @@ const createInvoice = async (req, res) => {
   }
 };
 
+const updateInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const invoice = await Invoice.findById(id);
+    if (!invoice) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Invoice not found" });
+    }
+
+    // Prevent invoiceNumber from being updated
+    if (req.body.invoiceNumber) delete req.body.invoiceNumber;
+
+    const {
+      reservationId,
+      totalAmount,
+      issuedDate,
+      fromDate,
+      subtotal,
+      dueDate,
+      carId,
+      items,
+      terms,
+      notes,
+      status,
+      currency,
+      from,
+      paymentMethod,
+    } = req.body;
+
+    let reservation = null;
+    if (reservationId) {
+      reservation = await Reservation.findById(reservationId)
+        .populate("car")
+        .populate("customer")
+        .populate("extraServices");
+    }
+
+    invoice.car = reservation?.car?._id || carId || invoice.car;
+    invoice.customer = reservation?.customer?._id || invoice.customer;
+    invoice.reservation = reservationId || invoice.reservation;
+    invoice.fromDate = fromDate || invoice.fromDate;
+    invoice.dueDate = dueDate || invoice.dueDate;
+    invoice.status = status || invoice.status;
+    invoice.currency = currency || invoice.currency;
+    invoice.subtotal = subtotal || invoice.subtotal;
+    invoice.totalAmount = totalAmount || invoice.totalAmount;
+    invoice.issuedDate = issuedDate || invoice.issuedDate;
+    invoice.terms = terms || invoice.terms;
+    invoice.notes = notes || invoice.notes;
+    invoice.paymentMethod = paymentMethod || invoice.paymentMethod;
+
+    invoice.from = {
+      name: from,
+    };
+    invoice.to = reservation?.customer
+      ? {
+          address: reservation.customer.address || "",
+          contact: reservation.customer.phone || "",
+          email: reservation.customer.email,
+        }
+      : invoice.to;
+
+    invoice.items = items || invoice.items;
+
+    await invoice.save();
+
+    res.json({
+      success: true,
+      message: "Invoice updated successfully",
+      data: invoice,
+    });
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 const getAllInvoice = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -92,7 +170,7 @@ const getAllInvoice = async (req, res) => {
       });
     }
     let filter = { admin: adminId };
-    if (search ) {
+    if (search) {
       filter.invoiceNumber = { $regex: search, $options: "i" };
     }
 
@@ -151,23 +229,6 @@ const invoiceDetails = async (req, res) => {
       .populate("customer")
       .populate("reservation")
       .populate("admin");
-    if (!invoice) {
-      return res
-        .status(404)
-        .json({ success: false, message: "invoice not found" });
-    }
-    res.json({ success: true, data: invoice });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-const updateInvoice = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const invoice = await Invoice.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
     if (!invoice) {
       return res
         .status(404)

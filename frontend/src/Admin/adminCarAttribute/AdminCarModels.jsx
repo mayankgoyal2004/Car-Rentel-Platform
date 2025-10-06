@@ -145,29 +145,8 @@ const AdminCarModels = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
-                >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
-              </div>
               <div className="mb-2">
                 <a
-                  href="javascript:void(0);"
                   data-bs-toggle="modal"
                   data-bs-target="#add_model"
                   className="btn btn-primary d-flex align-items-center"
@@ -213,7 +192,7 @@ const AdminCarModels = () => {
                   </th>
                   <th>MODEL</th>
                   <th>BRAND</th>
-                  <th>TOTAL CARS</th>
+
                   <th>STATUS</th>
                   <th />
                 </tr>
@@ -228,11 +207,11 @@ const AdminCarModels = () => {
                     </td>
                     <td>
                       <h6 className="fw-medium">
-                        <a href="javascript:void(0);">{model.carModel}</a>
+                        <a>{model.carModel}</a>
                       </h6>
                     </td>
                     <td>{model.brandName}</td>
-                    <td>0</td>
+                   
                     <td>
                       <span
                         className={`badge  ${

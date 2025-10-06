@@ -89,7 +89,6 @@ const BookingCheckout = () => {
     }
   };
 
-  // Calculate the number of days between pickup and return
   const calculateNumberOfDays = () => {
     if (!formData.pickupDate || !formData.returnDate) return 0;
 
@@ -314,7 +313,7 @@ const BookingCheckout = () => {
                                 type="radio"
                                 name="rentalType"
                                 value="delivery"
-                                checked={formData.rentalType === "delivery"}
+                                checked={formData?.rentalType === "delivery"}
                                 onChange={handleInputChange}
                               />
                               <span className="booking_checkmark">
@@ -328,7 +327,7 @@ const BookingCheckout = () => {
                                 type="radio"
                                 name="rentalType"
                                 value="pickup"
-                                checked={formData.rentalType === "pickup"}
+                                checked={formData?.rentalType === "pickup"}
                                 onChange={handleInputChange}
                               />
                               <span className="booking_checkmark">
@@ -342,7 +341,7 @@ const BookingCheckout = () => {
                       </div>
                     </div>
 
-                    {formData.rentalType === "delivery" ? (
+                    {formData?.rentalType === "delivery" ? (
                       <div className="booking-information-card delivery-location">
                         <div className="booking-info-head">
                           <span>
@@ -361,7 +360,7 @@ const BookingCheckout = () => {
                                 name="pickupAddress"
                                 className="form-control mb-0"
                                 placeholder="Add Location"
-                                value={formData.pickupAddress || ""}
+                                value={formData?.pickupAddress || ""}
                                 onChange={handleInputChange}
                               />
                               <button
@@ -379,13 +378,13 @@ const BookingCheckout = () => {
                               <input
                                 type="checkbox"
                                 name="returnToSame"
-                                checked={formData.returnToSame}
+                                checked={formData?.returnToSame}
                                 onChange={handleInputChange}
                               />
                               <span className="checkmark" />
                             </label>
                           </div>
-                          {!formData.returnToSame && (
+                          {!formData?.returnToSame && (
                             <div className="form-custom">
                               <label className="form-label">
                                 Return Location
@@ -396,7 +395,7 @@ const BookingCheckout = () => {
                                   name="dropAddress"
                                   className="form-control mb-0"
                                   placeholder="Add Location"
-                                  value={formData.dropAddress || ""}
+                                  value={formData?.dropAddress || ""}
                                   onChange={handleInputChange}
                                 />
                                 <button
@@ -429,7 +428,7 @@ const BookingCheckout = () => {
                                 type="text"
                                 name="pickupAddress"
                                 className="form-control mb-0"
-                                value={formData.adminPickupAddress || ""}
+                                value={formData?.adminPickupAddress || ""}
                                 onChange={handleInputChange}
                               />
                             </div>
@@ -440,13 +439,13 @@ const BookingCheckout = () => {
                               <input
                                 type="checkbox"
                                 name="returnToSame"
-                                checked={formData.returnToSame}
+                                checked={formData?.returnToSame}
                                 onChange={handleInputChange}
                               />
                               <span className="checkmark" />
                             </label>
                           </div>
-                          {!formData.returnToSame && (
+                          {!formData?.returnToSame && (
                             <div className="form-custom">
                               <label className="form-label">
                                 Return Location
@@ -456,7 +455,7 @@ const BookingCheckout = () => {
                                   type="text"
                                   name="dropAddress"
                                   className="form-control mb-0"
-                                  value={formData.dropAddress || ""}
+                                  value={formData?.dropAddress || ""}
                                   onChange={handleInputChange}
                                 />
                               </div>
@@ -483,7 +482,7 @@ const BookingCheckout = () => {
                                     type="radio"
                                     name="priceRate"
                                     value={rate}
-                                    checked={formData.priceRate === rate}
+                                    checked={formData?.priceRate === rate}
                                     onChange={handleInputChange}
                                   />
                                   <span className="booking_checkmark">
@@ -516,7 +515,7 @@ const BookingCheckout = () => {
                                     type="date"
                                     name="pickupDate"
                                     className="form-control"
-                                    value={formData.pickupDate || ""}
+                                    value={formData?.pickupDate || ""}
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon"></span>
@@ -531,7 +530,7 @@ const BookingCheckout = () => {
                                     type="time"
                                     name="pickupTime"
                                     className="form-control"
-                                    value={formData.pickupTime || ""}
+                                    value={formData?.pickupTime || ""}
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon"></span>
@@ -548,7 +547,7 @@ const BookingCheckout = () => {
                                     type="date"
                                     name="returnDate"
                                     className="form-control"
-                                    value={formData.returnDate || ""}
+                                    value={formData?.returnDate || ""}
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon"></span>
@@ -565,7 +564,7 @@ const BookingCheckout = () => {
                                     type="time"
                                     name="returnTime"
                                     className="form-control"
-                                    value={formData.returnTime || ""}
+                                    value={formData?.returnTime || ""}
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon"></span>
@@ -578,7 +577,10 @@ const BookingCheckout = () => {
                     </div>
 
                     <div className="booking-info-btns d-flex justify-content-end">
-                      <Link to="/listing-details" className="btn btn-secondary">
+                      <Link
+                        to={`/listing-details/${formData?.car?.permalink}`}
+                        className="btn btn-secondary"
+                      >
                         Back to Car details
                       </Link>
                       <button
@@ -656,23 +658,23 @@ const BookingCheckout = () => {
                               </li>
                               <li>
                                 <h6>Doorstep delivery</h6>
-                                <h5>+ ${formData.doorStepDelivery || 0}</h5>
+                                <h5>+ ${formData?.doorStepDelivery || 0}</h5>
                               </li>
                               <li>
                                 <h6>Trip Protection Fees</h6>
-                                <h5>+ ${formData.tripProtection || 0}</h5>
+                                <h5>+ ${formData?.tripProtection || 0}</h5>
                               </li>
                               <li>
                                 <h6>Convenience Fees</h6>
-                                <h5>+ ${formData.convenienceFee || 0}</h5>
+                                <h5>+ ${formData?.convenienceFee || 0}</h5>
                               </li>
                               <li>
                                 <h6>Tax</h6>
-                                <h5>+ ${formData.tax || 0}</h5>
+                                <h5>+ ${formData?.tax || 0}</h5>
                               </li>
                               <li>
                                 <h6>Refundable Deposit</h6>
-                                <h5>+${formData.deposit || 0}</h5>
+                                <h5>+${formData?.deposit || 0}</h5>
                               </li>
                               <li className="total-rate">
                                 <h6>Subtotal</h6>

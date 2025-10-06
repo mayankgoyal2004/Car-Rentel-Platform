@@ -28,7 +28,9 @@ const AdminCarFeatures = () => {
         setCurrentPage(res.data.pagination.currentPage || 1);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to fetch car features");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch car features"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,9 @@ const AdminCarFeatures = () => {
       setEditCarFeature(null);
       fetchAllCarFeatures(currentPage, search);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update car feature");
+      toast.error(
+        err.response?.data?.message || "Failed to update car feature"
+      );
     }
   };
 
@@ -78,15 +82,15 @@ const AdminCarFeatures = () => {
   const handleDeleteCarFeature = async () => {
     if (!deleteCarFeature) return;
     try {
-      const res = await apiService.deleteCarFeature(
-        deleteCarFeature._id
-      );
+      const res = await apiService.deleteCarFeature(deleteCarFeature._id);
       toast.success(res.data.message);
       setDeleteCarFeature(null);
       fetchAllCarFeatures(currentPage, search);
       document.getElementById("delete_car_feature_close")?.click();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete car feature");
+      toast.error(
+        err.response?.data?.message || "Failed to delete car feature"
+      );
     }
   };
 
@@ -121,29 +125,8 @@ const AdminCarFeatures = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
-                >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
-              </div>
               <div className="mb-2">
                 <a
-                  href="javascript:void(0);"
                   data-bs-toggle="modal"
                   data-bs-target="#add_car_feature"
                   className="btn btn-primary d-flex align-items-center"
@@ -443,7 +426,11 @@ const AdminCarFeatures = () => {
                 Are you sure you want to delete car feature?
               </p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal" id="delete_car_feature_close">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_car_feature_close"
+                >
                   Cancel
                 </button>
                 <button

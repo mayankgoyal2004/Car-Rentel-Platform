@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { Share2 } from "react-feather";
+import { ToastContainer, toast } from "react-toastify";
 
 const BlogDetails = () => {
   const { slug } = useParams();
@@ -12,7 +13,6 @@ const BlogDetails = () => {
     message: "",
   });
 
-  // Fetch blog details
   const fetchBlog = async () => {
     setLoading(true);
     try {
@@ -44,19 +44,37 @@ const BlogDetails = () => {
 
   const addComment = async (e) => {
     e.preventDefault();
-    if (!commentForm.message) return;
+
+    if (!commentForm.message.trim()) {
+      toast.error("Please enter a comment before submitting.");
+      return;
+    }
 
     try {
       const res = await apiService.addblogComment(blog._id, commentForm);
+
       if (res.data.success) {
         fetchComments(blog._id);
         setCommentForm((prev) => ({ ...prev, message: "" }));
+        toast.success(res.data.message || "Comment added successfully!");
+      } else {
+        toast.error(
+          res.data.message || "Failed to add comment. Please try again."
+        );
       }
     } catch (err) {
-      console.error(err);
+      console.error("Error adding comment:", err);
+
+      if (err.response?.status === 403) {
+        toast.error("Please login to post a comment.");
+      } else {
+        toast.error(
+          err.response?.data?.message ||
+            "Something went wrong while adding comment."
+        );
+      }
     }
   };
-
   useEffect(() => {
     if (slug) fetchBlog();
   }, [slug]);
@@ -97,7 +115,7 @@ const BlogDetails = () => {
               </div>
             </li>
             <li className="date-icon">
-              {new Date(blog.createdAt).toLocaleDateString()}
+              {new Date(blog?.createdAt).toLocaleDateString()}
             </li>
           </ul>
         </div>
@@ -106,12 +124,10 @@ const BlogDetails = () => {
       {/* Blog Content */}
       <div className="blog-section container">
         <div className="blog-description">
-          <p>{blog.description}</p>
+          <p>{blog?.description}</p>
         </div>
 
-        <div className="share-postsection mb-4">
-          <Share2 size={20} /> Share
-        </div>
+       
 
         {/* Comments Section */}
         <div className="review-sec">
@@ -170,6 +186,19 @@ const BlogDetails = () => {
             </form>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

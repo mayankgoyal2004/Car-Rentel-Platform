@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
+import { CSVLink } from "react-csv";
 
 const AdminLocations = () => {
   const [locations, setLocation] = useState([]);
@@ -175,6 +176,39 @@ const AdminLocations = () => {
       );
     }
   };
+
+  const csvHeaders = [
+    { label: "Location Title", key: "title" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "contact" },
+    { label: "Address", key: "location" },
+    { label: "Country", key: "countryName" },
+    { label: "State", key: "stateName" },
+    { label: "City", key: "cityName" },
+    { label: "Pincode", key: "pincode" },
+    { label: "Status", key: "status" },
+    { label: "Working Days", key: "workingDaysFormatted" },
+  ];
+
+  // Prepare CSV data
+  const csvData = locations.map((loc) => ({
+    title: loc.title,
+    email: loc.email,
+    contact: loc.contact,
+    location: loc.location,
+    countryName: loc.country?.countryName || "",
+    stateName: loc.state?.stateName || "",
+    cityName: loc.city?.cityName || "",
+    pincode: loc.pincode,
+    status: loc.status ? "Active" : "Inactive",
+    workingDaysFormatted: Object.keys(loc.workingDays || {})
+      .map((day) => {
+        const d = loc.workingDays[day];
+        return d?.active ? `${day} (${d.from} - ${d.to})` : null;
+      })
+      .filter(Boolean)
+      .join(", "),
+  }));
   const handleDeleteLocation = async () => {
     try {
       if (!selectedLocation) return;
@@ -222,19 +256,17 @@ const AdminLocations = () => {
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
               <div className="mb-2 me-2">
-                <a className="btn btn-white d-flex align-items-center">
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
+                <CSVLink
+                  data={csvData}
+                  headers={csvHeaders}
+                  filename={`locations_${new Date().toLocaleDateString()}.csv`}
+                  className="btn btn-dark d-inline-flex align-items-center"
+                >
+                  <i className="ti ti-upload me-1" />
+                  Export CSV
+                </CSVLink>
               </div>
-              <div className="mb-2 me-2">
-                <div className="dropdown">
-                  <a className="btn btn-dark d-inline-flex align-items-center">
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
-              </div>
+
               <div className="mb-2">
                 <a
                   className="btn btn-primary d-flex align-items-center"
@@ -628,7 +660,7 @@ const AdminLocations = () => {
                             setCities([]);
                           }
                         }}
-                        disabled={!formData.country_id} // ✅ block until country is selected
+                        disabled={!formData.country_id}
                       >
                         <option value="">Select</option>
                         {states.map((s) => (

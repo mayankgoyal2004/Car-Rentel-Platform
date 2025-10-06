@@ -174,14 +174,13 @@ const LocationSetting = () => {
                         </Link>
                       </li>
                     )}
-                    {userType === 1 && (
-                      <li>
-                        <a href="language-setting.html">
-                          <i className="ti ti-language me-2" />
-                          <span>Language</span>
-                        </a>
-                      </li>
-                    )}
+
+                    <li>
+                      <Link to="/admin-dashboard/localization-setting">
+                        <i className="ti ti-language me-2" />
+                        <span>Localization</span>
+                      </Link>
+                    </li>
 
                     {userType !== 1 && (
                       <li>

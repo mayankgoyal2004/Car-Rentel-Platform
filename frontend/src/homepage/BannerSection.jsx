@@ -21,9 +21,15 @@ function BannerSection() {
   }, []);
 
   const fetchLocationSetting = async () => {
-    const res = await apiService.getActiveLocationsSetting();
-    if (res.data.success) {
-      setLocationSetting(res.data.data);
+    try {
+      const res = await apiService.getActiveLocationsSetting();
+      if (res.data.success) {
+        setLocationSetting(res.data.data);
+      } else {
+        console.error("Failed to fetch location settings:", res.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching location settings:", error);
     }
   };
 

@@ -33,33 +33,52 @@ const UserBookingCancelled = () => {
     getAllReservationUser();
   }, []);
 
-  const calculateTotalPrice = (reservation) => {
-    const { bookingType, extraServices, securityDeposit } = reservation;
+  const getRentalPeriod = (res) => {
+    if (!res?.pickupDate || !res?.dropDate) return 0;
 
-    let basePrice = 0;
+    const start = new Date(res.pickupDate);
+    const end = new Date(res.dropDate);
 
-    if (reservation.car.pricing.prices) {
-      if (bookingType === "daily")
-        basePrice = reservation.car.pricing.prices.daily || 0;
-      else if (bookingType === "weekly")
-        basePrice = reservation.car.pricing.prices.weekly || 0;
-      else if (bookingType === "monthly")
-        basePrice = reservation.car.pricing.prices.monthly || 0;
-      else if (bookingType === "yearly")
-        basePrice = reservation.car.pricing.prices.yearly || 0;
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const calculateTotalPrice = (res) => {
+    if (!res?.car?.pricing) return 0;
+
+    const rentalDays = getRentalPeriod(res);
+    const prices = res.car.pricing.prices;
+
+    let carPrice = 0;
+    switch (res.bookingType) {
+      case "daily":
+        carPrice = prices.daily * rentalDays;
+        break;
+      case "weekly":
+        carPrice = prices.weekly * Math.ceil(rentalDays / 7);
+        break;
+      case "monthly":
+        carPrice = prices.monthly * Math.ceil(rentalDays / 30);
+        break;
+      case "yearly":
+        carPrice = prices.yearly * Math.ceil(rentalDays / 365);
+        break;
+      default:
+        carPrice = 0;
     }
 
-    const extraServicesTotal = extraServices.reduce(
-      (sum, service) => sum + (service.price || 0),
+    const extraServices = res.extraServices || [];
+    const extraServicesPrice = extraServices.reduce(
+      (total, service) =>
+        total + (service.price || 0) * (service.quantity || 1),
       0
     );
 
-    const deposit = securityDeposit || 0;
+    const securityDeposit = res.securityDeposit || 0;
+    const driverPrice = res.driverPrice || 0;
 
-    // 4️⃣ Total price
-    const totalPrice = basePrice + extraServicesTotal + deposit;
-
-    return totalPrice;
+    return carPrice + extraServicesPrice + securityDeposit + driverPrice;
   };
   return (
     <div className="row">

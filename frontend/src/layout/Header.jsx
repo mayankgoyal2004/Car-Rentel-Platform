@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import "../assets/navb\ar.css";
+import "../assets/navbar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
@@ -22,7 +22,7 @@ const Header = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 
@@ -68,7 +68,7 @@ const Header = () => {
     navigate("/");
   };
 
-  // Helper function tocheck if a path is active
+  // Helper function to check if a path is active
   const isActive = (path) => {
     if (path === "/" && activePath === "/") return true;
     if (path !== "/" && activePath.startsWith(path)) return true;
@@ -76,7 +76,7 @@ const Header = () => {
   };
 
   return (
-    <header className="header header-four  custom-header">
+    <header className="header header-four custom-header">
       <div className="container">
         <nav className="navbar navbar-expand-lg header-nav">
           {/* Logo */}
@@ -100,13 +100,6 @@ const Header = () => {
                 alt="Logo"
               />
             </Link>
-            <Link to="/" className="navbar-brand logo-small">
-              <img
-                src={BASE_URL_IMG + companySetting?.profilePhoto}
-                className="img-fluid"
-                alt="Logo"
-              />
-            </Link>
           </div>
 
           {/* Menu */}
@@ -125,7 +118,7 @@ const Header = () => {
             </div>
 
             <ul className="main-nav">
-              <li className={`has-submenu   ${isActive("/") ? "active" : ""}`}>
+              <li className={`has-submenu ${isActive("/") ? "active" : ""}`}>
                 <Link to="/">Home</Link>
               </li>
               <li
@@ -172,17 +165,70 @@ const Header = () => {
               >
                 <Link to="/blog-list">Blogs</Link>
               </li>
+              {!user && (
+                <>
+                  <li
+                    className={` login-link has-submenu ${
+                      isActive("/login") ? "active" : ""
+                    }`}
+                  >
+                    <Link to="/login">Login</Link>
+                  </li>
+                  <li
+                    className={` login-link has-submenu ${
+                      isActive("/register") ? "active" : ""
+                    }`}
+                  >
+                    <Link to="/register">Sign Up</Link>
+                  </li>
+                </>
+              )}
+
+              {/* Profile and Logout in sidebar (mobile view) */}
+              {user && (
+                <>
+                  <li
+                    className={`has-submenu mobile-profile-item ${
+                      isActive("/user-dashboard") ? "active" : ""
+                    }`}
+                  >
+                    <Link
+                      to="/user-dashboard"
+                      className="d-flex align-items-center"
+                    >
+                      <span className="user-img me-2">
+                        <img
+                          src={`${BASE_URL_IMG + user.image}`}
+                          alt="Profile"
+                          className="img-fluid rounded-circle"
+                        />
+                      </span>
+                      <span>Profile</span>
+                    </Link>
+                  </li>
+                  <li className="has-submenu mobile-logout-item">
+                    <Link
+                      onClick={handleLogout}
+                      className="d-flex align-items-center"
+                    >
+                      <i className="ti ti-logout me-2" />
+                      <span>Logout</span>
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
-          {/* ✅ Right Side Buttons */}
-          <ul className="nav header-navbar-rht  ">
+          {/* ✅ Right Side Buttons - Only show login/signup in desktop view */}
+          <ul className="nav header-navbar-rht">
             {user ? (
               <li className="nav-item dropdown profile-dropdown">
                 <a
                   className="d-flex align-items-center"
                   data-bs-toggle="dropdown"
                   data-bs-auto-close="outside"
+                  href="#!"
                 >
                   <span className="user-img">
                     <img
@@ -191,28 +237,63 @@ const Header = () => {
                       className="img-fluid rounded-circle"
                     />
                   </span>
+                  {/* <span className="ms-1">{user.userName}</span> */}
+                  <i className="fas fa-chevron-down ms-1" />
                 </a>
-                <div className="dropdown-menu p-1">
-                  <div className="profileset d-flex align-items-center">
+                <div className="dropdown-menu p-2">
+                  {/* Profile Header */}
+                  <div className="profileset d-flex align-items-center mb-2">
                     <span className="user-img me-2">
-                      <img src={`${BASE_URL_IMG + user.image}`} alt="Profile" />
+                      <img
+                        src={`${BASE_URL_IMG + user?.image}`}
+                        alt="Profile"
+                        className="img-fluid rounded-circle"
+                      />
                     </span>
                     <div>
                       <h6 className="fw-semibold mb-1">{user.userName}</h6>
+                      <p className="mb-0 text-muted">{user.email}</p>
                     </div>
                   </div>
 
-                  <div className="dropdown-divider my-2" />
+                  <div className="dropdown-divider" />
+
+                  {/* Dashboard Link */}
                   <Link
                     to="/user-dashboard"
                     className={`dropdown-item d-flex align-items-center ${
                       isActive("/user-dashboard") ? "active" : ""
                     }`}
                   >
-                    <i className="ti ti-exchange me-2" /> Profile
+                    <i className="ti ti-exchange me-2" />
+                    Dashboard
                   </Link>
 
-                  <div className="dropdown-divider my-2" />
+                  {/* Wishlist Link */}
+                  <Link
+                    to="/user-wishlist"
+                    className={`dropdown-item d-flex align-items-center ${
+                      isActive("/user-wishlist") ? "active" : ""
+                    }`}
+                  >
+                    <i className="ti ti-heart me-2" />
+                    Wishlist
+                  </Link>
+
+                  {/* Messages Link */}
+                  <Link
+                    to="/user-messages"
+                    className={`dropdown-item d-flex align-items-center ${
+                      isActive("/user-messages") ? "active" : ""
+                    }`}
+                  >
+                    <i className="ti ti-message me-2" />
+                    Messages
+                  </Link>
+
+                  <div className="dropdown-divider" />
+
+                  {/* Logout */}
                   <button
                     className="dropdown-item logout d-flex align-items-center justify-content-between"
                     onClick={handleLogout}
@@ -225,12 +306,12 @@ const Header = () => {
                 </div>
               </li>
             ) : (
-              // Sign in/up buttons when not logged in
               <>
+                {/* Sign in/up buttons when not logged in */}
                 <li className="nav-item">
                   <Link
                     to="/login"
-                    className={`nav-link custom-nav btn-secondary btn d-inline-flex align-items-center  custam-class${
+                    className={`nav-link custom-nav btn-secondary btn d-inline-flex align-items-center ${
                       isActive("/login") ? "active" : ""
                     }`}
                   >
@@ -238,16 +319,14 @@ const Header = () => {
                     Sign In
                   </Link>
                 </li>
-                <li className="nav-item ">
+                <li className="nav-item">
                   <Link
                     to="/register"
-                    className={`nav-link header-reg custam2 d-inline-flex  custam-class align-items-center ${
+                    className={`nav-link header-reg d-inline-flex align-items-center ${
                       isActive("/register") ? "active" : ""
                     }`}
                   >
-                    <span>
-                      <i className="bx bx-lock" />
-                    </span>
+                    <i className="bx bx-lock me-1" />
                     Sign Up
                   </Link>
                 </li>
@@ -255,6 +334,19 @@ const Header = () => {
             )}
           </ul>
         </nav>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </header>
   );

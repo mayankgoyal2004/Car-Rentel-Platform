@@ -1098,7 +1098,7 @@ const AddAdminReservation = () => {
                   carExtraServices.map((service) => (
                     <div key={service.id} className="col-md-6 mb-3">
                       <div
-                        className={`custom-checkbox ${
+                        className={`${
                           reservationData.extraServices.includes(service.id)
                             ? "active"
                             : ""
@@ -1106,7 +1106,7 @@ const AddAdminReservation = () => {
                       >
                         <div className="form-check form-check-md d-flex align-items-center">
                           <input
-                            className="form-check"
+                            className="form-check-input"
                             type="checkbox"
                             id={`custom-check-${service.id}`}
                             checked={reservationData.extraServices.includes(

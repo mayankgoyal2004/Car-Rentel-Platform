@@ -213,7 +213,7 @@ const About = () => {
             </div>
             {/* /Heading title */}
             <div className="counter-group">
-              <div className="row">
+              <div className="row bg-light">
                 <div className="col-lg-3 col-md-6 col-12 d-flex">
                   <div className="count-group flex-fill">
                     <div className="customer-count d-flex align-items-center">

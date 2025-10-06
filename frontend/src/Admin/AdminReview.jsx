@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import { CSVLink } from "react-csv";
 
 const AdminReview = () => {
   const [reveiw, setReview] = useState([]);
@@ -62,6 +63,22 @@ const AdminReview = () => {
     setCurrentPage(page);
   };
 
+  const reviewCsvHeaders = [
+    { label: "Author Name", key: "authorName" },
+    { label: "Author Email", key: "authorEmail" },
+    { label: "Review Date", key: "reviewDate" },
+    { label: "Ratings", key: "ratings" },
+    { label: "Review Comment", key: "comment" },
+  ];
+
+  // CSV data mapping
+  const reviewCsvData = reveiw.map((r) => ({
+    authorName: r.user?.userName || "Unknown",
+    authorEmail: r.user?.email || "Unknown",
+    reviewDate: new Date(r.createdAt).toLocaleDateString(),
+    ratings: r.carReview || 0,
+    comment: r.comment || "",
+  }));
   // Search input
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -89,18 +106,15 @@ const AdminReview = () => {
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
               <div className="mb-2 me-2">
-                <a className="btn btn-white d-flex align-items-center">
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="mb-2 me-2">
-                <div className="dropdown">
-                  <a className="btn btn-dark d-inline-flex align-items-center">
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
+                <CSVLink
+                  data={reviewCsvData}
+                  headers={reviewCsvHeaders}
+                  filename={`car_reviews_${new Date().toLocaleDateString()}.csv`}
+                  className="btn btn-dark d-inline-flex align-items-center"
+                >
+                  <i className="ti ti-upload me-1" />
+                  Export CSV
+                </CSVLink>
               </div>
             </div>
           </div>

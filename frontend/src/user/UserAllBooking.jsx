@@ -17,8 +17,8 @@ const UserAllBooking = () => {
   const [reservation, setReservation] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [deleteBooking, setDeleteBooking] = useState(null);
-  const [cancelationReseion, setCancellationReasion] = useState("");
+  // const [deleteBooking, setDeleteBooking] = useState(null);
+  // const [cancelationReseion, setCancellationReasion] = useState("");
   const getAllReservationUser = async () => {
     try {
       setLoading(true);
@@ -35,49 +35,68 @@ const UserAllBooking = () => {
     getAllReservationUser();
   }, []);
 
-  const cancelReservation = async () => {
-    try {
-      setLoading(true);
-      const res = await apiService.cancelRideByUser(deleteBooking, {
-        cancellationReason: cancelationReseion,
-      });
-      setReservation(res.data.data);
-      getAllReservationUser();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch Reservation");
-    } finally {
-      setLoading(false);
-    }
+  // const cancelReservation = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await apiService.cancelRideByUser(deleteBooking, {
+  //       cancellationReason: cancelationReseion,
+  //     });
+  //     setReservation(res.data.data);
+  //     getAllReservationUser();
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Failed to fetch Reservation");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const getRentalPeriod = (res) => {
+    if (!res?.pickupDate || !res?.dropDate) return 0;
+
+    const start = new Date(res.pickupDate);
+    const end = new Date(res.dropDate);
+
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
-  const calculateTotalPrice = (reservation) => {
-    const { bookingType, extraServices, securityDeposit } = reservation;
+  const calculateTotalPrice = (res) => {
+    if (!res?.car?.pricing) return 0;
 
-    let basePrice = 0;
+    const rentalDays = getRentalPeriod(res);
+    const prices = res.car.pricing.prices;
 
-    if (reservation.car.pricing.prices) {
-      if (bookingType === "daily")
-        basePrice = reservation.car.pricing.prices.daily || 0;
-      else if (bookingType === "weekly")
-        basePrice = reservation.car.pricing.prices.weekly || 0;
-      else if (bookingType === "monthly")
-        basePrice = reservation.car.pricing.prices.monthly || 0;
-      else if (bookingType === "yearly")
-        basePrice = reservation.car.pricing.prices.yearly || 0;
+    let carPrice = 0;
+    switch (res.bookingType) {
+      case "daily":
+        carPrice = prices.daily * rentalDays;
+        break;
+      case "weekly":
+        carPrice = prices.weekly * Math.ceil(rentalDays / 7);
+        break;
+      case "monthly":
+        carPrice = prices.monthly * Math.ceil(rentalDays / 30);
+        break;
+      case "yearly":
+        carPrice = prices.yearly * Math.ceil(rentalDays / 365);
+        break;
+      default:
+        carPrice = 0;
     }
 
-    const extraServicesTotal = extraServices.reduce(
-      (sum, service) => sum + (service.price || 0),
+    const extraServices = res.extraServices || [];
+    const extraServicesPrice = extraServices.reduce(
+      (total, service) =>
+        total + (service.price || 0) * (service.quantity || 1),
       0
     );
 
-    const deposit = securityDeposit || 0;
+    const securityDeposit = res.securityDeposit || 0;
+    const driverPrice = res.driverPrice || 0;
 
-    // 4️⃣ Total price
-    const totalPrice = basePrice + extraServicesTotal + deposit;
-
-    return totalPrice;
+    return carPrice + extraServicesPrice + securityDeposit + driverPrice;
   };
 
   return (
@@ -393,7 +412,7 @@ const UserAllBooking = () => {
                     </div>
                   </div>
                 </div>
-                <div className="modal-btn modal-btn-sm text-end">
+                {/* <div className="modal-btn modal-btn-sm text-end">
                   <a
                     data-bs-target="#cancel_ride"
                     data-bs-toggle="modal"
@@ -403,7 +422,7 @@ const UserAllBooking = () => {
                   >
                     Cancel Booking
                   </a>
-                </div>
+                </div> */}
               </div>
             ) : (
               <p>Loading...</p>
@@ -622,11 +641,7 @@ const UserAllBooking = () => {
                 </div>
               </div>
               <div className="modal-btn modal-btn-sm text-end">
-                <a
-                  href="javascript:void(0);"
-                  data-bs-dismiss="modal"
-                  className="btn btn-secondary"
-                >
+                <a data-bs-dismiss="modal" className="btn btn-secondary">
                   Go Back
                 </a>
                 <a
@@ -642,7 +657,7 @@ const UserAllBooking = () => {
         </div>
       </div>
 
-      <div
+      {/* <div
         className="modal new-modal fade"
         id="cancel_ride"
         data-keyboard="false"
@@ -691,38 +706,29 @@ const UserAllBooking = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
 
 export default UserAllBooking;
 
-
-
-
-
-
-
-
-
-
-	// <li class="nav-item dropdown has-arrow logged-item">
-	// 						<a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
-	// 							<span class="user-img">
-	// 								<img class="rounded-circle" src="assets/img/profiles/avatar-14.jpg" alt="Profile">
-	// 							</span>
-	// 							<span class="user-text">Daniel Johshuva</span>
-	// 						</a>
-	// 						<div class="dropdown-menu dropdown-menu-end">
-	// 							<a class="dropdown-item" href="user-dashboard.html">
-	// 								<i class="feather-user-check"></i> Dashboard
-	// 							</a>
-	// 							<a class="dropdown-item" href="user-settings.html">
-	// 								<i class="feather-settings"></i> Settings
-	// 							</a>
-	// 							<a class="dropdown-item" href="index.html">
-	// 								<i class="feather-power"></i> Logout
-	// 							</a>
-	// 						</div>
-	// 					</li>
+// <li class="nav-item dropdown has-arrow logged-item">
+// 						<a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
+// 							<span class="user-img">
+// 								<img class="rounded-circle" src="assets/img/profiles/avatar-14.jpg" alt="Profile">
+// 							</span>
+// 							<span class="user-text">Daniel Johshuva</span>
+// 						</a>
+// 						<div class="dropdown-menu dropdown-menu-end">
+// 							<a class="dropdown-item" href="user-dashboard.html">
+// 								<i class="feather-user-check"></i> Dashboard
+// 							</a>
+// 							<a class="dropdown-item" href="user-settings.html">
+// 								<i class="feather-settings"></i> Settings
+// 							</a>
+// 							<a class="dropdown-item" href="index.html">
+// 								<i class="feather-power"></i> Logout
+// 							</a>
+// 						</div>
+// 					</li>

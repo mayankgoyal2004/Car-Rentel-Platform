@@ -8,5 +8,13 @@ body {
 
 .custamize-nav {
   display: inline-flex;
-  width: 75%;
+  width: 80%;
 }
+
+
+
+ .navbar-1{
+  z-index: 999;
+  background-color: white;
+ }
+

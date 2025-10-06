@@ -29,7 +29,7 @@ const Login = () => {
       const res = await apiServices.getCaptchaFrontend();
       if (res.data.data) setCaptchaSetting(res.data.data);
     } catch (err) {
-      toast.error("Failed to load settings");
+      toast.error("Failed to load settings" + err.message);
     }
   };
 
@@ -40,7 +40,7 @@ const Login = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 
@@ -57,7 +57,6 @@ const Login = () => {
       toast.error("Please complete the reCAPTCHA!");
       return;
     }
-    setLoading(true);
     setLoading(true);
 
     try {
@@ -86,7 +85,9 @@ const Login = () => {
           res.data.data.userType === 4 &&
           res.data.data.status === true
         ) {
-          navigate("/user-dashboard");
+          setTimeout(() => {
+            navigate("/user-dashboard");
+          }, 1000);
         }
       }
     } catch (err) {

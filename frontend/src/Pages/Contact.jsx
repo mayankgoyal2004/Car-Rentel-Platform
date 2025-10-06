@@ -15,7 +15,7 @@ const Contact = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings"+ err.message);
     }
   };
 

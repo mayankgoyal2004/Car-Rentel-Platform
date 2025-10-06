@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+
 import Master from "./layout/Master";
 import Main from "./homepage/Main";
 import "aos/dist/aos.css";
@@ -123,199 +124,224 @@ import CompanySetting from "./Admin/CompanySetting";
 import LoginSettingAdmin from "./Admin/LoginSettingAdmin";
 import EmailSetting from "./Admin/EmailSetting";
 import LocationSetting from "./Admin/LocationSetting";
+import LocalizationSetting from "./Admin/LocalizationSetting";
+import ErrorPage from "../Error404Page";
 
 function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Master />}>
-          <Route path="/" element={<Main />} />
-          <Route path="/contact-us" element={<Contact />} />
-          <Route path="/listing" element={<Listing />} />
-          <Route path="/listing-details/:id" element={<ListingDetails />} />
-          <Route path="/about-us" element={<About />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/blog-list" element={<Bloglist />} />
-          <Route path="/blog-details/:slug" element={<BlogDetails />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-and-condition" element={<TermsAndCondition />} />
-          <Route path="/pricing" element={<Pricing />} />
+    <>
+      <BrowserRouter>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<Master />}>
+            <Route path="/" element={<Main />} />
+            <Route path="/contact-us" element={<Contact />} />
+            <Route path="/listing" element={<Listing />} />
+            <Route path="/listing-details/:id" element={<ListingDetails />} />
+            <Route path="/about-us" element={<About />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/blog-list" element={<Bloglist />} />
+            <Route path="/blog-details/:slug" element={<BlogDetails />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route
+              path="/terms-and-condition"
+              element={<TermsAndCondition />}
+            />
+            <Route path="/pricing" element={<Pricing />} />
 
-          <Route path="/testimonials" element={<Testimonials />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/booking-checkout/:id" element={<BookingCheckout />} />
-          <Route path="/booking-add-on/:id" element={<BookingAddOn />} />
-          <Route path="/booking-details/:id" element={<BookingDetals />} />
-          <Route path="/booking-payment/:id" element={<BookingPayment />} />
-          <Route path="/booking-success/:id" element={<BookingSuccess />} />
-          <Route path="/our-team" element={<Team />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route element={<ProtectedRoute allowedRoles={[4]} />}>
-            <Route path="/user-dashboard" element={<UserDashboard />}>
-              <Route path="/user-dashboard" element={<UserMainDashboard />} />
-              <Route path="user-review" element={<UserReview />} />
-              <Route path="user-wishlist" element={<UserWishlist />} />
-              <Route path="user-message" element={<UserMessage />} />
-              <Route path="user-wallet" element={<UserWallet />} />
-              <Route path="user-payment" element={<UserPayment />} />
-              <Route path="user-setting" element={<UserSetting />}>
-                <Route index element={<UserProfile />} />
-                <Route
-                  path="user-profile-setting"
-                  element={<UserProfileSetting />}
-                />
-                <Route path="user-preference" element={<UserPreference />} />
-                <Route
-                  path="user-notification"
-                  element={<UserNotification />}
-                />
-                <Route path="user-integration" element={<UserIntegration />} />
-              </Route>
-              <Route path="user-booking" element={<UserBooking />}>
-                <Route index element={<UserAllBooking />} />
-                <Route
-                  path="user-booking-calender"
-                  element={<UserBookingCalender />}
-                />
-                <Route
-                  path="user-upcoming-booking"
-                  element={<UserUpcomingBooking />}
-                />
-                <Route
-                  path="user-booking-in-progress"
-                  element={<UserBookingInProgress />}
-                />
-                <Route
-                  path="user-booking-completed"
-                  element={<UserBookingCompleted />}
-                />
-                <Route
-                  path="user-booking-cancelled"
-                  element={<UserBookingCancelled />}
-                />
+            <Route path="/testimonials" element={<Testimonials />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/booking-checkout/:id" element={<BookingCheckout />} />
+            <Route path="/booking-add-on/:id" element={<BookingAddOn />} />
+            <Route path="/booking-details/:id" element={<BookingDetals />} />
+            <Route path="/booking-payment/:id" element={<BookingPayment />} />
+            <Route path="/booking-success/:id" element={<BookingSuccess />} />
+            <Route path="/our-team" element={<Team />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route element={<ProtectedRoute allowedRoles={[4]} />}>
+              <Route path="/user-dashboard" element={<UserDashboard />}>
+                <Route path="/user-dashboard" element={<UserMainDashboard />} />
+                <Route path="user-review" element={<UserReview />} />
+                <Route path="user-wishlist" element={<UserWishlist />} />
+                <Route path="user-message" element={<UserMessage />} />
+                <Route path="user-wallet" element={<UserWallet />} />
+                <Route path="user-payment" element={<UserPayment />} />
+                <Route path="user-setting" element={<UserSetting />}>
+                  <Route index element={<UserProfile />} />
+                  <Route
+                    path="user-profile-setting"
+                    element={<UserProfileSetting />}
+                  />
+                  <Route path="user-preference" element={<UserPreference />} />
+                  <Route
+                    path="user-notification"
+                    element={<UserNotification />}
+                  />
+                  <Route
+                    path="user-integration"
+                    element={<UserIntegration />}
+                  />
+                </Route>
+                <Route path="user-booking" element={<UserBooking />}>
+                  <Route index element={<UserAllBooking />} />
+                  <Route
+                    path="user-booking-calender"
+                    element={<UserBookingCalender />}
+                  />
+                  <Route
+                    path="user-upcoming-booking"
+                    element={<UserUpcomingBooking />}
+                  />
+                  <Route
+                    path="user-booking-in-progress"
+                    element={<UserBookingInProgress />}
+                  />
+                  <Route
+                    path="user-booking-completed"
+                    element={<UserBookingCompleted />}
+                  />
+                  <Route
+                    path="user-booking-cancelled"
+                    element={<UserBookingCancelled />}
+                  />
+                </Route>
               </Route>
             </Route>
           </Route>
-        </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-email" element={<EmailVerified />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/business-register" element={<AdminRegister />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-email" element={<EmailVerified />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/business-register" element={<AdminRegister />} />
 
-        {/* adminroute */}
-        <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
-          <Route path="/admin-dashboard" element={<AdminDashboard />}>
-            <Route index element={<AdminMain />} />
-            <Route path="add-reservation" element={<AddAdminReservation />} />
-            <Route path="admin-calender" element={<AdminCalender />} />
-            <Route path="all-reservation" element={<AdminReservation />} />
-            <Route path="all-enquiries" element={<AdminEnquiries />} />
-            <Route path="all-customers" element={<AdminCustomers />} />
-            <Route path="all-owners" element={<AdminOwners />} />
-            <Route path="all-drivers" element={<AdminDrivers />} />
-            <Route path="all-locations" element={<AdminLocations />} />
-            <Route path="all-cars" element={<AdminCars />} />
-            <Route path="car-brands" element={<AdminBrands />} />
-            <Route path="car-types" element={<AdminCarTypes />} />
-            <Route path="car-models" element={<AdminCarModels />} />
-            <Route
-              path="car-transmissions"
-              element={<AdminCarTransmissions />}
-            />
-            <Route path="car-fuel" element={<AdminCarFuel />} />
-            <Route path="car-color" element={<AdminCarColor />} />
-            <Route path="car-steering" element={<AdminCarSteering />} />
-            <Route path="car-seats" element={<AdminCarSeats />} />
-            <Route path="car-cylinders" element={<AdminCarCylinders />} />
-            <Route path="car-features" element={<AdminCarFeatures />} />
-            <Route
-              path="car-extra-features"
-              element={<AdminCarExtraFeatures />}
-            />
-            <Route path="car-review" element={<AdminReview />} />
-            <Route path="all-invoice" element={<AdminInvoice />} />
-            <Route path="account-payment" element={<AdminPayment />} />
-            <Route path="admin-message" element={<AdminMessage />} />
-            <Route path="admin-news-letter" element={<AdminNewsLetter />} />
-            <Route path="admin-pages" element={<AdminPages />} />
-            <Route path="all-blogs" element={<AdminAllBlogs />} />
-            <Route path="blogs-categories" element={<AdminBlogsCategories />} />
-            <Route path="blogs-comments" element={<AdminBlogsComments />} />
-            <Route path="blogs-blogs-tags" element={<AdminBlogsTags />} />
-            <Route
-              path="location-countries"
-              element={<AdminLocationCountries />}
-            />
-            <Route path="location-states" element={<AdminLocationStates />} />
-            <Route path="location-cities" element={<AdminLocationCities />} />
-            <Route path="all-testimonials" element={<AdminTestimonials />} />
-            <Route path="all-faq" element={<AdminAllFaq />} />\{" "}
-            <Route path="all-faq-categories" element={<AdminFaqCategories />} />
-            <Route path="contact-message" element={<AdminContactMessage />} />
-            <Route path="all-user" element={<AdminAllUser />} />
-            <Route
-              path="roles-permissions"
-              element={<AdminManageRolsAndPermissions />}
-            />
-            <Route
-              path="admin-forgot-password"
-              element={<AdminForgotPassword />}
-            />
-            <Route path="admin-otp" element={<AdminOtp />} />
-            <Route
-              path="admin-resetPassword"
-              element={<AdminResetPassword />}
-            />
-            <Route path="profile-setting" element={<AdminProfileSetting />} />
-            <Route path="security-setting" element={<AdminSecuritySetting />} />
-            <Route path="invoice-setting" element={<InvoiceSetting />} />
-            <Route path="signature-setting" element={<SignatureSetting />} />
-            <Route path="location-setting" element={<LocationSetting />} />
-            <Route path="login-setting" element={<LoginSettingAdmin />} />
-            <Route path="company-setting" element={<CompanySetting />} />
-            <Route path="email-setting" element={<EmailSetting />} />
-            <Route
-              path="bank-account-setting"
-              element={<BankAccountSetting />}
-            />
-            <Route
-              path="customer-details/:id"
-              element={<AdminCustomersDetails />}
-            />
-            <Route
-              path="invoice-details/:id"
-              element={<AdminInvoiceDetails />}
-            />
-            <Route path="car-details/:id" element={<AdminCarDetails />} />
-            <Route path="add-car" element={<AdminAddCars />} />
-            <Route path="edit-car/:id" element={<AdminEditCar />} />
-            <Route
-              path="reservation-details/:id"
-              element={<AdminReservationDetails />}
-            />
-            <Route
-              path="edit-reservation/:id"
-              element={<AdminEditReservation />}
-            />
-            <Route path="edit-invoice/:id" element={<AdminEditEnvoice />} />
-            <Route path="add-invoice" element={<AddInvoice />} />
-            <Route
-              path="admin-blog-details/:id"
-              element={<AdminBlogDetails />}
-            />
-            <Route path="edit-blog/:id" element={<AdminEditBlog />} />
-            <Route path="add-blog" element={<AdminAddBlogs />} />
-            <Route
-              path="admin-permissions/:roleId"
-              element={<AdminPermissions />}
-            />
+          {/* adminroute */}
+          <Route element={<ProtectedRoute allowedRoles={[1, 2, 3]} />}>
+            <Route path="/admin-dashboard" element={<AdminDashboard />}>
+              <Route index element={<AdminMain />} />
+              <Route path="add-reservation" element={<AddAdminReservation />} />
+              <Route path="admin-calender" element={<AdminCalender />} />
+              <Route path="all-reservation" element={<AdminReservation />} />
+              <Route path="all-enquiries" element={<AdminEnquiries />} />
+              <Route path="all-customers" element={<AdminCustomers />} />
+              <Route path="all-owners" element={<AdminOwners />} />
+              <Route path="all-drivers" element={<AdminDrivers />} />
+              <Route path="all-locations" element={<AdminLocations />} />
+              <Route path="all-cars" element={<AdminCars />} />
+              <Route path="car-brands" element={<AdminBrands />} />
+              <Route path="car-types" element={<AdminCarTypes />} />
+              <Route path="car-models" element={<AdminCarModels />} />
+              <Route
+                path="car-transmissions"
+                element={<AdminCarTransmissions />}
+              />
+              <Route path="car-fuel" element={<AdminCarFuel />} />
+              <Route path="car-color" element={<AdminCarColor />} />
+              <Route path="car-steering" element={<AdminCarSteering />} />
+              <Route path="car-seats" element={<AdminCarSeats />} />
+              <Route path="car-cylinders" element={<AdminCarCylinders />} />
+              <Route path="car-features" element={<AdminCarFeatures />} />
+              <Route
+                path="car-extra-features"
+                element={<AdminCarExtraFeatures />}
+              />
+              <Route path="car-review" element={<AdminReview />} />
+              <Route path="all-invoice" element={<AdminInvoice />} />
+              <Route path="account-payment" element={<AdminPayment />} />
+              <Route path="admin-message" element={<AdminMessage />} />
+              <Route path="admin-news-letter" element={<AdminNewsLetter />} />
+              <Route path="admin-pages" element={<AdminPages />} />
+              <Route path="all-blogs" element={<AdminAllBlogs />} />
+              <Route
+                path="blogs-categories"
+                element={<AdminBlogsCategories />}
+              />
+              <Route path="blogs-comments" element={<AdminBlogsComments />} />
+              <Route path="blogs-blogs-tags" element={<AdminBlogsTags />} />
+              <Route
+                path="location-countries"
+                element={<AdminLocationCountries />}
+              />
+              <Route path="location-states" element={<AdminLocationStates />} />
+              <Route path="location-cities" element={<AdminLocationCities />} />
+              <Route path="all-testimonials" element={<AdminTestimonials />} />
+              <Route path="all-faq" element={<AdminAllFaq />} />\{" "}
+              <Route
+                path="all-faq-categories"
+                element={<AdminFaqCategories />}
+              />
+              <Route path="contact-message" element={<AdminContactMessage />} />
+              <Route path="all-user" element={<AdminAllUser />} />
+              <Route
+                path="roles-permissions"
+                element={<AdminManageRolsAndPermissions />}
+              />
+              <Route
+                path="admin-forgot-password"
+                element={<AdminForgotPassword />}
+              />
+              <Route path="admin-otp" element={<AdminOtp />} />
+              <Route
+                path="admin-resetPassword"
+                element={<AdminResetPassword />}
+              />
+              <Route path="profile-setting" element={<AdminProfileSetting />} />
+              <Route
+                path="security-setting"
+                element={<AdminSecuritySetting />}
+              />
+              <Route path="invoice-setting" element={<InvoiceSetting />} />
+              <Route path="signature-setting" element={<SignatureSetting />} />
+              <Route path="location-setting" element={<LocationSetting />} />
+              <Route
+                path="localization-setting"
+                element={<LocalizationSetting />}
+              />
+              <Route path="login-setting" element={<LoginSettingAdmin />} />
+              <Route path="company-setting" element={<CompanySetting />} />
+              <Route path="email-setting" element={<EmailSetting />} />
+              <Route
+                path="bank-account-setting"
+                element={<BankAccountSetting />}
+              />
+              <Route
+                path="customer-details/:id"
+                element={<AdminCustomersDetails />}
+              />
+              <Route
+                path="invoice-details/:id"
+                element={<AdminInvoiceDetails />}
+              />
+              <Route path="car-details/:id" element={<AdminCarDetails />} />
+              <Route path="add-car" element={<AdminAddCars />} />
+              <Route path="edit-car/:id" element={<AdminEditCar />} />
+              <Route
+                path="reservation-details/:id"
+                element={<AdminReservationDetails />}
+              />
+              <Route
+                path="edit-reservation/:id"
+                element={<AdminEditReservation />}
+              />
+              <Route path="edit-invoice/:id" element={<AdminEditEnvoice />} />
+              <Route path="add-invoice" element={<AddInvoice />} />
+              <Route
+                path="admin-blog-details/:id"
+                element={<AdminBlogDetails />}
+              />
+              <Route path="edit-blog/:id" element={<AdminEditBlog />} />
+              <Route path="add-blog" element={<AdminAddBlogs />} />
+              <Route
+                path="admin-permissions/:roleId"
+                element={<AdminPermissions />}
+              />
+            </Route>
           </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 

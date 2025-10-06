@@ -34,7 +34,7 @@ const UserSetting = () => {
       </div>
       <div>
         {/* Change Password Modal */}
-        <div
+        {/* <div
           className="modal new-modal fade"
           id="change_password"
           data-keyboard="false"
@@ -114,7 +114,7 @@ const UserSetting = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
         {/* /Change Password Modal */}
         {/* Change Phone Number Modal */}
         {/* /Change Phone Number Modal */}

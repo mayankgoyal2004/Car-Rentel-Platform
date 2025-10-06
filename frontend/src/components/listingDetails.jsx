@@ -11,7 +11,6 @@ import { Heart, Filter, Calendar, MapPin } from "react-feather";
 const ListingDetails = () => {
   const [carData, setCarData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [wishlist, setWishlist] = useState([]);
@@ -48,9 +47,7 @@ const ListingDetails = () => {
     phone: "",
     message: "",
   });
-  const [enquiryErrors, setEnquiryErrors] = useState({});
   const [enquirySubmitting, setEnquirySubmitting] = useState(false);
-  const [errors, setErrors] = useState({});
   const { id } = useParams();
   const fetchCar = async () => {
     setLoading(true);
@@ -67,7 +64,7 @@ const ListingDetails = () => {
   };
   const fetchReviews = async () => {
     try {
-      const res = await apiService.getCarReview(id);
+      const res = await apiService.getCarReview(carData._id);
       console.log("Reviews response:", res.data); // Debug log
 
       if (res.data && res.data.success && Array.isArray(res.data.reviews)) {
@@ -100,7 +97,7 @@ const ListingDetails = () => {
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch reviews");
+      toast.error("Failed to fetch reviews");
     }
   };
 
@@ -114,16 +111,32 @@ const ListingDetails = () => {
   };
   useEffect(() => {
     fetchCar();
-    fetchReviews();
     getWishList();
   }, [id]);
+  useEffect(() => {
+    if (carData?._id) {
+      fetchReviews();
+    }
+  }, [carData]);
 
   const handleWishlist = async (carId) => {
     try {
       const res = await apiService.addWishlist({ carId });
-      setWishlist(res.data.wishlist);
+
+      if (res.data.success) {
+        setWishlist(res.data.wishlist || []);
+        toast.success("Wishlist updated!");
+      } else {
+        toast.error(res.data.message || "Failed to update wishlist");
+      }
     } catch (err) {
-      console.error("Error toggling wishlist:", err);
+      if (err.response?.status === 403) {
+        toast.error("Please login to add to wishlist");
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
+        toast.error("Error toggling wishlist");
+        console.error("Error toggling wishlist:", err);
+      }
     }
   };
 
@@ -138,12 +151,6 @@ const ListingDetails = () => {
     });
 
     // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: "",
-      });
-    }
   };
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -168,16 +175,24 @@ const ListingDetails = () => {
     e.preventDefault();
 
     try {
-      const res = await apiService.addReservationByUserStep1(id, reservation);
+      const res = await apiService.addReservationByUserStep1(
+        carData._id,
+        reservation
+      );
 
       if (res.data.success) {
         navigate("/booking-checkout/" + res.data.data._id);
       } else {
-        alert(res.data.message);
+        toast.error(res.data.message || "Failed to create reservation");
       }
     } catch (err) {
       console.error(err);
-      alert("Error saving reservation data");
+
+      if (err.response?.status === 403) {
+        toast.error("Please login to make a reservation");
+      } else {
+        toast.error("Error saving reservation data");
+      }
     }
   };
 
@@ -187,56 +202,45 @@ const ListingDetails = () => {
       ...enquiryForm,
       [name]: value,
     });
-
-    // Clear error when user starts typing
-    if (enquiryErrors[name]) {
-      setEnquiryErrors({
-        ...enquiryErrors,
-        [name]: "",
-      });
-    }
   };
 
   const validateEnquiryForm = () => {
-    const newErrors = {};
-
     if (!enquiryForm.name.trim()) {
-      newErrors.name = "Name is required";
+      toast.error("Name is required");
+      return false;
     }
 
     if (!enquiryForm.email.trim()) {
-      newErrors.email = "Email is required";
+      toast.error("Email is required");
+      return false;
     } else if (!/\S+@\S+\.\S+/.test(enquiryForm.email)) {
-      newErrors.email = "Email is invalid";
+      toast.error("Invalid email address");
+      return false;
     }
 
     if (!enquiryForm.phone.trim()) {
-      newErrors.phone = "Phone number is required";
+      toast.error("Phone number is required");
+      return false;
     }
 
     if (!enquiryForm.message.trim()) {
-      newErrors.message = "Message is required";
+      toast.error("Message is required");
+      return false;
     }
 
-    setEnquiryErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
   };
 
-  // Add this function to submit the enquiry
   const submitEnquiry = async (e) => {
-    e.preventDefault(); // This is the key fix - prevent default form submission
+    e.preventDefault();
 
-    if (!validateEnquiryForm()) {
-      return;
-    }
+    if (!validateEnquiryForm()) return;
 
     setEnquirySubmitting(true);
     try {
-      // Replace with your actual API endpoint
-      const res = await apiService.sendEnquiry(id, enquiryForm);
+      const res = await apiService.sendEnquiry(carData._id, enquiryForm);
 
       if (res.data.success) {
-        // Reset form
         setEnquiryForm({
           name: "",
           email: "",
@@ -245,73 +249,73 @@ const ListingDetails = () => {
         });
 
         toast.success("Enquiry sent successfully!");
+      } else {
+        toast.error(res.data.message || "Failed to send enquiry");
       }
     } catch (err) {
-      alert("Failed to send enquiry: " + (err.message || "Unknown error"));
+      toast.error("Failed to send enquiry");
+      console.error(err);
     } finally {
       setEnquirySubmitting(false);
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
-
     if (
       !formData.carReview ||
       formData.carReview < 1 ||
       formData.carReview > 5
     ) {
-      newErrors.carReview = "Please select a rating between 1 and 5";
+      toast.error("Please select a rating between 1 and 5");
+      return false;
     }
 
     if (!formData.comment.trim()) {
-      newErrors.comment = "Comment is required";
+      toast.error("Comment is required");
+      return false;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return true;
   };
 
   const addReview = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setSubmitting(true);
+
     try {
       const reviewData = {
         carReview: formData.carReview,
         comment: formData.comment,
       };
 
-      const res = await apiService.addCarReview(id, reviewData);
+      const res = await apiService.addCarReview(carData._id, reviewData);
 
-      if (res.data.success) {
-        // Reset form and refresh reviews
-        setFormData({
-          carReview: 0,
-          comment: "",
-        });
-        setShowReviewForm(false);
-        setErrors({});
-
-        // Refresh reviews
-        await fetchReviews();
-
-        // Show success message (you can add a toast notification here)
+      if (res.data.success || res.data.message === "Review created") {
         toast.success("Review submitted successfully!");
+
+        await fetchReviews();
+        setFormData({ carReview: 0, comment: "" });
+        setShowReviewForm(false);
       } else {
-        setError("Failed to submit review");
+        toast.error(res.data.message || "Failed to submit review");
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to submit review");
+
+      if (err.response?.status === 403) {
+        toast.error("Please login to submit a review");
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
+        toast.error("Failed to submit review");
+      }
     } finally {
       setSubmitting(false);
     }
   };
+
   const previewLength = 150;
   const description = carData?.description || "";
 
@@ -1300,14 +1304,22 @@ const ListingDetails = () => {
                   >
                     Message to owner
                   </Link>
-                  <a href="#" className="chat-link">
-                    <i className="fa-brands fa-whatsapp" />
-                    Chat Via Whatsapp
+                  <a
+                    href={`https://wa.me/${
+                      carData.admin?.contact
+                    }?text=${encodeURIComponent(
+                      "Hello, I am interested in your car!"
+                    )}`}
+                    className="chat-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <i className="fa-brands fa-whatsapp" /> Chat Via Whatsapp
                   </a>
                 </div>
               </div>
 
-              <div className="review-sec share-car mt-0 mb-0">
+              {/* <div className="review-sec share-car mt-0 mb-0">
                 <div className="review-header">
                   <h4>Share</h4>
                 </div>
@@ -1343,7 +1355,7 @@ const ListingDetails = () => {
                     </a>
                   </li>
                 </ul>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -1412,9 +1424,7 @@ const ListingDetails = () => {
                   <input
                     type="text"
                     name="name"
-                    className={`form-control ${
-                      enquiryErrors.name ? "is-invalid" : ""
-                    }`}
+                    className={`form-control `}
                     placeholder="Enter Name"
                     value={enquiryForm.name}
                     onChange={handleEnquiryChange}
@@ -1425,54 +1435,33 @@ const ListingDetails = () => {
                   <input
                     type="email"
                     name="email"
-                    className={`form-control ${
-                      enquiryErrors.email ? "is-invalid" : ""
-                    }`}
+                    className={`form-control`}
                     placeholder="Enter Email Address"
                     value={enquiryForm.email}
                     onChange={handleEnquiryChange}
                   />
-                  {enquiryErrors.email && (
-                    <div className="text-danger small">
-                      {enquiryErrors.email}
-                    </div>
-                  )}
                 </div>
                 <div className="modal-form-group">
                   <label>Phone Number</label>
                   <input
                     type="text"
                     name="phone"
-                    className={`form-control ${
-                      enquiryErrors.phone ? "is-invalid" : ""
-                    }`}
+                    className={`form-control `}
                     placeholder="Enter Phone Number"
                     value={enquiryForm.phone}
                     onChange={handleEnquiryChange}
                   />
-                  {enquiryErrors.phone && (
-                    <div className="text-danger small">
-                      {enquiryErrors.phone}
-                    </div>
-                  )}
                 </div>
                 <div className="modal-form-group">
                   <label>Message</label>
                   <textarea
                     name="message"
-                    className={`form-control ${
-                      enquiryErrors.message ? "is-invalid" : ""
-                    }`}
+                    className={`form-control`}
                     rows={4}
                     placeholder="Enter your message"
                     value={enquiryForm.message}
                     onChange={handleEnquiryChange}
                   />
-                  {enquiryErrors.message && (
-                    <div className="text-danger small">
-                      {enquiryErrors.message}
-                    </div>
-                  )}
                 </div>
                 <label className="custom_check w-100">
                   <input type="checkbox" name="username" />
@@ -1603,7 +1592,19 @@ const ListingDetails = () => {
           </div>
         </div>
       </div>
-      {/* /Custom Date Modal */}
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

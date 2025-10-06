@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { CSVLink } from "react-csv";
 
 const AdminDrivers = () => {
   const [drivers, setDrivers] = useState([]);
@@ -173,6 +174,34 @@ const AdminDrivers = () => {
     }
   };
 
+  const driverCsvHeaders = [
+    { label: "Name", key: "name" },
+    { label: "Email", key: "email" },
+    { label: "Contact", key: "contact" },
+    { label: "License Number", key: "licenseNumber" },
+    { label: "Date of Issue", key: "dateOfIssue" },
+    { label: "Valid Till", key: "validTill" },
+    { label: "Gender", key: "gender" },
+    { label: "Address", key: "address" },
+    { label: "Status", key: "isActive" },
+  ];
+
+  const csvData = drivers.map((driver) => ({
+    name: driver.name,
+    email: driver.email,
+    contact: driver.contact,
+    licenseNumber: driver.licenseNumber,
+    dateOfIssue: driver.dateOfIssue
+      ? new Date(driver.dateOfIssue).toLocaleDateString()
+      : "",
+    validTill: driver.validTill
+      ? new Date(driver.validTill).toLocaleDateString()
+      : "",
+    gender: driver.gender,
+    address: driver.address,
+    isActive: driver.isActive ? "Active" : "Inactive",
+  }));
+
   const handleDeleteConfirm = (driver) => {
     setDeleteDriver(driver);
   };
@@ -213,28 +242,18 @@ const AdminDrivers = () => {
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
               <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
+                <CSVLink
+                  data={csvData}
+                  headers={driverCsvHeaders}
+                  filename="drivers.csv"
+                  className="btn btn-dark d-inline-flex align-items-center"
                 >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="mb-2 me-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
+                  <i className="ti ti-upload me-1" />
+                  Export CSV
+                </CSVLink>
               </div>
               <div className="mb-2">
                 <a
-                  href="javascript:void(0);"
                   className="btn btn-primary d-flex align-items-center"
                   data-bs-toggle="modal"
                   data-bs-target="#add_driver"

@@ -1147,6 +1147,11 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
+  editPaymentStatusofUser(id) {
+    return axios.post(BASE_URL + `payment-completed-by-user/${id}`,{}, {
+      headers: getAuthHeaders(),
+    });
+  }
   changeReservationStatusToConformed(id) {
     return axios.post(
       BASE_URL + `change-reservation-status-conformed/${id}`,

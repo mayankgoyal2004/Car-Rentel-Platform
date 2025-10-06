@@ -312,6 +312,7 @@ const AddInvoice = () => {
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -336,7 +337,7 @@ const AddInvoice = () => {
 
       if (res.data.success) {
         toast.success("Invoice created successfully!");
-        navigate("/admin-dashboard-invoices");
+        navigate("/admin-dashboard/all-invoice");
       }
     } catch (err) {
       console.error("Error creating invoice:", err);

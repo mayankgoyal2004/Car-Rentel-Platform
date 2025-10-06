@@ -177,14 +177,12 @@ const BankAccountSetting = () => {
                         </Link>
                       </li>
                     )}
-                    {userType === 1 && (
-                      <li>
-                        <a href="localization-setting.html">
-                          <i className="ti ti-settings-2 me-2" />
-                          <span>Localization</span>
-                        </a>
-                      </li>
-                    )}
+                    <li>
+                      <Link to="/admin-dashboard/localization-setting">
+                        <i className="ti ti-language me-2" />
+                        <span>Localization</span>
+                      </Link>
+                    </li>
                     {userType === 1 && (
                       <li>
                         <a href="language-setting.html">

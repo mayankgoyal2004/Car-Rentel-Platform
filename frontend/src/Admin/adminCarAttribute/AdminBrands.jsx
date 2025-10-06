@@ -138,7 +138,7 @@ const AdminBrands = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
+              {/* <div className="mb-2 me-2">
                 <a
                   href="javascript:void(0);"
                   className="btn btn-white d-flex align-items-center"
@@ -146,8 +146,8 @@ const AdminBrands = () => {
                   <i className="ti ti-printer me-2" />
                   Print
                 </a>
-              </div>
-              <div className="me-2 mb-2">
+              </div> */}
+              {/* <div className="me-2 mb-2">
                 <div className="dropdown">
                   <a
                     href="javascript:void(0);"
@@ -157,7 +157,7 @@ const AdminBrands = () => {
                     Export
                   </a>
                 </div>
-              </div>
+              </div> */}
               <div className="mb-2">
                 <a
                   href="javascript:void(0);"

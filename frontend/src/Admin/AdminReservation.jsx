@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { CSVLink } from "react-csv";
 
 const AdminReservation = () => {
   const [reservations, setReservations] = useState([]);
@@ -61,11 +62,34 @@ const AdminReservation = () => {
     setSearch(e.target.value);
     setCurrentPage(1); // ✅ good
   };
-    const handlePageChange = (page) => {
+  const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
 
+  const csvHeaders = [
+    { label: "Booking ID", key: "bookingId" },
+    { label: "Car Name", key: "carName" },
+    { label: "Customer Name", key: "customerName" },
+    { label: "Pickup Date", key: "pickupDate" },
+    { label: "Pickup Address", key: "pickupAddress" },
+    { label: "Drop Date", key: "dropDate" },
+    { label: "Drop Address", key: "dropAddress" },
+    { label: "Status", key: "status" },
+  ];
+
+  const csvData = reservations.map((res) => ({
+    bookingId: res.bookingId,
+    carName: res.car?.carName,
+    customerName: res.customer?.name,
+    pickupDate: res.pickupDate
+      ? new Date(res.pickupDate).toLocaleDateString()
+      : "",
+    pickupAddress: res.pickupAddress,
+    dropDate: res.dropDate ? new Date(res.dropDate).toLocaleDateString() : "",
+    dropAddress: res.dropAddress,
+    status: res.status ,
+  }));
 
   return (
     <div className="page-wrapper">
@@ -86,19 +110,16 @@ const AdminReservation = () => {
             </nav>
           </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-            <div className="mb-2 me-2">
-              <a className="btn btn-white d-flex align-items-center">
-                <i className="ti ti-printer me-2" />
-                Print
-              </a>
-            </div>
             <div className="mb-2">
-              <div className="dropdown">
-                <a className="btn btn-dark d-inline-flex align-items-center">
-                  <i className="ti ti-upload me-1" />
-                  Export
-                </a>
-              </div>
+              <CSVLink
+                data={csvData}
+                headers={csvHeaders}
+                filename={"reservations.csv"}
+                className="btn btn-dark d-inline-flex align-items-center"
+              >
+                <i className="ti ti-upload me-1" />
+                Export
+              </CSVLink>
             </div>
           </div>
         </div>
@@ -293,7 +314,7 @@ const AdminReservation = () => {
                             className="dropdown-item rounded-1"
                           >
                             <i className="ti ti-eye me-1" />
-                            Edit REservation{" "}
+                            Edit Reservation{" "}
                           </Link>
                         </li>
                         <li>

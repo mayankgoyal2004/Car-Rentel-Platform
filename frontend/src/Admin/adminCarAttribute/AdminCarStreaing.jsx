@@ -28,7 +28,9 @@ const AdminCarSteering = () => {
         setCurrentPage(res.data.pagination.currentPage || 1);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to fetch car steering");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch car steering"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,9 @@ const AdminCarSteering = () => {
       setEditCarSteering(null);
       fetchAllCarSteering(currentPage, search);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update car steering");
+      toast.error(
+        err.response?.data?.message || "Failed to update car steering"
+      );
     }
   };
 
@@ -78,15 +82,15 @@ const AdminCarSteering = () => {
   const handleDeleteCarSteering = async () => {
     if (!deleteCarSteering) return;
     try {
-      const res = await apiService.deleteCarSteering(
-        deleteCarSteering._id
-      );
+      const res = await apiService.deleteCarSteering(deleteCarSteering._id);
       toast.success(res.data.message);
       setDeleteCarSteering(null);
       fetchAllCarSteering(currentPage, search);
       document.getElementById("delete_steering_close")?.click();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete car steering");
+      toast.error(
+        err.response?.data?.message || "Failed to delete car steering"
+      );
     }
   };
 
@@ -121,29 +125,8 @@ const AdminCarSteering = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
-                >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
-              </div>
               <div className="mb-2">
                 <a
-                  href="javascript:void(0);"
                   data-bs-toggle="modal"
                   data-bs-target="#add_steering"
                   className="btn btn-primary d-flex align-items-center"
@@ -439,11 +422,13 @@ const AdminCarSteering = () => {
                 <i className="ti ti-trash-x fs-26" />
               </span>
               <h4 className="mb-1">Delete Steering</h4>
-              <p className="mb-3">
-                Are you sure you want to delete steering?
-              </p>
+              <p className="mb-3">Are you sure you want to delete steering?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal" id="delete_steering_close">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_steering_close"
+                >
                   Cancel
                 </button>
                 <button

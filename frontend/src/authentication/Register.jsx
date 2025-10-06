@@ -29,7 +29,7 @@ const Register = () => {
       const res = await apiServices.getCaptchaFrontend();
       if (res.data.data) setCaptchaSetting(res.data.data);
     } catch (err) {
-      toast.error("Failed to load settings");
+      toast.error("Failed to load settings" + err.message);
     }
   };
   const fetchCompanySetting = async () => {
@@ -39,7 +39,7 @@ const Register = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 
@@ -90,10 +90,10 @@ const Register = () => {
     setLoading(true);
 
     try {
-        const payload = { ...formData };
-    if (captchaSetting.status) {
-      payload.recaptchaToken = recaptchaToken;
-    }
+      const payload = { ...formData };
+      if (captchaSetting.status) {
+        payload.recaptchaToken = recaptchaToken;
+      }
       const res = await apiServices.register(payload);
       toast.success(res.data.message);
 
@@ -106,6 +106,8 @@ const Register = () => {
       } else {
         toast.error("Something went wrong!");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -135,7 +137,7 @@ const Register = () => {
                 </Link>
                 <Link
                   to="/business-register"
-                  className="btn btn-outline-primary ms-2"
+                  className="btn btn-outline-primary ms-2 border-0"
                 >
                   Business Owner Register
                 </Link>
@@ -186,7 +188,7 @@ const Register = () => {
                   </label>
                   <div className="pass-group" style={{ position: "relative" }}>
                     <input
-                      type={showPassword ? "text" : "password"} // 👈 toggle type
+                      type={showPassword ? "text" : "password"}
                       name="password"
                       className="form-control pass-input"
                       placeholder="Enter password"
@@ -199,7 +201,7 @@ const Register = () => {
                       className={`fas ${
                         showPassword ? "fa-eye" : "fa-eye-slash"
                       } toggle-password`}
-                      onClick={() => setShowPassword(!showPassword)} // 👈 toggle state
+                      onClick={() => setShowPassword(!showPassword)}
                       style={{
                         position: "absolute",
                         right: "10px",
@@ -233,7 +235,7 @@ const Register = () => {
               <div className="login-or">
                 <span className="or-line" />
                 <span className="span-or">
-                  Or, Create an account with your email
+                  Create an account with your email
                 </span>
               </div>
 

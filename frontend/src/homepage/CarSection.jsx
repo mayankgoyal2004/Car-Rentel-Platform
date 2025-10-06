@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { Heart } from "react-feather";
-
+import { ToastContainer, toast } from "react-toastify";
 export const CarSection = () => {
   const [cars, setCars] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-
+  const navigate = useNavigate();
   const fetchCars = async () => {
     try {
       const res = await apiService.getFeaturedCar();
@@ -34,9 +34,22 @@ export const CarSection = () => {
   const handleWishlist = async (carId) => {
     try {
       const res = await apiService.addWishlist({ carId });
-      setWishlist(res.data.wishlist || []);
+
+      if (res.data.success) {
+        setWishlist(res.data.wishlist || []);
+        toast.success("Wishlist updated!");
+      } else {
+        toast.error(res.data.message || "Failed to update wishlist");
+      }
     } catch (err) {
-      console.error("Error toggling wishlist:", err);
+     
+      if (err.response?.status === 403) {
+        toast.error("Please login to add to wishlist");
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
+        toast.error("Error toggling wishlist");
+        console.error("Error toggling wishlist:", err);
+      }
     }
   };
 
@@ -44,7 +57,6 @@ export const CarSection = () => {
     getWishList();
   }, []);
 
-  // helper to check if car is in wishlist
   const isInWishlist = (carId) =>
     Array.isArray(wishlist) && wishlist.some((w) => w._id === carId);
 
@@ -71,7 +83,7 @@ export const CarSection = () => {
                 <div className="listing-img">
                   <Slider {...sliderSettings}>
                     <div className="slide-images">
-                      <Link to={`/listing-details/${car._id}`}>
+                      <Link to={`/listing-details/${car.permalink}`}>
                         <img
                           src={BASE_URL_IMG + car.image}
                           className="img-fluid"
@@ -110,7 +122,7 @@ export const CarSection = () => {
                   <div className="listing-features d-flex align-items-center justify-content-between">
                     <div className="list-rating">
                       <h3 className="listing-title">
-                        <Link to={`/listing-details/${car._id}`}>
+                        <Link to={`/listing-details/${car.permalink}`}>
                           {car.carModel?.carModel}
                         </Link>
                       </h3>
@@ -119,14 +131,17 @@ export const CarSection = () => {
                           .fill(0)
                           .map((_, i) => (
                             <i
-                              className={`fas fa-star ${
-                                i < car.rating ? "filled" : ""
-                              }`}
                               key={i}
+                              className={`fas fa-star ${
+                                i < Math.round(car.avgRating || 0)
+                                  ? "filled"
+                                  : ""
+                              }`}
                             />
                           ))}
                         <span>
-                          ({car.rating || 0}) {car.reviews || 0} Reviews
+                          ({car.avgRating?.toFixed(1) || 0}){" "}
+                          {car.reviewCount || 0} Reviews
                         </span>
                       </div>
                     </div>
@@ -178,6 +193,19 @@ export const CarSection = () => {
             <i className="bx bx-right-arrow-alt ms-1" />
           </Link>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </section>
   );

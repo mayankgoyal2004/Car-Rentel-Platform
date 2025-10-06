@@ -11,15 +11,16 @@ import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { removeUser } from "../utils/userSlice";
 
 const AdminDashboard = () => {
-  const [open, setOpen] = useState(false);
-  const [rentalSettingOpen, setReantalSettingOpen] = useState(false);
-  const [blogOpen, setblogOpen] = useState(false);
   const [LocationOpen, SetLocationOpen] = useState(false);
   const [FaqOpen, SetFaqOpen] = useState(false);
   const [SettingOpen, SetSettingOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [companySetting, setCompanySetting] = useState({});
+  const [openMenu, setOpenMenu] = useState("");
 
+  const toggleMenu = (menu) => {
+    setOpenMenu((prev) => (prev === menu ? "" : menu));
+  };
   const fetchCompanySetting = async () => {
     try {
       const res = await apiService.getCompanySettings();
@@ -65,6 +66,50 @@ const AdminDashboard = () => {
     wrapper.classList.toggle("slide-nav");
   };
 
+  useEffect(() => {
+    const body = document.body;
+    const toggleBtn = document.getElementById("toggle_btn");
+    const sidebar = document.getElementById("sidebar");
+
+    if (!toggleBtn || !sidebar) return;
+
+    const handleToggle = () => {
+      handleSidebarToggle(); // call our fixed function instead
+    };
+
+    const handleMouseEnter = () => {
+      if (body.classList.contains("mini-sidebar")) {
+        body.classList.add("extend-menu");
+      }
+    };
+
+    const handleMouseLeave = () => {
+      body.classList.remove("extend-menu");
+    };
+
+    toggleBtn.addEventListener("click", handleToggle);
+    sidebar.addEventListener("mouseenter", handleMouseEnter);
+    sidebar.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      toggleBtn.removeEventListener("click", handleToggle);
+      sidebar.removeEventListener("mouseenter", handleMouseEnter);
+      sidebar.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
+
+  const handleSidebarToggle = () => {
+    const body = document.body;
+
+    // Toggle mini sidebar
+    body.classList.toggle("mini-sidebar");
+    body.classList.remove("extend-menu");
+
+    if (body.classList.contains("mini-sidebar")) {
+      setOpenMenu("");
+    }
+  };
+
   return (
     <div className={`main-wrapper`}>
       {/* Header */}
@@ -72,10 +117,16 @@ const AdminDashboard = () => {
         <div className="main-header">
           <div className="header-left">
             <NavLink to="/admin-dashboard" className="logo">
-              <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
+              <img
+                src={BASE_URL_IMG + companySetting.profilePhoto}
+                alt="Logo"
+              />
             </NavLink>
             <NavLink to="/admin-dashboard" className="dark-logo">
-              <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
+              <img
+                src={BASE_URL_IMG + companySetting.profilePhoto}
+                alt="Logo"
+              />
             </NavLink>
           </div>
           <a id="mobile_btn" className="mobile_btn" onClick={toggleSidebar}>
@@ -147,16 +198,15 @@ const AdminDashboard = () => {
 
                       <li>
                         <NavLink
-                          to=""
-                          href="extra-services.html"
+                          to="all-reservation"
                           className="dropdown-item d-inline-flex align-items-center"
                         >
                           <i className="ti ti-script-plus me-2" />
-                          Extra Service
+                         Reservation
                         </NavLink>
                       </li>
 
-                      <li></li>
+                      
                     </ul>
                   </div>
                 </div>
@@ -255,31 +305,29 @@ const AdminDashboard = () => {
 
       {/* /Header */}
       {/* Sidebar */}
-      <div
-        className="sidebar"
-        onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => setIsExpanded(false)}
-        id="sidebar"
-      >
+      <div className="sidebar" id="sidebar">
         {/* Logo */}
         <div className="sidebar-logo navbar-1">
-          <NavLink to="/admin-dashboard" className="logo logo-normal">
+          <NavLink
+            to="/admin-dashboard"
+            className="logo logo-normal custom-logo-1"
+          >
             <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
           </NavLink>
           <NavLink to="/admin-dashboard" className="logo-small">
-            <img src={BASE_URL_IMG + companySetting.profilePhoto}  alt="Logo" />
+            <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
           </NavLink>
           <NavLink to="/admin-dashboard" className="dark-logo">
-            <img src={BASE_URL_IMG + companySetting.profilePhoto}  alt="Logo" />
+            <img src={BASE_URL_IMG + companySetting.profilePhoto} alt="Logo" />
           </NavLink>
         </div>
         {/* /Logo */}
         <div className="sidebar-inner ">
           <PerfectScrollbar>
             <div id="sidebar-menu" className="sidebar-menu">
-              <div className="form-group">
-                {/* Search */}
-                <div className="input-group input-group-flat d-inline-flex">
+              {/* <div className="form-group"> */}
+              {/* Search */}
+              {/* <div className="input-group input-group-flat d-inline-flex">
                   <span className="input-icon-addon">
                     <i className="ti ti-search" />
                   </span>
@@ -291,9 +339,9 @@ const AdminDashboard = () => {
                   <span className="group-text">
                     <i className="ti ti-command" />
                   </span>
-                </div>
-                {/* /Search */}
-              </div>
+                </div> */}
+              {/* /Search */}
+
               <ul>
                 <li className="menu-title">
                   <span>Main</span>
@@ -385,6 +433,7 @@ const AdminDashboard = () => {
 
                 <li>
                   <ul>
+                    {/* Cars */}
                     <li>
                       <NavLink to="all-cars">
                         <i className="ti ti-car" />
@@ -392,15 +441,20 @@ const AdminDashboard = () => {
                       </NavLink>
                     </li>
 
+                    {/* Car Attributes */}
                     {userType !== 1 && (
-                      <li>
-                        <a onClick={() => setOpen(!open)}>
+                      <li
+                        className={`submenu ${
+                          openMenu === "attributes" ? "subdrop" : ""
+                        }`}
+                      >
+                        <a onClick={() => toggleMenu("attributes")}>
                           <i className="ti ti-device-camera-phone" />
-                          <span>car Attributes</span>
+                          <span>Car Attributes</span>
                           <span className="menu-arrow" />
                         </a>
-                        {open && (
-                          <ul>
+                        {openMenu === "attributes" && (
+                          <ul style={{ display: "block" }}>
                             <li>
                               <NavLink to="car-brands">Brands</NavLink>
                             </li>
@@ -430,7 +484,6 @@ const AdminDashboard = () => {
                             <li>
                               <NavLink to="car-cylinders">Cylinders</NavLink>
                             </li>
-
                             <li>
                               <NavLink to="car-features">Features</NavLink>
                             </li>
@@ -438,6 +491,8 @@ const AdminDashboard = () => {
                         )}
                       </li>
                     )}
+
+                    {/* Extra Service */}
                     {userType !== 1 && (
                       <li>
                         <NavLink to="car-extra-features">
@@ -446,19 +501,8 @@ const AdminDashboard = () => {
                         </NavLink>
                       </li>
                     )}
-                    {/* <li>
-                      <NavLink to="car-pricing">
-                        <i className="ti ti-file-dollar" />
-                        <span>Seasonal Pricing</span>
-                      </NavLink>
-                    </li> */}
 
-                    {/* <li>
-                      <NavLink to="car-maintenance">
-                        <i className="ti ti-color-filter" />
-                        <span>Maintenance</span>
-                      </NavLink>
-                    </li> */}
+                    {/* Reviews */}
                     {userType !== 1 && (
                       <li>
                         <NavLink to="car-review">
@@ -509,14 +553,19 @@ const AdminDashboard = () => {
                 </li>
                 <li>
                   <ul>
-                    <li>
-                      <a onClick={() => setblogOpen(!blogOpen)}>
+                    {/* Blogs */}
+                    <li
+                      className={`submenu ${
+                        openMenu === "blogs" ? "subdrop" : ""
+                      }`}
+                    >
+                      <a onClick={() => toggleMenu("blogs")}>
                         <i className="ti ti-device-desktop-analytics" />
                         <span>Blogs</span>
                         <span className="menu-arrow" />
                       </a>
-                      {blogOpen && (
-                        <ul>
+                      {openMenu === "blogs" && (
+                        <ul style={{ display: "block" }}>
                           <li>
                             <NavLink to="all-blogs">All Blogs</NavLink>
                           </li>
@@ -541,15 +590,20 @@ const AdminDashboard = () => {
                       )}
                     </li>
 
+                    {/* Locations */}
                     {userType !== 1 && (
-                      <li>
-                        <a onClick={() => SetLocationOpen(!LocationOpen)}>
+                      <li
+                        className={`submenu ${
+                          openMenu === "locations" ? "subdrop" : ""
+                        }`}
+                      >
+                        <a onClick={() => toggleMenu("locations")}>
                           <i className="ti ti-map" />
                           <span>Locations</span>
                           <span className="menu-arrow" />
                         </a>
-                        {LocationOpen && (
-                          <ul>
+                        {openMenu === "locations" && (
+                          <ul style={{ display: "block" }}>
                             <li>
                               <NavLink to="location-countries">
                                 Countries
@@ -566,23 +620,30 @@ const AdminDashboard = () => {
                       </li>
                     )}
 
+                    {/* Testimonials */}
                     {userType === 1 && (
-                      <li>
+                      <li className="submenu">
                         <NavLink to="all-testimonials">
                           <i className="ti ti-brand-hipchat" />
                           <span>Testimonials</span>
                         </NavLink>
                       </li>
                     )}
+
+                    {/* FAQ */}
                     {userType === 1 && (
-                      <li>
-                        <a onClick={() => SetFaqOpen(!FaqOpen)}>
+                      <li
+                        className={`submenu ${
+                          openMenu === "faq" ? "subdrop" : ""
+                        }`}
+                      >
+                        <a onClick={() => toggleMenu("faq")}>
                           <i className="ti ti-question-mark" />
                           <span>FAQ’s</span>
                           <span className="menu-arrow" />
                         </a>
-                        {FaqOpen && (
-                          <ul>
+                        {openMenu === "faq" && (
+                          <ul style={{ display: "block" }}>
                             <li>
                               <NavLink to="all-faq">FAQ's</NavLink>
                             </li>
@@ -662,14 +723,19 @@ const AdminDashboard = () => {
                 </li>
                 <li>
                   <ul>
-                    <li>
-                      <a onClick={() => SetSettingOpen(!SettingOpen)}>
+                    {/* Account Settings */}
+                    <li
+                      className={`submenu ${
+                        openMenu === "account" ? "subdrop" : ""
+                      }`}
+                    >
+                      <a onClick={() => toggleMenu("account")}>
                         <i className="ti ti-user-cog" />
                         <span>Account Settings</span>
                         <span className="menu-arrow" />
                       </a>
-                      {SettingOpen && (
-                        <ul>
+                      {openMenu === "account" && (
+                        <ul style={{ display: "block" }}>
                           <li>
                             <NavLink to="profile-setting">Profile</NavLink>
                           </li>
@@ -679,58 +745,62 @@ const AdminDashboard = () => {
                         </ul>
                       )}
                     </li>
-                    <li>
-                      <a
-                        onClick={() =>
-                          setReantalSettingOpen(!rentalSettingOpen)
-                        }
-                      >
+
+                    {/* Website Settings */}
+                    <li
+                      className={`submenu ${
+                        openMenu === "website" ? "subdrop" : ""
+                      }`}
+                    >
+                      <a onClick={() => toggleMenu("website")}>
                         <i className="ti ti-clock-cog" />
-                        <span>Website Setting </span>
+                        <span>Website Setting</span>
                         <span className="menu-arrow" />
                       </a>
-                      {rentalSettingOpen && (
-                        <ul>
+                      {openMenu === "website" && (
+                        <ul style={{ display: "block" }}>
                           {userType !== 1 && (
-                            <li>
-                              <Link to="invoice-setting">Invoice Settings</Link>
-                            </li>
-                          )}
-
-                          {userType !== 1 && (
-                            <li>
-                              <Link to="signature-setting">Signatures</Link>
-                            </li>
-                          )}
-                          {userType !== 1 && (
-                            <li>
-                              <Link to="bank-account-setting">
-                                Bank Accounts
-                              </Link>
-                            </li>
-                          )}
-                          {userType === 1 && (
-                            <li>
-                              <Link to="company-setting">Company Settings</Link>
-                            </li>
+                            <>
+                              <li>
+                                <Link to="invoice-setting">
+                                  Invoice Settings
+                                </Link>
+                              </li>
+                              <li>
+                                <Link to="signature-setting">Signatures</Link>
+                              </li>
+                              <li>
+                                <Link to="bank-account-setting">
+                                  Bank Accounts
+                                </Link>
+                              </li>
+                            </>
                           )}
                           {userType === 1 && (
-                            <li>
-                              <Link to="login-setting">Login Settings</Link>
-                            </li>
+                            <>
+                              <li>
+                                <Link to="company-setting">
+                                  Company Settings
+                                </Link>
+                              </li>
+                              <li>
+                                <Link to="login-setting">Login Settings</Link>
+                              </li>
+                              <li>
+                                <Link to="email-setting">Email Settings</Link>
+                              </li>
+                              <li>
+                                <Link to="location-setting">
+                                  Location Settings
+                                </Link>
+                              </li>
+                            </>
                           )}
-                          {userType === 1 && (
-                            <li>
-                              <Link to="email-setting">Email Settings</Link>
-                            </li>
-                          )}
-                          {userType === 1 && (
-                            <li>
-                              <Link to="location-setting">
-                                Location Settings
-                              </Link>
-                            </li>
-                          )}
+                          <li>
+                            <Link to="localization-setting">
+                              Localization Settings
+                            </Link>
+                          </li>
                         </ul>
                       )}
                     </li>

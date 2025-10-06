@@ -68,7 +68,7 @@ route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
 route.get("/blogs/get-all-comments-user/:blogId", blogComments.getCommentBlog);
 
 //!! car
-route.get("/car-details-user/:id", car.getSingleCarUser);
+route.get("/car-details-user/:permalink", car.getSingleCarUser);
 route.get("/car-review/:carId", carReview.getCarReviews);
 route.get("/get-featured-car", car.getFeaturedCar);
 
@@ -1040,6 +1040,10 @@ route.post(
   checkPermission("Reservation", "edit"),
   reservation.bookingCompleteByAdmin
 );
+route.post(
+  "/payment-completed-by-user/:id",
+  reservation.paymanetCompletedByUser
+);
 route.get(
   "/get-reservation-by/:id",
   checkPermission("Reservation", "view"),
@@ -1116,7 +1120,7 @@ route.post(
 route.post(
   "/edit-invoice-admin/:id",
   checkPermission("Invoice", "edit"),
-  invoice.createInvoice
+  invoice.updateInvoice
 );
 
 //!!! invoice setting

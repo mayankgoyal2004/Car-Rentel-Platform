@@ -7,7 +7,7 @@ const Faq = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10; // FAQs per page
+  const limit = 10; 
 
   useEffect(() => {
     const fetchFaqs = async () => {

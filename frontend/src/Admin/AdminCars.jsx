@@ -4,6 +4,7 @@ import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
+import { CSVLink } from "react-csv";
 
 const AdminCars = () => {
   const [cars, setCars] = useState([]);
@@ -105,6 +106,38 @@ const AdminCars = () => {
     }
   };
 
+  const carCsvHeaders = [
+    { label: "Car Name", key: "carName" },
+    { label: "Car Model", key: "carModel" },
+    { label: "Car Type", key: "carType" },
+    { label: "Brand", key: "carBrand" },
+    { label: "Fuel", key: "carFuel" },
+    { label: "Transmission", key: "carTransmission" },
+    { label: "Seats", key: "carSeats" },
+    { label: "Location", key: "location" },
+    { label: "Price (Daily)", key: "pricing" },
+    { label: "Status", key: "status" },
+    { label: "Featured", key: "isFeatured" },
+    { label: "Created Date", key: "createdAt" },
+    { label: "Views", key: "views" },
+  ];
+
+  // CSV data mapping
+  const carCsvData = cars.map((car) => ({
+    carName: car.carName,
+    carModel: car.carModel,
+    carType: car.carType,
+    carBrand: car.carBrand,
+    carFuel: car.carFuel,
+    carTransmission: car.carTransmission,
+    carSeats: car.carSeats,
+    location: car.location,
+    pricing: car.pricing || 0,
+    status: car.status ? "Active" : "Inactive",
+    isFeatured: car.isFeatured ? "Yes" : "No",
+    createdAt: new Date(car.createdAt).toLocaleDateString(),
+    views: car.views || 0,
+  }));
   const handleDeleteCar = async () => {
     if (!deleteCar) return;
     try {
@@ -159,14 +192,17 @@ const AdminCars = () => {
   </ul>
 </div> */}
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-            <div className="mb-2 me-2"></div>
+            
             <div className="mb-2 me-2">
-              <div className="dropdown">
-                <a className="btn btn-dark d-inline-flex align-items-center">
-                  <i className="ti ti-upload me-1" />
-                  Export
-                </a>
-              </div>
+              <CSVLink
+                data={carCsvData}
+                headers={carCsvHeaders}
+                filename={`admin_cars_${new Date().toLocaleDateString()}.csv`}
+                className="btn btn-dark d-inline-flex align-items-center"
+              >
+                <i className="ti ti-upload me-1" />
+                Export CSV
+              </CSVLink>
             </div>
 
             <div className="mb-2">

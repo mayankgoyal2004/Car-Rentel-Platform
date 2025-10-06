@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { Heart } from "react-feather";
+import { ToastContainer, toast } from "react-toastify";
 
 const UserWishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -9,7 +10,7 @@ const UserWishlist = () => {
   const getWishList = async () => {
     try {
       const res = await apiService.getWishlist();
-      setWishlist(res.data.wishlist ); 
+      setWishlist(res.data.wishlist);
     } catch (err) {
       console.error("Error fetching wishlist:", err);
     }
@@ -18,9 +19,20 @@ const UserWishlist = () => {
   const handleWishlist = async (carId) => {
     try {
       const res = await apiService.addWishlist({ carId });
-      setWishlist(res.data.wishlist || []); 
+
+      if (res.data.success) {
+        setWishlist(res.data.wishlist);
+        toast.success("Wishlist updated!");
+      } else {
+        toast.error(res.data.message || "Failed to update wishlist");
+      }
     } catch (err) {
-      console.error("Error toggling wishlist:", err);
+      if (err.response?.status === 403) {
+        toast.error("Please login to add to wishlist");
+      } else {
+        toast.error("Error toggling wishlist");
+        console.error("Error toggling wishlist:", err);
+      }
     }
   };
 
@@ -28,7 +40,6 @@ const UserWishlist = () => {
     getWishList();
   }, []);
 
-  // helper to check if car is in wishlist
   const isInWishlist = (carId) =>
     Array.isArray(wishlist) && wishlist.some((w) => w._id === carId);
 
@@ -51,32 +62,31 @@ const UserWishlist = () => {
                     <div className="card">
                       <div className="blog-widget d-flex">
                         <div className="blog-img">
-                           <button
+                          <button
                             onClick={() => handleWishlist(car._id)}
                             className="btn btn-link p-0 border-0"
                           >
                             <Heart
                               size={20}
-                              color={isInWishlist(car._id) ? "red" : "gray"}
-                              fill={isInWishlist(car._id) ? "red" : "none"}
+                              color={isInWishlist(car?._id) ? "red" : "gray"}
+                              fill={isInWishlist(car?._id) ? "red" : "none"}
                             />
                           </button>
-                          <Link to={`/listing-details/${car._id}`}>
+                          <Link to={`/listing-details/${car?.permalink}`}>
                             <img
                               src={BASE_URL_IMG + car?.image}
                               className="img-fluid"
-                              alt={car.carName}
+                              alt={car?.carName}
                             />
                           </Link>
-                         
                         </div>
                         <div className="bloglist-content w-100">
                           <div className="card-body">
                             <div className="blog-list-head d-flex">
                               <div className="blog-list-title">
                                 <h3>
-                                  <Link to={`/listing-details/${car._id}`}>
-                                    {car.carName}
+                                  <Link to={`/listing-details/${car.permalink}`}>
+                                    {car?.carName}
                                   </Link>
                                 </h3>
                                 <h6>
@@ -103,7 +113,11 @@ const UserWishlist = () => {
                                   <p>{car?.carFuel?.carFuel}</p>
                                 </li>
                                 <li>
-                                  <p>{car.year ? new Date(car.year).getFullYear() : "N/A"}</p>
+                                  <p>
+                                    {car?.year
+                                      ? new Date(car?.year).getFullYear()
+                                      : "N/A"}
+                                  </p>
                                 </li>
                                 <li>
                                   <p>{car?.carSeats?.carSeats} Persons</p>
@@ -113,12 +127,12 @@ const UserWishlist = () => {
                             <div className="blog-list-head list-head-bottom d-flex">
                               <div className="address-info">
                                 <h6>
-                                  {car?.mainLocation?.location || "Unknown"}
+                                  {car?.mainLocation?.location}
                                 </h6>
                               </div>
                               <div className="listing-button">
                                 <Link
-                                  to={`/listing-details/${car._id}`}
+                                  to={`/listing-details/${car.permalink}`}
                                   className="btn btn-order"
                                 >
                                   Rent Now
@@ -135,6 +149,19 @@ const UserWishlist = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

@@ -78,9 +78,7 @@ const AdminCarFuel = () => {
   const handleDeleteCarFuel = async () => {
     if (!deleteCarFuel) return;
     try {
-      const res = await apiService.deleteCarFuel(
-        deleteCarFuel._id
-      );
+      const res = await apiService.deleteCarFuel(deleteCarFuel._id);
       toast.success(res.data.message);
       setDeleteCarFuel(null);
       fetchAllCarFuel(currentPage, search);
@@ -121,29 +119,8 @@ const AdminCarFuel = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-white d-flex align-items-center"
-                >
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </a>
-              </div>
-              <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <a
-                    href="javascript:void(0);"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </a>
-                </div>
-              </div>
               <div className="mb-2">
                 <a
-                  href="javascript:void(0);"
                   data-bs-toggle="modal"
                   data-bs-target="#add_fuel"
                   className="btn btn-primary d-flex align-items-center"
@@ -439,11 +416,13 @@ const AdminCarFuel = () => {
                 <i className="ti ti-trash-x fs-26" />
               </span>
               <h4 className="mb-1">Delete Fuel</h4>
-              <p className="mb-3">
-                Are you sure you want to delete fuel?
-              </p>
+              <p className="mb-3">Are you sure you want to delete fuel?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal" id="delete_fuel_close">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_fuel_close"
+                >
                   Cancel
                 </button>
                 <button

@@ -1,67 +1,90 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import apiService from "../../../Apiservice/apiService";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-const AdminSecuritySetting = () => {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
+const LocalizationSetting = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType;
+  const [loaded, setLoaded] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      return alert("All fields are required!");
+  useEffect(() => {
+    const elementId = "google_translate_element";
+    if (!document.getElementById(elementId)) {
+      const div = document.createElement("div");
+      div.id = elementId;
+      div.style.display = "none"; 
+      document.body.appendChild(div);
+    }
+    if (!document.getElementById("google-translate-script")) {
+      const script = document.createElement("script");
+      script.id = "google-translate-script";
+      script.src =
+        "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+      document.body.appendChild(script);
     }
 
-    if (newPassword !== confirmPassword) {
-      return alert("New password and confirm password do not match!");
-    }
+    // Define global init callback
+    window.googleTranslateElementInit = () => {
+      new window.google.translate.TranslateElement(
+        {
+          pageLanguage: "en",
+          includedLanguages: "en,hi,pa,gu,bn,ta,te,ml,mr,fr,de,es",
+          autoDisplay: false,
+        },
+        elementId
+      );
+      setLoaded(true);
+    };
+  }, []);
 
-    setLoading(true);
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "hi", name: "Hindi" },
+    { code: "pa", name: "Punjabi" },
+    { code: "gu", name: "Gujarati" },
+    { code: "bn", name: "Bengali" },
+    { code: "ta", name: "Tamil" },
+    { code: "te", name: "Telugu" },
+    { code: "ml", name: "Malayalam" },
+    { code: "mr", name: "Marathi" },
+    { code: "fr", name: "French" },
+    { code: "de", name: "German" },
+    { code: "es", name: "Spanish" },
+  ];
 
-    try {
-      const res = await apiService.updateAdminPassword({
-        currentPassword,
-        newPassword,
-      });
-
-      if (res.data.success) {
-        alert("Password updated successfully!");
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmPassword("");
-      } else {
-        alert(res.message || "Failed to update password");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error. Try again later.");
-    } finally {
-      setLoading(false);
+  const handleChange = (e) => {
+    const lang = e.target.value;
+    const combo = document.querySelector(".goog-te-combo");
+    if (combo) {
+      combo.value = lang;
+      combo.dispatchEvent(new Event("change"));
+    } else {
+      alert("Language selector not ready yet, please wait a second.");
     }
   };
 
   return (
     <div className="page-wrapper">
-      <div className="content me-4 pb-0">
-        {/* Breadcrumb */}
+      <div className="content me-0 pb-0 me-lg-4">
         <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="my-auto mb-2">
             <h2 className="mb-1">Settings</h2>
+            <nav>
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <Link to="/">Home</Link>
+                </li>
+                <li className="breadcrumb-item active" aria-current="page">
+                  Settings
+                </li>
+              </ol>
+            </nav>
           </div>
         </div>
 
         <div className="row">
-          <div className="col-xl-3">
-            {/* Sidebar */}
+          <div className="col-lg-3">
+            {/* inner sidebar - unchanged */}
             <div className="settings-sidebar slimscroll">
               <div className="sidebar-menu">
                 <ul>
@@ -76,7 +99,7 @@ const AdminSecuritySetting = () => {
                         Profile
                       </Link>
                     </li>
-                    <li className="active">
+                    <li>
                       <Link to="/admin-dashboard/security-setting">
                         <i className="ti ti-lock me-2" />
                         Security
@@ -115,20 +138,21 @@ const AdminSecuritySetting = () => {
                         </Link>
                       </li>
                     )}
-                    <li>
+                    {userType === 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/location-setting">
+                          <i className="ti ti-settings-2 me-2" />
+                          <span>Location Setting</span>
+                        </Link>
+                      </li>
+                    )}
+
+                    <li className="active">
                       <Link to="/admin-dashboard/localization-setting">
                         <i className="ti ti-language me-2" />
                         <span>Localization</span>
                       </Link>
                     </li>
-                    {userType === 1 && (
-                      <li>
-                        <a href="language-setting.html">
-                          <i className="ti ti-language me-2" />
-                          <span>Language</span>
-                        </a>
-                      </li>
-                    )}
 
                     {userType !== 1 && (
                       <li>
@@ -140,7 +164,7 @@ const AdminSecuritySetting = () => {
                       </li>
                     )}
                     {userType !== 1 && (
-                      <li>
+                      <li >
                         <Link to="/admin-dashboard/signature-setting">
                           <i className="ti ti-signature me-2" />
                           <span>Signatures</span>
@@ -164,54 +188,38 @@ const AdminSecuritySetting = () => {
           <div className="col-xl-9">
             <div className="card">
               <div className="card-header">
-                <h5>Change Password</h5>
+                <h5>Website Settings</h5>
               </div>
-              <div className="card-body">
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Current Password <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      New Password <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Confirm Password <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="d-flex justify-content-end">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={loading}
+              <div className="card-body pb-0">
+                <div className="localization-content mb-3">
+                  <h6 className="mb-3">Localization</h6>
+                  <div className="localization-list">
+                    <p className="text-gray-9 fw-medium">
+                       Language <span className="text-danger">*</span>
+                    </p>
+                    <select
+                      className="select"
+                      defaultValue="en"
+                      onChange={handleChange}
+                      disabled={!loaded}
                     >
-                      {loading ? "Updating..." : "Save Changes"}
-                    </button>
+                      {languages.map((lang) => (
+                        <option key={lang.code} value={lang.code}>
+                          {lang.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
-                </form>
+
+                  {/* Hidden Google Translate container */}
+                  <div
+                    id="google_translate_element"
+                    style={{ display: "none" }}
+                  ></div>
+                </div>
               </div>
+
+             
             </div>
           </div>
         </div>
@@ -220,4 +228,4 @@ const AdminSecuritySetting = () => {
   );
 };
 
-export default AdminSecuritySetting;
+export default LocalizationSetting;

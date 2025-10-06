@@ -118,9 +118,12 @@ const register = async (req, res) => {
       password: hashedPassword,
       status: userStatus,
     });
+    let verificationToken;
 
     if (SMTPSetting?.status) {
-      const verificationToken = generateVerificationToken(newUser);
+      verificationToken = generateVerificationToken(newUser);
+      console.log("Generated verification token:", verificationToken);
+
       newUser.verificationToken = verificationToken;
       newUser.tokenExpirationTime = Date.now() + 24 * 60 * 60 * 1000;
     }
@@ -541,25 +544,31 @@ const updateUserDetails = async (req, res) => {
       updateData.image = imagePath;
     }
 
-    // Update user
     const user = await User.findByIdAndUpdate(_id, updateData, { new: true });
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    const existingCustomer = await customer.findOne({ userId: _id });
+
+    const customerUpdateData = {
+      userId: _id,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      contact: req.body.contact,
+      address: req.body.address,
+      country: req.body.country,
+      state: req.body.state,
+      city: req.body.city,
+      pincode: req.body.pincode,
+    };
+
+    if (req.file) {
+      customerUpdateData.image = imagePath;
+    }
+
     const Customer = await customer.findOneAndUpdate(
       { userId: _id },
-      {
-        userId: _id,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        contact: req.body.contact,
-        address: req.body.address,
-        country: req.body.country,
-        state: req.body.state,
-        city: req.body.city,
-        pincode: req.body.pincode,
-        image: imagePath,
-      },
+      customerUpdateData,
       { new: true, upsert: true }
     );
 
@@ -831,10 +840,14 @@ const registerAdmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "User already exists" });
     }
+    if(!req.file){
+      return res
+        .status(409)
+        .json({ success: false, message: "Image is Required" });
+    }
 
-    const imagePath = req.file
-      ? req.file.path.replace(/\\/g, "/")
-      : "/uploads/businessImage/default.jpg";
+    const imagePath = req.file.path.replace(/\\/g, "/")
+    
 
     const setting = await RecaptchaSetting.findOne({});
     if (setting?.status) {
@@ -989,7 +1002,6 @@ module.exports = {
   login,
   forgotPassword,
   resetPassword,
-  // logout,
   verifyEmail,
   changePassword,
   updateUserDetails,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { Heart, Filter, Calendar, MapPin } from "react-feather";
-
+import { ToastContainer, toast } from "react-toastify";
 const Listing = () => {
   const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -10,7 +10,7 @@ const Listing = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [wishlist, setWishlist] = useState([]);
-
+  const navigate = useNavigate();
   // Get query parameters from URL
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -35,11 +35,9 @@ const Listing = () => {
     rating: [],
   });
 
-  // Fetch cars on component mount and when filters/page change
   const fetchCars = async () => {
     setLoading(true);
     try {
-      // Combine search query with other filters
       const apiFilters = {
         search: searchQuery || filters.search,
         page: currentPage,
@@ -98,15 +96,26 @@ const Listing = () => {
   useEffect(() => {
     fetchCars();
     getWishList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, filters.limit]);
+  }, [currentPage, filters.limit, searchQuery]);
 
   const handleWishlist = async (carId) => {
     try {
       const res = await apiService.addWishlist({ carId });
-      setWishlist(res.data.wishlist);
+
+      if (res.data.success) {
+        setWishlist(res.data.wishlist || []);
+        toast.success("Wishlist updated!");
+      } else {
+        toast.error(res.data.message || "Failed to update wishlist");
+      }
     } catch (err) {
-      console.error("Error toggling wishlist:", err);
+      if (err.response?.status === 403) {
+        toast.error("Please login to add to wishlist");
+        setTimeout(() => navigate("/login"), 3000);
+      } else {
+        toast.error("Error toggling wishlist");
+        console.error("Error toggling wishlist:", err);
+      }
     }
   };
   // Update search query when URL params change
@@ -131,9 +140,9 @@ const Listing = () => {
   }, [location.search]);
 
   const handleSearch = (e) => {
-    e.preventDefault();
+  setSearchQuery(e.target.value)
     setCurrentPage(1);
-    fetchCars();
+  
   };
 
   const handleFilterChange = (filterType, value) => {
@@ -159,16 +168,11 @@ const Listing = () => {
 
         return {
           ...prev,
-          [filterType]: value, // 👈 keep frontend key (for UI binding)
-          [backendKey]: value, // 👈 backend key (for API request)
+          [filterType]: value,
+          [backendKey]: value,
         };
       }
     });
-  };
-
-  const applyFilters = () => {
-    setCurrentPage(1);
-    fetchCars();
   };
 
   const resetFilters = () => {
@@ -330,7 +334,7 @@ const Listing = () => {
             <div className="search-box-banner">
               <form onSubmit={handleSearch}>
                 <ul className="align-items-center">
-                  <li className="column-group-main">
+                  {/* <li className="column-group-main">
                     <div className="input-block">
                       <label>Search Cars</label>
                       <div className="group-img">
@@ -343,7 +347,7 @@ const Listing = () => {
                         />
                       </div>
                     </div>
-                  </li>
+                  </li> */}
                   {/* Show quick search details if they exist */}
 
                   <>
@@ -386,46 +390,62 @@ const Listing = () => {
                         </div>
                       </div>
                     </li>
-                    {filters.pickupDate && (
-                      <li className="column-group">
-                        <div className="input-block">
-                          <label>Pickup Date</label>
-                          <div className="group-img">
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={new Date(
-                                filters.pickupDate
-                              ).toLocaleString()}
-                              readOnly
-                            />
-                            <span>
-                              <i className="feather-calendar" />
-                            </span>
-                          </div>
+
+                    <li className="column-group">
+                      <div className="input-block">
+                        <label>Pickup Date</label>
+                        <div className="group-img">
+                          <input
+                            type="date"
+                            className="form-control"
+                            value={
+                              filters.pickupDate
+                                ? new Date(filters.pickupDate)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : ""
+                            }
+                            onChange={(e) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                pickupDate: e.target.value,
+                              }))
+                            }
+                          />
+                          <span>
+                            <i className="feather-calendar" />
+                          </span>
                         </div>
-                      </li>
-                    )}
-                    {filters.dropDate && (
-                      <li className="column-group">
-                        <div className="input-block">
-                          <label>Dropoff Date</label>
-                          <div className="group-img">
-                            <input
-                              type="text"
-                              className="form-control"
-                              value={new Date(
-                                filters.dropDate
-                              ).toLocaleString()}
-                              readOnly
-                            />
-                            <span>
-                              <i className="feather-calendar" />
-                            </span>
-                          </div>
+                      </div>
+                    </li>
+
+                    <li className="column-group">
+                      <div className="input-block">
+                        <label>Dropoff Date</label>
+                        <div className="group-img">
+                          <input
+                            type="date"
+                            className="form-control"
+                            value={
+                              filters.dropDate
+                                ? new Date(filters.dropDate)
+                                    .toISOString()
+                                    .split("T")[0]
+                                : ""
+                            }
+                            onChange={(e) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                dropDate: e.target.value,
+                              }))
+                            }
+                          />
+                          <span>
+                            <i className="feather-calendar" />
+                          </span>
                         </div>
-                      </li>
-                    )}
+                      </div>
+                    </li>
                   </>
 
                   <li className="column-group-last">
@@ -477,6 +497,17 @@ const Listing = () => {
                   <div className="sidebar-heading">
                     <h3>What Are You Looking For</h3>
                   </div>
+                  <div className="product-search">
+                    <div className="form-custom">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search Car"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                  </div>
 
                   <div className="accord-list">
                     {/* Car Brand Filter */}
@@ -512,7 +543,7 @@ const Listing = () => {
                                 <div className="selectBox-cont">
                                   {[
                                     "Tesla",
-                                    "test",
+
                                     "Ford",
                                     "Mercedes Benz",
                                     "Audi",
@@ -661,6 +692,67 @@ const Listing = () => {
                         </div>
                       </div>
                     </div>
+                    {/* Car Color Filter */}
+                    <div className="accordion" id="accordionMainColor">
+                      <div className="card-header-new" id="headingColor">
+                        <h6 className="filter-title">
+                          <a
+                            href="#javascript"
+                            className="w-100 collapsed"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseColor"
+                            aria-expanded="true"
+                            aria-controls="collapseColor"
+                            onClick={(e) => e.preventDefault()}
+                          >
+                            Car Color
+                            <span className="float-end">
+                              <i className="fa-solid fa-chevron-down" />
+                            </span>
+                          </a>
+                        </h6>
+                      </div>
+                      <div
+                        id="collapseColor"
+                        className="collapse"
+                        aria-labelledby="headingColor"
+                        data-bs-parent="#accordionExample2"
+                      >
+                        <div className="card-body-chat">
+                          <div className="fuel-list">
+                            <ul>
+                              {[
+                                "Black",
+                                "White",
+                                "Red",
+                                "Blue",
+                                "Silver",
+                                "Gray",
+                                "Green",
+                                "Yellow",
+                              ].map((color) => (
+                                <li key={color}>
+                                  <div className="input-selection">
+                                    <input
+                                      type="radio"
+                                      name="color"
+                                      id={color.toLowerCase()}
+                                      checked={filters.color === color}
+                                      onChange={() =>
+                                        handleFilterChange("color", color)
+                                      }
+                                    />
+                                    <label htmlFor={color.toLowerCase()}>
+                                      {color}
+                                    </label>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
                     {/* Rating Filter */}
                     {/* <div className="accordion" id="accordionMain10">
@@ -785,7 +877,7 @@ const Listing = () => {
                         >
                           <div className="listing-item">
                             <div className="listing-img">
-                              <Link to={`/listing-details/${car._id}`}>
+                              <Link to={`/listing-details/${car.permalink}`}>
                                 <img
                                   src={BASE_URL_IMG + car?.image}
                                   className="img-fluid"
@@ -816,7 +908,9 @@ const Listing = () => {
                               <div className="listing-features d-flex align-items-end justify-content-between">
                                 <div className="list-rating">
                                   <h3 className="listing-title">
-                                    <Link to={`/listing-details/${car?._id}`}>
+                                    <Link
+                                      to={`/listing-details/${car?.permalink}`}
+                                    >
                                       {car?.carName}
                                     </Link>
                                   </h3>
@@ -931,7 +1025,7 @@ const Listing = () => {
                               </div>
                               <div className="listing-button">
                                 <Link
-                                  to={`/listing-details/${car._id}`}
+                                  to={`/listing-details/${car.permalink}`}
                                   className="btn btn-order"
                                 >
                                   <span>
@@ -960,6 +1054,19 @@ const Listing = () => {
           </div>
         </section>
         {/* /Car Grid View */}
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

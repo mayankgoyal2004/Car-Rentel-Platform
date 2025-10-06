@@ -32,35 +32,52 @@ const UserBookingCompleted = () => {
     getAllReservationUser();
   }, []);
 
+  const getRentalPeriod = (res) => {
+    if (!res?.pickupDate || !res?.dropDate) return 0;
 
+    const start = new Date(res.pickupDate);
+    const end = new Date(res.dropDate);
 
-  const calculateTotalPrice = (reservation) => {
-    const { bookingType, extraServices, securityDeposit } = reservation;
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
-    let basePrice = 0;
+  const calculateTotalPrice = (res) => {
+    if (!res?.car?.pricing) return 0;
 
-    if (reservation.car.pricing.prices) {
-      if (bookingType === "daily")
-        basePrice = reservation.car.pricing.prices.daily || 0;
-      else if (bookingType === "weekly")
-        basePrice = reservation.car.pricing.prices.weekly || 0;
-      else if (bookingType === "monthly")
-        basePrice = reservation.car.pricing.prices.monthly || 0;
-      else if (bookingType === "yearly")
-        basePrice = reservation.car.pricing.prices.yearly || 0;
+    const rentalDays = getRentalPeriod(res);
+    const prices = res.car.pricing.prices;
+
+    let carPrice = 0;
+    switch (res.bookingType) {
+      case "daily":
+        carPrice = prices.daily * rentalDays;
+        break;
+      case "weekly":
+        carPrice = prices.weekly * Math.ceil(rentalDays / 7);
+        break;
+      case "monthly":
+        carPrice = prices.monthly * Math.ceil(rentalDays / 30);
+        break;
+      case "yearly":
+        carPrice = prices.yearly * Math.ceil(rentalDays / 365);
+        break;
+      default:
+        carPrice = 0;
     }
 
-    const extraServicesTotal = extraServices.reduce(
-      (sum, service) => sum + (service.price || 0),
+    const extraServices = res.extraServices || [];
+    const extraServicesPrice = extraServices.reduce(
+      (total, service) =>
+        total + (service.price || 0) * (service.quantity || 1),
       0
     );
 
-    const deposit = securityDeposit || 0;
+    const securityDeposit = res.securityDeposit || 0;
+    const driverPrice = res.driverPrice || 0;
 
-    // 4️⃣ Total price
-    const totalPrice = basePrice + extraServicesTotal + deposit;
-
-    return totalPrice;
+    return carPrice + extraServicesPrice + securityDeposit + driverPrice;
   };
   return (
     <div className="row">
@@ -239,166 +256,163 @@ const UserBookingCompleted = () => {
           </div>
         </div>
       </div>
-       <div
-              className="modal new-modal multi-step fade"
-              id="upcoming_booking_All_Booking"
-              data-keyboard="false"
-              data-backdrop="static"
-            >
-              <div className="modal-dialog modal-dialog-centered modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <button
-                      type="button"
-                      className="close-btn"
-                      data-bs-dismiss="modal"
-                    >
-                      <span>×</span>
-                    </button>
-                  </div>
-                  {selectedBooking ? (
-                    <div className="modal-body">
-                      <div className="booking-header">
-                        <div className="booking-img-wrap">
-                          <div className="book-img">
-                            <img
-                              src={BASE_URL_IMG + selectedBooking?.car?.image}
-                              alt="car"
-                            />
-                          </div>
-                          <div className="book-info">
-                            <h6>{selectedBooking?.car?.carName}</h6>
-      
-                            <p>
-                              <MapPin size={16} color="#000" />
-                              Location : {selectedBooking?.pickupAddress}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="book-amount">
-                          <p>Total Amount</p>
-                          <h6>
-                            ${calculateTotalPrice(selectedBooking)}{" "}
-                            <a href="javascript:void(0);">
-                              <AlertCircle size={16} color="#f00" />
-                            </a>
-                          </h6>
-                        </div>
-                      </div>
-                      <div className="booking-group">
-                        <div className="booking-wrapper">
-                          <div className="booking-title">
-                            <h6>Booking Details</h6>
-                          </div>
-                          <div className="row">
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Booking Type</h6>
-                                <p>{selectedBooking?.bookingType}</p>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Rental Type</h6>
-                                <p>{selectedBooking?.rentalType}</p>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Extra Service</h6>
-                                <p>
-                                  {selectedBooking?.extraServices
-                                    ?.map((service) => service.name)
-                                    .join(", ")}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Delivery</h6>
-                                <p>{selectedBooking?.pickupAddress}</p>
-                                <p>
-                                  {new Date(
-                                    selectedBooking?.pickupDate
-                                  ).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Dropoff</h6>
-                                <p>{selectedBooking?.dropAddress}</p>
-                                <p>
-                                  {new Date(
-                                    selectedBooking?.dropDate
-                                  ).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Status</h6>
-                                <span
-                                  className={`badge ${
-                                    selectedBooking?.status === "cancelled"
-                                      ? "badge-danger"
-                                      : selectedBooking?.status === "confirmed"
-                                      ? "badge-success"
-                                      : "badge-secondary"
-                                  }`}
-                                >
-                                  {selectedBooking?.status}
-                                </span>
-                              </div>
-                            </div>
-      
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Booked On</h6>
-                                <p>
-                                  {new Date(
-                                    selectedBooking?.createdAt
-                                  ).toLocaleString()}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="booking-wrapper">
-                          <div className="booking-title">
-                            <h6>Personal Details</h6>
-                          </div>
-                          <div className="row">
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Details</h6>
-                                <p>{selectedBooking?.customer.name}</p>
-                                <p>{selectedBooking?.customer.contact}</p>
-                                <p>
-                                  <a>{selectedBooking?.customer.email}</a>
-                                </p>
-                              </div>
-                            </div>
-                            <div className="col-lg-4 col-md-6">
-                              <div className="booking-view">
-                                <h6>Address</h6>
-                                <p>{selectedBooking?.customer.address}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                     
+      <div
+        className="modal new-modal multi-step fade"
+        id="upcoming_booking_All_Booking"
+        data-keyboard="false"
+        data-backdrop="static"
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button
+                type="button"
+                className="close-btn"
+                data-bs-dismiss="modal"
+              >
+                <span>×</span>
+              </button>
+            </div>
+            {selectedBooking ? (
+              <div className="modal-body">
+                <div className="booking-header">
+                  <div className="booking-img-wrap">
+                    <div className="book-img">
+                      <img
+                        src={BASE_URL_IMG + selectedBooking?.car?.image}
+                        alt="car"
+                      />
                     </div>
-                  ) : (
-                    <p>Loading...</p>
-                  )}
+                    <div className="book-info">
+                      <h6>{selectedBooking?.car?.carName}</h6>
+
+                      <p>
+                        <MapPin size={16} color="#000" />
+                        Location : {selectedBooking?.pickupAddress}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="book-amount">
+                    <p>Total Amount</p>
+                    <h6>
+                      ${calculateTotalPrice(selectedBooking)}{" "}
+                      <a href="javascript:void(0);">
+                        <AlertCircle size={16} color="#f00" />
+                      </a>
+                    </h6>
+                  </div>
+                </div>
+                <div className="booking-group">
+                  <div className="booking-wrapper">
+                    <div className="booking-title">
+                      <h6>Booking Details</h6>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Booking Type</h6>
+                          <p>{selectedBooking?.bookingType}</p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Rental Type</h6>
+                          <p>{selectedBooking?.rentalType}</p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Extra Service</h6>
+                          <p>
+                            {selectedBooking?.extraServices
+                              ?.map((service) => service.name)
+                              .join(", ")}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Delivery</h6>
+                          <p>{selectedBooking?.pickupAddress}</p>
+                          <p>
+                            {new Date(
+                              selectedBooking?.pickupDate
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Dropoff</h6>
+                          <p>{selectedBooking?.dropAddress}</p>
+                          <p>
+                            {new Date(
+                              selectedBooking?.dropDate
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Status</h6>
+                          <span
+                            className={`badge ${
+                              selectedBooking?.status === "cancelled"
+                                ? "badge-danger"
+                                : selectedBooking?.status === "confirmed"
+                                ? "badge-success"
+                                : "badge-secondary"
+                            }`}
+                          >
+                            {selectedBooking?.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Booked On</h6>
+                          <p>
+                            {new Date(
+                              selectedBooking?.createdAt
+                            ).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="booking-wrapper">
+                    <div className="booking-title">
+                      <h6>Personal Details</h6>
+                    </div>
+                    <div className="row">
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Details</h6>
+                          <p>{selectedBooking?.customer.name}</p>
+                          <p>{selectedBooking?.customer.contact}</p>
+                          <p>
+                            <a>{selectedBooking?.customer.email}</a>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="col-lg-4 col-md-6">
+                        <div className="booking-view">
+                          <h6>Address</h6>
+                          <p>{selectedBooking?.customer.address}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-      
-          
-         
+            ) : (
+              <p>Loading...</p>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* /Completed Bookings */}
     </div>
   );

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { CSVLink } from "react-csv";
+
 import { useSelector } from "react-redux";
 
 const AdminCustomers = () => {
@@ -106,7 +108,6 @@ const AdminCustomers = () => {
     setCurrentPage(page);
   };
 
-
   const handleAddCustomer = async () => {
     try {
       const userFormData = new FormData();
@@ -193,7 +194,38 @@ const AdminCustomers = () => {
       );
     }
   };
+  const csvHeaders = [
+    { label: "Name", key: "name" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "contact" },
+    { label: "License Number", key: "licenseNumber" },
+    { label: "Date of Birth", key: "dateOfBirth" },
+    { label: "Gender", key: "gender" },
+    { label: "Address", key: "address" },
+    { label: "Language", key: "language" },
+    { label: "Date of Issue", key: "dateOfIssue" },
+    { label: "Valid Till", key: "validTill" },
+  ];
 
+  // CSV data
+  const csvData = customers.map((customer) => ({
+    name: customer.name,
+    email: customer.email,
+    contact: customer.contact,
+    licenseNumber: customer.licenseNumber,
+    dateOfBirth: customer.dateOfBirth
+      ? new Date(customer.dateOfBirth).toLocaleDateString()
+      : "",
+    gender: customer.gender,
+    address: customer.address,
+    language: customer.language,
+    dateOfIssue: customer.dateOfIssue
+      ? new Date(customer.dateOfIssue).toLocaleDateString()
+      : "",
+    validTill: customer.validTill
+      ? new Date(customer.validTill).toLocaleDateString()
+      : "",
+  }));
   const handleDeleteConfirm = (customer) => {
     setDeleteCustomer(customer);
   };
@@ -237,19 +269,17 @@ const AdminCustomers = () => {
           </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
             <div className="mb-2 me-2">
-              <a className="btn btn-white d-flex align-items-center">
-                <i className="ti ti-printer me-2" />
-                Print
-              </a>
+              <CSVLink
+                headers={csvHeaders}
+                data={csvData}
+                filename={"customers.csv"}
+                className="btn btn-dark d-inline-flex align-items-center"
+              >
+                <i className="ti ti-upload me-1" />
+                Export CSV
+              </CSVLink>
             </div>
-            <div className="mb-2 me-2">
-              <div className="dropdown">
-                <a className="btn btn-dark d-inline-flex align-items-center">
-                  <i className="ti ti-upload me-1" />
-                  Export
-                </a>
-              </div>
-            </div>
+
             <div className="mb-2">
               <a
                 className="btn btn-primary d-flex align-items-center"

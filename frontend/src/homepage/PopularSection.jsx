@@ -86,7 +86,7 @@ const PopularSection = () => {
               </div>
 
               <Link
-                to={`/listing-details/${car._id}`}
+                to={`/listing-details/${car.permalink}`}
                 className="btn btn-primary"
               >
                 Rent Now

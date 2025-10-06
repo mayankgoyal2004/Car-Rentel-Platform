@@ -231,6 +231,8 @@ const getAllLocation = async (req, res) => {
     }
 
     const location = await Location.find(filter)
+      .populate("city")
+      .populate("country")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);

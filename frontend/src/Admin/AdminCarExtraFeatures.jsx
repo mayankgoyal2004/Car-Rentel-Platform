@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../Apiservice/apiService";
 import { toast } from "react-toastify";
+import { CSVLink } from "react-csv";
 
 const AdminCarExtraFeatures = () => {
   const [extraFeatures, setExtraFeatures] = useState([]);
@@ -99,6 +100,24 @@ const AdminCarExtraFeatures = () => {
     }
   };
 
+  const extraFeaturesCsvHeaders = [
+    { label: "Name", key: "name" },
+    { label: "Quantity", key: "quantity" },
+    { label: "Price", key: "price" },
+    { label: "Type", key: "type" },
+    { label: "Description", key: "description" },
+    { label: "Status", key: "status" },
+  ];
+
+  const extraFeaturesCsvData = extraFeatures.map((e) => ({
+    name: e.name || "",
+    quantity: e.quantity || "",
+    price: e.price || "",
+    type: e.type || "",
+    description: e.description || "",
+    status: e.status ? "Active" : "Inactive",
+  }));
+
   // Pagination
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -129,20 +148,18 @@ const AdminCarExtraFeatures = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-              <div className="mb-2 me-2">
-                <button className="btn btn-white d-flex align-items-center">
-                  <i className="ti ti-printer me-2" />
-                  Print
-                </button>
-              </div>
               <div className="me-2 mb-2">
-                <div className="dropdown">
-                  <button className="btn btn-dark d-inline-flex align-items-center">
-                    <i className="ti ti-upload me-1" />
-                    Export
-                  </button>
-                </div>
+                <CSVLink
+                  data={extraFeaturesCsvData}
+                  headers={extraFeaturesCsvHeaders}
+                  filename={`extra_services_${new Date().toLocaleDateString()}.csv`}
+                  className="btn btn-dark d-inline-flex align-items-center"
+                >
+                  <i className="ti ti-upload me-1" />
+                  Export CSV
+                </CSVLink>
               </div>
+
               <div className="mb-2">
                 <button
                   data-bs-toggle="modal"

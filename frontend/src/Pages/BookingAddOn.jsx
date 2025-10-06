@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BookingAddOn = () => {
   const { id } = useParams();
@@ -15,7 +17,7 @@ const BookingAddOn = () => {
     age: "",
     mobile: "",
     licenseNumber: "",
-    document: null
+    document: null,
   });
   const [showMoreAddons, setShowMoreAddons] = useState(false);
   const [openInfo, setOpenInfo] = useState({});
@@ -27,7 +29,7 @@ const BookingAddOn = () => {
 
         if (res.data && res.data.success && res.data.data) {
           const reservationData = res.data.data;
-          
+
           // Transform API data
           const transformedData = {
             ...reservationData,
@@ -35,13 +37,14 @@ const BookingAddOn = () => {
             priceRate: reservationData.bookingType || "daily",
             pickupAddress: reservationData.pickupAddress || "",
             dropAddress: reservationData.dropAddress || "",
-            returnToSame: !reservationData.dropAddress || 
-                         reservationData.pickupAddress === reservationData.dropAddress,
-            pickupDate: reservationData.pickupDate 
-              ? new Date(reservationData.pickupDate).toISOString().split("T")[0] 
+            returnToSame:
+              !reservationData.dropAddress ||
+              reservationData.pickupAddress === reservationData.dropAddress,
+            pickupDate: reservationData.pickupDate
+              ? new Date(reservationData.pickupDate).toISOString().split("T")[0]
               : "",
-            returnDate: reservationData.dropDate 
-              ? new Date(reservationData.dropDate).toISOString().split("T")[0] 
+            returnDate: reservationData.dropDate
+              ? new Date(reservationData.dropDate).toISOString().split("T")[0]
               : "",
             pickupTime: reservationData.pickupTime || "10:00",
             returnTime: reservationData.dropTime || "10:00",
@@ -50,13 +53,15 @@ const BookingAddOn = () => {
             convenienceFee: 0,
             tax: reservationData.pricingDetails?.tax || 0,
             deposit: reservationData.securityDeposit || 0,
-           
           };
 
           setReservation(transformedData);
-          
+
           // Load any previously selected addons
-          if (reservationData.extraServices && reservationData.extraServices.length > 0) {
+          if (
+            reservationData.extraServices &&
+            reservationData.extraServices.length > 0
+          ) {
             setSelectedAddons(reservationData.extraServices);
           }
         }
@@ -72,8 +77,9 @@ const BookingAddOn = () => {
 
   // Calculate number of days
   const calculateNumberOfDays = () => {
-    if (!reservation || !reservation.pickupDate || !reservation.returnDate) return 0;
-    
+    if (!reservation || !reservation.pickupDate || !reservation.returnDate)
+      return 0;
+
     const start = new Date(reservation.pickupDate);
     const end = new Date(reservation.returnDate);
     const diffTime = Math.abs(end - start);
@@ -81,40 +87,49 @@ const BookingAddOn = () => {
   };
 
   // Calculate rental rate
-const calculateRentalRate = () => {
-  if (!reservation || !reservation.priceRate || !reservation.car?.pricing?.prices) return 0;
-  
-  const days = calculateNumberOfDays();
-  const rateType = reservation.priceRate;
-  const ratePrices = reservation.car.pricing.prices;
-  
-  switch(rateType) {
-    case "daily": return days * ratePrices.daily;
-    case "weekly": return Math.ceil(days / 7) * ratePrices.weekly;
-    case "monthly": return Math.ceil(days / 30) * ratePrices.monthly;
-    case "yearly": return Math.ceil(days / 365) * ratePrices.yearly;
-    default: return days * ratePrices.daily;
-  }
-};
+  const calculateRentalRate = () => {
+    if (
+      !reservation ||
+      !reservation.priceRate ||
+      !reservation.car?.pricing?.prices
+    )
+      return 0;
+
+    const days = calculateNumberOfDays();
+    const rateType = reservation.priceRate;
+    const ratePrices = reservation.car.pricing.prices;
+
+    switch (rateType) {
+      case "daily":
+        return days * ratePrices.daily;
+      case "weekly":
+        return Math.ceil(days / 7) * ratePrices.weekly;
+      case "monthly":
+        return Math.ceil(days / 30) * ratePrices.monthly;
+      case "yearly":
+        return Math.ceil(days / 365) * ratePrices.yearly;
+      default:
+        return days * ratePrices.daily;
+    }
+  };
   // Get available extra services for this car
-const getAvailableAddons = () => {
-  if (!reservation || !reservation.car) return { main: [], more: [] };
+  const getAvailableAddons = () => {
+    if (!reservation || !reservation.car) return { main: [], more: [] };
 
-  const carExtras = reservation.car.extraService || [];
+    const carExtras = reservation.car.extraService || [];
 
-  // Split into first 4 and rest
-  const main = carExtras.slice(0, 4);
-  const more = carExtras.slice(4);
+    // Split into first 4 and rest
+    const main = carExtras.slice(0, 4);
+    const more = carExtras.slice(4);
 
-  return { main, more };
-};
-
+    return { main, more };
+  };
 
   const handleAddonToggle = (addon) => {
-    setSelectedAddons(prev => {
-      const isSelected = prev.some(item => item._id === addon._id);
+    setSelectedAddons((prev) => {
+      const isSelected = prev.some((item) => item._id === addon._id);
       if (isSelected) {
-        return prev.filter(item => item._id !== addon._id);
+        return prev.filter((item) => item._id !== addon._id);
       } else {
         return [...prev, addon];
       }
@@ -122,24 +137,24 @@ const getAvailableAddons = () => {
   };
 
   const handleToggleInfo = (addonId) => {
-    setOpenInfo(prev => ({
+    setOpenInfo((prev) => ({
       ...prev,
-      [addonId]: !prev[addonId]
+      [addonId]: !prev[addonId],
     }));
   };
 
   const handleDriverDetailChange = (e) => {
     const { name, value } = e.target;
-    setDriverDetails(prev => ({
+    setDriverDetails((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleDocumentUpload = (e) => {
-    setDriverDetails(prev => ({
+    setDriverDetails((prev) => ({
       ...prev,
-      document: e.target.files[0]
+      document: e.target.files[0],
     }));
   };
 
@@ -150,53 +165,64 @@ const getAvailableAddons = () => {
   const calculateTotal = () => {
     const rentalRate = calculateRentalRate();
     const addonsTotal = calculateAddonsTotal();
-    const additionalFees = (reservation?.doorStepDelivery || 0) + 
-                          (reservation?.tripProtection || 0) + 
-                          (reservation?.convenienceFee || 0) + 
-                          (reservation?.tax || 0) + 
-                          (reservation?.deposit || 0);
-    
+    const additionalFees =
+      (reservation?.doorStepDelivery || 0) +
+      (reservation?.tripProtection || 0) +
+      (reservation?.convenienceFee || 0) +
+      (reservation?.tax || 0) +
+      (reservation?.deposit || 0);
+
     return rentalRate + addonsTotal + additionalFees;
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-     const formData = new FormData();
+      const formData = new FormData();
 
-    // Append driver type
-    formData.append("driverType", driverType);
+      // Append driver type
+      formData.append("driverType", driverType);
 
-    // Append extra services
-selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id));
+      // Append extra services
+      selectedAddons.forEach((addon) =>
+        formData.append("extraServices[]", addon._id)
+      );
 
-    // Append total price
+      // Append total price
 
-    // Append driver details (if self)
-    if (driverType === "self") {
-      formData.append("driverDetails[firstName]", driverDetails.firstName);
-      formData.append("driverDetails[lastName]", driverDetails.lastName);
-      formData.append("driverDetails[age]", driverDetails.age);
-      formData.append("driverDetails[mobile]", driverDetails.mobile);
-      formData.append("driverDetails[licenseNumber]", driverDetails.licenseNumber);
+      if (driverType === "self") {
+        formData.append("driverDetails[firstName]", driverDetails.firstName);
+        formData.append("driverDetails[lastName]", driverDetails.lastName);
+        formData.append("driverDetails[age]", driverDetails.age);
+        formData.append("driverDetails[mobile]", driverDetails.mobile);
+        formData.append(
+          "driverDetails[licenseNumber]",
+          driverDetails.licenseNumber
+        );
 
-      // Append driver document file
-      if (driverDetails.document) {
-        formData.append("driverDetailsDocument", driverDetails.document);
+        if (driverDetails.document) {
+          formData.append("driverDetailsDocument", driverDetails.document);
+        }
       }
-    }
 
-      // Save the updated reservation
-      await apiService.editReservationStep3(id, formData);
-      
-      // Navigate to details page
-      navigate(`/booking-details/${id}`);
-    } catch (error) {
-      console.error("Error updating reservation:", error);
-      alert("There was an error saving your selection. Please try again.");
+    const res =  await apiService.editReservationStep3(id, formData);
+
+      if (res?.data?.success) {
+        toast.success(res.data.message || "Reservation updated successfully!");
+        navigate(`/booking-details/${id}`);
+      } else {
+        toast.error(res?.data?.message || "Failed to update reservation!");
+      }
+    }  catch (error) {
+    console.error("Error updating reservation:", error);
+
+    if (error.response && error.response.data?.message) {
+      toast.error(error.response.data.message);
+    } else {
+      toast.error("Something went wrong. Please try again later.");
     }
+  }
   };
 
   if (loading) {
@@ -224,7 +250,9 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
             <div className="col-12 text-center py-5">
               <h3>Reservation not found</h3>
               <p>The reservation you're looking for doesn't exist.</p>
-              <Link to="/" className="btn btn-primary">Return Home</Link>
+              <Link to="/" className="btn btn-primary">
+                Return Home
+              </Link>
             </div>
           </div>
         </div>
@@ -244,8 +272,12 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
               <h2 className="breadcrumb-title">Extra Services</h2>
               <nav aria-label="breadcrumb" className="page-breadcrumb">
                 <ol className="breadcrumb">
-                  <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-                  <li className="breadcrumb-item active" aria-current="page">Extra Services</li>
+                  <li className="breadcrumb-item">
+                    <Link to="/">Home</Link>
+                  </li>
+                  <li className="breadcrumb-item active" aria-current="page">
+                    Extra Services
+                  </li>
                 </ol>
               </nav>
             </div>
@@ -253,7 +285,7 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
         </div>
       </div>
       {/* /Breadscrumb Section */}
-      
+
       <div className="booking-new-module">
         <div className="container">
           <div className="booking-wizard-head">
@@ -268,23 +300,48 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                 <div className="booking-wizard-lists">
                   <ul>
                     <li className="active activated">
-                      <span><img src="/user-assets/img/icons/booking-head-icon-01.svg" alt="Booking Icon" /></span>
+                      <span>
+                        <img
+                          src="/user-assets/img/icons/booking-head-icon-01.svg"
+                          alt="Booking Icon"
+                        />
+                      </span>
                       <h6>Location &amp; Time</h6>
                     </li>
                     <li className="active">
-                      <span><img src="/user-assets/img/icons/booking-head-icon-02.svg" alt="Booking Icon" /></span>
+                      <span>
+                        <img
+                          src="/user-assets/img/icons/booking-head-icon-02.svg"
+                          alt="Booking Icon"
+                        />
+                      </span>
                       <h6>Extra Services</h6>
                     </li>
                     <li>
-                      <span><img src="/user-assets/img/icons/booking-head-icon-03.svg" alt="Booking Icon" /></span>
+                      <span>
+                        <img
+                          src="/user-assets/img/icons/booking-head-icon-03.svg"
+                          alt="Booking Icon"
+                        />
+                      </span>
                       <h6>Detail</h6>
                     </li>
                     <li>
-                      <span><img src="/user-assets/img/icons/booking-head-icon-04.svg" alt="Booking Icon" /></span>
+                      <span>
+                        <img
+                          src="/user-assets/img/icons/booking-head-icon-04.svg"
+                          alt="Booking Icon"
+                        />
+                      </span>
                       <h6>Checkout</h6>
                     </li>
                     <li>
-                      <span><img src="/user-assets/img/icons/booking-head-icon-05.svg" alt="Booking Icon" /></span>
+                      <span>
+                        <img
+                          src="/user-assets/img/icons/booking-head-icon-05.svg"
+                          alt="Booking Icon"
+                        />
+                      </span>
                       <h6>Booking Confirmed</h6>
                     </li>
                   </ul>
@@ -292,7 +349,7 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
               </div>
             </div>
           </div>
-          
+
           <div className="booking-detail-info">
             <div className="row">
               <div className="col-lg-8">
@@ -301,42 +358,70 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                     <div className="booking-information-card">
                       <div className="booking-info-head justify-content-between">
                         <div className="d-flex align-items-center">
-                          <span><i className="bx bx-add-to-queue" /></span>
+                          <span>
+                            <i className="bx bx-add-to-queue" />
+                          </span>
                           <h5>Extra Services</h5>
                         </div>
-                        <h6>Total : {availableAddons.main.length + availableAddons.more.length} Extra Services</h6>
+                        <h6>
+                          Total :{" "}
+                          {availableAddons.main.length +
+                            availableAddons.more.length}{" "}
+                          Extra Services
+                        </h6>
                       </div>
                       <div className="booking-info-body">
                         <ul className="adons-lists">
                           {availableAddons.main.map((addon) => {
-                            const isSelected = selectedAddons.some(item => item._id === addon._id);
-                            
+                            const isSelected = selectedAddons.some(
+                              (item) => item._id === addon._id
+                            );
+
                             return (
                               <li key={addon._id}>
                                 <div className="adons-types">
                                   <div className="d-flex align-items-center adon-name-info">
-                                    <span className="adon-icon"><i className={addon.icon} /></span>
+                                    <span className="adon-icon">
+                                      <i className={addon.icon} />
+                                    </span>
                                     <div className="adon-name">
                                       <h6>{addon.name}</h6>
                                       <a
                                         href="#"
-                                        onClick={(e) => { e.preventDefault(); handleToggleInfo(addon._id); }}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          handleToggleInfo(addon._id);
+                                        }}
                                         className="d-inline-flex align-items-center adon-info-btn"
                                       >
                                         <i className="bx bx-info-circle me-2" />
                                         More information
-                                        <i className={`bx bx-chevron-${openInfo[addon._id] ? 'up' : 'down'} ms-2 arrow-icon`} />
+                                        <i
+                                          className={`bx bx-chevron-${
+                                            openInfo[addon._id] ? "up" : "down"
+                                          } ms-2 arrow-icon`}
+                                        />
                                       </a>
                                     </div>
                                   </div>
-                                  <span className="adon-price">${addon.price}</span>
+                                  <span className="adon-price">
+                                    ${addon.price}
+                                  </span>
                                   <button
                                     type="button"
-                                    className={`btn ${isSelected ? 'btn-secondary remove-adon-btn' : 'add-addon-btn'}`}
+                                    className={`btn ${
+                                      isSelected
+                                        ? "btn-secondary remove-adon-btn"
+                                        : "add-addon-btn"
+                                    }`}
                                     onClick={() => handleAddonToggle(addon)}
                                   >
-                                    <i className={`bx bx-${isSelected ? 'minus' : 'plus'}-circle me-2`} />
-                                    {isSelected ? 'Remove' : 'Add'}
+                                    <i
+                                      className={`bx bx-${
+                                        isSelected ? "minus" : "plus"
+                                      }-circle me-2`}
+                                    />
+                                    {isSelected ? "Remove" : "Add"}
                                   </button>
                                 </div>
                                 {openInfo[addon._id] && (
@@ -347,39 +432,69 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               </li>
                             );
                           })}
-                          
+
                           <li className="view-more-adons">
-                            <div className="more-adons" style={{ display: showMoreAddons ? "block" : "none" }}>
+                            <div
+                              className="more-adons"
+                              style={{
+                                display: showMoreAddons ? "block" : "none",
+                              }}
+                            >
                               <ul>
                                 {availableAddons.more.map((addon) => {
-                                  const isSelected = selectedAddons.some(item => item._id === addon._id);
-                                  
+                                  const isSelected = selectedAddons.some(
+                                    (item) => item._id === addon._id
+                                  );
+
                                   return (
                                     <li key={addon._id}>
                                       <div className="adons-types">
                                         <div className="d-flex align-items-center adon-name-info">
-                                          <span className="adon-icon"><i className={addon.icon} /></span>
+                                          <span className="adon-icon">
+                                            <i className={addon.icon} />
+                                          </span>
                                           <div className="adon-name">
                                             <h6>{addon.name}</h6>
                                             <a
                                               href="#"
-                                              onClick={(e) => { e.preventDefault(); handleToggleInfo(addon._id); }}
+                                              onClick={(e) => {
+                                                e.preventDefault();
+                                                handleToggleInfo(addon._id);
+                                              }}
                                               className="d-inline-flex align-items-center adon-info-btn"
                                             >
                                               <i className="bx bx-info-circle me-2" />
                                               More information
-                                              <i className={`bx bx-chevron-${openInfo[addon._id] ? 'up' : 'down'} ms-2 arrow-icon`} />
+                                              <i
+                                                className={`bx bx-chevron-${
+                                                  openInfo[addon._id]
+                                                    ? "up"
+                                                    : "down"
+                                                } ms-2 arrow-icon`}
+                                              />
                                             </a>
                                           </div>
                                         </div>
-                                        <span className="adon-price">${addon.price}</span>
+                                        <span className="adon-price">
+                                          ${addon.price}
+                                        </span>
                                         <button
                                           type="button"
-                                          className={`btn ${isSelected ? 'btn-secondary remove-adon-btn' : 'add-addon-btn'}`}
-                                          onClick={() => handleAddonToggle(addon)}
+                                          className={`btn ${
+                                            isSelected
+                                              ? "btn-secondary remove-adon-btn"
+                                              : "add-addon-btn"
+                                          }`}
+                                          onClick={() =>
+                                            handleAddonToggle(addon)
+                                          }
                                         >
-                                          <i className={`bx bx-${isSelected ? 'minus' : 'plus'}-circle me-2`} />
-                                          {isSelected ? 'Remove' : 'Add'}
+                                          <i
+                                            className={`bx bx-${
+                                              isSelected ? "minus" : "plus"
+                                            }-circle me-2`}
+                                          />
+                                          {isSelected ? "Remove" : "Add"}
                                         </button>
                                       </div>
                                       {openInfo[addon._id] && (
@@ -394,11 +509,16 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                             </div>
                             <a
                               href="#"
-                              onClick={(e) => { e.preventDefault(); setShowMoreAddons(!showMoreAddons); }}
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setShowMoreAddons(!showMoreAddons);
+                              }}
                               className="view-adon-btn"
                             >
                               <i className="bx bx-plus-circle me-2" />
-                              {showMoreAddons ? "Hide Add-Ons" : "View More Add-Ons"}
+                              {showMoreAddons
+                                ? "Hide Add-Ons"
+                                : "View More Add-Ons"}
                             </a>
                           </li>
                         </ul>
@@ -407,7 +527,9 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
 
                     <div className="booking-information-card">
                       <div className="booking-info-head">
-                        <span><i className="bx bx-user-pin" /></span>
+                        <span>
+                          <i className="bx bx-user-pin" />
+                        </span>
                         <h5>Driver details</h5>
                       </div>
                       <div className="booking-info-body">
@@ -422,7 +544,9 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                                 onChange={() => setDriverType("self")}
                               />
                               <span className="booking_checkmark">
-                                <span className="checked-title">Self Driver</span>
+                                <span className="checked-title">
+                                  Self Driver
+                                </span>
                               </span>
                             </label>
                           </li>
@@ -436,12 +560,14 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                                 onChange={() => setDriverType("acting")}
                               />
                               <span className="booking_checkmark">
-                                <span className="checked-title">Acting Driver</span>
+                                <span className="checked-title">
+                                  Acting Driver
+                                </span>
                               </span>
                             </label>
                           </li>
                         </ul>
-                        
+
                         {driverType === "self" && (
                           <div className="booking-timings self-driver-info">
                             <div className="row">
@@ -453,7 +579,8 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-6">
                                 <div className="input-block date-widget">
                                   <label className="form-label">
-                                    First Name <span className="text-danger"> *</span>
+                                    First Name{" "}
+                                    <span className="text-danger"> *</span>
                                   </label>
                                   <input
                                     type="text"
@@ -469,7 +596,8 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-6">
                                 <div className="input-block date-widget">
                                   <label className="form-label">
-                                    Last Name <span className="text-danger"> *</span>
+                                    Last Name{" "}
+                                    <span className="text-danger"> *</span>
                                   </label>
                                   <input
                                     type="text"
@@ -485,7 +613,8 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-6">
                                 <div className="input-block date-widget">
                                   <label className="form-label">
-                                    Driver Age <span className="text-danger"> *</span>
+                                    Driver Age{" "}
+                                    <span className="text-danger"> *</span>
                                   </label>
                                   <input
                                     type="number"
@@ -502,7 +631,8 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-6">
                                 <div className="input-block date-widget">
                                   <label className="form-label">
-                                    Mobile Number <span className="text-danger"> *</span>
+                                    Mobile Number{" "}
+                                    <span className="text-danger"> *</span>
                                   </label>
                                   <input
                                     type="tel"
@@ -518,7 +648,8 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-12">
                                 <div className="input-block date-widget">
                                   <label className="form-label">
-                                    Driving Licence Number <span className="text-danger"> *</span>
+                                    Driving Licence Number{" "}
+                                    <span className="text-danger"> *</span>
                                   </label>
                                   <input
                                     type="text"
@@ -534,23 +665,31 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-12">
                                 <div className="input-block date-widget">
                                   <label className="form-label">
-                                    Upload Document <span className="text-danger"> *</span>
+                                    Upload Document{" "}
+                                    <span className="text-danger"> *</span>
                                   </label>
                                   <div className="upload-div">
-                                    <input 
-                                      type="file" 
+                                    <input
+                                      type="file"
                                       onChange={handleDocumentUpload}
                                       accept="image/*,.pdf"
                                       required
                                     />
                                     <div className="upload-photo-drag">
-                                      <span><i className="fa fa-upload me-2" /> Upload Photo</span>
+                                      <span>
+                                        <i className="fa fa-upload me-2" />{" "}
+                                        Upload Photo
+                                      </span>
                                       <h6>or Drag Photos</h6>
                                     </div>
                                   </div>
                                   <div className="upload-list">
                                     <ul>
-                                      <li>The maximum photo size is 8 MB. Formats: jpeg, jpg, png. Put the main picture first</li>
+                                      <li>
+                                        The maximum photo size is 8 MB. Formats:
+                                        jpeg, jpg, png. Put the main picture
+                                        first
+                                      </li>
                                     </ul>
                                   </div>
                                 </div>
@@ -558,8 +697,15 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <div className="col-md-12">
                                 <div className="input-block m-0">
                                   <label className="custom_check d-inline-flex location-check m-0">
-                                    <span>I Confirm Driver's Age is above 20 years old</span>
-                                    <input type="checkbox" name="ageConfirmation" required />
+                                    <span>
+                                      I Confirm Driver's Age is above 20 years
+                                      old
+                                    </span>
+                                    <input
+                                      type="checkbox"
+                                      name="ageConfirmation"
+                                      required
+                                    />
                                     <span className="checkmark" />
                                   </label>
                                 </div>
@@ -567,7 +713,7 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                             </div>
                           </div>
                         )}
-                        
+
                         {driverType === "acting" && (
                           <div className="booking-timings acting-driver-info">
                             <div className="form-title-head">
@@ -577,7 +723,10 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <li>
                                 <div className="driver-profile-info">
                                   <span className="driver-profile">
-                                    <img src="/user-assets/img/icons/booking-head-icon-03.svg" alt="Driver" />
+                                    <img
+                                      src="/user-assets/img/icons/booking-head-icon-03.svg"
+                                      alt="Driver"
+                                    />
                                   </span>
                                   <div className="driver-name">
                                     <h5>Professional Driver</h5>
@@ -595,45 +744,71 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                     </div>
 
                     <div className="booking-info-btns d-flex justify-content-end">
-                      <Link to={`/booking-checkout/${id}`} className="btn btn-secondary">
+                      <Link
+                        to={`/booking-checkout/${id}`}
+                        className="btn btn-secondary"
+                      >
                         Back to Location &amp; Time
                       </Link>
-                      <button type="submit" className="btn btn-primary continue-book-btn">
+                      <button
+                        type="submit"
+                        className="btn btn-primary continue-book-btn"
+                      >
                         Continue Booking
                       </button>
                     </div>
                   </form>
                 </div>
               </div>
-              
+
               <div className="col-lg-4 theiaStickySidebar">
                 <div className="booking-sidebar">
                   <div className="booking-sidebar-card">
                     <div className="accordion-item border-0 mb-4">
                       <div className="accordion-header">
-                        <div className="accordion-button" role="button" data-bs-toggle="collapse" data-bs-target="#accordion_collapse_one" aria-expanded="true">
+                        <div
+                          className="accordion-button"
+                          role="button"
+                          data-bs-toggle="collapse"
+                          data-bs-target="#accordion_collapse_one"
+                          aria-expanded="true"
+                        >
                           <div className="booking-sidebar-head">
-                            <h5>Booking Details<i className="fas fa-chevron-down" /></h5>
+                            <h5>
+                              Booking Details
+                              <i className="fas fa-chevron-down" />
+                            </h5>
                           </div>
                         </div>
                       </div>
-                      <div id="accordion_collapse_one" className="accordion-collapse collapse show">
+                      <div
+                        id="accordion_collapse_one"
+                        className="accordion-collapse collapse show"
+                      >
                         <div className="booking-sidebar-body">
                           <div className="booking-car-detail">
                             <span className="car-img">
-                              <img 
-                                src={BASE_URL_IMG + (reservation.car?.image || '')} 
-                                className="img-fluid" 
+                              <img
+                                src={
+                                  BASE_URL_IMG + (reservation.car?.image || "")
+                                }
+                                className="img-fluid"
                                 alt="Car"
                                 onError={(e) => {
-                                  e.target.src = '/user-assets/img/car-list-4.jpg';
+                                  e.target.src =
+                                    "/user-assets/img/car-list-4.jpg";
                                 }}
                               />
                             </span>
                             <div className="care-more-info">
                               <h5>{reservation.car?.carName || "Car Name"}</h5>
-                              <p>{reservation.car?.mainLocation?.title || "Car Location"}</p>
-                              <Link to="/listing-details">View Car Details</Link>
+                              <p>
+                                {reservation.car?.mainLocation?.title ||
+                                  "Car Location"}
+                              </p>
+                              <Link to="/listing-details">
+                                View Car Details
+                              </Link>
                             </div>
                           </div>
                           <div className="booking-vehicle-rates">
@@ -641,18 +816,20 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                               <li>
                                 <div className="rental-charge">
                                   <h6>Rental Charges Rate</h6>
-                                  <span className="text-danger">(This does not include fuel)</span>
+                                  <span className="text-danger">
+                                    (This does not include fuel)
+                                  </span>
                                 </div>
                                 <h5>+ ${calculateRentalRate()}</h5>
                               </li>
-                              
-                              {selectedAddons.map(addon => (
+
+                              {selectedAddons.map((addon) => (
                                 <li key={addon._id}>
                                   <h6>{addon.name}</h6>
                                   <h5>+ ${addon.price}</h5>
                                 </li>
                               ))}
-                              
+
                               <li>
                                 <h6>Doorstep delivery</h6>
                                 <h5>+ ${reservation.doorStepDelivery || 0}</h5>
@@ -683,7 +860,7 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="total-rate-card">
                     <div className="vehicle-total-price">
                       <h5>Estimated Total</h5>
@@ -696,6 +873,20 @@ selectedAddons.forEach((addon) => formData.append("extraServices[]", addon._id))
           </div>
         </div>
       </div>
+        <div>
+      
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
     </div>
   );
 };

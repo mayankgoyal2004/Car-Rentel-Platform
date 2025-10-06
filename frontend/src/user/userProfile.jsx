@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { ToastContainer, toast } from "react-toastify";
 
 const UserProfile = () => {
   const [loading, setLoading] = useState(false);
@@ -16,7 +17,7 @@ const UserProfile = () => {
   const [state, setState] = useState("");
   const [city, setCity] = useState("");
   const [pincode, setPincode] = useState("");
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   // image can be File or string (backend URL)
   const [image, setImage] = useState(null);
@@ -38,11 +39,9 @@ const UserProfile = () => {
       setCity(Customer?.city || "");
       setPincode(Customer?.pincode || "");
 
-      // Image handling
       const img = Customer?.image || user?.image || null;
-      setImage(img); // this is either string or file
+      setImage(img);
       if (img) {
-        // If it's a URL from backend, set preview
         setImagePreview(
           typeof img === "string"
             ? BASE_URL_IMG + img
@@ -63,7 +62,7 @@ const UserProfile = () => {
     if (!file) return;
 
     setImage(file);
-    setImagePreview(URL.createObjectURL(file)); // preview
+    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
@@ -82,21 +81,20 @@ const UserProfile = () => {
     formData.append("city", city);
     formData.append("pincode", pincode);
 
-    if (image instanceof File) {
-      // If user selected new image
-      formData.append("image", image);
-    } else if (typeof image === "string" && image !== "") {
-      // Keep old image (send its path or filename)
-      formData.append("image", image);
-    }
+    if (image) formData.append("image", image);
+
     try {
-     const res =  await apiService.updateuserDetials(formData);
-      alert("Profile updated!");
-     dispatch(addUser(res.data.user || res.data)); 
-      fetchUser(); // reload updated data
+      const res = await apiService.updateuserDetials(formData);
+      toast.success("Profile updated!");
+      dispatch(addUser(res.data.user));
+      fetchUser();
     } catch (err) {
       console.error(err);
-      alert("Error saving profile");
+      // Show backend error message if available
+      const message =
+        err.response?.data?.message ||
+        "Error saving profile. Please try again.";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

@@ -6,59 +6,104 @@ import { useEffect } from "react";
 import { ArrowRight } from "react-feather";
 import { toast } from "react-toastify";
 
-
 const UserMainDashboard = () => {
   const [wishlist, setWishlist] = useState([]);
-  const[reservation, setReservation ] = useState([])
-    const [loading, setLoading] = useState(false);
-  
+  const [reservation, setReservation] = useState([]);
+  const [allReservation, setAllReservation] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const getWishList = async () => {
-    const res = await apiService.getWishlist();
-    setWishlist(res.data.wishlist);
-  };
-  const getLast5reservation = async () => {
-  try{
-    setLoading(true)
-      const res = await apiService.getLast5Reservation();
-    setReservation(res.data.data);
-  } catch (error) {
-        console.error(error);
-        toast.error("Failed to fetch contacts");
-      } finally {
-        setLoading(false);
+    try {
+      const res = await apiService.getWishlist();
+      if (res.data?.wishlist) {
+        setWishlist(res.data.wishlist);
+      } else {
+        toast.error("No wishlist data found");
       }
-
+    } catch (err) {
+      console.error("Error fetching wishlist:", err);
+    }
   };
+
+  const getLast5reservation = async () => {
+    try {
+      setLoading(true);
+      const res = await apiService.getLast5Reservation();
+      setReservation(res.data.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch contacts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getAllReservationUser = async () => {
+    try {
+      setLoading(true);
+      const res = await apiService.getAllreservationUser();
+      setAllReservation(res.data.data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch Reservation");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getAllReservationUser();
+  }, []);
   useEffect(() => {
     getLast5reservation();
     getWishList();
   }, []);
+  const getRentalPeriod = (res) => {
+    if (!res?.pickupDate || !res?.dropDate) return 0;
 
-  const calculateTotalPrice = (reservation) => {
-  const {  bookingType, extraServices, securityDeposit } = reservation;
+    const start = new Date(res.pickupDate);
+    const end = new Date(res.dropDate);
 
-  
-  let basePrice = 0;
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
-  if (reservation?.car?.pricing?.prices) {
-    if (bookingType === "daily") basePrice = reservation.car.pricing.prices.daily || 0;
-    else if (bookingType === "weekly") basePrice = reservation.car.pricing.prices.weekly || 0;
-    else if (bookingType === "monthly") basePrice = reservation.car.pricing.prices.monthly || 0;
-    else if (bookingType === "yearly") basePrice = reservation.car.pricing.prices.yearly || 0;
-  }
+  const calculateTotalPrice = (res) => {
+    if (!res?.car?.pricing) return 0;
 
-  const extraServicesTotal = extraServices.reduce((sum, service) => sum + (service.price || 0), 0);
+    const rentalDays = getRentalPeriod(res);
+    const prices = res.car.pricing.prices;
 
-  const deposit = securityDeposit || 0;
+    let carPrice = 0;
+    switch (res.bookingType) {
+      case "daily":
+        carPrice = prices.daily * rentalDays;
+        break;
+      case "weekly":
+        carPrice = prices.weekly * Math.ceil(rentalDays / 7);
+        break;
+      case "monthly":
+        carPrice = prices.monthly * Math.ceil(rentalDays / 30);
+        break;
+      case "yearly":
+        carPrice = prices.yearly * Math.ceil(rentalDays / 365);
+        break;
+      default:
+        carPrice = 0;
+    }
 
-  // 4️⃣ Total price
-  const totalPrice = basePrice + extraServicesTotal + deposit;
+    const extraServices = res.extraServices || [];
+    const extraServicesPrice = extraServices.reduce(
+      (total, service) =>
+        total + (service.price || 0) * (service.quantity || 1),
+      0
+    );
 
-  return totalPrice;
-};
+    const securityDeposit = res.securityDeposit || 0;
+    const driverPrice = res.driverPrice || 0;
 
-// Example usage:
+    return carPrice + extraServicesPrice + securityDeposit + driverPrice;
+  };
 
   return (
     <div className="content dashboard-content">
@@ -79,7 +124,7 @@ const UserMainDashboard = () => {
               <div className="widget-header">
                 <div className="widget-content">
                   <h6>My Bookings</h6>
-                  <h3>{reservation?.length}</h3>
+                  <h3>{allReservation?.length}</h3>
                 </div>
                 <div className="widget-icon">
                   <span>
@@ -153,71 +198,73 @@ const UserMainDashboard = () => {
                   <table className="table">
                     <tbody>
                       {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    Loading...
-                  </td>
-                </tr>
-              ) : reservation.length > 0 ? (
-                reservation.map((res) => (
-                      <tr key={res._id}>
-                        <td>
-                          <div className="table-avatar">
-                            <Link
-                              to="user-booking"
-                              className="avatar avatar-lg flex-shrink-0"
-                            >
-                              <img
-                                className="avatar-img"
-                                src={BASE_URL_IMG + res?.car?.image}
-                                alt="Booking"
-                              />
-                            </Link>
-                            <div className="table-head-name flex-grow-1">
-                              <Link to="user-booking">
-                                {res?.car?.carName}
-                              </Link>
-                              <p>{res.driverType}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <h6>Start date</h6>
-                          <p>{new Date(res.pickupDate).toDateString()}</p>
-                        </td>
-                        <td>
-                          <h6>End Date</h6>
-                          <p>{new Date(res.dropDate).toDateString()}</p>
-                        </td>
-                        <td>
-                          <h6>Price</h6>
-                          <h5 className="text-danger">${calculateTotalPrice(res)}</h5>
-                        </td>
-                        <td>
-  <span
-    className={`badge ${
-      res.status === "confirmed"
-        ? "badge-success"
-        : res.status === "pending"
-        ? "badge-warning"
-        : res.status === "cancelled"
-        ? "badge-danger"
-        : "badge-secondary"
-    }`}
-  >
-    {res.status.charAt(0).toUpperCase() + res.status.slice(1)}
-  </span>
-</td>
-                      </tr>
-                   ))
-              ) : (
-                <tr>
-                  <td colSpan="6" className="text-center">
-                    No contacts found
-                  </td>
-                </tr>
-              )}
-                        
+                        <tr>
+                          <td colSpan="6" className="text-center">
+                            Loading...
+                          </td>
+                        </tr>
+                      ) : reservation.length > 0 ? (
+                        reservation.map((res) => (
+                          <tr key={res._id}>
+                            <td>
+                              <div className="table-avatar">
+                                <Link
+                                  to="user-booking"
+                                  className="avatar avatar-lg flex-shrink-0"
+                                >
+                                  <img
+                                    className="avatar-img"
+                                    src={BASE_URL_IMG + res?.car?.image}
+                                    alt="Booking"
+                                  />
+                                </Link>
+                                <div className="table-head-name flex-grow-1">
+                                  <Link to="user-booking">
+                                    {res?.car?.carName}
+                                  </Link>
+                                  <p>{res.driverType}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <h6>Start date</h6>
+                              <p>{new Date(res.pickupDate).toDateString()}</p>
+                            </td>
+                            <td>
+                              <h6>End Date</h6>
+                              <p>{new Date(res.dropDate).toDateString()}</p>
+                            </td>
+                            <td>
+                              <h6>Price</h6>
+                              <h5 className="text-danger">
+                                ${calculateTotalPrice(res)}
+                              </h5>
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  res.status === "confirmed"
+                                    ? "badge-success"
+                                    : res.status === "pending"
+                                    ? "badge-warning"
+                                    : res.status === "cancelled"
+                                    ? "badge-danger"
+                                    : "badge-secondary"
+                                }`}
+                              >
+                                {res.status.charAt(0).toUpperCase() +
+                                  res.status.slice(1)}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="text-center">
+                            No contacts found
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
                 </div>

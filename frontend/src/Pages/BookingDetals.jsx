@@ -696,13 +696,7 @@ const BookingDetals = () => {
                                 <i className="fas fa-chevron-down" />
                               </h5>
                             </div>
-                            <Link
-                              to={`/booking-add-on/${id}`}
-                              className="d-flex align-items-center sidebar-edit"
-                            >
-                              <i className="bx bx-edit-alt me-2" />
-                              Edit
-                            </Link>
+                           
                           </div>
                         </div>
                         <div

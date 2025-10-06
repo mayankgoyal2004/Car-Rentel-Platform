@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminCarModels = () => {
   const [models, setModels] = useState([]);
@@ -23,7 +23,7 @@ const AdminCarModels = () => {
         setActiveBrands(res.data.data);
       }
     } catch (err) {
-      console.error("Failed to fetch active brands");
+      toast.error(err.response?.data?.message || "Failed to fetch Model");
     }
   };
 
@@ -35,7 +35,6 @@ const AdminCarModels = () => {
         search: searchQuery,
       });
       if (res.data.success) {
-        // Map brand ID to name
         const modelsWithBrandName = res.data.data.map((model) => ({
           ...model,
           brandName:
@@ -198,70 +197,84 @@ const AdminCarModels = () => {
                 </tr>
               </thead>
               <tbody>
-                {models.map((model) => (
-                  <tr key={model._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <h6 className="fw-medium">
-                        <a>{model.carModel}</a>
-                      </h6>
-                    </td>
-                    <td>{model.brandName}</td>
-                   
-                    <td>
-                      <span
-                        className={`badge  ${
-                          model.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {model.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_model"
-                              onClick={() => {
-                                setEditModel(model);
-                                setEditBrandId(model.carBrand);
-                              }}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_model"
-                              onClick={() => setDeleteModel(model)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : models.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No model found
+                    </td>
+                  </tr>
+                ) : (
+                  models?.map((model) => (
+                    <tr key={model?._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <h6 className="fw-medium">
+                          <a>{model?.carModel}</a>
+                        </h6>
+                      </td>
+                      <td>{model?.brandName}</td>
+
+                      <td>
+                        <span
+                          className={`badge  ${
+                            model?.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {model?.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_model"
+                                onClick={() => {
+                                  setEditModel(model);
+                                  setEditBrandId(model.carBrand);
+                                }}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_model"
+                                onClick={() => setDeleteModel(model)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -503,6 +516,19 @@ const AdminCarModels = () => {
           </div>
         </div>
         {/* /Delete Model */}
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

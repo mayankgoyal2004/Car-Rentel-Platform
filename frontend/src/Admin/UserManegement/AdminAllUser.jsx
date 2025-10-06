@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminAllUser = () => {
   const [users, setUsers] = useState([]);
@@ -40,19 +41,18 @@ const AdminAllUser = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching users:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch users");
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch roles
   const getAllActiveRoles = async () => {
     try {
       const res = await apiService.getAllActiveRole();
       setRoles(res.data.data || []);
     } catch (err) {
-      console.error("Error fetching roles:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch roles");
     }
   };
 
@@ -121,21 +121,19 @@ const AdminAllUser = () => {
         userFormData.append("image", formData.image);
       }
 
-      await apiService.addUserByAdmin(userFormData);
-      fetchUserData(search, currentPage);
-      resetFormData();
+      const res = await apiService.addUserByAdmin(userFormData);
+      if (res.data.success) {
+toast.success("user deleted successfully!");
+        fetchUserData(search, currentPage);
+        resetFormData();
+      }
 
-      // Close modal
       document.getElementById("add_user_close").click();
     } catch (err) {
-      console.error("Error adding user:", err);
-      alert(
-        "Error adding user: " + (err.response?.data?.message || err.message)
-      );
+      toast.error(err.response?.data?.message || "Something went wrong!");
     }
   };
 
-  // Set form data for editing
   const handleEditClick = (user) => {
     setSelectedUser(user);
     setFormData({
@@ -180,11 +178,12 @@ const AdminAllUser = () => {
         userFormData.append("image", formData.image);
       }
 
-      await apiService.updateUserByAdmin(userFormData);
+   const res =   await apiService.updateUserByAdmin(userFormData);
+     if (res.data.success) {
+         toast.success("user updated successfully!");
       fetchUserData(search, currentPage);
 
-      // Close modal
-      document.getElementById("edit_user_close").click();
+      document.getElementById("edit_user_close").click();}
     } catch (err) {
       console.error("Error updating user:", err);
       alert(
@@ -196,16 +195,19 @@ const AdminAllUser = () => {
   // Delete user
   const handleDeleteUser = async () => {
     try {
-      await apiService.deleteUserByAdmin(selectedUser._id);
+    const res =  await apiService.deleteUserByAdmin(selectedUser._id);
+
+if (res.data.success) {
+ toast.success("user deleted successfully!");
       fetchUserData(search, currentPage);
 
       // Close modal
-      document.getElementById("delete_user_close").click();
+      document.getElementById("delete_user_close").click();}
     } catch (err) {
-      console.error("Error deleting user:", err);
-      alert(
-        "Error deleting user: " + (err.response?.data?.message || err.message)
-      );
+          toast.error(
+            "Error deleting user: " +
+              (err.response?.data?.message || err.message)
+          );
     }
   };
 
@@ -307,19 +309,19 @@ const AdminAllUser = () => {
                                 "/admin-assets/img/profiles/avatar-20.jpg";
                             }}
                           />
-                          <h6 className="mb-0">{user.userName}</h6>
+                          <h6 className="mb-0">{user?.userName}</h6>
                         </div>
                       </td>
-                      <td>{user.contact}</td>
-                      <td>{user.email}</td>
+                      <td>{user?.contact}</td>
+                      <td>{user?.email}</td>
                       <td>{user.role?.name}</td>
                       <td>
                         <span
                           className={`badge  ${
-                            user.status ? "bg-success" : "bg-danger"
+                            user?.status ? "bg-success" : "bg-danger"
                           }`}
                         >
-                          {user.status ? "active" : "inactive"}
+                          {user?.status ? "active" : "inactive"}
                         </span>
                       </td>
                       <td>
@@ -348,7 +350,7 @@ const AdminAllUser = () => {
                               <button
                                 className="dropdown-item rounded-1"
                                 data-bs-toggle="modal"
-                                data-bs-target="#delete_user"
+                                data-bs-target="#delete_modal"
                                 onClick={() => setSelectedUser(user)}
                               >
                                 <i className="ti ti-trash me-1" />
@@ -809,30 +811,47 @@ const AdminAllUser = () => {
       {/* /Edit User Modal */}
 
       {/* Delete Confirmation Modal */}
-      <div className="modal fade" id="delete_user">
+     <div className="modal fade" id="delete_modal">
         <div className="modal-dialog modal-dialog-centered modal-sm">
           <div className="modal-content">
-            <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
-              <i className="ti ti-trash-x fs-26" />
-            </span>
-            <h4 className="mb-1">Delete User</h4>
-            <p className="mb-3">
-              Are you sure you want to delete {selectedUser?.userName}?
-            </p>
-            <div className="d-flex justify-content-center">
-              <button
-                id="delete_user_close"
-                className="btn btn-light me-3"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleDeleteUser}>
-                Yes, Delete
-              </button>
+            <div className="modal-body text-center">
+              <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
+                <i className="ti ti-trash-x fs-26" />
+              </span>
+              <h4 className="mb-1">Delete Customer</h4>
+              <p className="mb-3">
+                Are you sure you want to delete{" "}
+             
+              </p>
+              <div className="d-flex justify-content-center">
+                <a className="btn btn-light me-3" data-bs-dismiss="modal">
+                  Cancel
+                </a>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleDeleteUser}
+                  data-bs-dismiss="modal"
+                >
+                  Yes, Delete
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Confirmation Modal */}
     </div>

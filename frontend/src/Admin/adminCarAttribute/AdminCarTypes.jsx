@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 
 const AdminCarTypes = () => {
@@ -169,7 +169,20 @@ const AdminCarTypes = () => {
                 </tr>
               </thead>
               <tbody>
-                {carType.map((type) => (
+                 {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : carType.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No car Type found
+                    </td>
+                  </tr>
+                ) : (
+                carType.map((type) => (
                   <tr key={type._id}>
                     <td>
                       <div className="form-check form-check-md">
@@ -178,16 +191,16 @@ const AdminCarTypes = () => {
                     </td>
                     <td>
                       <h6 className="fw-medium">
-                        <a>{type.carType}</a>
+                        <a>{type?.carType}</a>
                       </h6>
                     </td>
                     <td>
                       <span
                         className={`badge  ${
-                          type.status ? "bg-success" : "bg-danger"
+                          type?.status ? "bg-success" : "bg-danger"
                         }`}
                       >
-                        {type.status ? "Active" : "Inactive"}
+                        {type?.status ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>
@@ -227,7 +240,7 @@ const AdminCarTypes = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                      )))}
               </tbody>
             </table>
           </div>
@@ -438,6 +451,19 @@ const AdminCarTypes = () => {
         </div>
         {/* /Delete Type */}
       </div>
+       <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
     </div>
   );
 };

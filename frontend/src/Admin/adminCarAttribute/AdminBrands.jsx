@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminBrands = () => {
   const [brands, setBrands] = useState([]);
@@ -205,86 +205,102 @@ const AdminBrands = () => {
                     </div>
                   </th>
                   <th>NAME</th>
-                  <th>TOTAL CARS</th>
+                 
                   <th>STATUS</th>
                   <th />
                 </tr>
               </thead>
               <tbody>
-                {brands.map((brand) => (
-                  <tr key={brand._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="d-flex align-items-center file-name-icon">
-                        <a
-                          href="javascript:void(0);"
-                          className="avatar avatar-lg border"
-                        >
-                          <img
-                            src={`${BASE_URL_IMG + brand.image}`}
-                            className="img-fluid"
-                            alt="brands"
-                          />
-                        </a>
-                        <div className="ms-2">
-                          <h6 className="fw-medium">
-                            <a href="javascript:void(0);">{brand.brandName}</a>
-                          </h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td>0</td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          brand.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {brand.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_brand"
-                              onClick={() => setEditBrand(brand)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_brand"
-                              onClick={() => setDeleteBrand(brand)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : brands.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No brands found
+                    </td>
+                  </tr>
+                ) : (
+                  brands.map((brand) => (
+                    <tr key={brand._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center file-name-icon">
+                          <a
+                            
+                            className="avatar avatar-lg border"
+                          >
+                            <img
+                              src={`${BASE_URL_IMG + brand.image}`}
+                              className="img-fluid"
+                              alt="brands"
+                            />
+                          </a>
+                          <div className="ms-2">
+                            <h6 className="fw-medium">
+                              <a >
+                                {brand.brandName}
+                              </a>
+                            </h6>
+                          </div>
+                        </div>
+                      </td>
+                    
+                      <td>
+                        <span
+                          className={`badge  ${
+                            brand.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {brand.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_brand"
+                                onClick={() => setEditBrand(brand)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_brand"
+                                onClick={() => setDeleteBrand(brand)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -579,6 +595,19 @@ const AdminBrands = () => {
           </div>
         </div>
         {/* /Delete Brand */}
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import apiService from "../../Apiservice/apiService";
 
 const MODULES = [
@@ -46,14 +46,12 @@ const AdminPermissions = () => {
       const res = await apiService.getroleById(roleId);
       const roleData = res.data.data;
 
-      // Normalize every time → ensures UI shows new modules
       roleData.permissions = normalizePermissions(roleData.permissions);
 
       setRole(roleData);
       setPermissions(roleData.permissions);
     } catch (err) {
-      toast.error("Failed to fetch role");
-      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to fetch roles");
     } finally {
       setLoading(false);
     }
@@ -63,13 +61,11 @@ const AdminPermissions = () => {
     fetchRole();
   }, [roleId]);
 
-  // Toggle a single checkbox
   const toggleAction = (moduleIndex, action) => {
     const updated = [...permissions];
     updated[moduleIndex].actions[action] =
       !updated[moduleIndex].actions[action];
 
-    // if allowAll toggled → sync all actions
     if (action === "allowAll") {
       const newVal = updated[moduleIndex].actions.allowAll;
       updated[moduleIndex].actions = {
@@ -84,10 +80,9 @@ const AdminPermissions = () => {
     setPermissions(updated);
   };
 
-  // Save permissions
   const handleSubmit = async () => {
     try {
-      const normalized = normalizePermissions(permissions); // ensure always full set
+      const normalized = normalizePermissions(permissions);
       const res = await apiService.updatePermission(roleId, {
         permissions: normalized,
       });
@@ -125,7 +120,7 @@ const AdminPermissions = () => {
           </span>
           <div>
             <p className="mb-0">Role</p>
-            <h6 className="fw-medium">{role.name}</h6>
+            <h6 className="fw-medium">{role?.name}</h6>
           </div>
         </div>
 
@@ -148,7 +143,7 @@ const AdminPermissions = () => {
                   {permissions.map((perm, i) => (
                     <tr key={i}>
                       <td>
-                        <p className="text-gray-9 fw-medium">{perm.module}</p>
+                        <p className="text-gray-9 fw-medium">{perm?.module}</p>
                       </td>
                       {["create", "edit", "delete", "view", "allowAll"].map(
                         (action) => (
@@ -157,7 +152,7 @@ const AdminPermissions = () => {
                               <input
                                 className="form-check-input"
                                 type="checkbox"
-                                checked={perm.actions[action]}
+                                checked={perm?.actions[action]}
                                 onChange={() => toggleAction(i, action)}
                               />
                             </div>
@@ -195,6 +190,19 @@ const AdminPermissions = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

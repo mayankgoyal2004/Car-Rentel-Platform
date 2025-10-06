@@ -370,7 +370,7 @@ const AdminCustomers = () => {
                 </tr>
               ) : (
                 customers.map((customer) => (
-                  <tr key={customer._id}>
+                  <tr key={customer?._id}>
                     <td>
                       <div className="form-check form-check-md">
                         <input className="form-check-input" type="checkbox" />
@@ -379,11 +379,11 @@ const AdminCustomers = () => {
                     <td>
                       <div className="d-flex align-items-center">
                         <Link
-                          to={`/admin-dashboard/customer-details/${customer._id}`}
+                          to={`/admin-dashboard/customer-details/${customer?._id}`}
                           className="avatar rounded-circle me-2 flex-shrink-0"
                         >
                           <img
-                            src={`${BASE_URL_IMG + customer.image}`}
+                            src={`${BASE_URL_IMG + customer?.image}`}
                             className="rounded-circle"
                             alt="img"
                           />
@@ -391,25 +391,25 @@ const AdminCustomers = () => {
                         <div>
                           <h6 className="fs-14 fw-semibold">
                             <Link
-                              to={`/admin-dashboard/customer-details/${customer._id}`}
+                              to={`/admin-dashboard/customer-details/${customer?._id}`}
                             >
-                              {customer.name}
+                              {customer?.name}
                             </Link>
                           </h6>
-                          <p>{customer.contact}</p>
+                          <p>{customer?.contact}</p>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <p className="text-gray-9">{customer.email}</p>
+                      <p className="text-gray-9">{customer?.email}</p>
                     </td>
                     <td>
-                      <p className="text-gray-9">{customer.licenseNumber}</p>
+                      <p className="text-gray-9">{customer?.licenseNumber}</p>
                     </td>
                     <td>
                       <p className="text-gray-9">
                         {customer.validTill
-                          ? new Date(customer.validTill).toLocaleDateString()
+                          ? new Date(customer?.validTill).toLocaleDateString()
                           : ""}
                       </p>
                     </td>
@@ -427,7 +427,7 @@ const AdminCustomers = () => {
                         <ul className="dropdown-menu dropdown-menu-end p-2">
                           <li>
                             <Link
-                              to={`/admin-dashboard/customer-details/${customer._id}`}
+                              to={`/admin-dashboard/customer-details/${customer?._id}`}
                               className="dropdown-item rounded-1"
                             >
                               <i className="ti ti-eye me-1" />
@@ -849,7 +849,7 @@ const AdminCustomers = () => {
                       type="text"
                       className="form-control"
                       name="name"
-                      value={formData.name}
+                      value={formData?.name}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -863,7 +863,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="dateOfBirth"
-                      value={formData.dateOfBirth}
+                      value={formData?.dateOfBirth}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -876,7 +876,7 @@ const AdminCustomers = () => {
                     <select
                       className="form-select"
                       name="gender"
-                      value={formData.gender}
+                      value={formData?.gender}
                       onChange={handleInputChange}
                     >
                       <option value="">Select</option>
@@ -894,7 +894,7 @@ const AdminCustomers = () => {
                       type="text"
                       className="form-control"
                       name="contact"
-                      value={formData.contact}
+                      value={formData?.contact}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -908,7 +908,7 @@ const AdminCustomers = () => {
                       className="form-control"
                       type="email"
                       name="email"
-                      value={formData.email}
+                      value={formData?.email}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -922,7 +922,7 @@ const AdminCustomers = () => {
                       className="form-control"
                       type="text"
                       name="address"
-                      value={formData.address}
+                      value={formData?.address}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -935,7 +935,7 @@ const AdminCustomers = () => {
                     <select
                       className="select"
                       name="language"
-                      value={formData.language}
+                      value={formData?.language}
                       onChange={handleInputChange}
                     >
                       <option value="">Select</option>
@@ -955,7 +955,7 @@ const AdminCustomers = () => {
                       className="form-control"
                       type="text"
                       name="licenseNumber"
-                      value={formData.licenseNumber}
+                      value={formData?.licenseNumber}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -969,7 +969,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="dateOfIssue"
-                      value={formData.dateOfIssue}
+                      value={formData?.dateOfIssue}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -983,7 +983,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="validTill"
-                      value={formData.validTill}
+                      value={formData?.validTill}
                       onChange={handleInputChange}
                     />
                   </div>

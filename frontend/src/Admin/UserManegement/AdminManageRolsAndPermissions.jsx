@@ -23,12 +23,14 @@ const AdminManageRolesAndPermissions = () => {
       const res = await apiService.getAllRole({ search: searchQuery, page });
       setRoles(res.data.data || []);
       setTotalPages(res.data.pagination?.totalPages || 1);
-      if (res.data.pagination?.currentPage && res.data.pagination.currentPage !== currentPage) {
+      if (
+        res.data.pagination?.currentPage &&
+        res.data.pagination.currentPage !== currentPage
+      ) {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching roles:", err);
-      toast.error("Failed to fetch roles");
+      toast.error(err.response?.data?.message || "Failed to fetch roles");
     } finally {
       setLoading(false);
     }
@@ -153,19 +155,35 @@ const AdminManageRolesAndPermissions = () => {
               </tr>
             </thead>
             <tbody>
-              {roles.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    Loading...
+                  </td>
+                </tr>
+              ) : roles.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No roles found
+                  </td>
+                </tr>
+              ) : (
                 roles.map((role) => (
                   <tr key={role._id}>
                     <td>{role.name}</td>
                     <td>{new Date(role.createdAt).toLocaleDateString()}</td>
                     <td>
-                      <span className={`badge ${role.status ? "bg-success" : "bg-danger"}`}>
+                      <span
+                        className={`badge ${
+                          role.status ? "bg-success" : "bg-danger"
+                        }`}
+                      >
                         {role.status ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>
                       <div className="dropdown">
-                         <button
+                        <button
                           className="btn btn-icon btn-sm dropdown-toggle"
                           type="button"
                           data-bs-toggle="dropdown"
@@ -206,12 +224,6 @@ const AdminManageRolesAndPermissions = () => {
                     </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="text-center">
-                    No roles found
-                  </td>
-                </tr>
               )}
             </tbody>
           </table>
@@ -219,23 +231,40 @@ const AdminManageRolesAndPermissions = () => {
           {/* Pagination */}
           <nav aria-label="Page navigation" className="mt-3">
             <ul className="pagination justify-content-center">
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
                   Prev
                 </button>
               </li>
               {[...Array(totalPages)].map((_, idx) => (
                 <li
                   key={idx}
-                  className={`page-item ${currentPage === idx + 1 ? "active" : ""}`}
+                  className={`page-item ${
+                    currentPage === idx + 1 ? "active" : ""
+                  }`}
                 >
-                  <button className="page-link" onClick={() => handlePageChange(idx + 1)}>
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(idx + 1)}
+                  >
                     {idx + 1}
                   </button>
                 </li>
               ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
                   Next
                 </button>
               </li>
@@ -250,7 +279,11 @@ const AdminManageRolesAndPermissions = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="mb-0">Add Role</h5>
-              <button type="button" className="btn-close custom-btn-close" data-bs-dismiss="modal" />
+              <button
+                type="button"
+                className="btn-close custom-btn-close"
+                data-bs-dismiss="modal"
+              />
             </div>
             <div className="modal-body">
               <label className="form-label">
@@ -268,7 +301,11 @@ const AdminManageRolesAndPermissions = () => {
               <button className="btn btn-light" data-bs-dismiss="modal">
                 Cancel
               </button>
-              <button className="btn btn-primary" onClick={handleCreateRole} data-bs-dismiss="modal">
+              <button
+                className="btn btn-primary"
+                onClick={handleCreateRole}
+                data-bs-dismiss="modal"
+              >
                 Create
               </button>
             </div>
@@ -282,7 +319,11 @@ const AdminManageRolesAndPermissions = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="mb-0">Edit Role</h5>
-              <button type="button" className="btn-close custom-btn-close" data-bs-dismiss="modal" />
+              <button
+                type="button"
+                className="btn-close custom-btn-close"
+                data-bs-dismiss="modal"
+              />
             </div>
             <div className="modal-body">
               <label className="form-label">
@@ -292,7 +333,9 @@ const AdminManageRolesAndPermissions = () => {
                 type="text"
                 className="form-control"
                 value={editRole?.name || ""}
-                onChange={(e) => setEditRole({ ...editRole, name: e.target.value })}
+                onChange={(e) =>
+                  setEditRole({ ...editRole, name: e.target.value })
+                }
               />
 
               <div className="form-check form-switch mt-3">
@@ -300,7 +343,9 @@ const AdminManageRolesAndPermissions = () => {
                   className="form-check-input"
                   type="checkbox"
                   checked={editRole?.status || false}
-                  onChange={(e) => setEditRole({ ...editRole, status: e.target.checked })}
+                  onChange={(e) =>
+                    setEditRole({ ...editRole, status: e.target.checked })
+                  }
                 />
                 <label className="form-check-label">Active</label>
               </div>
@@ -334,10 +379,18 @@ const AdminManageRolesAndPermissions = () => {
               <p className="mb-3">Are you sure you want to delete Role?</p>
               <strong>{deleteRole?.name}</strong>
               <div className="d-flex justify-content-center mt-2">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal" onClick={() => setDeleteRole(null)}>
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  onClick={() => setDeleteRole(null)}
+                >
                   Cancel
                 </button>
-                <button className="btn btn-primary" onClick={handleDeleteRole} data-bs-dismiss="modal">
+                <button
+                  className="btn btn-primary"
+                  onClick={handleDeleteRole}
+                  data-bs-dismiss="modal"
+                >
                   Yes, Delete
                 </button>
               </div>

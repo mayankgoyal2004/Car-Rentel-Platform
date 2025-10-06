@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 
 const AdminCarTransmissions = () => {
@@ -183,7 +183,20 @@ const AdminCarTransmissions = () => {
                 </tr>
               </thead>
               <tbody>
-                {carTransmission.map((transmission) => (
+ {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : carTransmission.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No Car Transmission found
+                    </td>
+                  </tr>
+                ) : (
+                carTransmission.map((transmission) => (
                   <tr key={transmission._id}>
                     <td>
                       <div className="form-check form-check-md">
@@ -192,16 +205,16 @@ const AdminCarTransmissions = () => {
                     </td>
                     <td>
                       <h6 className="fw-medium">
-                        <a>{transmission.carTransmission}</a>
+                        <a>{transmission?.carTransmission}</a>
                       </h6>
                     </td>
                     <td>
                       <span
                         className={`badge  ${
-                          transmission.status ? "bg-success" : "bg-danger"
+                          transmission?.status ? "bg-success" : "bg-danger"
                         }`}
                       >
-                        {transmission.status ? "Active" : "Inactive"}
+                        {transmission?.status ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>
@@ -245,7 +258,8 @@ const AdminCarTransmissions = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+              ))
+                )}
               </tbody>
             </table>
           </div>
@@ -456,6 +470,19 @@ const AdminCarTransmissions = () => {
           </div>
         </div>
       </div>
+        <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
       {/* /Delete Car Transmission */}
     </div>
   );

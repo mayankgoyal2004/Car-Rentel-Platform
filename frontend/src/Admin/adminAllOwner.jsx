@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminOwners = () => {
   const [onwers, setOwners] = useState([]);
@@ -30,7 +31,7 @@ const AdminOwners = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching Customers:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch owners");
     } finally {
       setLoading(false);
     }
@@ -42,11 +43,12 @@ const AdminOwners = () => {
 
   const handleDelete = async () => {
     try {
-      await apiService.deleteOwner(deleteowner._id);
+      const res = await apiService.deleteOwner(deleteowner._id);
+      toast.success(res.data.message);
       fetchCustomers(search, currentPage);
       SetdeleteOwner("");
-    } catch (error) {
-      console.error("Error deleting owner:", error);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete owner");
     }
   };
 
@@ -68,41 +70,26 @@ const AdminOwners = () => {
               </ol>
             </nav>
           </div>
-          <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-            <div className="mb-2 me-2">
-              <a className="btn btn-white d-flex align-items-center">
-                <i className="ti ti-printer me-2" />
-                Print
-              </a>
-            </div>
-            <div className="mb-2 me-2">
-              <div className="dropdown">
-                <a className="btn btn-dark d-inline-flex align-items-center">
-                  <i className="ti ti-upload me-1" />
-                  Export
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
         {/* /Breadcrumb */}
 
         {/* Table Header */}
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-          <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
-          <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-            <div className="top-search me-2">
-              <div className="top-search-group">
-                <span className="input-icon">
-                  <i className="ti ti-search" />
-                </span>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
+          <div className="d-flex align-items-center flex-wrap row-gap-3">
+            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+              <div className="top-search me-2">
+                <div className="top-search-group">
+                  <span className="input-icon">
+                    <i className="ti ti-search" />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -182,9 +169,11 @@ const AdminOwners = () => {
                       <p className="text-gray-9">{own.contact}</p>
                     </td>
                     <td>
-                      <p className={`badge  ${
+                      <p
+                        className={`badge  ${
                           own.status ? "bg-success" : "bg-danger"
-                        }`}>
+                        }`}
+                      >
                         {own.status ? "Active" : "Inactive"}
                       </p>
                     </td>
@@ -318,6 +307,19 @@ const AdminOwners = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Modal */}
     </div>

@@ -31,7 +31,7 @@ const AdminFaqCategories = () => {
           setCurrentPage(res.data.pagination.currentPage);
         }
       } catch (err) {
-        console.error("Error fetching category:", err);
+        toast.error(err.response?.data?.message || "Failed to fetch Faq");
       } finally {
         setLoading(false);
       }
@@ -50,17 +50,13 @@ const AdminFaqCategories = () => {
         categoryName: newFaqCategory.trim(),
       });
 
-      // Success response (HTTP 2xx)
-      toast.success(res.data.message); // e.g., "New Category Created"
+      toast.success(res.data.message);
       setNewFaqCategory("");
       getAllFaqCategory();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "Category already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -76,12 +72,9 @@ const AdminFaqCategories = () => {
       setEditFaqCategory(null);
       getAllFaqCategory();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "category already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -95,12 +88,9 @@ const AdminFaqCategories = () => {
       setDeleteCategory(null);
       getAllFaqCategory();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "Category already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -139,7 +129,6 @@ const AdminFaqCategories = () => {
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
               <div className="mb-2">
                 <a
-                 
                   data-bs-toggle="modal"
                   data-bs-target="#add_Category"
                   className="btn btn-primary d-flex align-items-center"
@@ -185,65 +174,81 @@ const AdminFaqCategories = () => {
                 </tr>
               </thead>
               <tbody>
-                {faqCategory.map((faq) => (
+                {loading ? (
                   <tr>
-                    <td>
-                      <a className="fw-medium">{faq.categoryName}</a>
-                    </td>
-                    <td>
-                      <span className="text-gray-9">
-                        {" "}
-                        {new Date(faq.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-
-                    <td>
-                       <span
-                        className={`badge badge-md ${
-                          faq.status ? "badge-soft-success" : "badge-soft-danger"
-                        }`}
-                      >
-                        {faq.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_Category"
-                              onClick={() => setEditFaqCategory(faq)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_Category"
-                              onClick={() => setDeleteCategory(faq)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : faqCategory.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No Faq found
+                    </td>
+                  </tr>
+                ) : (
+                  faqCategory.map((faq) => (
+                    <tr>
+                      <td>
+                        <a className="fw-medium">{faq.categoryName}</a>
+                      </td>
+                      <td>
+                        <span className="text-gray-9">
+                          {" "}
+                          {new Date(faq.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            faq.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {faq.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_Category"
+                                onClick={() => setEditFaqCategory(faq)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_Category"
+                                onClick={() => setDeleteCategory(faq)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -439,6 +444,19 @@ const AdminFaqCategories = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Category */}
     </div>

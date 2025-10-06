@@ -26,7 +26,9 @@ const LoginSettingAdmin = () => {
         });
       }
     } catch (err) {
-      toast.error("Failed to load captcha settings");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch captcha setting"
+      );
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,7 @@ const LoginSettingAdmin = () => {
       await apiService.updatecaptchaSetting(captchaSetting);
       toast.success("Captcha settings updated successfully");
     } catch (err) {
-      toast.error("Failed to update captcha settings");
+      toast.error("Failed to update captcha settings" + err.message);
     }
   };
 
@@ -82,7 +84,7 @@ const LoginSettingAdmin = () => {
         document.getElementById("configureCaptcha").click();
       }
     } catch (err) {
-      toast.error("Failed to update captcha status");
+      toast.error("Failed to update captcha status" + err.message);
     }
   };
 
@@ -165,20 +167,19 @@ const LoginSettingAdmin = () => {
                     )}
                     {userType === 1 && (
                       <li>
-                        <a href="localization-setting.html">
+                        <Link to="/admin-dashboard/location-setting">
                           <i className="ti ti-settings-2 me-2" />
-                          <span>Localization</span>
-                        </a>
+                          <span>Location Setting</span>
+                        </Link>
                       </li>
                     )}
-                    {userType === 1 && (
-                      <li>
-                        <a href="language-setting.html">
-                          <i className="ti ti-language me-2" />
-                          <span>Language</span>
-                        </a>
-                      </li>
-                    )}
+                    <li>
+                      <Link to="/admin-dashboard/localization-setting">
+                        <i className="ti ti-language me-2" />
+
+                        <span>Localization</span>
+                      </Link>
+                    </li>
 
                     {userType !== 1 && (
                       <li>

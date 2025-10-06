@@ -31,7 +31,7 @@ const EmailSetting = () => {
         });
       }
     } catch (err) {
-      toast.error("Failed to load email settings");
+      toast.error("Failed to load email settings" + err.message);
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ const EmailSetting = () => {
       await apiService.updatesmtpSetting(emailSetting);
       toast.success("SMTP settings updated successfully");
     } catch (err) {
-      toast.error("Failed to update SMTP settings");
+      toast.error("Failed to update SMTP settings" + err.message);
     }
   };
   const handleInputChange = (e) => {
@@ -80,7 +80,7 @@ const EmailSetting = () => {
       setEmailSetting(updatedSettings);
       toast.success(`SMTP ${newStatus ? "enabled" : "disabled"} successfully`);
     } catch (err) {
-      toast.error("Failed to update SMTP status");
+      toast.error("Failed to update SMTP status" + err.message);
     }
   };
 
@@ -163,20 +163,19 @@ const EmailSetting = () => {
                     )}
                     {userType === 1 && (
                       <li>
-                        <a href="localization-setting.html">
+                        <Link to="/admin-dashboard/location-setting">
                           <i className="ti ti-settings-2 me-2" />
-                          <span>Localization</span>
-                        </a>
+                          <span>Location Setting</span>
+                        </Link>
                       </li>
                     )}
-                    {userType === 1 && (
-                      <li>
-                        <a href="language-setting.html">
-                          <i className="ti ti-language me-2" />
-                          <span>Language</span>
-                        </a>
-                      </li>
-                    )}
+                    <li>
+                      <Link to="/admin-dashboard/localization-setting">
+                        <i className="ti ti-language me-2" />
+
+                        <span>Localization</span>
+                      </Link>
+                    </li>
 
                     {userType !== 1 && (
                       <li>

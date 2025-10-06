@@ -551,12 +551,6 @@ const AdminCarDetails = () => {
                         <div className="tab-pane fade" id="car-service">
                           <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                             <h6>Extra Services</h6>
-                            <Link
-                              to="/admin-dashboard/edit-car"
-                              className="link-default"
-                            >
-                              <i className="ti ti-edit" />
-                            </Link>
                           </div>
                           <div className="row gy-2">
                             {car?.extraService?.map((service, index) => (
@@ -565,7 +559,6 @@ const AdminCarDetails = () => {
                                   <p className="d-flex align-items-center mb-0">
                                     <i className="ti ti-square-check-filled text-success me-2" />
                                     {service.name}{" "}
-                                    {/* Use actual property from your service object */}
                                   </p>
                                 </div>
                               </div>
@@ -579,15 +572,11 @@ const AdminCarDetails = () => {
                           <div className="border-bottom mb-3 pb-3">
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                               <h6>Gallery</h6>
-                              <Link
-                                to="/admin-dashboard/edit-car"
-                                className="link-default"
-                              ></Link>
                             </div>
                             <div className="d-flex align-items-center flex-wrap gap-3">
                               <div className="gallery-wrap">
                                 <a
-                                  href={BASE_URL_IMG + car.image}
+                                  href={BASE_URL_IMG + car?.image}
                                   data-fancybox="gallery"
                                 >
                                   <img
@@ -606,14 +595,14 @@ const AdminCarDetails = () => {
                               <div className="uploaded-video">
                                 {car?.video?.length > 0 && (
                                   <video
-                                    src={BASE_URL_IMG + car.carVideo[0]}
+                                    src={BASE_URL_IMG + car?.carVideo[0]}
                                     controls
                                     width="100%"
                                   />
                                 )}
                                 {car?.carVideo?.length > 0 && (
                                   <a
-                                    href={BASE_URL_IMG + car.carVideo[0]}
+                                    href={BASE_URL_IMG + car?.carVideo[0]}
                                     data-fancybox
                                     className="play-icon"
                                   >
@@ -641,20 +630,20 @@ const AdminCarDetails = () => {
                                     <div className="col-xxl-8 col-md-7">
                                       <div className="d-flex align-items-center gap-2 mb-1">
                                         <h6 className="fs-14 fw-medium">
-                                          {damage.type}
+                                          {damage?.type}
                                         </h6>
                                         <span
                                           className={`badge ${
-                                            damage.location === "Interior"
+                                            damage?.location === "Interior"
                                               ? "bg-pink-transparent"
                                               : "bg-secondary-transparent"
                                           } badge-sm`}
                                         >
-                                          {damage.location}
+                                          {damage?.location}
                                         </span>
                                       </div>
                                       <p className="fs-13">
-                                        {damage.description}
+                                        {damage?.description}
                                       </p>
                                     </div>
                                     <div className="col-xxl-4 col-md-5">
@@ -1012,119 +1001,7 @@ const AdminCarDetails = () => {
             </div>
           </div>
           {/* /Add Brand */}
-          {/* Create Seasonal Pricing */}
-          <div className="modal fade" id="add_price">
-            <div className="modal-dialog modal-dialog-centered modal-md">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h5 className="modal-title mb-0">Create Seasonal Pricing</h5>
-                  <button
-                    type="button"
-                    className="btn-close custom-btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  >
-                    <i className="ti ti-x fs-16" />
-                  </button>
-                </div>
-                <form action="add-car">
-                  <div className="modal-body pb-1">
-                    <div className="row">
-                      <div className="col-md-12">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Season Name <span className="text-danger">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control input-tags"
-                            data-role="tagsinput"
-                            defaultValue="Winter"
-                          />
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Start Date <span className="text-danger">*</span>
-                          </label>
-                          <div className="input-icon-end position-relative">
-                            <input
-                              type="text"
-                              className="form-control datetimepicker"
-                              placeholder="dd/mm/yyyy"
-                            />
-                            <span className="input-icon-addon">
-                              <i className="ti ti-calendar" />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            End Date <span className="text-danger">*</span>
-                          </label>
-                          <div className="input-icon-end position-relative">
-                            <input
-                              type="text"
-                              className="form-control datetimepicker"
-                              placeholder="dd/mm/yyyy"
-                            />
-                            <span className="input-icon-addon">
-                              <i className="ti ti-calendar" />
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Daily Rate <span className="text-danger">*</span>
-                          </label>
-                          <input type="text" className="form-control " />
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Weekly Rate <span className="text-danger">*</span>
-                          </label>
-                          <input type="text" className="form-control " />
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Monthly Rate <span className="text-danger">*</span>
-                          </label>
-                          <input type="text" className="form-control " />
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="mb-3">
-                          <label className="form-label">
-                            Late Fees <span className="text-danger">*</span>
-                          </label>
-                          <input type="text" className="form-control " />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="modal-footer">
-                    <div className="d-flex justify-content-center">
-                      <a className="btn btn-light me-3" data-bs-dismiss="modal">
-                        Cancel
-                      </a>
-                      <button type="submit" className="btn btn-primary">
-                        Create New
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
+
           {/* /Create Seasonal Pricing */}
           {/* Edit Seasonal Pricing */}
           <div className="modal fade" id="edit_seasonal_price">
@@ -1670,6 +1547,18 @@ const AdminCarDetails = () => {
           {/* /Create FAQ */}
         </div>
       )}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

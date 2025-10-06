@@ -22,7 +22,7 @@ const BankAccountSetting = () => {
       const res = await apiService.getAllBankAccount();
       setBankAccount(res.data.data);
     } catch (err) {
-      toast.error("Failed to load signatures");
+      toast.error("Failed to load signatures"+err.message);
     }
   };
 
@@ -55,7 +55,7 @@ const BankAccountSetting = () => {
       });
       fetchBankAccount();
     } catch (err) {
-      toast.error("Failed to add bank account");
+      toast.error("Failed to add bank account"+err.message);
     }
   };
 
@@ -82,7 +82,7 @@ const BankAccountSetting = () => {
       setEditingBankAccount(null);
       fetchBankAccount();
     } catch (err) {
-      toast.error("Failed to update bank account");
+      toast.error("Failed to update bank account"+err.message);
     }
   };
 
@@ -92,7 +92,7 @@ const BankAccountSetting = () => {
       toast.success("Bank account deleted successfully");
       fetchBankAccount();
     } catch (err) {
-      toast.error("Failed to delete bank account");
+      toast.error("Failed to delete bank account"+err.message);
     }
   };
 
@@ -148,7 +148,7 @@ const BankAccountSetting = () => {
 
                   {/* Website Setting */}
                   <li className="menu-title">
-                    <span>WEBSITE SETTING</span>
+                    <span>Website Setting</span>
                   </li>
                   <ul className="sidebar-links pb-3 mb-3 border-bottom">
                     {userType === 1 && (
@@ -225,7 +225,7 @@ const BankAccountSetting = () => {
           <div className="col-xl-9">
             <div className="card">
               <div className="card-header">
-                <h5>System Settings</h5>
+                <h5>Invoice Setting</h5>
               </div>
               <div className="card-body">
                 <div className="payment-section">

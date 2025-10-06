@@ -93,20 +93,21 @@ const AdminInvoice = () => {
           {/* /Breadcrumb */}
           {/* Table Header */}
           <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-            <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
-            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-              <div className="top-search me-2">
-                <div className="top-search-group">
-                  <span className="input-icon">
-                    <i className="ti ti-search" />
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search"
-                    value={search}
-                    onChange={handleSearchChange}
-                  />
+            <div className="d-flex align-items-center flex-wrap row-gap-3">
+              <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+                <div className="top-search me-2">
+                  <div className="top-search-group">
+                    <span className="input-icon">
+                      <i className="ti ti-search" />
+                    </span>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Search"
+                      value={search}
+                      onChange={handleSearchChange}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

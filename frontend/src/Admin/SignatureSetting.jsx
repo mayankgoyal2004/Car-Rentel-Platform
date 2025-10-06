@@ -22,7 +22,7 @@ const SignatureSetting = () => {
       const res = await apiService.getAllSignature();
       setSignatures(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to load signatures");
+      toast.error("Failed to load signatures" + err.message);
     }
   };
 
@@ -50,7 +50,7 @@ const SignatureSetting = () => {
       document.getElementById("add_signatures_close").click();
       fetchSignatures();
     } catch (err) {
-      toast.error("Failed to add signature");
+      toast.error("Failed to add signature" + err.message);
     }
   };
 
@@ -76,7 +76,7 @@ const SignatureSetting = () => {
       document.getElementById("edit_signature_close").click();
       fetchSignatures();
     } catch (err) {
-      toast.error("Failed to update signature");
+      toast.error("Failed to update signature" + err.message);
     }
   };
 
@@ -87,7 +87,7 @@ const SignatureSetting = () => {
       document.getElementById("delete_signature_close").click();
       fetchSignatures();
     } catch (err) {
-      toast.error("Failed to delete signature");
+      toast.error("Failed to delete signature" + err.message);
     }
   };
 
@@ -213,11 +213,11 @@ const SignatureSetting = () => {
                       </li>
                     )}
                     <li>
-                                        <Link to="/admin-dashboard/localization-setting">
-                                          <i className="ti ti-language me-2" />
-                                          <span>Localization</span>
-                                        </Link>
-                                      </li>
+                      <Link to="/admin-dashboard/localization-setting">
+                        <i className="ti ti-language me-2" />
+                        <span>Localization</span>
+                      </Link>
+                    </li>
                     {userType === 1 && (
                       <li>
                         <a href="language-setting.html">
@@ -261,7 +261,7 @@ const SignatureSetting = () => {
           <div className="col-lg-9">
             <div className="card">
               <div className="card-header">
-                <h5 className="fw-bold">App Settings</h5>
+                <h5 className="fw-bold">Invoice Settings</h5>
               </div>
               <div className="card-body">
                 <h6 className="fw-bold mb-3">Signatures</h6>

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useSelector } from "react-redux";
 
 const AdminAllFaq = () => {
   const [faq, setFaq] = useState([]);
   const [newFaqQuestion, setNewFaqQuestion] = useState("");
   const [newFaqAnswer, setNewFaqAnswer] = useState("");
-  const [categories, setCategories] = useState([]); // all active categories
-  const [newCategory, setNewCategory] = useState(""); // selected category id
+  const [categories, setCategories] = useState([]);
+  const [newCategory, setNewCategory] = useState("");
   const [editFaq, setEditFaq] = useState(null);
   const [deleteFaq, setDeleteFaq] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -190,60 +190,76 @@ const AdminAllFaq = () => {
                 </tr>
               </thead>
               <tbody>
-                {faq.map((f) => (
-                  <tr key={f._id}>
-                    <td>{f.question}</td>
-                    <td>{f.answer}</td>
-                    <td>{f.category?.categoryName || "N/A"}</td>
-                    <td>
-                      <span
-                        className={`badge badge-md ${
-                          f.status ? "badge-soft-success" : "badge-soft-danger"
-                        }`}
-                      >
-                        {f.status ? "Published" : "Unpublished"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <a
-                              className="dropdown-item rounded-1"
-                              href="javascript:void(0);"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_FAQ"
-                              onClick={() => setEditFaq(f)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              className="dropdown-item rounded-1"
-                              href="javascript:void(0);"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_FAQ"
-                              onClick={() => setDeleteFaq(f)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : faq.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No Faq found
+                    </td>
+                  </tr>
+                ) : (
+                  faq.map((f) => (
+                    <tr key={f._id}>
+                      <td>{f.question}</td>
+                      <td>{f.answer}</td>
+                      <td>{f.category?.categoryName || "N/A"}</td>
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            f.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {f.status ? "Published" : "Unpublished"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <a
+                                className="dropdown-item rounded-1"
+                                href="javascript:void(0);"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_FAQ"
+                                onClick={() => setEditFaq(f)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className="dropdown-item rounded-1"
+                                href="javascript:void(0);"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_FAQ"
+                                onClick={() => setDeleteFaq(f)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}{" "}
               </tbody>
             </table>
           </div>
@@ -464,10 +480,7 @@ const AdminAllFaq = () => {
           <div className="modal-content">
             <div className="modal-body text-center">
               <h4 className="mb-1">Delete FAQ</h4>
-              <p className="mb-3">
-                Are you sure you want to delete{" "}
-               
-              </p>
+              <p className="mb-3">Are you sure you want to delete </p>
               <div className="d-flex justify-content-center">
                 <button
                   onClick={deleteFaqHandler}
@@ -480,6 +493,19 @@ const AdminAllFaq = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

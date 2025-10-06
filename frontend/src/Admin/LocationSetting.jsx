@@ -21,7 +21,7 @@ const LocationSetting = () => {
       });
       setCountry(res.data.data);
     } catch (err) {
-      console.error("Error fetching category:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch location");
     } finally {
       setLoading(false);
     }
@@ -54,7 +54,7 @@ const LocationSetting = () => {
   const updateLocation = async (e) => {
     e.preventDefault();
     if (!editCountry?.countryName?.trim()) {
-      toast.error("Country Name is required");
+      toast.error("city Name is required");
       return;
     }
 
@@ -167,17 +167,17 @@ const LocationSetting = () => {
                       </li>
                     )}
                     {userType === 1 && (
-                      <li>
+                      <li className="active">
                         <Link to="/admin-dashboard/location-setting">
                           <i className="ti ti-settings-2 me-2" />
                           <span>Location Setting</span>
                         </Link>
                       </li>
                     )}
-
                     <li>
                       <Link to="/admin-dashboard/localization-setting">
                         <i className="ti ti-language me-2" />
+
                         <span>Localization</span>
                       </Link>
                     </li>
@@ -243,63 +243,77 @@ const LocationSetting = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {countrys.map((loc) => (
-                        <tr key={loc._id}>
-                          <td>
-                            <h6 className="fw-medium">
-                              <a>{loc.countryName}</a>
-                            </h6>
-                          </td>
-                          <td>
-                            <span
-                              className={`badge ${
-                                loc.status
-                                  ? "badge-success-transparent"
-                                  : "badge-danger-transparent"
-                              } d-inline-flex align-items-center badge-sm`}
-                            >
-                              <i className="ti ti-point-filled me-1" />
-                              {loc.status ? "Active" : "Inactive"}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="dropdown">
-                              <button
-                                className="btn btn-icon btn-sm"
-                                type="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                              >
-                                <i className="ti ti-dots-vertical" />
-                              </button>
-                              <ul className="dropdown-menu dropdown-menu-end p-2">
-                                <li>
-                                  <a
-                                    className="dropdown-item rounded-1"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#edit_signature"
-                                    onClick={() => seteditCountry(loc)}
-                                  >
-                                    <i className="ti ti-edit me-1" />
-                                    Edit
-                                  </a>
-                                </li>
-                                <li>
-                                  <a
-                                    className="dropdown-item rounded-1"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#delete_signature"
-                                    onClick={() => setDeleteCountry(loc)}
-                                  >
-                                    <i className="ti ti-trash me-1" />
-                                    Delete
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
+                      {loading ? (
+                        <tr>
+                          <td colSpan="7" className="text-center py-4">
+                            Loading...
                           </td>
                         </tr>
-                      ))}
+                      ) : countrys.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="text-center py-4">
+                            No location found
+                          </td>
+                        </tr>
+                      ) : (
+                        countrys.map((loc) => (
+                          <tr key={loc._id}>
+                            <td>
+                              <h6 className="fw-medium">
+                                <a>{loc.countryName}</a>
+                              </h6>
+                            </td>
+                            <td>
+                              <span
+                                className={`badge ${
+                                  loc.status
+                                    ? "badge-success-transparent"
+                                    : "badge-danger-transparent"
+                                } d-inline-flex align-items-center badge-sm`}
+                              >
+                                <i className="ti ti-point-filled me-1" />
+                                {loc.status ? "Active" : "Inactive"}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="dropdown">
+                                <button
+                                  className="btn btn-icon btn-sm"
+                                  type="button"
+                                  data-bs-toggle="dropdown"
+                                  aria-expanded="false"
+                                >
+                                  <i className="ti ti-dots-vertical" />
+                                </button>
+                                <ul className="dropdown-menu dropdown-menu-end p-2">
+                                  <li>
+                                    <a
+                                      className="dropdown-item rounded-1"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#edit_signature"
+                                      onClick={() => seteditCountry(loc)}
+                                    >
+                                      <i className="ti ti-edit me-1" />
+                                      Edit
+                                    </a>
+                                  </li>
+                                  <li>
+                                    <a
+                                      className="dropdown-item rounded-1"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#delete_signature"
+                                      onClick={() => setDeleteCountry(loc)}
+                                    >
+                                      <i className="ti ti-trash me-1" />
+                                      Delete
+                                    </a>
+                                  </li>
+                                </ul>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -451,9 +465,9 @@ const LocationSetting = () => {
                 <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
                   <i className="ti ti-trash-x fs-26" />
                 </span>
-                <h4 className="mb-1">Delete Signature</h4>
+                <h4 className="mb-1">Delete City</h4>
                 <p className="mb-3">
-                  Are you sure you want to delete this signature?
+                  Are you sure you want to delete this City?
                 </p>
                 <div className="d-flex justify-content-center">
                   <button

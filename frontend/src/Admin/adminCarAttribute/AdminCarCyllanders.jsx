@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 
 const AdminCarCylinders = () => {
@@ -28,7 +28,9 @@ const AdminCarCylinders = () => {
         setCurrentPage(res.data.pagination.currentPage || 1);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to fetch car cylinders");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch car cylinders"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,9 @@ const AdminCarCylinders = () => {
       setEditCarCylinder(null);
       fetchAllCarCylinders(currentPage, search);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update car cylinder");
+      toast.error(
+        err.response?.data?.message || "Failed to update car cylinder"
+      );
     }
   };
 
@@ -78,15 +82,15 @@ const AdminCarCylinders = () => {
   const handleDeleteCarCylinder = async () => {
     if (!deleteCarCylinder) return;
     try {
-      const res = await apiService.deleteCarCylinder(
-        deleteCarCylinder._id
-      );
+      const res = await apiService.deleteCarCylinder(deleteCarCylinder._id);
       toast.success(res.data.message);
       setDeleteCarCylinder(null);
       fetchAllCarCylinders(currentPage, search);
       document.getElementById("delete_cylinder_close")?.click();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete car cylinder");
+      toast.error(
+        err.response?.data?.message || "Failed to delete car cylinder"
+      );
     }
   };
 
@@ -121,11 +125,8 @@ const AdminCarCylinders = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-             
-            
               <div className="mb-2">
                 <a
-                
                   data-bs-toggle="modal"
                   data-bs-target="#add_cylinder_type"
                   className="btn btn-primary d-flex align-items-center"
@@ -175,65 +176,79 @@ const AdminCarCylinders = () => {
                 </tr>
               </thead>
               <tbody>
-                {carCylinder.map((cylinder) => (
-                  <tr key={cylinder._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <h6 className="fw-medium">
-                        <a>{cylinder.carCylinder}</a>
-                      </h6>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          cylinder.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {cylinder.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_cylinder_type"
-                              onClick={() => setEditCarCylinder(cylinder)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_cylinder_type"
-                              onClick={() => setDeleteCarCylinder(cylinder)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : carCylinder.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No car cylinder found
+                    </td>
+                  </tr>
+                ) : (
+                  carCylinder.map((cylinder) => (
+                    <tr key={cylinder._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <h6 className="fw-medium">
+                          <a>{cylinder.carCylinder}</a>
+                        </h6>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge  ${
+                            cylinder.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {cylinder.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_cylinder_type"
+                                onClick={() => setEditCarCylinder(cylinder)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_cylinder_type"
+                                onClick={() => setDeleteCarCylinder(cylinder)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -421,11 +436,13 @@ const AdminCarCylinders = () => {
                 <i className="ti ti-trash-x fs-26" />
               </span>
               <h4 className="mb-1">Delete Cylinder</h4>
-              <p className="mb-3">
-                Are you sure you want to delete cylinder?
-              </p>
+              <p className="mb-3">Are you sure you want to delete cylinder?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal" id="delete_cylinder_close">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_cylinder_close"
+                >
                   Cancel
                 </button>
                 <button

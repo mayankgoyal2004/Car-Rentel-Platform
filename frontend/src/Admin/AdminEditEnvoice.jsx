@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminEditEnvoice = () => {
   const { id } = useParams();
@@ -106,12 +106,11 @@ const AdminEditEnvoice = () => {
       const invoiceData = res.data.data;
       setInvoice(invoiceData);
 
-      console.log("Fetched invoice data:", invoiceData); // Debug log
+      console.log("Fetched invoice data:", invoiceData);
 
-      // Set the form data with the fetched invoice data - matching your API structure
       setInvoiceData({
         invoiceNumber: invoiceData.invoiceNumber || "",
-        carId: invoiceData.car || "", // Note: your API has "car" not "carId"
+        carId: invoiceData.car || "",
         reservationId: invoiceData.reservation?._id || "",
         fromDate: invoiceData.fromDate
           ? invoiceData.fromDate.split("T")[0]
@@ -119,8 +118,8 @@ const AdminEditEnvoice = () => {
         dueDate: invoiceData.dueDate ? invoiceData.dueDate.split("T")[0] : "",
         currency: invoiceData.currency || "USD",
         status: invoiceData.status || "pending",
-        from: invoiceData.from?.name || "", // From is an object with name
-        to: invoiceData.to?.name || invoiceData.customer?._id || "", // To is an object with name, fallback to customer ID
+        from: invoiceData.from?.name || "",
+        to: invoiceData.to?.name || invoiceData.customer?._id || "",
         paymentMethod: invoiceData.paymentMethod || "",
         terms: invoiceData.terms || "",
         notes: invoiceData.notes || "",
@@ -368,7 +367,9 @@ const AdminEditEnvoice = () => {
 
       if (res.data.success) {
         toast.success("Invoice updated successfully!");
-        navigate("/admin-dashboard/all-invoice");
+        setTimeout(() => {
+          navigate("/admin-dashboard/all-invoice");
+        }, 1000);
       }
     } catch (err) {
       console.error(" Error updating invoice:", err);
@@ -381,11 +382,6 @@ const AdminEditEnvoice = () => {
   const handleCancel = () => {
     navigate("/admin-dashboard-invoices");
   };
-
-  // Find the selected customer for display
-  const selectedCustomer =
-    customers.find((customer) => customer._id === invoiceData.to) ||
-    customers.find((customer) => customer.name === invoiceData.to);
 
   if (loading && !invoiceData.invoiceNumber) {
     return <div className="text-center p-4">Loading...</div>;
@@ -462,9 +458,7 @@ const AdminEditEnvoice = () => {
                                   onChange={handleInputChange}
                                   required
                                 />
-                                <span className="input-icon-addon">
-                                   
-                                </span>
+                                <span className="input-icon-addon"></span>
                               </div>
                             </div>
                           </div>
@@ -480,9 +474,7 @@ const AdminEditEnvoice = () => {
                                   onChange={handleInputChange}
                                   required
                                 />
-                                <span className="input-icon-addon">
-                                   
-                                </span>
+                                <span className="input-icon-addon"></span>
                               </div>
                             </div>
                           </div>
@@ -496,7 +488,7 @@ const AdminEditEnvoice = () => {
                                 onChange={handleInputChange}
                               >
                                 <option value="USD">USD</option>
-                              
+
                                 <option value="Dollor">Dollor</option>
                               </select>
                             </div>
@@ -972,6 +964,18 @@ const AdminEditEnvoice = () => {
           </div>
         </div>
       </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

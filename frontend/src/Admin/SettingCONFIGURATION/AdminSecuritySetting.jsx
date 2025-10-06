@@ -34,16 +34,16 @@ const AdminSecuritySetting = () => {
       });
 
       if (res.data.success) {
-        alert("Password updated successfully!");
+        toast.success("Password updated successfully!");
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
-      } else {
-        alert(res.message || "Failed to update password");
       }
     } catch (err) {
-      console.error(err);
-      alert("Server error. Try again later.");
+      toast.error(
+        "Error changing password: " +
+          (err.response?.data?.message || err.message)
+      );
     } finally {
       setLoading(false);
     }
@@ -115,20 +115,21 @@ const AdminSecuritySetting = () => {
                         </Link>
                       </li>
                     )}
+                    {userType === 1 && (
+                      <li>
+                        <Link to="/admin-dashboard/location-setting">
+                          <i className="ti ti-settings-2 me-2" />
+                          <span>Location Setting</span>
+                        </Link>
+                      </li>
+                    )}
                     <li>
                       <Link to="/admin-dashboard/localization-setting">
                         <i className="ti ti-language me-2" />
+
                         <span>Localization</span>
                       </Link>
                     </li>
-                    {userType === 1 && (
-                      <li>
-                        <a href="language-setting.html">
-                          <i className="ti ti-language me-2" />
-                          <span>Language</span>
-                        </a>
-                      </li>
-                    )}
 
                     {userType !== 1 && (
                       <li>
@@ -215,6 +216,19 @@ const AdminSecuritySetting = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

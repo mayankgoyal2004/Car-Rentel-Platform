@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
 import { addUser } from "../../utils/userSlice";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminProfileSetting = () => {
   const [loading, setLoading] = useState(false);
@@ -40,7 +41,7 @@ const AdminProfileSetting = () => {
         );
       }
     } catch (err) {
-      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to fetch profile");
     }
   };
 
@@ -76,12 +77,13 @@ const AdminProfileSetting = () => {
 
       const res = await apiService.updateAdmin(formData);
 
-      alert("Profile updated!");
-      dispatch(addUser(res?.data?.admin)); // update Redux with backend response
-      fetchUser(); // reload updated data
+      toast.success("Profile updated!");
+      dispatch(addUser(res?.data?.admin));
+      fetchUser();
     } catch (err) {
-      console.error(err);
-      alert("Error saving profile");
+      toast.error(
+        "Error adding profile: " + (err.response?.data?.message || err.message)
+      );
     } finally {
       setLoading(false);
     }
@@ -171,9 +173,10 @@ const AdminProfileSetting = () => {
                         </Link>
                       </li>
                     )}
-                    <li >
+                    <li>
                       <Link to="/admin-dashboard/localization-setting">
-                        <i className="ti ti-language me-2" />
+<i className="ti ti-language me-2" />
+
                         <span>Localization</span>
                       </Link>
                     </li>
@@ -364,6 +367,19 @@ const AdminProfileSetting = () => {
           </div>
         </div>
         {/* /Settings Prefix */}
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

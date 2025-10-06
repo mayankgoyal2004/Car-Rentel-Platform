@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import apiService from "../../../Apiservice/apiService"; // adjust path if needed
-import { toast } from "react-toastify";
+import apiService from "../../../Apiservice/apiService"; 
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminContactMessage = () => {
   const [contacts, setContacts] = useState([]);
@@ -12,7 +12,7 @@ const AdminContactMessage = () => {
   const fetchContacts = async () => {
     try {
       setLoading(true);
-      const res = await apiService.getAllContactAdmin(); // <-- your GET route
+      const res = await apiService.getAllContactAdmin();
       if (res.data.success) {
         setContacts(res.data.data);
       }
@@ -28,7 +28,7 @@ const AdminContactMessage = () => {
   const handleDelete = async () => {
     try {
       if (!selectedId) return;
-      const res = await apiService.deletecontact(selectedId); // <-- your DELETE route
+      const res = await apiService.deletecontact(selectedId); 
       if (res.data.success) {
         toast.success("Contact deleted successfully");
         setContacts(contacts.filter((c) => c._id !== selectedId));
@@ -199,6 +199,19 @@ const AdminContactMessage = () => {
           </div>
         </div>
       </div>
+        <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
       {/* /Delete Modal */}
     </div>
   );

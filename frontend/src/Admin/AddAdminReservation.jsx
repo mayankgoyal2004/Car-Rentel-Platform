@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const AddAdminReservation = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [cars, setCars] = useState([]);
@@ -75,7 +76,7 @@ const AddAdminReservation = () => {
         setCars(formattedCars);
       }
     } catch (err) {
-      console.error("Error fetching cars:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch car");
     }
   };
 
@@ -83,7 +84,6 @@ const AddAdminReservation = () => {
     try {
       const res = await apiService.getAllActiveCustomer();
       if (res.data.success) {
-        // Map the API response to match your component's expected structure
         const formattedCustomers = res.data.data.map((customer) => ({
           id: customer?._id,
           _id: customer?._id,
@@ -104,7 +104,6 @@ const AddAdminReservation = () => {
     try {
       const res = await apiService.getAllActiveDriver();
       if (res.data.success) {
-        // Map the API response to match your component's expected structure
         const formattedDrivers = res.data.data.map((driver) => ({
           id: driver._id,
           _id: driver._id,
@@ -126,7 +125,6 @@ const AddAdminReservation = () => {
     try {
       const res = await apiService.getAllActiveLocation();
       if (res.data.success) {
-        // Map the API response to match your component's expected structure
         const formattedLocations = res.data.data.map((location) => ({
           id: location._id,
           _id: location._id,
@@ -163,21 +161,20 @@ const AddAdminReservation = () => {
     });
   };
 
- const handleServiceToggle = (serviceId) => {
-  // Convert to string to ensure consistent comparison
-  const idStr = String(serviceId);
-  
-  setReservationData((prev) => {
-    const exists = prev.extraServices.some(s => String(s) === idStr);
+  const handleServiceToggle = (serviceId) => {
+    const idStr = String(serviceId);
 
-    return {
-      ...prev,
-      extraServices: exists
-        ? prev.extraServices.filter((s) => String(s) !== idStr)
-        : [...prev.extraServices, idStr],
-    };
-  });
-};
+    setReservationData((prev) => {
+      const exists = prev.extraServices.some((s) => String(s) === idStr);
+
+      return {
+        ...prev,
+        extraServices: exists
+          ? prev.extraServices.filter((s) => String(s) !== idStr)
+          : [...prev.extraServices, idStr],
+      };
+    });
+  };
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -192,7 +189,6 @@ const AddAdminReservation = () => {
 
   const handleSubmit = async () => {
     try {
-      // Format the data to match your API endpoint expectations
       const formattedData = {
         car_id: reservationData.selectedCar,
         customer_id: reservationData.customer,
@@ -222,8 +218,7 @@ const AddAdminReservation = () => {
 
       const res = await apiService.addCarReservationByAdmin(formattedData);
       if (res.data.success) {
-        alert("Reservation created successfully!");
-        // Reset form or navigate away
+        toast.success("Reservation created successfully!");
         setReservationData({
           tariff: "weekly",
           rentalType: "self",
@@ -248,15 +243,14 @@ const AddAdminReservation = () => {
         });
         setCurrentStep(0);
       } else {
-        alert(
+        toast.error(
           "Failed to create reservation: " +
             (res.data.message || "Unknown error")
         );
       }
     } catch (err) {
-      console.error("Reservation creation error:", err);
-      alert(
-        "Error creating reservation: " +
+      toast.error(
+        "Error adding reservation: " +
           (err.response?.data?.message || err.message)
       );
     }
@@ -601,22 +595,6 @@ const AddAdminReservation = () => {
                       <p>Select Vehicle for your rental</p>
                     </div>
                   </div>
-                  <div className="col-lg-8">
-                    <div className="d-flex align-items-center justify-content-end flex-wrap row-gap-3 mb-3">
-                      <div className="top-search me-2">
-                        <div className="top-search-group">
-                          <span className="input-icon">
-                            <i className="ti ti-search" />
-                          </span>
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Search cars..."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
                 <div className="car-select">
@@ -665,11 +643,7 @@ const AddAdminReservation = () => {
                                   </div>
                                   <span className="avatar flex-shrink-0 me-2">
                                     <img
-                                      src={
-                                        car.image
-                                          ? `${BASE_URL_IMG}${car.image}`
-                                          : "/default-car.jpg"
-                                      }
+                                      src={`${BASE_URL_IMG}${car.image}`}
                                       alt={car.carName}
                                       style={{
                                         width: "50px",
@@ -690,7 +664,6 @@ const AddAdminReservation = () => {
                                     <div>
                                       <p className="mb-1">Color</p>
                                       <h6 className="fs-14 d-inline-flex align-items-center">
-                                        <i className="ti ti-square-filled me-1" />
                                         {car.carColor}
                                       </h6>
                                     </div>
@@ -1634,6 +1607,17 @@ const AddAdminReservation = () => {
           {currentStep === 3 && renderStep4()}
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

@@ -52,7 +52,10 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">Best Deal</h6>
-                    <p>{companySetting.organizationName}offers a fleet of high-quality </p>
+                    <p>
+                      {companySetting.organizationName}offers a fleet of
+                      high-quality{" "}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -65,7 +68,10 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">Doorstep Delivery</h6>
-                    <p>{companySetting.organizationName} offers a fleet of high-quality </p>
+                    <p>
+                      {companySetting.organizationName} offers a fleet of
+                      high-quality{" "}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -78,7 +84,10 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">Low Security Deposit</h6>
-                    <p>{companySetting.organizationName} offers a fleet of high-quality </p>
+                    <p>
+                      {companySetting.organizationName} offers a fleet of
+                      high-quality{" "}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -91,7 +100,10 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">Latest Cars</h6>
-                    <p>{companySetting.organizationName} offers a fleet of high-quality</p>
+                    <p>
+                      {companySetting.organizationName} offers a fleet of
+                      high-quality
+                    </p>
                   </div>
                 </div>
               </div>
@@ -104,7 +116,10 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">Customer Support</h6>
-                    <p>{companySetting.organizationName} offers a fleet of high-quality</p>
+                    <p>
+                      {companySetting.organizationName} offers a fleet of
+                      high-quality
+                    </p>
                   </div>
                 </div>
               </div>
@@ -117,7 +132,10 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">No Hidden Charges</h6>
-                    <p>{companySetting.organizationName}offers a fleet of high-quality</p>
+                    <p>
+                      {companySetting.organizationName}offers a fleet of
+                      high-quality
+                    </p>
                   </div>
                 </div>
               </div>
@@ -126,6 +144,18 @@ const FeatureSection = () => {
           </div>
         </div>
       </div>
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </section>
   );
 };

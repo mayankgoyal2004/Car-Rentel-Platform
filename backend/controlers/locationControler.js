@@ -307,7 +307,7 @@ const addLocationSetting = async (req, res) => {
       return res.status(409).json({
         success: false,
         status: 409,
-        message: "Country already exists",
+        message: "city already exists",
       });
     }
 
@@ -319,7 +319,7 @@ const addLocationSetting = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: "country added successfully",
+      message: "city added successfully",
       data: country,
     });
   } catch (err) {
@@ -336,7 +336,7 @@ const updateLocationSetting = async (req, res) => {
     return res.status(400).json({
       success: false,
       status: 400,
-      message: "Both Id and countryName are required",
+      message: "Both Id and cityName are required",
     });
   }
   if (status === undefined || status === null) {
@@ -360,7 +360,7 @@ const updateLocationSetting = async (req, res) => {
     await country.save();
     res.json({
       success: true,
-      message: "country updated successfully",
+      message: "city updated successfully",
       data: country,
     });
   } catch (err) {
@@ -389,7 +389,7 @@ const deleteLocationSetting = async (req, res) => {
 
     res.json({
       success: true,
-      message: "country deleted successfully",
+      message: "city deleted successfully",
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

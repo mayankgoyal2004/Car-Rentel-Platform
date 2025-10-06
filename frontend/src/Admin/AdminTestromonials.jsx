@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminTestimonials = () => {
   const [testimonials, setTestimonials] = useState([]);
@@ -23,7 +24,6 @@ const AdminTestimonials = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType;
 
-  // 🔹 Fetch testimonials
   const fetchAllTestimonials = async (searchQuery = "", page = 1) => {
     if (userType === 1) {
       setLoading(true);
@@ -41,7 +41,9 @@ const AdminTestimonials = () => {
           setCurrentPage(res.data.pagination.currentPage);
         }
       } catch (err) {
-        console.error("Error fetching testimonials:", err);
+        toast.error(
+          err.response?.data?.message || "Failed to fetch testimonials"
+        );
       } finally {
         setLoading(false);
       }
@@ -77,13 +79,13 @@ const AdminTestimonials = () => {
       userTestimonial.append("status", formData.status);
 
       await apiService.addtestimonial(userTestimonial);
+      toast.success("Testimonial added successfully");
       fetchAllTestimonials(search, currentPage);
       resetFormData();
       document.getElementById("add_user_close").click();
     } catch (err) {
-      console.error("Error adding Testimonial:", err);
-      alert(
-        "Error adding Testimonial: " +
+      toast.error(
+        "Error adding testimonial: " +
           (err.response?.data?.message || err.message)
       );
     }
@@ -91,8 +93,6 @@ const AdminTestimonials = () => {
 
   // 🔹 Update testimonial
   const updateTestimonial = async () => {
-  
-
     try {
       const userTestimonial = new FormData();
 
@@ -104,13 +104,16 @@ const AdminTestimonials = () => {
         userTestimonial.append("image", formData.image);
       }
 
-      await apiService.updatetestimonial(selectedTestimonial._id, userTestimonial);
+      await apiService.updatetestimonial(
+        selectedTestimonial._id,
+        userTestimonial
+      );
+      toast.success("Testimonial updated successfully");
       fetchAllTestimonials(search, currentPage);
       resetFormData();
       document.getElementById("edit_user_close").click();
     } catch (err) {
-      console.error("Error updating Testimonial:", err);
-      alert(
+      toast.error(
         "Error updating Testimonial: " +
           (err.response?.data?.message || err.message)
       );
@@ -123,11 +126,11 @@ const AdminTestimonials = () => {
       if (!selectedTestimonial) return;
       await apiService.deletetestimonial(selectedTestimonial._id);
       fetchAllTestimonials(search, currentPage);
+      toast.success("Testimonial deleted successfully!");
       resetFormData();
       document.getElementById("delete_user_close").click();
     } catch (err) {
-      console.error("Error deleting Testimonial:", err);
-      alert(
+      toast.error(
         "Error deleting Testimonial: " +
           (err.response?.data?.message || err.message)
       );
@@ -141,6 +144,10 @@ const AdminTestimonials = () => {
     if (file) {
       setImagePreview(URL.createObjectURL(file));
     }
+  };
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
 
   return (
@@ -241,10 +248,12 @@ const AdminTestimonials = () => {
                     </td>
                     <td>{item.review}</td>
                     <td>{new Date(item.createdAt).toLocaleDateString()}</td>
-                      <td>
+                    <td>
                       <span
                         className={`badge badge-md ${
-                          item.status ? "badge-soft-success" : "badge-soft-danger"
+                          item.status
+                            ? "badge-soft-success"
+                            : "badge-soft-danger"
                         }`}
                       >
                         {item.status ? "Published" : "Unpublished"}
@@ -268,9 +277,8 @@ const AdminTestimonials = () => {
                               data-bs-target="#edit_testimonial"
                               onClick={() => {
                                 setSelectedTestimonial(item);
-                               
+
                                 setFormData({
-                                  
                                   _id: item._id,
                                   customer: item.customer,
                                   rating: item.rating,
@@ -313,6 +321,49 @@ const AdminTestimonials = () => {
               )}
             </tbody>
           </table>
+          <nav aria-label="Page navigation" className="mt-3">
+            <ul className="pagination justify-content-center">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Prev
+                </button>
+              </li>
+
+              {[...Array(totalPages)].map((_, idx) => (
+                <li
+                  key={idx}
+                  className={`page-item ${
+                    currentPage === idx + 1 ? "active" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(idx + 1)}
+                  >
+                    {idx + 1}
+                  </button>
+                </li>
+              ))}
+
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
         </div>
 
         {/* ---------------- Add Testimonial Modal ---------------- */}
@@ -493,6 +544,19 @@ const AdminTestimonials = () => {
           </div>
         </div>
       </div>
+        <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
     </div>
   );
 };

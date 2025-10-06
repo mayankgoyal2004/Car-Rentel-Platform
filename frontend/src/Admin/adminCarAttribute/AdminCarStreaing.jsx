@@ -2,8 +2,9 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
+
 
 const AdminCarSteering = () => {
   const [carSteering, setCarSteering] = useState([]);
@@ -176,7 +177,20 @@ const AdminCarSteering = () => {
                 </tr>
               </thead>
               <tbody>
-                {carSteering.map((steering) => (
+                 {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
+                    </td>
+                  </tr>
+                ) : carSteering.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No car steering found
+                    </td>
+                  </tr>
+                ) : (
+                carSteering.map((steering) => (
                   <tr key={steering._id}>
                     <td>
                       <div className="form-check form-check-md">
@@ -234,7 +248,8 @@ const AdminCarSteering = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+              ))
+                )}
               </tbody>
             </table>
           </div>
@@ -443,6 +458,19 @@ const AdminCarSteering = () => {
           </div>
         </div>
       </div>
+       <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
       {/* /Delete Steering */}
     </div>
   );

@@ -34,7 +34,9 @@ const CompanySetting = () => {
         }
       }
     } catch (err) {
-      toast.error("Failed to load company settings");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch company Setting"
+      );
     }
   };
 
@@ -68,8 +70,10 @@ const CompanySetting = () => {
       toast.success("Company settings updated successfully!");
       fetchCompanySetting();
     } catch (err) {
-      console.error(err);
-      toast.error("Error saving company settings");
+      toast.error(
+        "Error saving company setting : " +
+          (err.response?.data?.message || err.message)
+      );
     } finally {
       setLoading(false);
     }
@@ -87,7 +91,6 @@ const CompanySetting = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
@@ -111,7 +114,7 @@ const CompanySetting = () => {
             <h2 className="mb-1">Settings</h2>
             <nav>
               <ol className="breadcrumb mb-0">
-             <li className="breadcrumb-item">
+                <li className="breadcrumb-item">
                   <Link t0="/admin-dashboard">Home</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
@@ -179,7 +182,7 @@ const CompanySetting = () => {
                         </Link>
                       </li>
                     )}
-                    <li >
+                    <li>
                       <Link to="/admin-dashboard/localization-setting">
                         <i className="ti ti-language me-2" />
                         <span>Localization</span>
@@ -187,12 +190,19 @@ const CompanySetting = () => {
                     </li>
                     {userType === 1 && (
                       <li>
-                        <a href="language-setting.html">
-                          <i className="ti ti-language me-2" />
-                          <span>Language</span>
-                        </a>
+                        <Link to="/admin-dashboard/location-setting">
+                          <i className="ti ti-settings-2 me-2" />
+                          <span>Location Setting</span>
+                        </Link>
                       </li>
                     )}
+                    <li>
+                      <Link to="/admin-dashboard/localization-setting">
+                        <i className="ti ti-language me-2" />
+
+                        <span>Localization</span>
+                      </Link>
+                    </li>
 
                     {userType !== 1 && (
                       <li>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const AddInvoice = () => {
   const [reservations, setReservations] = useState([]);
@@ -255,7 +256,7 @@ const AddInvoice = () => {
         totalPrice: totalCarPricing,
       });
       if (selectedReservation.extraServices) {
-        selectedReservation.extraServices.forEach((service, index) => {
+        selectedReservation.extraServices.forEach((service) => {
           if (service && service.name) {
             items.push({
               description: `Extra Service - ${service.name}`,
@@ -312,7 +313,6 @@ const AddInvoice = () => {
     }
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -337,7 +337,9 @@ const AddInvoice = () => {
 
       if (res.data.success) {
         toast.success("Invoice created successfully!");
-        navigate("/admin-dashboard/all-invoice");
+        setTimeout(() => {
+          navigate("/admin-dashboard/all-invoice");
+        }, 1000);
       }
     } catch (err) {
       console.error("Error creating invoice:", err);
@@ -929,6 +931,17 @@ const AddInvoice = () => {
         </div>
       </div>
       {/* /Link Reservation */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

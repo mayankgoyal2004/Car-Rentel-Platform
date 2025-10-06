@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 
 const AdminCarColor = () => {
@@ -118,10 +118,7 @@ const AdminCarColor = () => {
               </nav>
             </div>
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-           
-              <div className="me-2 mb-2">
-              
-              </div>
+              <div className="me-2 mb-2"></div>
               <div className="mb-2">
                 <a
                   href="javascript:void(0);"
@@ -174,71 +171,82 @@ const AdminCarColor = () => {
                 </tr>
               </thead>
               <tbody>
-                {carColor.map((color) => (
-                  <tr key={color._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="d-inline-flex gap-2 align-items-center">
-                        <div
-                        
-                       
-                        />
-                        <h6 className="fw-medium">
-                          <a>{color.carColor}</a>
-                        </h6>
-                      </div>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          color.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {color.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_color"
-                              onClick={() => setEditCarColor(color)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_color"
-                              onClick={() => setDeleteCarColor(color)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : carColor.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No car color found
+                    </td>
+                  </tr>
+                ) : (
+                  carColor.map((color) => (
+                    <tr key={color._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-inline-flex gap-2 align-items-center">
+                          <div />
+                          <h6 className="fw-medium">
+                            <a>{color.carColor}</a>
+                          </h6>
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge  ${
+                            color.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {color.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_color"
+                                onClick={() => setEditCarColor(color)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_color"
+                                onClick={() => setDeleteCarColor(color)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -375,7 +383,7 @@ const AdminCarColor = () => {
                   placeholder="Enter Color"
                 />
               </div>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <label className="form-label">
                   Color Value <span className="text-danger">*</span>
                 </label>
@@ -403,7 +411,7 @@ const AdminCarColor = () => {
                     }
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="modal-footer">
               <div className="d-flex justify-content-between align-items-center w-100">
@@ -475,6 +483,19 @@ const AdminCarColor = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Color */}
     </div>

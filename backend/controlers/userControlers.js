@@ -840,14 +840,13 @@ const registerAdmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "User already exists" });
     }
-    if(!req.file){
+    if (!req.file) {
       return res
         .status(409)
         .json({ success: false, message: "Image is Required" });
     }
 
-    const imagePath = req.file.path.replace(/\\/g, "/")
-    
+    const imagePath = req.file.path.replace(/\\/g, "/");
 
     const setting = await RecaptchaSetting.findOne({});
     if (setting?.status) {
@@ -911,26 +910,26 @@ const updateAdmin = async (req, res) => {
       address,
       packageId,
     } = req.body;
-    const admin = await User.findById(_id);
-    if (!admin || admin.userType !== 2) {
+    const user = await User.findById(_id);
+    if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Admin not found",
+        message: "user not found",
       });
     }
-    if (name) admin.userName = name;
-    if (email) admin.email = email;
-    if (firstName) admin.firstName = firstName;
-    if (lastName) admin.lastName = lastName;
-    if (userName) admin.userName = userName;
-    if (contact) admin.contact = contact;
-    if (address) admin.address = address;
+    if (name) user.userName = name;
+    if (email) user.email = email;
+    if (firstName) user.firstName = firstName;
+    if (lastName) user.lastName = lastName;
+    if (userName) user.userName = userName;
+    if (contact) user.contact = contact;
+    if (address) user.address = address;
     if (password) {
       const hashedPassword = await bcrypt.hash(password, saltround);
-      admin.password = hashedPassword;
+      user.password = hashedPassword;
     }
     if (req.file) {
-      admin.image = req.file.path.replace(/\\/g, "/");
+      user.image = req.file.path.replace(/\\/g, "/");
     }
     if (packageId) {
       const pkg = await Package.findById(packageId);
@@ -941,18 +940,18 @@ const updateAdmin = async (req, res) => {
         });
       }
 
-      admin.package = pkg._id;
-      admin.packageExpiration = new Date(
+      user.package = pkg._id;
+      user.packageExpiration = new Date(
         Date.now() + pkg.duration * 24 * 60 * 60 * 1000 // duration in days
       );
     }
 
-    await admin.save();
+    await user.save();
 
     return res.status(200).json({
       success: true,
       message: "Admin updated successfully",
-      admin,
+      admin: user,
     });
   } catch (error) {
     console.error("Update Admin Error:", error);

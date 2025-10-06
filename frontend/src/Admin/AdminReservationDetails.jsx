@@ -18,7 +18,7 @@ const AdminReservationDetails = () => {
       const res = await apiService.getReservationByIdBooking(id);
       setReservations(res.data.data);
     } catch (err) {
-      console.error("Error fetching Reservations:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch reservation");
     } finally {
       setLoading(false);
     }
@@ -146,10 +146,12 @@ const AdminReservationDetails = () => {
   const handleConfirm = async () => {
     await apiService.changeReservationStatusToConformed(reservations._id);
     setReservations({ ...reservations, status: "confirmed" });
+    toast.success("Reservation confirmed successfully");
   };
   const handleComplete = async () => {
     await apiService.changeReservationStatusToComplete(reservations._id);
     setReservations({ ...reservations, status: "complete" });
+    toast.success("Reservation completed successfully");
   };
   const handlegetInvoiceId = async () => {
     try {
@@ -177,6 +179,7 @@ const AdminReservationDetails = () => {
     });
     setReservations({ ...reservations, status: "cancelled", cancelReason });
     setCancelReason("");
+    toast.success("Reservation cancelled successfully");
   };
 
   if (loading) {

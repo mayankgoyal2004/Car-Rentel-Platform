@@ -1,7 +1,7 @@
 import axios from "axios";
 
-export const BASE_URL_IMG = "http://localhost:7777/";
-const BASE_URL = "http://localhost:7777/admin/";
+export const BASE_URL_IMG = import.meta.env.VITE_BASE_URL_IMG;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getAuthHeaders = () => {
   const token = sessionStorage.getItem("token");
@@ -1153,9 +1153,13 @@ class apiServices {
     });
   }
   editPaymentStatusofUser(id) {
-    return axios.post(BASE_URL + `payment-completed-by-user/${id}`,{}, {
-      headers: getAuthHeaders(),
-    });
+    return axios.post(
+      BASE_URL + `payment-completed-by-user/${id}`,
+      {},
+      {
+        headers: getAuthHeaders(),
+      }
+    );
   }
   changeReservationStatusToConformed(id) {
     return axios.post(

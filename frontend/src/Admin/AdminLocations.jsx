@@ -46,7 +46,7 @@ const AdminLocations = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching users:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch locations");
     } finally {
       setLoading(false);
     }
@@ -56,7 +56,7 @@ const AdminLocations = () => {
       const res = await apiService.getAllActiveCountry();
       if (res.data.success) setCountries(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch categories");
+      toast.error(err.response?.data?.message || "Failed to fetch country");
     }
   };
   const getStateBycountry = async (countryId) => {
@@ -64,7 +64,7 @@ const AdminLocations = () => {
       const res = await apiService.getStateByCountry(countryId);
       if (res.data.success) setStates(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch categories");
+      toast.error(err.response?.data?.message || "Failed to fetch state");
     }
   };
   const getCityByState = async (stateId) => {
@@ -73,7 +73,7 @@ const AdminLocations = () => {
       const res = await apiService.getCityByState(stateId);
       if (res.data.success) setCities(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch cities");
+      toast.error(err.response?.data?.message || "Failed to fetch states");
     }
   };
   useEffect(() => {
@@ -133,19 +133,22 @@ const AdminLocations = () => {
       userLocation.append("pincode", formData.pincode);
       userLocation.append("workingDays", JSON.stringify(formData.workingDays));
 
-      await apiService.addLocation(userLocation);
-      fetchAllLocation(search, currentPage);
-      resetFormData();
+      const res = await apiService.addLocation(userLocation);
+      if (res.data.success) {
+        toast.success("Location added successfully!");
+
+        fetchAllLocation(search, currentPage);
+        resetFormData();
+      }
     } catch (err) {
-      console.error("Error adding Location:", err);
-      alert(
+      toast.error(
         "Error adding Location: " + (err.response?.data?.message || err.message)
       );
     }
   };
   const updateLocation = async () => {
     if (!selectedLocation?._id) {
-      alert("No location selected for update.");
+      toast.error("No location selected for update.");
       return;
     }
 
@@ -164,13 +167,18 @@ const AdminLocations = () => {
       userLocation.append("pincode", formData.pincode);
       userLocation.append("workingDays", JSON.stringify(formData.workingDays));
       userLocation.append("status", formData.status ? "true" : "false");
-      await apiService.updateLocation(selectedLocation._id, userLocation);
-      fetchAllLocation(search, currentPage);
-      resetFormData();
-      document.getElementById("edit_user_close").click(); // closes modal
+      const res = await apiService.updateLocation(
+        selectedLocation._id,
+        userLocation
+      );
+      if (res.data.success) {
+        toast.success("Location updated successfully!");
+        fetchAllLocation(search, currentPage);
+        resetFormData();
+        document.getElementById("edit_user_close").click();
+      }
     } catch (err) {
-      console.error("Error updating Location:", err);
-      alert(
+      toast.error(
         "Error updating Location: " +
           (err.response?.data?.message || err.message)
       );
@@ -212,13 +220,17 @@ const AdminLocations = () => {
   const handleDeleteLocation = async () => {
     try {
       if (!selectedLocation) return;
-      await apiService.deleteLocation(selectedLocation._id);
-      fetchAllLocation(search, currentPage);
-      resetFormData();
+      const res = await apiService.deleteLocation(selectedLocation._id);
+
+      if (res.data.success) {
+        toast.success("Location deleted successfully!");
+
+        fetchAllLocation(search, currentPage);
+        resetFormData();
+      }
     } catch (err) {
-      console.error("Error deleting Location:", err);
-      alert(
-        "Error deleting Location: " +
+      toast.error(
+        "Error deleting location: " +
           (err.response?.data?.message || err.message)
       );
     }
@@ -282,20 +294,21 @@ const AdminLocations = () => {
           {/* /Breadcrumb */}
           {/* Table Header */}
           <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
-            <div className="d-flex align-items-center flex-wrap row-gap-3"></div>
-            <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-              <div className="top-search me-2">
-                <div className="top-search-group">
-                  <span className="input-icon">
-                    <i className="ti ti-search" />
-                  </span>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
+            <div className="d-flex align-items-center flex-wrap row-gap-3">
+              <div className="d-flex my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+                <div className="top-search me-2">
+                  <div className="top-search-group">
+                    <span className="input-icon">
+                      <i className="ti ti-search" />
+                    </span>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Search"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -324,114 +337,128 @@ const AdminLocations = () => {
                 </tr>
               </thead>
               <tbody>
-                {locations.map((loc) => (
-                  <tr key={loc._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <a className="avatar rounded-circle me-2 flex-shrink-0">
-                          <img
-                            src={BASE_URL_IMG + loc.image}
-                            className="rounded-circle"
-                            alt={loc.title}
-                          />
-                        </a>
-                        <h6 className="fs-14 fw-semibold">
-                          <a>{loc.title}</a>
-                        </h6>
-                      </div>
-                    </td>
-                    <td>{loc.location}</td>
-                    <td>{loc.contact}</td>
-                    <td>
-                      <div className="working-days">
-                        {dayMap.map((day, i) => (
-                          <span
-                            key={i}
-                            className={
-                              loc.workingDays?.[day]?.active
-                                ? "working"
-                                : "non-working"
-                            }
-                          >
-                            {shortDayMap[i]}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge badge-md ${
-                          loc.status
-                            ? "badge-soft-success"
-                            : "badge-soft-danger"
-                        }`}
-                      >
-                        {loc.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_location"
-                              onClick={() => {
-                                setSelectedLocation(loc);
-
-                                setFormData({
-                                  _id: loc._id,
-                                  title: loc.title,
-                                  email: loc.email,
-                                  contact: loc.contact,
-                                  location: loc.location,
-                                  country_id: loc.country_id,
-                                  state_id: loc.state_id,
-                                  city_id: loc.city_id,
-                                  pincode: loc.pincode,
-                                  workingDays: loc.workingDays,
-                                  image: null,
-                                  status: loc.status,
-                                });
-                                setImagePreview(
-                                  loc.image ? BASE_URL_IMG + loc.image : null
-                                );
-                              }}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_location"
-                              onClick={() => setSelectedLocation(loc)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : locations.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No locations found
+                    </td>
+                  </tr>
+                ) : (
+                  locations.map((loc) => (
+                    <tr key={loc._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center">
+                          <a className="avatar rounded-circle me-2 flex-shrink-0">
+                            <img
+                              src={BASE_URL_IMG + loc.image}
+                              className="rounded-circle"
+                              alt={loc.title}
+                            />
+                          </a>
+                          <h6 className="fs-14 fw-semibold">
+                            <a>{loc.title}</a>
+                          </h6>
+                        </div>
+                      </td>
+                      <td>{loc.location}</td>
+                      <td>{loc.contact}</td>
+                      <td>
+                        <div className="working-days">
+                          {dayMap.map((day, i) => (
+                            <span
+                              key={i}
+                              className={
+                                loc.workingDays?.[day]?.active
+                                  ? "working"
+                                  : "non-working"
+                              }
+                            >
+                              {shortDayMap[i]}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            loc.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {loc.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_location"
+                                onClick={() => {
+                                  setSelectedLocation(loc);
+
+                                  setFormData({
+                                    _id: loc._id,
+                                    title: loc.title,
+                                    email: loc.email,
+                                    contact: loc.contact,
+                                    location: loc.location,
+                                    country_id: loc.country_id,
+                                    state_id: loc.state_id,
+                                    city_id: loc.city_id,
+                                    pincode: loc.pincode,
+                                    workingDays: loc.workingDays,
+                                    image: null,
+                                    status: loc.status,
+                                  });
+                                  setImagePreview(
+                                    loc.image ? BASE_URL_IMG + loc.image : null
+                                  );
+                                }}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_location"
+                                onClick={() => setSelectedLocation(loc)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
             <nav aria-label="Page navigation" className="mt-3">
@@ -1197,6 +1224,19 @@ const AdminLocations = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete */}
     </div>

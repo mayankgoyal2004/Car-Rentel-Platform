@@ -58,7 +58,7 @@ const AdminCustomers = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to customers");
+      toast.error(err.response?.data?.message || "Failed to fetch customers");
     } finally {
       setLoading(false);
     }

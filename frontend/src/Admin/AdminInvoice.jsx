@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminInvoice = () => {
   const [invoice, setInvoice] = useState([]);
@@ -25,7 +26,7 @@ const AdminInvoice = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching Customers:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch invoice");
     } finally {
       setLoading(false);
     }
@@ -36,13 +37,16 @@ const AdminInvoice = () => {
   const handleDelete = async () => {
     if (!deleteinvoceId) return;
     try {
-      await apiService.deleteInvoice(deleteinvoceId);
-      fetchInvoce(search, currentPage);
-      setDeleteInvoiceId(null);
+      const res = await apiService.deleteInvoice(deleteinvoceId);
+      if (res.data.success) {
+        toast.success("Invoice deleted successfully!");
+
+        fetchInvoce(search, currentPage);
+        setDeleteInvoiceId(null);
+      }
     } catch (err) {
-      console.error("Error deleting Invoice:", err);
-      alert(
-        "Error deleting Invoice: " +
+      toast.error(
+        "Error deleting invoice: " +
           (err.response?.data?.message || err.message)
       );
     }
@@ -54,7 +58,7 @@ const AdminInvoice = () => {
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // ✅ good
+    setCurrentPage(1);
   };
   return (
     <div>
@@ -329,6 +333,19 @@ const AdminInvoice = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Modal*/}
     </div>

@@ -42,8 +42,8 @@ const AdminBlogsComments = () => {
       }
 
       // Close modal
-    } catch (err) {
-      console.error("Error deleting comment:", err);
+    }catch (err) {
+          toast.error(err.response?.data?.message || "Failed to fetch blog commnets");
     }
   };
 

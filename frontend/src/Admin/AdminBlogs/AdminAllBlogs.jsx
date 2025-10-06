@@ -36,14 +36,14 @@ const AdminAllBlogs = () => {
       setTotalPages(res.data.pagination?.totalPages || 1);
       setCurrentPage(res.data.pagination?.currentPage || 1);
     } catch (err) {
-      console.error("Error fetching blogs:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch blogs");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchBlog(search, 1); 
+    fetchBlog(search, 1);
   }, [search]);
 
   const handleDeleteBlog = async () => {
@@ -55,12 +55,9 @@ const AdminAllBlogs = () => {
       setDeleteId(null);
       fetchBlog();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "Tag already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -89,13 +86,15 @@ const AdminAllBlogs = () => {
           </div>
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
             <div className="mb-2">
-             {userType !== 1 &&( <Link
-                to="/admin-dashboard/add-blog"
-                className="btn btn-primary d-flex align-items-center"
-              >
-                <i className="ti ti-plus me-2" />
-                Add Blogs
-              </Link>)}
+              {userType !== 1 && (
+                <Link
+                  to="/admin-dashboard/add-blog"
+                  className="btn btn-primary d-flex align-items-center"
+                >
+                  <i className="ti ti-plus me-2" />
+                  Add Blogs
+                </Link>
+              )}
             </div>
           </div>
         </div>

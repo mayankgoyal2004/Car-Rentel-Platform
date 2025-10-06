@@ -41,7 +41,7 @@ const AdminBlogsTags = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching tags:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch customers");
     } finally {
       setLoading(false);
     }
@@ -56,11 +56,9 @@ const AdminBlogsTags = () => {
     if (!newTag.trim()) return;
 
     try {
-      // Axios call
       const res = await apiService.addblogstag({ TagName: newTag.trim() });
 
-      // Success response (HTTP 2xx)
-      toast.success(res.data.message); // e.g., "New Tag Created"
+      toast.success(res.data.message);
       setNewTag("");
       fetchTags();
     } catch (err) {
@@ -185,60 +183,74 @@ const AdminBlogsTags = () => {
                 </tr>
               </thead>
               <tbody>
-                {tags.map((tag) => (
-                  <tr key={tag._id}>
-                    <td>
-                      <a className="fw-medium">{tag.TagName}</a>
-                    </td>
-                    <td>
-                      <span className="text-gray-9">
-                        {new Date(tag.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          tag.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {tag.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm dropdown-toggle"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_Category"
-                              onClick={() => setEditTag(tag)}
-                            >
-                              <i className="ti ti-edit me-1" /> Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_Category"
-                              onClick={() => setDeleteTag(tag)}
-                            >
-                              <i className="ti ti-trash me-1" /> Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : tags.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No tags found
+                    </td>
+                  </tr>
+                ) : (
+                  tags.map((tag) => (
+                    <tr key={tag._id}>
+                      <td>
+                        <a className="fw-medium">{tag.TagName}</a>
+                      </td>
+                      <td>
+                        <span className="text-gray-9">
+                          {new Date(tag.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge  ${
+                            tag.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {tag.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_Category"
+                                onClick={() => setEditTag(tag)}
+                              >
+                                <i className="ti ti-edit me-1" /> Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_Category"
+                                onClick={() => setDeleteTag(tag)}
+                              >
+                                <i className="ti ti-trash me-1" /> Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
 
@@ -425,7 +437,6 @@ const AdminBlogsTags = () => {
         </div>
       </div>
       <div>
-
         <ToastContainer
           position="top-right"
           autoClose={3000}

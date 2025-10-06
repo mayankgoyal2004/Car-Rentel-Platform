@@ -32,9 +32,8 @@ const AdminReview = () => {
           setCurrentPage(res.data.pagination.currentPage);
         }
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to fetch contacts");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to fetch review");
     } finally {
       setLoading(false);
     }
@@ -45,12 +44,11 @@ const AdminReview = () => {
       if (!selectedId) return;
       const res = await apiService.deleteCarReviewAdmin(selectedId);
       if (res.data.success) {
-        toast.success("Contact deleted successfully");
+        toast.success("Review deleted successfully");
         setReview(reveiw.filter((c) => c._id !== selectedId));
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete contact");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete review");
     }
   };
 

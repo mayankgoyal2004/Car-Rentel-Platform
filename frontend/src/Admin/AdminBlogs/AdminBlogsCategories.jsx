@@ -41,7 +41,7 @@ const AdminBlogsCategories = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching categories:", err);
+          toast.error(err.response?.data?.message || "Failed to fetch blog category");
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ const AdminBlogsCategories = () => {
       });
 
       toast.success(res.data.message);
-      setNewCategory(""); // ✅ reset input
+      setNewCategory(""); 
       fetchCategories();
     } catch (err) {
       if (err.response && err.response.data) {
@@ -183,7 +183,20 @@ const AdminBlogsCategories = () => {
                 </tr>
               </thead>
               <tbody>
-                {categories.map((category) => (
+                 {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    Loading...
+                  </td>
+                </tr>
+              ) : categories.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No categories found
+                  </td>
+                </tr>
+              ) : (
+                categories.map((category) => (
                   <tr key={category._id}>
                     <td>
                       <a className="fw-medium">{category.categoryName}</a>
@@ -236,7 +249,8 @@ const AdminBlogsCategories = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+             ))
+              )}
               </tbody>
             </table>
 

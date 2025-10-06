@@ -28,7 +28,7 @@ const UserReview = () => {
   const handleDelete = async () => {
     try {
       if (!selectedReveiw) return;
-      const res = await apiService.deleteCarReviewAdmin(selectedReveiw); // <-- your DELETE route
+      const res = await apiService.deletecarReviewuser(selectedReveiw); // <-- your DELETE route
       if (res.data.success) {
         toast.success("Review deleted successfully");
         setReview(review.filter((c) => c._id !== selectedReveiw));

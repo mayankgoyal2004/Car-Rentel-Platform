@@ -192,7 +192,6 @@ const AdminCars = () => {
   </ul>
 </div> */}
           <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
-            
             <div className="mb-2 me-2">
               <CSVLink
                 data={carCsvData}
@@ -264,151 +263,167 @@ const AdminCars = () => {
               </tr>
             </thead>
             <tbody>
-              {cars.map((car) => (
-                <tr key={car._id}>
-                  <td>
-                    <div className="form-check form-check-md">
-                      <input className="form-check-input" type="checkbox" />
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex align-items-center">
-                      <Link
-                        to={`/admin-dashboard/car-details/${car._id}`}
-                        className="avatar me-2 flex-shrink-0"
-                      >
-                        <img
-                          src={`${BASE_URL_IMG + car.image}`}
-                          className="rounded-3"
-                          alt="car"
-                        />
-                      </Link>
-                      <div>
-                        <h6>
-                          <Link
-                            to={`/admin-dashboard/car-details/${car._id}`}
-                            className="fs-14 fw-semibold"
-                          >
-                            {car.carName}
-                          </Link>
-                        </h6>
-                        <p>{car.carModel}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{car.location}</td>
-                  <td>
-                    <p className="fs-14 fw-semibold text-gray-9">
-                      ${car.pricing}
-                    </p>
-                  </td>
-
-                  {userType === 1 && (
-                    <td>
-                      <button
-                        className="btn border-0"
-                        onClick={() =>
-                          handleToggleFeatured(car._id, car.isFeatured)
-                        }
-                      >
-                        <i
-                          className={`ti ${
-                            car.isFeatured
-                              ? "ti-star-filled text-warning"
-                              : "ti-star"
-                          }`}
-                          style={{ fontSize: "18px" }}
-                        />
-                      </button>
-                    </td>
-                  )}
-                  <td>
-                    <h6 className="fs-14 fw-normal">
-                      {new Date(car.createdAt).toLocaleDateString()}
-                    </h6>
-                    <p className="fs-13">
-                      {new Date(car.createdAt).toLocaleTimeString()}
-                    </p>
-                  </td>
-                  <td>
-                    {userType === 1 ? (
-                      <button
-                        className={`badge border-0 ${
-                          car.status ? "bg-success" : "bg-danger"
-                        }`}
-                        onClick={() => handleToggleStatus(car._id, car.status)}
-                      >
-                        {car.status ? "Active" : "Inactive"}
-                      </button>
-                    ) : (
-                      <span
-                        className={`badge ${
-                          car.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {car.status ? "Active" : "Inactive"}
-                      </span>
-                    )}
-                  </td>
-
-                  <td>
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-icon btn-sm"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <i className="ti ti-dots-vertical" />
-                      </button>
-                      <ul className="dropdown-menu dropdown-menu-end p-2">
-                        <li>
-                          <Link
-                            to={`/admin-dashboard/car-details/${car._id}`}
-                            className="dropdown-item rounded-1"
-                          >
-                            <i className="ti ti-eye me-1" />
-                            View Details
-                          </Link>
-                        </li>
-                        {userType !== 1 && (
-                          <li>
-                            <Link
-                              to="/admin-dashboard/add-reservation"
-                              className="dropdown-item rounded-1"
-                            >
-                              <i className="ti ti-plus me-1" />
-                              Add Reservation
-                            </Link>
-                          </li>
-                        )}
-                        {userType !== 1 && (
-                          <li>
-                            <Link
-                              to={`/admin-dashboard/edit-car/${car._id}`}
-                              className="dropdown-item rounded-1"
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </Link>
-                          </li>
-                        )}
-                        <li>
-                          <button
-                            className="dropdown-item rounded-1"
-                            data-bs-toggle="modal"
-                            data-bs-target="#delete_car"
-                            onClick={() => setDeleteCar(car)}
-                          >
-                            <i className="ti ti-trash me-1" />
-                            Delete
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              ) : cars.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No Car found
+                  </td>
+                </tr>
+              ) : (
+                cars.map((car) => (
+                  <tr key={car._id}>
+                    <td>
+                      <div className="form-check form-check-md">
+                        <input className="form-check-input" type="checkbox" />
+                      </div>
+                    </td>
+                    <td>
+                      <div className="d-flex align-items-center">
+                        <Link
+                          to={`/admin-dashboard/car-details/${car._id}`}
+                          className="avatar me-2 flex-shrink-0"
+                        >
+                          <img
+                            src={`${BASE_URL_IMG + car.image}`}
+                            className="rounded-3"
+                            alt="car"
+                          />
+                        </Link>
+                        <div>
+                          <h6>
+                            <Link
+                              to={`/admin-dashboard/car-details/${car._id}`}
+                              className="fs-14 fw-semibold"
+                            >
+                              {car.carName}
+                            </Link>
+                          </h6>
+                          <p>{car.carModel}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{car.location}</td>
+                    <td>
+                      <p className="fs-14 fw-semibold text-gray-9">
+                        ${car.pricing}
+                      </p>
+                    </td>
+
+                    {userType === 1 && (
+                      <td>
+                        <button
+                          className="btn border-0"
+                          onClick={() =>
+                            handleToggleFeatured(car._id, car.isFeatured)
+                          }
+                        >
+                          <i
+                            className={`ti ${
+                              car.isFeatured
+                                ? "ti-star-filled text-warning"
+                                : "ti-star"
+                            }`}
+                            style={{ fontSize: "18px" }}
+                          />
+                        </button>
+                      </td>
+                    )}
+                    <td>
+                      <h6 className="fs-14 fw-normal">
+                        {new Date(car.createdAt).toLocaleDateString()}
+                      </h6>
+                      <p className="fs-13">
+                        {new Date(car.createdAt).toLocaleTimeString()}
+                      </p>
+                    </td>
+                    <td>
+                      {userType === 1 ? (
+                        <button
+                          className={`badge border-0 ${
+                            car.status ? "bg-success" : "bg-danger"
+                          }`}
+                          onClick={() =>
+                            handleToggleStatus(car._id, car.status)
+                          }
+                        >
+                          {car.status ? "Active" : "Inactive"}
+                        </button>
+                      ) : (
+                        <span
+                          className={`badge ${
+                            car.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {car.status ? "Active" : "Inactive"}
+                        </span>
+                      )}
+                    </td>
+
+                    <td>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-icon btn-sm"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <i className="ti ti-dots-vertical" />
+                        </button>
+                        <ul className="dropdown-menu dropdown-menu-end p-2">
+                          <li>
+                            <Link
+                              to={`/admin-dashboard/car-details/${car._id}`}
+                              className="dropdown-item rounded-1"
+                            >
+                              <i className="ti ti-eye me-1" />
+                              View Details
+                            </Link>
+                          </li>
+                          {userType !== 1 && (
+                            <li>
+                              <Link
+                                to="/admin-dashboard/add-reservation"
+                                className="dropdown-item rounded-1"
+                              >
+                                <i className="ti ti-plus me-1" />
+                                Add Reservation
+                              </Link>
+                            </li>
+                          )}
+                          {userType !== 1 && (
+                            <li>
+                              <Link
+                                to={`/admin-dashboard/edit-car/${car._id}`}
+                                className="dropdown-item rounded-1"
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </Link>
+                            </li>
+                          )}
+                          <li>
+                            <button
+                              className="dropdown-item rounded-1"
+                              data-bs-toggle="modal"
+                              data-bs-target="#delete_car"
+                              onClick={() => setDeleteCar(car)}
+                            >
+                              <i className="ti ti-trash me-1" />
+                              Delete
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

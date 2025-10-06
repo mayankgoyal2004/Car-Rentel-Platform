@@ -92,7 +92,6 @@ route.get(
   recaptchaSetting.getCaptchaFrontend
 );
 
-
 //!! location setting
 route.get(
   "/get-all-active-location-Setting",
@@ -244,7 +243,7 @@ route.get(
 
 route.post(
   "/blogs/update-blog",
-  checkPermission("Blog", "update"),
+  checkPermission("Blog", "edit"),
   upload.blogUpload.single("image"),
   blog.updateblog
 );
@@ -873,6 +872,11 @@ route.post("/add-car-review/:carId", carReview.addCarReview);
 route.get("/get-all-review-admin", carReview.allReviewByAdmin);
 route.get("/get-all-review-user-dashboard", carReview.allReviewByUser);
 route.delete("/delete-car-review/:id", carReview.deleteCarReview);
+route.delete(
+  "/delete-car-review-admin/:id",
+  checkPermission("Car", "delete"),
+  carReview.deleteCarReview
+);
 
 //!! role route
 
@@ -1076,7 +1080,11 @@ route.get(
   reservation.getCancelledReservationsUser
 );
 route.get("/get-reservation-by-booking/:id", reservation.getReservationById);
-route.delete("/delete-reservation/:id",checkPermission("Reservation", "delete"), reservation.deleteReservation);
+route.delete(
+  "/delete-reservation/:id",
+  checkPermission("Reservation", "delete"),
+  reservation.deleteReservation
+);
 route.get("/get-all-active-car-admin", car.getApprovedCarsAdminReservation);
 
 //!!! contact api
@@ -1237,8 +1245,10 @@ route.get(
   location.getAllLocationSetting
 );
 
-
-route.delete("/delete-location-Setting/:id",  checkPermission("admin", "assignPackage", true),
- location.deleteLocationSetting);
+route.delete(
+  "/delete-location-Setting/:id",
+  checkPermission("admin", "assignPackage", true),
+  location.deleteLocationSetting
+);
 
 module.exports = route;

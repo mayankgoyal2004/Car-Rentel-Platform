@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { CSVLink } from "react-csv";
 
 const AdminCarExtraFeatures = () => {
@@ -32,7 +32,7 @@ const AdminCarExtraFeatures = () => {
         setCurrentPage(res.data.pagination.currentPage || 1);
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to fetch pricing");
+      toast.error(err.response?.data?.message || "Failed to add Extra Service");
     } finally {
       setLoading(false);
     }
@@ -54,11 +54,10 @@ const AdminCarExtraFeatures = () => {
       });
       fetchExtraFeatures();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to add pricing");
+      toast.error(err.response?.data?.message || "Failed to add Extra Service");
     }
   };
 
-  // Update pricing
   const updateExtraFeatures = async () => {
     if (!editExtraFeatures) return;
     const { name, quantity, price, type, description, status } =
@@ -80,9 +79,8 @@ const AdminCarExtraFeatures = () => {
       toast.success(res.data.message);
       setEditExtraFeatures(null);
       fetchExtraFeatures(currentPage, search);
-      document.getElementById("edit_pricing_close")?.click();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to update pricing");
+      toast.error(err.response?.data?.message || "Failed to add Extra Service");
     }
   };
 
@@ -96,7 +94,7 @@ const AdminCarExtraFeatures = () => {
       fetchExtraFeatures(currentPage, search);
       document.getElementById("delete_pricing_close")?.click();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to delete pricing");
+      toast.error(err.response?.data?.message || "Failed to add Extra Service");
     }
   };
 
@@ -125,7 +123,7 @@ const AdminCarExtraFeatures = () => {
   };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // ✅ good
+    setCurrentPage(1);
   };
   return (
     <div>
@@ -217,68 +215,84 @@ const AdminCarExtraFeatures = () => {
                 </tr>
               </thead>
               <tbody>
-                {extraFeatures.map((e) => (
-                  <tr key={e._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <h6 className="fw-medium">
-                        <a>{e.name}</a>
-                      </h6>
-                    </td>
-                    <td>${e.price}</td>
-                    <td>{e.type}</td>
-
-                    <td>
-                      <span
-                        className={`badge badge-md ${
-                          e.status ? "badge-soft-success" : "badge-soft-danger"
-                        }`}
-                      >
-                        {e.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <a
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_extra_services"
-                              onClick={() => setEditExtraFeatures(e)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </a>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_extra_services"
-                              onClick={() => setDeleteExtraFeatures(e)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : extraFeatures.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No Extra Service found
+                    </td>
+                  </tr>
+                ) : (
+                  extraFeatures.map((e) => (
+                    <tr key={e._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <h6 className="fw-medium">
+                          <a>{e.name}</a>
+                        </h6>
+                      </td>
+                      <td>${e.price}</td>
+                      <td>{e.type}</td>
+
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            e.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {e.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <a
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_extra_services"
+                                onClick={() => setEditExtraFeatures(e)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </a>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_extra_services"
+                                onClick={() => setDeleteExtraFeatures(e)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}{" "}
               </tbody>
             </table>
           </div>
@@ -622,7 +636,19 @@ const AdminCarExtraFeatures = () => {
       </div>
       {/* /Delete Extra Service */}
       {/* Cars List */}
-
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
       {/* /Cars List */}
     </div>
   );

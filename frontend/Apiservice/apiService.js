@@ -1058,6 +1058,11 @@ class apiServices {
     });
   }
   deleteCarReviewAdmin(id) {
+    return axios.delete(BASE_URL + `delete-car-review-admin/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+  deletecarReviewuser(id) {
     return axios.delete(BASE_URL + `delete-car-review/${id}`, {
       headers: getAuthHeaders(),
     });

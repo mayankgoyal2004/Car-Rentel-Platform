@@ -30,7 +30,7 @@ const AdminLocationStates = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching users:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch states");
     } finally {
       setLoading(false);
     }
@@ -41,7 +41,7 @@ const AdminLocationStates = () => {
       const res = await apiService.getAllActiveCountry();
       if (res.data.success) setCountries(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch categories");
+      toast.error(err.response?.data?.message || "Failed to fetch countries");
     }
   };
 
@@ -186,70 +186,87 @@ const AdminLocationStates = () => {
                 </tr>
               </thead>
               <tbody>
-                {states.map((s) => (
-                  <tr key={s._id}>
-                    <td>
-                      <p className="text-gray-9">{s.stateName}</p>
-                    </td>
-                    <td>
-                      <div className="d-flex align-items-center flag-image">
-                        <p className="text-gray-9">{s.country?.countryName}</p>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="text-gray-9">
-                        {" "}
-                        {new Date(s.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge badge-md ${
-                          s.status ? "badge-soft-success" : "badge-soft-danger"
-                        }`}
-                      >
-                        {s.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_state"
-                              onClick={() => setEditState(s)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                             
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_state"
-                              onClick={() => setDeleteState(s)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : states.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No State found
+                    </td>
+                  </tr>
+                ) : (
+                  states.map((s) => (
+                    <tr key={s._id}>
+                      <td>
+                        <p className="text-gray-9">{s.stateName}</p>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center flag-image">
+                          <p className="text-gray-9">
+                            {s.country?.countryName}
+                          </p>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-gray-9">
+                          {" "}
+                          {new Date(s.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            s.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {s.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_state"
+                                onClick={() => setEditState(s)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_state"
+                                onClick={() => setDeleteState(s)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -471,6 +488,19 @@ const AdminLocationStates = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Modal*/}
     </div>

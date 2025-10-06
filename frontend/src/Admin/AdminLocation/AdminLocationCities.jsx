@@ -35,7 +35,7 @@ const AdminLocationCities = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching users:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch cities");
     } finally {
       setLoading(false);
     }
@@ -45,7 +45,7 @@ const AdminLocationCities = () => {
       const res = await apiService.getAllActiveCountry();
       if (res.data.success) setCountries(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch categories");
+          toast.error(err.response?.data?.message || "Failed to fetch countries");
     }
   };
   const getAllActiveState = async () => {
@@ -53,7 +53,7 @@ const AdminLocationCities = () => {
       const res = await apiService.getAllActiveState();
       if (res.data.success) setStates(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch categories");
+          toast.error(err.response?.data?.message || "Failed to fetch states");
     }
   };
   useEffect(() => {
@@ -161,7 +161,6 @@ const AdminLocationCities = () => {
             <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
               <div className="mb-2 me-2">
                 <button
-
                   className="btn btn-primary d-flex align-items-center"
                   data-bs-toggle="modal"
                   data-bs-target="#add_city"
@@ -208,72 +207,88 @@ const AdminLocationCities = () => {
                 </tr>
               </thead>
               <tbody>
-                {cityes.map((c) => (
+                {loading ? (
                   <tr>
-                    <td>
-                      <p className="text-gray-9">{c.cityName}</p>
-                    </td>
-                    <td>
-                      <p className="text-gray-9">{c.state.stateName}</p>
-                    </td>
-                    <td>
-                      <div className="d-flex align-items-center flag-image">
-                        <p className="text-gray-9">{c.country.countryName}</p>
-                      </div>
-                    </td>
-                    <td>
-                      <span className="text-gray-9">
-                        {" "}
-                        {new Date(c.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge badge-md ${
-                          c.status ? "badge-soft-success" : "badge-soft-danger"
-                        }`}
-                      >
-                        {c.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_city"
-                              onClick={() => setEditCity(c)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_city"
-                              onClick={() => setDeleteCity(c)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : cityes.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No cities found
+                    </td>
+                  </tr>
+                ) : (
+                  cityes?.map((c) => (
+                    <tr>
+                      <td>
+                        <p className="text-gray-9">{c?.cityName}</p>
+                      </td>
+                      <td>
+                        <p className="text-gray-9">{c.state?.stateName}</p>
+                      </td>
+                      <td>
+                        <div className="d-flex align-items-center flag-image">
+                          <p className="text-gray-9">{c.country?.countryName}</p>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="text-gray-9">
+                          {" "}
+                          {new Date(c.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            c?.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {c?.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_city"
+                                onClick={() => setEditCity(c)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_city"
+                                onClick={() => setDeleteCity(c)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -535,6 +550,19 @@ const AdminLocationCities = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Modal*/}
     </div>

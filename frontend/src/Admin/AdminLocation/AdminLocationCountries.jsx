@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
@@ -29,7 +28,7 @@ const AdminLocationCountries = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-      console.error("Error fetching category:", err);
+      toast.error(err.response?.data?.message || "Failed to fetch countries");
     } finally {
       setLoading(false);
     }
@@ -47,17 +46,13 @@ const AdminLocationCountries = () => {
         countryCode: newCountry.countryCode.trim(),
       });
 
-      // Success response (HTTP 2xx)
-      toast.success(res.data.message); // e.g., "New Category Created"
+      toast.success(res.data.message);
       setnewCountry("");
       getAllCountry();
     } catch (err) {
-      // Error response (HTTP 4xx/5xx)
       if (err.response && err.response.data) {
-        // Use backend message like "Category already exists"
         toast.error(err.response.data.message);
       } else {
-        // Network or unexpected error
         toast.error("Something went wrong!");
       }
     }
@@ -171,7 +166,20 @@ const AdminLocationCountries = () => {
                 </tr>
               </thead>
               <tbody>
-                {countrys.map((country) => (
+                  {loading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    Loading...
+                  </td>
+                </tr>
+              ) : countrys.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No country found
+                  </td>
+                </tr>
+              ) : (
+                countrys.map((country) => (
                   <tr>
                     <td>
                       <div className="d-flex align-items-center flag-image">
@@ -234,7 +242,8 @@ const AdminLocationCountries = () => {
                       </div>
                     </td>
                   </tr>
-                ))}
+                 ))
+              )}
               </tbody>
             </table>
           </div>
@@ -463,6 +472,19 @@ const AdminLocationCountries = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Modal*/}
     </div>

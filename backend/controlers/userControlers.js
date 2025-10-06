@@ -5,7 +5,9 @@ const Package = require("../models/packageModel");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
-const saltround = 12;
+require("dotenv").config();
+
+const saltround = process.env.BCRYPT_SALT_ROUNDS;
 const secretKey = "Protect@@@@";
 const emailSecret = "EmailVerifySecret@@@";
 const otpGenerator = require("otp-generator");
@@ -430,7 +432,7 @@ const verifyEmail = async (req, res) => {
     }
     let decoded;
     try {
-      decoded = jwt.verify(token, emailSecret); // emailSecret same as used in register
+      decoded = jwt.verify(token, emailSecret); 
     } catch (err) {
       return res.status(400).json({
         success: false,

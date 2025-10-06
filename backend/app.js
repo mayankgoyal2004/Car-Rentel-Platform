@@ -7,8 +7,9 @@ const connectDb = require("./Config/db.js");
 const adminRoutes = require("./routes/adminRoutes.js");
 const path = require("path");
 const Message = require("./models/messageModel.js");
+require("dotenv").config();
 
-const port = 7777;
+const port = process.env.PORT;
 
 // Middlewares
 app.use(express.json());
@@ -18,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 const cors = require("cors");
 app.use(
   cors({
-    origin: "https://car-rentel-platform-r519-mblqcjazh.vercel.app/",
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
   })
 );
@@ -34,7 +35,7 @@ const seeder = require("./Config/sedder.js");
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*", methods: ["GET", "POST"] },
+  cors: { origin: process.env.CORS_ORIGIN, methods: ["GET", "POST"] },
 });
 
 let onlineUsers = {};

@@ -201,6 +201,10 @@ const deleteCustomer = async (req, res) => {
         .json({ success: false, message: "customer not found" });
     }
 
+    if (Customer.userId) {
+      await User.deleteOne({ _id: Customer.userId });
+    }
+
     await customer.deleteOne({ _id: id });
 
     res.json({
@@ -424,7 +428,7 @@ const getAllOwner = async (req, res) => {
 const getOwnerDetails = async (req, res) => {
   try {
     const users = await User.findById(req.user.admin);
-    
+
     res.json({
       success: true,
       data: users,

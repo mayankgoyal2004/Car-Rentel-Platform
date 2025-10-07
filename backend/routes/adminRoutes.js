@@ -55,7 +55,7 @@ route.post("/forgot-password", userRoute.forgotPassword);
 route.post("/reset-password", userRoute.resetPassword);
 route.post(
   "/register-admin",
-  upload.bussinessLogoUpload.single("image"),
+  upload.userImageUpload.single("image"),
   userRoute.registerAdmin
 );
 route.post("/verify-email", userRoute.verifyEmail);
@@ -317,7 +317,7 @@ route.post(
 );
 route.delete(
   "/delete-customer/:id",
-  checkPermission("Customer", "delete"),
+  checkPermission("admin", "assignPackage", true),
   customer.deleteCustomer
 );
 route.get(

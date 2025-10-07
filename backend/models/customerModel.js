@@ -9,7 +9,7 @@ const customerschema = new mongoose.Schema(
     lastName: { type: String, default: null },
     email: { type: String, default: null },
     contact: { type: Number, default: 0 },
-    address: { type: String, default: "United Kingdom" },
+    address: { type: String },
     image: { type: String, default: null },
     file: {
       type: String,

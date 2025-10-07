@@ -261,7 +261,7 @@ const UserMainDashboard = () => {
                       ) : (
                         <tr>
                           <td colSpan="6" className="text-center">
-                            No contacts found
+                            No Reservation found
                           </td>
                         </tr>
                       )}

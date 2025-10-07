@@ -370,9 +370,7 @@ const AdminReservationDetails = () => {
                                 <div className="mb-3">
                                   <h6 className="d-inline-flex align-items-center fs-14 fw-medium ">
                                     Driver
-                                    <a className="ms-2">
-                                      <i className="ti ti-edit" />
-                                    </a>
+                                    <a className="ms-2"></a>
                                   </h6>
                                 </div>
                                 <div className="d-flex align-items-center mb-3">

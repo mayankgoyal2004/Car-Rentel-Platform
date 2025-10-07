@@ -1,6 +1,5 @@
 const CompanySetting = require("../models/CompanySettingModel");
 
-// Add or Update (only one document)
 const addCompanySetting = async (req, res) => {
   try {
     const {

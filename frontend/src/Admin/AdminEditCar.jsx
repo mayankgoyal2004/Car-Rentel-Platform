@@ -349,8 +349,9 @@ const AdminEditCar = () => {
         toast.error(res.data.message);
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Error saving damages");
+      toast.error(
+        "Error saving damages: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 
@@ -494,8 +495,10 @@ const AdminEditCar = () => {
         toast.error(res.data.message || "Failed to upload documents");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Error uploading documents");
+      toast.error(
+        "Error uploading documents: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   };
 
@@ -1177,7 +1180,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2  text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1436,7 +1439,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2  text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1515,7 +1518,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2  text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1687,7 +1690,7 @@ const AdminEditCar = () => {
                           )}
                         </div>
 
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                           <label className="form-label">
                             Or Add Video Link
                           </label>
@@ -1715,7 +1718,7 @@ const AdminEditCar = () => {
                               />
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -1723,7 +1726,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2  text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1872,7 +1875,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -2008,7 +2011,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2  text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -2059,7 +2062,7 @@ const AdminEditCar = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2  text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />

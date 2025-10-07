@@ -45,7 +45,6 @@ const addCar = async (req, res) => {
       !carModel ||
       !category ||
       !plateNumber ||
-      !vinNumber ||
       !mainLocation ||
       !carFuel ||
       !odometer ||
@@ -942,9 +941,7 @@ const getAllCarsForSuperAdmin = async (req, res) => {
     const search = req.query.search || "";
     let statusFilter = req.query.status; // true | false | undefined
 
-    // Convert query string to boolean if provided
 
-    // Build filter object
     let filter = {};
     if (search) {
       filter.carName = { $regex: search, $options: "i" };
@@ -996,7 +993,6 @@ const getApprovedCarsAdminReservation = async (req, res) => {
 
     let filter = { admin: req.user.admin };
 
-    // ✅ Search filter
     if (search) {
       filter.$or = [
         { carName: { $regex: search, $options: "i" } },

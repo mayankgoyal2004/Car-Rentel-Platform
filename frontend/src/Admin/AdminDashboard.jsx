@@ -36,17 +36,15 @@ const AdminDashboard = () => {
     fetchCompanySetting();
   }, []);
 
-  const [theme, setTheme] = useState("light-mode");
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") || "light-mode";
-    setTheme(savedTheme);
-    document.documentElement.classList.add(savedTheme);
-  }, []);
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light-mode";
+  });
 
   useEffect(() => {
     document.documentElement.classList.remove("light-mode", "dark-mode");
+
     document.documentElement.classList.add(theme);
+
     localStorage.setItem("theme", theme);
   }, [theme]);
 
@@ -821,13 +819,16 @@ const AdminDashboard = () => {
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">
-              <p className="text-secondary">© 2025 Vibrantick Inc All Rights Reserved.</p>
+              <p className="text-secondary">
+                © 2025 Vibrantick Inc All Rights Reserved.
+              </p>
             </div>
           </div>
         </div>
       </footer>
-      
+
       <div>
+        +
         <ToastContainer
           position="top-right"
           autoClose={3000}

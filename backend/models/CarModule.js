@@ -133,10 +133,8 @@ const CarSchema = new mongoose.Schema(
 
 CarSchema.pre("validate", async function (next) {
   if (this.permalink) {
-    // Normalize user-entered permalink
     this.permalink = slugify(this.permalink, { lower: true, strict: true });
 
-    // Ensure uniqueness
     let slug = this.permalink;
     let count = 1;
     const Car = mongoose.model("Car", CarSchema);

@@ -440,9 +440,10 @@ const AdminAddCars = () => {
       } else {
         toast.error(res.data.message || "Failed to upload documents");
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error uploading documents");
+    }  catch (err) {
+      toast.error(
+        "Error uploading documents: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 

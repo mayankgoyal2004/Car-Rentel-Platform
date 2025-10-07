@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import apiService from "../../Apiservice/apiService"; // adjust path
+import apiService from "../../Apiservice/apiService"; 
 
 const Faq = () => {
   const [faqs, setFaqs] = useState([]);

@@ -294,7 +294,7 @@ function App() {
               <Route path="signature-setting" element={<SignatureSetting />} />
               <Route path="location-setting" element={<LocationSetting />} />
               <Route
-                path="localization-setting"
+                path="language-setting"
                 element={<LocalizationSetting />}
               />
               <Route path="login-setting" element={<LoginSettingAdmin />} />

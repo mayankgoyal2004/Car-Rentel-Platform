@@ -133,12 +133,13 @@ const InvoiceSetting = () => {
                         </Link>
                       </li>
                     )}
-                    <li >
-                      <Link to="/admin-dashboard/localization-setting">
-                        <i className="ti ti-language me-2" />
-                        <span>Localization</span>
-                      </Link>
-                    </li>
+                    <li>
+                                        <Link to="/admin-dashboard/language-setting">
+                                          <i className="ti ti-language me-2" />
+                  
+                                          <span> Language Settings</span>
+                                        </Link>
+                                      </li>
                     {userType === 1 && (
                       <li>
                         <a href="language-setting.html">

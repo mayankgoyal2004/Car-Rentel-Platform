@@ -28,7 +28,7 @@ const AdminDashboard = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings"+err.message);
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 
@@ -145,15 +145,17 @@ const AdminDashboard = () => {
                 <a id="toggle_btn">
                   <i className="ti ti-menu-deep" />
                 </a>
-               {userType !==1 &&( <div className="add-dropdown">
-                  <NavLink
-                    to="add-reservation"
-                    className="btn btn-dark d-inline-flex align-items-center"
-                  >
-                    <i className="ti ti-plus me-1" />
-                    New Reservation
-                  </NavLink>
-                </div>)}
+                {userType !== 1 && (
+                  <div className="add-dropdown">
+                    <NavLink
+                      to="add-reservation"
+                      className="btn btn-dark d-inline-flex align-items-center"
+                    >
+                      <i className="ti ti-plus me-1" />
+                      New Reservation
+                    </NavLink>
+                  </div>
+                )}
               </div>
               <div className="d-flex align-items-center header-icons">
                 <div className="theme-item">
@@ -196,15 +198,17 @@ const AdminDashboard = () => {
                         </NavLink>
                       </li>
 
-                     {userType !== 1 &&( <li>
-                        <NavLink
-                          to="all-reservation"
-                          className="dropdown-item d-inline-flex align-items-center"
-                        >
-                          <i className="ti ti-script-plus me-2" />
-                          Reservation
-                        </NavLink>
-                      </li>)}
+                      {userType !== 1 && (
+                        <li>
+                          <NavLink
+                            to="all-reservation"
+                            className="dropdown-item d-inline-flex align-items-center"
+                          >
+                            <i className="ti ti-script-plus me-2" />
+                            Reservation
+                          </NavLink>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -281,8 +285,10 @@ const AdminDashboard = () => {
               <i className="fa fa-ellipsis-v" />
             </a>
             <div className="dropdown-menu dropdown-menu-end">
-              <a className="dropdown-item">My Profile</a>
-              <NavLink to="profile-setting" className="dropdown-item">
+              <Link to="profile-setting" className="dropdown-item">
+                My Profile
+              </Link>
+              <NavLink to="security-setting" className="dropdown-item">
                 Settings
               </NavLink>
               <button
@@ -795,8 +801,8 @@ const AdminDashboard = () => {
                             </>
                           )}
                           <li>
-                            <Link to="localization-setting">
-                              Localization Settings
+                            <Link to="language-setting">
+                              Language Settings
                             </Link>
                           </li>
                         </ul>
@@ -814,7 +820,7 @@ const AdminDashboard = () => {
         {" "}
         <Outlet />
       </div>
-        <footer className="log-footer">
+      <footer className="log-footer">
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">
@@ -823,19 +829,19 @@ const AdminDashboard = () => {
           </div>
         </div>
       </footer>
-       <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

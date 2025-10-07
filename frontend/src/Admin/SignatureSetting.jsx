@@ -213,9 +213,10 @@ const SignatureSetting = () => {
                       </li>
                     )}
                     <li>
-                      <Link to="/admin-dashboard/localization-setting">
+                      <Link to="/admin-dashboard/language-setting">
                         <i className="ti ti-language me-2" />
-                        <span>Localization</span>
+
+                        <span> Language Settings</span>
                       </Link>
                     </li>
                     {userType === 1 && (

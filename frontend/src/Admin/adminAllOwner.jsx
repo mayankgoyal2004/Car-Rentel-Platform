@@ -141,10 +141,7 @@ const AdminOwners = () => {
                     </td>
                     <td>
                       <div className="d-flex align-items-center">
-                        <Link
-                          to={`/admin-dashboard/customer-details/${own._id}`}
-                          className="avatar rounded-circle me-2 flex-shrink-0"
-                        >
+                        <Link className="avatar rounded-circle me-2 flex-shrink-0">
                           <img
                             src={`${BASE_URL_IMG + own.image}`}
                             className="rounded-circle"
@@ -153,11 +150,7 @@ const AdminOwners = () => {
                         </Link>
                         <div>
                           <h6 className="fs-14 fw-semibold">
-                            <Link
-                              to={`/admin-dashboard/customer-details/${own._id}`}
-                            >
-                              {own.name}
-                            </Link>
+                            <Link>{own.userName}</Link>
                           </h6>
                         </div>
                       </div>

@@ -12,7 +12,7 @@ const LocalizationSetting = () => {
     if (!document.getElementById(elementId)) {
       const div = document.createElement("div");
       div.id = elementId;
-      div.style.display = "none"; 
+      div.style.display = "none";
       document.body.appendChild(div);
     }
     if (!document.getElementById("google-translate-script")) {
@@ -148,9 +148,10 @@ const LocalizationSetting = () => {
                     )}
 
                     <li className="active">
-                      <Link to="/admin-dashboard/localization-setting">
+                      <Link to="/admin-dashboard/language-setting">
                         <i className="ti ti-language me-2" />
-                        <span>Localization</span>
+
+                        <span> Language Settings</span>
                       </Link>
                     </li>
 
@@ -164,7 +165,7 @@ const LocalizationSetting = () => {
                       </li>
                     )}
                     {userType !== 1 && (
-                      <li >
+                      <li>
                         <Link to="/admin-dashboard/signature-setting">
                           <i className="ti ti-signature me-2" />
                           <span>Signatures</span>
@@ -192,10 +193,10 @@ const LocalizationSetting = () => {
               </div>
               <div className="card-body pb-0">
                 <div className="localization-content mb-3">
-                  <h6 className="mb-3">Localization</h6>
+                  <h6 className="mb-3">Language</h6>
                   <div className="localization-list">
                     <p className="text-gray-9 fw-medium">
-                       Language <span className="text-danger">*</span>
+                      Language <span className="text-danger">*</span>
                     </p>
                     <select
                       className="select"
@@ -218,8 +219,6 @@ const LocalizationSetting = () => {
                   ></div>
                 </div>
               </div>
-
-             
             </div>
           </div>
         </div>

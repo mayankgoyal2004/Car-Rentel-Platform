@@ -817,7 +817,7 @@ const AdminDashboard = () => {
         {" "}
         <Outlet />
       </div>
-      <footer className="log-footer footer d-sm-flex align-items-center justify-content-between bg-white p-3">
+      <footer className="log-footer  d-sm-flex align-items-center justify-content-between bg-white p-3">
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">

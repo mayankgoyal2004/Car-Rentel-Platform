@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Flatpickr from "react-flatpickr"; // ✅ date time picker
+import Flatpickr from "react-flatpickr"; 
 import "flatpickr/dist/flatpickr.css";
 import "../assets/banner.css";
 import apiService from "../../Apiservice/apiService";

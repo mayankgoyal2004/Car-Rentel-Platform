@@ -17,7 +17,8 @@ const Listing = () => {
 
   const [filters, setFilters] = useState({
     search: "",
-    carType: "",
+    carType: queryParams.get("carType") || "",
+
     carTransmission: "",
     carColor: "",
     carBrand: "",
@@ -52,7 +53,7 @@ const Listing = () => {
         carTransmission: filters.transmission,
         carFuel: filters.fuelType,
         carColor: filters.color,
-        carType: filters.type,
+       carType: filters.carType,
       };
 
       // Remove empty filters
@@ -123,6 +124,7 @@ const Listing = () => {
     if (queryParams.get("pickupLocation") || queryParams.get("dropLocation")) {
       setFilters((prev) => ({
         ...prev,
+
         pickupLocation: queryParams.get("pickupLocation") || "",
         dropLocation: queryParams.get("dropLocation") || "",
         pickupDate: queryParams.get("pickupDate") || "",
@@ -139,10 +141,25 @@ const Listing = () => {
     }
   }, [location.search]);
 
+  useEffect(() => {
+    const carTypeParam = queryParams.get("carType");
+    if (carTypeParam) {
+      setFilters((prev) => ({
+        ...prev,
+        carType: carTypeParam,
+      }));
+
+      if (currentPage === 1) {
+        fetchCars();
+      } else {
+        setCurrentPage(1);
+      }
+    }
+  }, [location.search]);
+
   const handleSearch = (e) => {
-  setSearchQuery(e.target.value)
+    setSearchQuery(e.target.value);
     setCurrentPage(1);
-  
   };
 
   const handleFilterChange = (filterType, value) => {
@@ -744,6 +761,68 @@ const Listing = () => {
                                     />
                                     <label htmlFor={color.toLowerCase()}>
                                       {color}
+                                    </label>
+                                  </div>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* car type*/}
+                    <div className="accordion" id="accordionMainType">
+                      <div className="card-header-new" id="headingType">
+                        <h6 className="filter-title">
+                          <a
+                            href="#javascript"
+                            className="w-100 collapsed"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseType"
+                            aria-expanded="true"
+                            aria-controls="collapseType"
+                            onClick={(e) => e.preventDefault()}
+                          >
+                            Car Type
+                            <span className="float-end">
+                              <i className="fa-solid fa-chevron-down" />
+                            </span>
+                          </a>
+                        </h6>
+                      </div>
+
+                      <div
+                        id="collapseType"
+                        className="collapse"
+                        aria-labelledby="headingType"
+                        data-bs-parent="#accordionExample2"
+                      >
+                        <div className="card-body-chat">
+                          <div className="fuel-list">
+                            <ul>
+                              {[
+                                "SUV",
+                                "Sedan",
+                                "Hatchback",
+                                "Convertible",
+                                "Coupe",
+                                "Pickup Truck",
+                                "Van",
+                                "Luxury",
+                              ].map((type) => (
+                                <li key={type}>
+                                  <div className="input-selection">
+                                    <input
+                                      type="radio"
+                                      name="carType"
+                                      id={type.toLowerCase()}
+                                      checked={filters.carType === type}
+                                      onChange={() =>
+                                        handleFilterChange("type", type)
+                                      }
+                                    />
+                                    <label htmlFor={type.toLowerCase()}>
+                                      {type}
                                     </label>
                                   </div>
                                 </li>

@@ -53,7 +53,7 @@ const Listing = () => {
         carTransmission: filters.transmission,
         carFuel: filters.fuelType,
         carColor: filters.color,
-       carType: filters.carType
+        carType: filters.carType,
       };
 
       // Remove empty filters
@@ -913,12 +913,31 @@ const Listing = () => {
                   </button> */}
 
                   <a
-                    href="#javascript"
                     className="reset-filter"
                     onClick={(e) => {
                       e.preventDefault();
-                      resetFilters();
-                      setTimeout(() => fetchCars(), 100);
+                      setFilters((prev) => ({
+                        ...prev,
+                        search: "",
+                        carType: "",
+                        carTransmission: "",
+                        carColor: "",
+                        carBrand: "",
+                        carModel: "",
+                        pickupLocation: "",
+                        dropLocation: "",
+                        pickupDate: "",
+                        dropDate: "",
+                        city: "",
+                        page: 1,
+                        limit: 10,
+                        brand: [],
+                        fuelType: "",
+                        transmission: "",
+                        rating: [],
+                      }));
+                      setSearchQuery("");
+                      setCurrentPage(1);
                     }}
                   >
                     Reset Filter

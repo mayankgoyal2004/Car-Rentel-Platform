@@ -9,19 +9,19 @@ const AdminAddBlogs = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [tagsId, setTagsId] = useState([]);
+  const [tagsId, setTagsId] = useState("");
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [image, setImage] = useState(null);
 
-    const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
   // Fetch Categories
   const getAllActiveCategory = async () => {
     try {
       const res = await apiService.getAllActiveBlogCategory();
       if (res.data.success) setCategories(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch categories");
+      toast.error("Failed to fetch categories" + err.message);
     }
   };
 
@@ -31,7 +31,7 @@ const AdminAddBlogs = () => {
       const res = await apiService.getAllActiveTags();
       if (res.data.success) setTags(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to fetch tags");
+      toast.error("Failed to fetch tags" + err.message);
     }
   };
 
@@ -52,9 +52,8 @@ const AdminAddBlogs = () => {
       formData.append("title", title);
       formData.append("description", description);
       formData.append("category_id", categoryId);
-      tagsId.forEach((tag) => {
-        formData.append("tags_id[]", tag);
-      });
+      formData.append("tags_id", tagsId);
+
       if (image) formData.append("image", image);
 
       const res = await apiService.addBlog(formData);
@@ -66,8 +65,8 @@ const AdminAddBlogs = () => {
       setTagsId([]);
       setImage(null);
       if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // ✅ clear file input
-    }
+        fileInputRef.current.value = "";
+      }
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -76,9 +75,15 @@ const AdminAddBlogs = () => {
   return (
     <div className="blog-wrapper">
       <div className="blog-card">
-         <div className="mb-4">
-        <Link to="/admin-dashboard/all-blogs" className="d-inline-flex align-items-center fw-medium"><i className="ti ti-arrow-narrow-left me-1" />Blogs</Link>
-      </div>
+        <div className="mb-4">
+          <Link
+            to="/admin-dashboard/all-blogs"
+            className="d-inline-flex align-items-center fw-medium"
+          >
+            <i className="ti ti-arrow-narrow-left me-1" />
+            Blogs
+          </Link>
+        </div>
         <h2 className="blog-title">Add Blog</h2>
 
         {/* Upload Image */}
@@ -87,7 +92,7 @@ const AdminAddBlogs = () => {
           <input
             type="file"
             accept="image/*"
-             ref={fileInputRef}
+            ref={fileInputRef}
             onChange={(e) => setImage(e.target.files[0])}
           />
         </div>
@@ -122,14 +127,8 @@ const AdminAddBlogs = () => {
         {/* Tags */}
         <div className="form-group">
           <label>Tags</label>
-          <select
-            value={tagsId}
-            onChange={(e) =>
-              setTagsId(
-                Array.from(e.target.selectedOptions, (opt) => opt.value)
-              )
-            }
-          >
+          <select value={tagsId} onChange={(e) => setTagsId(e.target.value)}>
+            <option value="">Select Tag</option>
             {tags.map((tag) => (
               <option key={tag._id} value={tag._id}>
                 {tag.TagName}

@@ -157,11 +157,11 @@ const Footer = () => {
                         <i className="#" />
                       </a>
                     </li>
-                    <li>
+                    {/* <li>
                       <a href="#">
                         <i className="fab fa-behance fi-icon" />
                       </a>
-                    </li>
+                    </li> */}
                     <li>
                       <a href="#">
                         <i className="fab fa-twitter fi-icon" />{" "}

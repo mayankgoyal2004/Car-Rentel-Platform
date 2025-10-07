@@ -6,6 +6,7 @@ const CarBrand = require("../models/caratributes/carBrandModel");
 const CarTransmission = require("../models/caratributes/carTransmissionsModel");
 const CarFuel = require("../models/caratributes/carFuelModel");
 const Review = require("../models/carReviewmodel");
+const CarType = require("../models/caratributes/carTypeModel");
 
 const CarColor = require("../models/caratributes/carColorModel");
 const addCar = async (req, res) => {
@@ -463,7 +464,24 @@ const getAllCars = async (req, res) => {
       }
     }
 
-    if (carType) filter.carType = carType;
+    if (carType) {
+      const typeNames = Array.isArray(carType)
+        ? carType
+        : carType.split(",").map((t) => t.trim());
+
+      const regexQueries = typeNames.map((t) => ({
+        carType: { $regex: new RegExp(t, "i") },
+      }));
+
+      const types = await CarType.find({ $or: regexQueries }).select("_id");
+
+      if (types.length > 0) {
+        filter.carType = { $in: types.map((t) => t._id) };
+      } else {
+        filter.carType = { $in: [] };
+      }
+    }
+
     if (carTransmission) {
       const transmissionNames = Array.isArray(carTransmission)
         ? carTransmission

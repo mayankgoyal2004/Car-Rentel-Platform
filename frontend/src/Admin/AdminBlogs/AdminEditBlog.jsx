@@ -8,13 +8,13 @@ export const AdminEditBlog = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [tagsId, setTagsId] = useState([]);
+  const [tagsId, setTagsId] = useState("");
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
-  const [status, setStatus] = useState(true); // default true
+  const [status, setStatus] = useState(true);
 
   const { id } = useParams();
 
@@ -38,7 +38,6 @@ export const AdminEditBlog = () => {
     }
   };
 
-  // 🔹 Fetch single blog details
   const getBlogDetails = async () => {
     try {
       const res = await apiService.getSingleBlogForAdmin(id);
@@ -49,7 +48,7 @@ export const AdminEditBlog = () => {
         setCategoryId(blog.category?._id || "");
         setStatus(blog.status);
         setTagsId(blog.tags?.map((t) => t._id) || []);
-        setPreview(blog.image ? BASE_URL_IMG + blog.image : null); // show existing image
+        setPreview(blog.image ? BASE_URL_IMG + blog.image : null);
       }
     } catch {
       toast.error("Failed to fetch blog details");
@@ -84,7 +83,7 @@ export const AdminEditBlog = () => {
       formData.append("title", title);
       formData.append("description", description);
       formData.append("category_id", categoryId);
-      tagsId.forEach((tag) => formData.append("tags_id[]", tag));
+      formData.append("tags_id", tagsId);
       if (image) formData.append("image", image);
       formData.append("status", status);
       const res = await apiService.updateblog(formData);
@@ -158,14 +157,8 @@ export const AdminEditBlog = () => {
         {/* Tags */}
         <div className="form-group">
           <label>Tags</label>
-          <select
-            value={tagsId}
-            onChange={(e) =>
-              setTagsId(
-                Array.from(e.target.selectedOptions, (opt) => opt.value)
-              )
-            }
-          >
+          <select value={tagsId} onChange={(e) => setTagsId(e.target.value)}>
+            <option value="">Select Tag</option>
             {tags.map((tag) => (
               <option key={tag._id} value={tag._id}>
                 {tag.TagName}

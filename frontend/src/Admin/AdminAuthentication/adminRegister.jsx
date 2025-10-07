@@ -48,7 +48,7 @@ const AdminRegister = () => {
       const res = await apiServices.getCaptchaFrontend();
       if (res.data.data) setCaptchaSetting(res.data.data);
     } catch (err) {
-      toast.error("Failed to load settings"+err.message);
+      toast.error("Failed to load settings" + err.message);
     }
   };
   const fetchCompanySetting = async () => {
@@ -58,7 +58,7 @@ const AdminRegister = () => {
         setCompanySetting(res.data.data);
       }
     } catch (err) {
-      toast.error("Failed to load company settings"+err.message);
+      toast.error("Failed to load company settings" + err.message);
     }
   };
 
@@ -107,6 +107,8 @@ const AdminRegister = () => {
       } else {
         toast.error("Something went wrong!");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -295,7 +297,7 @@ const AdminRegister = () => {
           pauseOnHover
         />
       </div>
-        <footer className="log-footer">
+      <footer className="log-footer">
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">

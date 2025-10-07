@@ -1016,6 +1016,7 @@ const AdminCustomers = () => {
                 </div>
               </div>
             </div>
+         
             <div className="modal-footer">
               <div className="d-flex justify-content-between align-items-center w-100">
                 <div className="d-flex justify-content-center">

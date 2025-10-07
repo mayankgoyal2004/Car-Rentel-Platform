@@ -1127,7 +1127,7 @@ const AdminAddCars = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1450,7 +1450,7 @@ const AdminAddCars = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1528,7 +1528,7 @@ const AdminAddCars = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1666,7 +1666,7 @@ const AdminAddCars = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />
@@ -1777,7 +1777,7 @@ const AdminAddCars = () => {
                 </div>
 
                 {/* Navigation */}
-                <div className="d-flex justify-content-end gap-2 pt-3">
+                <div className="d-flex justify-content-end gap-2 pt-3 text-light">
                   <button className="btn btn-outline-light" onClick={prevStep}>
                     Back
                   </button>
@@ -1883,8 +1883,8 @@ const AdminAddCars = () => {
                 </div>
 
                 {/* Navigation */}
-                <div className="d-flex justify-content-end gap-2 pt-3">
-                  <button className="btn btn-outline-light" onClick={prevStep}>
+                <div className="d-flex justify-content-end gap-2 pt-3 text-light">
+                  <button className="btn btn-outline-light text-light " onClick={prevStep}>
                     Back
                   </button>
                   <button className="btn btn-primary" onClick={saveCarFaqs}>
@@ -1925,7 +1925,7 @@ const AdminAddCars = () => {
                   <div className="d-flex align-items-center justify-content-end pt-3">
                     <button
                       type="button"
-                      className="btn btn-outline-light border wizard-prev me-2"
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                       onClick={prevStep}
                     >
                       <i className="ti ti-chevron-left me-1" />

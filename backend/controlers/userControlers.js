@@ -7,7 +7,7 @@ const axios = require("axios");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
-const saltround = process.env.BCRYPT_SALT_ROUNDS;
+const saltround = Number(process.env.BCRYPT_SALT_ROUNDS);
 const secretKey = "Protect@@@@";
 const emailSecret = "EmailVerifySecret@@@";
 const otpGenerator = require("otp-generator");
@@ -432,7 +432,7 @@ const verifyEmail = async (req, res) => {
     }
     let decoded;
     try {
-      decoded = jwt.verify(token, emailSecret); 
+      decoded = jwt.verify(token, emailSecret);
     } catch (err) {
       return res.status(400).json({
         success: false,
@@ -801,6 +801,7 @@ const registerAdmin = async (req, res) => {
       email,
       password,
       address,
+      contact,
       confirmPassword,
       recaptchaToken,
     } = req.body;
@@ -819,6 +820,11 @@ const registerAdmin = async (req, res) => {
       return res
         .status(400)
         .json({ success: false, message: "Password is required" });
+    }
+    if (!contact) {
+      return res
+        .status(400)
+        .json({ success: false, message: "contact is required" });
     }
     if (!confirmPassword) {
       return res
@@ -847,6 +853,8 @@ const registerAdmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "Image is Required" });
     }
+    console.log(req.body);
+    console.log(req.file);
 
     const imagePath = req.file.path.replace(/\\/g, "/");
 
@@ -876,6 +884,7 @@ const registerAdmin = async (req, res) => {
     let newUser = new User({
       userName: ownerName,
       email,
+      contact,
       password: hashedPassword,
       userType: 2,
       status: true,

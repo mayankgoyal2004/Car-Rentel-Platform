@@ -817,15 +817,16 @@ const AdminDashboard = () => {
         {" "}
         <Outlet />
       </div>
-      <footer className="log-footer">
+      <footer className="log-footer footer d-sm-flex align-items-center justify-content-between bg-white p-3">
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
+              <p className="text-secondary">© 2025 Vibrantick Inc All Rights Reserved.</p>
             </div>
           </div>
         </div>
       </footer>
+      
       <div>
         <ToastContainer
           position="top-right"

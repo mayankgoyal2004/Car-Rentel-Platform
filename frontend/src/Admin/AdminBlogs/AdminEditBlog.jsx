@@ -159,7 +159,6 @@ export const AdminEditBlog = () => {
         <div className="form-group">
           <label>Tags</label>
           <select
-            multiple
             value={tagsId}
             onChange={(e) =>
               setTagsId(
@@ -187,34 +186,31 @@ export const AdminEditBlog = () => {
         </div>
 
         {/* Actions */}
-     <div className="modal-footer">
-                <div className="d-flex justify-content-between align-items-center w-100">
-                <div className="form-check form-check-md form-switch me-2">
-  <label className="form-check-label form-label mt-0 mb-0">
-    <input
-      className="form-check-input form-label me-2"
-      type="checkbox"
-      role="switch"
-      checked={status}
-      onChange={(e) => setStatus(e.target.checked)}
-    />
-    Status
-  </label>
-</div>
+        <div className="modal-footer">
+          <div className="d-flex justify-content-between align-items-center w-100">
+            <div className="form-check form-check-md form-switch me-2">
+              <label className="form-check-label form-label mt-0 mb-0">
+                <input
+                  className="form-check-input form-label me-2"
+                  type="checkbox"
+                  role="switch"
+                  checked={status}
+                  onChange={(e) => setStatus(e.target.checked)}
+                />
+                Status
+              </label>
+            </div>
 
-                  <div className="d-flex justify-content-center">
-                    <button
-                      className="btn btn-light me-3"
-                      data-bs-dismiss="modal"
-                    >
-                      Cancel
-                    </button>
-                    <button onClick={handleEditBlog} className="btn btn-primary">
-                      Save Changes
-                    </button>
-                  </div>
-                </div>
-              </div>
+            <div className="d-flex justify-content-center">
+              <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button onClick={handleEditBlog} className="btn btn-primary">
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
       <ToastContainer />
     </div>

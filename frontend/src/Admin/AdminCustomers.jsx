@@ -296,7 +296,7 @@ const AdminCustomers = () => {
               </CSVLink>
             </div>
 
-            <div className="mb-2">
+           {userType !== 1 &&( <div className="mb-2">
               <a
                 className="btn btn-primary d-flex align-items-center"
                 data-bs-toggle="modal"
@@ -305,7 +305,7 @@ const AdminCustomers = () => {
                 <i className="ti ti-plus me-2" />
                 Add New Client
               </a>
-            </div>
+            </div>)}
           </div>
         </div>
         {/* /Breadcrumb */}
@@ -445,17 +445,19 @@ const AdminCustomers = () => {
                               Edit
                             </a>
                           </li>
-                          {/* <li>
-                            <a
-                              className="dropdown-item rounded-1"
-                              onClick={() => handleDeleteConfirm(customer)}
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_modal"
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </a>
-                          </li> */}
+                          {userType === 1 && (
+                            <li>
+                              <a
+                                className="dropdown-item rounded-1"
+                                onClick={() => setDeleteCustomer(customer)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_modal"
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </a>
+                            </li>
+                          )}
                         </ul>
                       </div>
                     </td>

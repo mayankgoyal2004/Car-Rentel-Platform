@@ -3,7 +3,6 @@ import axios from "axios";
 export const BASE_URL_IMG = import.meta.env.VITE_BASE_URL_IMG;
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-
 const getAuthHeaders = () => {
   const token = sessionStorage.getItem("token");
   return {
@@ -310,10 +309,13 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
-  getAllOwnerAdmin() {
-    return axios.get(BASE_URL + `get-all-owner-super-admin`, {
-      headers: getAuthHeaders(),
-    });
+  getAllOwnerAdmin({ search = "", page } = {}) {
+    return axios.get(
+      BASE_URL + `get-all-owner-super-admin?search=${search}&page=${page}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
   }
   getLatest5Customer() {
     return axios.get(BASE_URL + `get-5-customer-admin`, {

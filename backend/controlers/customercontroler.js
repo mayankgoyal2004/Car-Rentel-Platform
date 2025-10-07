@@ -65,7 +65,7 @@ const addCustomer = async (req, res) => {
     if (!language) {
       return res
         .status(400)
-        .json({ success: false, message: "language number is required" });
+        .json({ success: false, message: "language  is required" });
     }
     if (!dateOfBirth) {
       return res

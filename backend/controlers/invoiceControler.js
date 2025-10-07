@@ -259,7 +259,6 @@ const getLatestInvoice = async (req, res) => {
 
 const getInvoiceByReservationId = async (req, res) => {
   try {
-    console.log(req.params);
     const invoice = await Invoice.findOne({
       reservation: req.params.reservationId,
     })

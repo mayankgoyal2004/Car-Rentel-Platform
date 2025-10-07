@@ -106,7 +106,6 @@ const AdminEditEnvoice = () => {
       const invoiceData = res.data.data;
       setInvoice(invoiceData);
 
-      console.log("Fetched invoice data:", invoiceData);
 
       setInvoiceData({
         invoiceNumber: invoiceData.invoiceNumber || "",

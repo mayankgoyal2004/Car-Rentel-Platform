@@ -65,7 +65,6 @@ const ListingDetails = () => {
   const fetchReviews = async () => {
     try {
       const res = await apiService.getCarReview(carData._id);
-      console.log("Reviews response:", res.data); // Debug log
 
       if (res.data && res.data.success && Array.isArray(res.data.reviews)) {
         setReviews(res.data.reviews);
@@ -608,7 +607,9 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Year</span>
-                          <h6>{new Date(carData?.year).toLocaleDateString()}</h6>
+                          <h6>
+                            {new Date(carData?.year).toLocaleDateString()}
+                          </h6>
                         </div>
                       </div>
 

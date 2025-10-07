@@ -36,7 +36,6 @@ const ResetPassword = () => {
       };
       if (captchaSetting.status) data.recaptchaToken = recaptchaToken;
       const res = await apiService.resetpassword(data);
-      console.log(res);
       if (res.data.success) {
         toast.success(res.data.message);
        setTimeout(() => {

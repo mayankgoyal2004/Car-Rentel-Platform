@@ -15,7 +15,6 @@ const addLocation = async (req, res) => {
       pincode,
       workingDays,
     } = req.body;
-    console.log("req.file:", req.file);
 
     if (!title) {
       return res

@@ -853,8 +853,7 @@ const registerAdmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "Image is Required" });
     }
-    console.log(req.body);
-    console.log(req.file);
+
 
     const imagePath = req.file.path.replace(/\\/g, "/");
 

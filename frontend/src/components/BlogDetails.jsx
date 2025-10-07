@@ -17,7 +17,6 @@ const BlogDetails = () => {
     setLoading(true);
     try {
       const res = await apiService.getSingleBlogUser(slug);
-      console.log("Blog response:", res.data);
 
       if (res.data.success) {
         setBlog(res.data.data);

@@ -796,7 +796,7 @@ const AddInvoice = () => {
                   <tbody>
                     {reservations.map((reservation) => (
                       <tr key={reservation._id}>
-                        <td>#{reservation.bookingId}</td>
+                        <td>{reservation.bookingId}</td>
                         <td>
                           <div className="d-flex align-items-center">
                             <div className="avatar me-2 flex-shrink-0">

@@ -213,9 +213,7 @@ const AdminEditCar = () => {
       const res = await apiService.getSingleCarById(id);
       if (res.data.success) {
         const carData = res.data.data;
-        console.log(carData);
 
-        // Pre-fill form data
         setFormData({
           carName: carData.carName,
           permalink: carData.permalink || "",

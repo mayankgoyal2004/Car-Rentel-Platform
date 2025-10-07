@@ -50,7 +50,7 @@ const AddAdminReservation = () => {
     try {
       const res = await apiService.getAllAproverCarAdmin();
       if (res.data.success) {
-        // Map the API response to match your component's expected structure
+    
         const formattedCars = res.data.data.map((car) => ({
           id: car._id || car.id,
           _id: car?._id,
@@ -65,7 +65,7 @@ const AddAdminReservation = () => {
           image: car.image,
           extraServices:
             car.extraService?.map((es) => ({
-              id: es._id, // use _id here
+              id: es._id, 
               name: es.name,
               price: es.price,
               type: es.type,
@@ -236,10 +236,8 @@ const AddAdminReservation = () => {
           driver: "",
           extraServices: [],
           baseKilometers: "",
-          // unlimitedKilometers: false,
           kmExtraPrice: "",
-          // insuranceEnabled: false,
-          // insuranceType: "",
+          
         });
         setCurrentStep(0);
       } else {

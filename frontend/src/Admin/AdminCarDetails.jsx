@@ -335,7 +335,24 @@ const AdminCarDetails = () => {
                                     target="/"
                                     className="fs-14 fw-medium"
                                   >
-                                    car Insurance{" "}
+                                    car policy{" "}
+                                  </a>
+                                </div>
+                              </div>
+                              <div className="d-flex align-items-center">
+                                <span className="me-2">
+                                  <img
+                                    src="/admin-assets/img/icons/pdf-icon.svg"
+                                    alt="img"
+                                  />
+                                </span>
+                                <div>
+                                  <a
+                                    href={BASE_URL_IMG + car?.carDocuments}
+                                    target="/"
+                                    className="fs-14 fw-medium"
+                                  >
+                                    car Document{" "}
                                   </a>
                                 </div>
                               </div>

@@ -445,7 +445,7 @@ const AdminCustomers = () => {
                               Edit
                             </a>
                           </li>
-                          <li>
+                          {/* <li>
                             <a
                               className="dropdown-item rounded-1"
                               onClick={() => handleDeleteConfirm(customer)}
@@ -455,7 +455,7 @@ const AdminCustomers = () => {
                               <i className="ti ti-trash me-1" />
                               Delete
                             </a>
-                          </li>
+                          </li> */}
                         </ul>
                       </div>
                     </td>

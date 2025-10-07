@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import apiService from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminAddCars = () => {
   const navigate = useNavigate();
@@ -257,14 +257,15 @@ const AdminAddCars = () => {
 
       if (res.data.success) {
         toast.success("Car basic info saved successfully!");
-        setCarId(res.data.car._id); // store carId for next steps
+        setCarId(res.data.car._id); 
         nextStep();
       } else {
         toast.error(res.data.message || "Failed to save car info");
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while saving!");
+          toast.error(
+            "Error adding car: " + (err.response?.data?.message || err.message)
+          );
     } finally {
       setIsSubmitting(false);
     }
@@ -1967,6 +1968,19 @@ const AdminAddCars = () => {
           </div>
         </div>
       </div>
+      <div>
+              <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+            </div>
 
       {/* /Create Seasonal Pricing */}
       {/* Select Seasonal Pricing */}

@@ -4,7 +4,6 @@ const Car = require("../models/CarModule");
 const updateCarPricing = async (req, res) => {
   try {
     const { id } = req.params;
-
     const {
       prices,
       baseKilometers,
@@ -14,8 +13,6 @@ const updateCarPricing = async (req, res) => {
       insurance,
     } = req.body;
 
-    console.log(req.body);
-    // validate required fields
     if (!baseKilometers || !extraKilometerPrice) {
       return res.status(400).json({
         success: false,
@@ -28,9 +25,9 @@ const updateCarPricing = async (req, res) => {
       return res.status(404).json({ success: false, message: "Car not found" });
     }
 
-    // Check if pricing exists, update or create
     let pricing;
     if (car.pricing) {
+      // Update existing pricing
       pricing = await Pricing.findByIdAndUpdate(
         car.pricing,
         {
@@ -38,34 +35,34 @@ const updateCarPricing = async (req, res) => {
           baseKilometers,
           unlimitedKilometers,
           extraKilometerPrice,
-          seasonal,
           insurance,
+          seasonal,
         },
         { new: true }
       );
     } else {
+      // Create new pricing
       pricing = new Pricing({
         prices,
         baseKilometers,
         unlimitedKilometers,
         extraKilometerPrice,
-        seasonal,
         insurance,
+        seasonal,
       });
       await pricing.save();
+
       car.pricing = pricing._id;
       await car.save();
     }
 
-    // Optionally populate seasonal & insurance for frontend
-    const populatedPricing = await Pricing.findById(pricing._id)
-      .populate("seasonal") // if seasonal references another collection
-      .lean();
+    // Populate pricing to return complete data
+    const populatedCar = await Car.findById(id).populate("pricing");
 
     res.status(200).json({
       success: true,
       message: "Car pricing updated successfully",
-      pricing: populatedPricing,
+      pricing: populatedCar.pricing,
     });
   } catch (error) {
     console.error("Update Car Pricing Error:", error);
@@ -88,31 +85,26 @@ const editCarPricing = async (req, res) => {
       baseKilometers,
       unlimitedKilometers,
       extraKilometerPrice,
-      seasonal,
-      insurance,
     } = req.body;
 
     const car = await Car.findById(id);
-    if (!car) {
+    if (!car || !car.pricing) {
       return res
         .status(404)
         .json({ success: false, message: "Car or pricing not found" });
     }
+
     const updateData = {
       prices: { daily, weekly, monthly, yearly },
       baseKilometers,
       unlimitedKilometers,
       extraKilometerPrice,
-      seasonal,
-      insurance,
     };
 
     const updatedPricing = await Pricing.findByIdAndUpdate(
-      car.Pricing,
+      car.pricing,
       updateData,
-      {
-        new: true,
-      }
+      { new: true }
     );
 
     res.status(200).json({

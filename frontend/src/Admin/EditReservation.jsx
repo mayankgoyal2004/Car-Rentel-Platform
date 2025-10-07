@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import apiService, { BASE_URL_IMG } from '../../Apiservice/apiService';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const AdminEditReservation = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const AdminEditReservation = () => {
   const [drivers, setDrivers] = useState([]);
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [reservationData, setReservationData] = useState({
     tariff: "Weekly",
@@ -54,24 +55,32 @@ const AdminEditReservation = () => {
       if (res.data.success) {
         const reservation = res.data.data;
         setReservation(reservation);
-        
+
         // Pre-fill the form with reservation data
         setReservationData({
-          tariff: reservation?.bookingType ,
+          tariff: reservation?.bookingType,
           rentalType: reservation?.rentalType,
-          passengers: reservation.passengers ,
-          startDate: reservation?.pickupDate ? reservation.pickupDate.split('T')[0] : "",
-          startTime: reservation?.pickupTime ,
-          endDate: reservation.dropDate ? reservation.dropDate.split('T')[0] : "",
-          endTime: reservation.dropTime ,
-          pickupLocation: reservation.pickupLocation ,
-          returnLocation: reservation.dropLocation ,
-          securityDeposit: reservation.securityDeposit ,
-          returnSameLocation: reservation.pickupLocation === reservation.dropLocation,
+          passengers: reservation.passengers,
+          startDate: reservation?.pickupDate
+            ? reservation.pickupDate.split("T")[0]
+            : "",
+          startTime: reservation?.pickupTime,
+          endDate: reservation.dropDate
+            ? reservation.dropDate.split("T")[0]
+            : "",
+          endTime: reservation.dropTime,
+          pickupLocation: reservation.pickupLocation,
+          returnLocation: reservation.dropLocation,
+          securityDeposit: reservation.securityDeposit,
+          returnSameLocation:
+            reservation.pickupLocation === reservation.dropLocation,
           selectedCar: reservation.car?._id || reservation.car || null,
           customer: reservation.customer?._id || reservation.customer || "",
           driver: reservation.driver?._id || reservation.driver || "",
-          extraServices: reservation.extraServices?.map(service => service._id || service) || [],
+          extraServices:
+            reservation.extraServices?.map(
+              (service) => service._id || service
+            ) || [],
           baseKilometers: reservation.baseKilometers || "",
           kmExtraPrice: reservation.kmExtraPrice || "",
         });
@@ -99,14 +108,15 @@ const AdminEditReservation = () => {
           inRental: car.inRent,
           location: car.mainLocation?.location,
           image: car.image,
-          extraServices: car.extraService?.map((es) => ({
-            id: es._id || es.id,
-            name: es.name,
-            price: es.price,
-            type: es.type,
-            period: es.type === "per_day" ? "Per Day" : "One Time",
-            description: es.description || "",
-          })) || [],
+          extraServices:
+            car.extraService?.map((es) => ({
+              id: es._id || es.id,
+              name: es.name,
+              price: es.price,
+              type: es.type,
+              period: es.type === "per_day" ? "Per Day" : "One Time",
+              description: es.description || "",
+            })) || [],
         }));
         setCars(formattedCars);
       }
@@ -117,7 +127,7 @@ const AdminEditReservation = () => {
 
   const fetchAllActiveCustomers = async () => {
     try {
-      const res = await apiService.getAllActiveCustomer();
+      const res = await apiService.getAllCustomerAdmin();
       if (res.data.success) {
         const formattedCustomers = res.data.data.map((customer) => ({
           id: customer?._id,
@@ -189,8 +199,6 @@ const AdminEditReservation = () => {
     });
   };
 
-
-
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -203,27 +211,21 @@ const AdminEditReservation = () => {
     }
   };
 
-const handleServiceToggle = (serviceId) => {
-  setReservationData((prev) => {
-    // Clone the array
-    const services = [...prev.extraServices];
+  const handleServiceToggle = (serviceId) => {
+    setReservationData((prev) => {
+      const services = [...prev.extraServices];
 
-    // Check if service already exists
-    const index = services.findIndex((id) => id === serviceId);
+      const index = services.findIndex((id) => id === serviceId);
 
-    if (index > -1) {
-      // Remove it if clicked again
-      services.splice(index, 1);
-    } else {
-      // Add it if not present
-      services.push(serviceId);
-    }
+      if (index > -1) {
+        services.splice(index, 1);
+      } else {
+        services.push(serviceId);
+      }
 
-    return { ...prev, extraServices: services };
-  });
-};
-
-
+      return { ...prev, extraServices: services };
+    });
+  };
 
   const handleSubmit = async () => {
     try {
@@ -232,9 +234,13 @@ const handleServiceToggle = (serviceId) => {
         customer_id: reservationData.customer,
         rentalType: reservationData.rentalType,
         pickupLocation: reservationData.pickupLocation,
-        pickupAddress: locations.find((loc) => loc.id === reservationData.pickupLocation)?.address || "",
+        pickupAddress:
+          locations.find((loc) => loc.id === reservationData.pickupLocation)
+            ?.address || "",
         dropLocation: reservationData.returnLocation,
-        dropAddress: locations.find((loc) => loc.id === reservationData.returnLocation)?.address || "",
+        dropAddress:
+          locations.find((loc) => loc.id === reservationData.returnLocation)
+            ?.address || "",
         noOfPassengers: parseInt(reservationData.passengers) || 1,
         bookingType: reservationData.tariff,
         pickupTime: reservationData.startTime,
@@ -251,23 +257,30 @@ const handleServiceToggle = (serviceId) => {
 
       const res = await apiService.editReservation(id, formattedData);
       if (res.data.success) {
-        alert("Reservation updated successfully!");
+        toast.success("Reservation updated successfully!");
         navigate("/admin-dashboard/all-reservation");
       } else {
-        alert("Failed to update reservation: " + (res.data.message || "Unknown error"));
+        alert(
+          "Failed to update reservation: " +
+            (res.data.message || "Unknown error")
+        );
       }
     } catch (err) {
       console.error("Reservation update error:", err);
-      alert("Error updating reservation: " + (err.response?.data?.message || err.message));
+      alert(
+        "Error updating reservation: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   };
-
-  
 
   const renderStepIndicator = () => {
     return (
       <div className="reservation-wizard mb-4">
-        <ul className="d-flex align-items-center flex-wrap row-gap-2" id="progressbar">
+        <ul
+          className="d-flex align-items-center flex-wrap row-gap-2"
+          id="progressbar"
+        >
           {steps.map((step, index) => (
             <li
               key={index}
@@ -306,37 +319,50 @@ const handleServiceToggle = (serviceId) => {
     );
   };
 
-
-  
-
   const SummarySidebar = () => {
-    const selectedCar = cars.find((car) => car.id === reservationData.selectedCar);
-    const selectedCustomer = customers.find((customer) => customer.id === reservationData.customer);
-    const selectedDriver = drivers.find((driver) => driver.id === reservationData.driver);
-    const pickupLocation = locations.find((loc) => loc.id === reservationData.pickupLocation);
-    const returnLocation = locations.find((loc) => loc.id === reservationData.returnLocation);
+    const selectedCar = cars.find(
+      (car) => car.id === reservationData.selectedCar
+    );
+    const selectedCustomer = customers.find(
+      (customer) => customer.id === reservationData.customer
+    );
+    const selectedDriver = drivers.find(
+      (driver) => driver.id === reservationData.driver
+    );
+    const pickupLocation = locations.find(
+      (loc) => loc.id === reservationData.pickupLocation
+    );
+    const returnLocation = locations.find(
+      (loc) => loc.id === reservationData.returnLocation
+    );
 
     const startDate = new Date(reservationData.startDate);
     const endDate = new Date(reservationData.endDate);
-    const rentalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) || 1;
+    const rentalDays =
+      Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) || 1;
 
     const carPrice = selectedCar ? selectedCar.price * rentalDays : 0;
     const driverPrice = selectedDriver ? selectedDriver.price * rentalDays : 0;
-    
-    const servicesPrice = reservationData.extraServices.reduce((total, serviceId) => {
-      if (selectedCar) {
-        const service = selectedCar.extraServices.find((s) => s.id === serviceId);
-        if (service) {
-          if (service.period === "Per Day") {
-            return total + service.price * rentalDays;
-          } else {
-            return total + service.price;
+
+    const servicesPrice = reservationData.extraServices.reduce(
+      (total, serviceId) => {
+        if (selectedCar) {
+          const service = selectedCar.extraServices.find(
+            (s) => s.id === serviceId
+          );
+          if (service) {
+            if (service.period === "Per Day") {
+              return total + service.price * rentalDays;
+            } else {
+              return total + service.price;
+            }
           }
         }
-      }
-      return total;
-    }, 0);
-    
+        return total;
+      },
+      0
+    );
+
     const securityDeposit = parseFloat(reservationData.securityDeposit) || 0;
     const totalPrice = carPrice + driverPrice + servicesPrice + securityDeposit;
 
@@ -354,9 +380,17 @@ const handleServiceToggle = (serviceId) => {
                     <div className="d-flex align-items-center">
                       <span className="avatar flex-shrink-0 me-2">
                         <img
-                          src={selectedCar.image ? `${BASE_URL_IMG}${selectedCar.image}` : "/default-car.jpg"}
+                          src={
+                            selectedCar.image
+                              ? `${BASE_URL_IMG}${selectedCar.image}`
+                              : "/default-car.jpg"
+                          }
                           alt={selectedCar.carName}
-                          style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            objectFit: "cover",
+                          }}
                         />
                       </span>
                       <div>
@@ -447,9 +481,14 @@ const handleServiceToggle = (serviceId) => {
                 </div>
                 <div className="mt-2">
                   {reservationData.extraServices.map((serviceId) => {
-                    const service = selectedCar.extraServices.find((s) => s.id === serviceId);
+                    const service = selectedCar.extraServices.find(
+                      (s) => s.id === serviceId
+                    );
                     return service ? (
-                      <div key={service.id} className="d-flex align-items-center justify-content-between mb-1">
+                      <div
+                        key={service.id}
+                        className="d-flex align-items-center justify-content-between mb-1"
+                      >
                         <span className="text-muted small">{service.name}</span>
                         <span className="small">
                           ${service.price}
@@ -478,7 +517,10 @@ const handleServiceToggle = (serviceId) => {
           </div>
         </div>
 
-        <button className="btn btn-danger w-100 mb-4" onClick={() => setCurrentStep(0)}>
+        <button
+          className="btn btn-danger w-100 mb-4"
+          onClick={() => setCurrentStep(0)}
+        >
           <i className="ti ti-x me-1" />
           Cancel Booking
         </button>
@@ -815,24 +857,21 @@ const handleServiceToggle = (serviceId) => {
                                     <div>
                                       <p className="mb-1">Color</p>
                                       <h6 className="fs-14 d-inline-flex align-items-center">
-                                        <i className="ti ti-square-filled me-1" />
-                                        {car.carColor}
+                                        {car?.carColor}
                                       </h6>
                                     </div>
                                   </div>
                                   <div className="col-md-4">
                                     <div>
                                       <p className="mb-1">Year</p>
-                                      <h6 className="fs-14">
-                                        {car.year}
-                                      </h6>
+                                      <h6 className="fs-14">{car?.year}</h6>
                                     </div>
                                   </div>
                                   <div className="col-md-4">
                                     <div>
                                       <p className="mb-1">Price</p>
                                       <h6 className="fs-14">
-                                        ${car.price}
+                                        ${car?.price}
                                         <span className="text-gray-5">
                                           /day
                                         </span>
@@ -951,11 +990,13 @@ const handleServiceToggle = (serviceId) => {
                             <div className="col-md-4">
                               <div className="d-flex align-items-center">
                                 <span className="avatar avatar-rounded flex-shrink-0 me-2">
-                                 <img
-  src={
-    BASE_URL_IMG +
-      (customers.find((c) => c.id === reservationData.customer)?.image || "default-user.jpg")
-  }
+                                  <img
+                                    src={
+                                      BASE_URL_IMG +
+                                      (customers.find(
+                                        (c) => c.id === reservationData.customer
+                                      )?.image || "default-user.jpg")
+                                    }
                                     alt="Customer"
                                     style={{
                                       width: "40px",
@@ -1027,7 +1068,7 @@ const handleServiceToggle = (serviceId) => {
                       <select
                         className="form-select"
                         name="driver"
-                        value={reservationData.driver}
+                        value={reservationData?.driver}
                         onChange={handleInputChange}
                       >
                         <option value="">No Driver</option>
@@ -1035,7 +1076,7 @@ const handleServiceToggle = (serviceId) => {
                           .filter((d) => d.status === "available")
                           .map((driver) => (
                             <option key={driver.id} value={driver.id}>
-                              {driver.name} - ${driver.price}/day
+                              {driver?.name} - ${driver.price}/day
                             </option>
                           ))}
                       </select>
@@ -1060,11 +1101,13 @@ const handleServiceToggle = (serviceId) => {
                                   />
                                 </div>
                                 <span className="avatar avatar-rounded flex-shrink-0 me-2">
-                                <img
-  src={
-    BASE_URL_IMG +
-      (drivers.find((d) => d.id === reservationData.driver)?.image || "default-user.jpg")
-  }
+                                  <img
+                                    src={
+                                      BASE_URL_IMG +
+                                      (drivers.find(
+                                        (d) => d.id === reservationData.driver
+                                      )?.image || "default-user.jpg")
+                                    }
                                     alt="Driver"
                                     style={{
                                       width: "40px",
@@ -1163,7 +1206,9 @@ const handleServiceToggle = (serviceId) => {
   };
 
   const renderStep3 = () => {
-    const selectedCar = cars.find((car) => car.id === reservationData.selectedCar);
+    const selectedCar = cars.find(
+      (car) => car.id === reservationData.selectedCar
+    );
     const carExtraServices = selectedCar ? selectedCar.extraServices : [];
 
     return (
@@ -1200,25 +1245,34 @@ const handleServiceToggle = (serviceId) => {
                   carExtraServices.map((service) => (
                     <div key={service.id} className="col-md-6 mb-3">
                       <div
-                        className={`custom-checkbox ${
+                        className={`${
                           reservationData.extraServices.includes(service.id)
                             ? "active"
                             : ""
                         }`}
                       >
-                        <div className="form-check form-check-md">
+                        <div className="form-check form-check-md d-flex align-items-center">
                           <input
                             className="form-check-input"
                             type="checkbox"
                             id={`custom-check-${service.id}`}
-                            checked={reservationData.extraServices.includes(service.id)}
+                            checked={reservationData.extraServices.includes(
+                              service.id
+                            )}
                             onChange={() => handleServiceToggle(service.id)}
                           />
                         </div>
                         <div className="d-flex align-items-center justify-content-between">
-                          <label className="form-check-label ms-2 ps-4" htmlFor={`custom-check-${service.id}`}>
-                            <span className="fw-semibold text-gray-9 d-block mb-1">{service.name}</span>
-                            <span className="d-block">{service.description}</span>
+                          <label
+                            className="form-check-label ms-2 ps-4"
+                            htmlFor={`custom-check-${service.id}`}
+                          >
+                            <span className="fw-semibold text-gray-9 d-block mb-1">
+                              {service.name}
+                            </span>
+                            <span className="d-block">
+                              {service.description}
+                            </span>
                           </label>
                           <div className="text-end">
                             <p className="mb-1">{service.period}</p>
@@ -1234,13 +1288,21 @@ const handleServiceToggle = (serviceId) => {
               <div className="card-footer px-0 pb-0">
                 <div className="d-flex align-items-center justify-content-end">
                   <div className="field-btns">
-                    <button className="btn btn-light me-2" type="button" onClick={prevStep}>
+                    <button
+                      className="btn btn-light me-2"
+                      type="button"
+                      onClick={prevStep}
+                    >
                       <i className="ti ti-chevron-left me-1" />
                       Back
                     </button>
                   </div>
                   <div className="field-btns">
-                    <button className="btn btn-primary" type="button" onClick={nextStep}>
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={nextStep}
+                    >
                       Proceed to Billing
                       <i className="ti ti-chevron-right ms-1" />
                     </button>
@@ -1283,7 +1345,9 @@ const handleServiceToggle = (serviceId) => {
                 <div className="row">
                   <div className="col-md-6">
                     <div className="mb-3">
-                      <label className="form-label">Base Kilometers (Per Day)</label>
+                      <label className="form-label">
+                        Base Kilometers (Per Day)
+                      </label>
                       <input
                         type="number"
                         className="form-control"
@@ -1296,7 +1360,9 @@ const handleServiceToggle = (serviceId) => {
                   </div>
                   <div className="col-md-6">
                     <div className="mb-3">
-                      <label className="form-label">Kilometers Extra Price ($ per km)</label>
+                      <label className="form-label">
+                        Kilometers Extra Price ($ per km)
+                      </label>
                       <input
                         type="number"
                         className="form-control"
@@ -1314,13 +1380,21 @@ const handleServiceToggle = (serviceId) => {
               <div className="card-footer px-0 pb-0">
                 <div className="d-flex align-items-center justify-content-end">
                   <div className="field-btns">
-                    <button className="btn btn-light me-2" type="button" onClick={prevStep}>
+                    <button
+                      className="btn btn-light me-2"
+                      type="button"
+                      onClick={prevStep}
+                    >
                       <i className="ti ti-chevron-left me-1" />
                       Back
                     </button>
                   </div>
                   <div className="field-btns">
-                    <button className="btn btn-primary" type="button" onClick={handleSubmit}>
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={handleSubmit}
+                    >
                       Finish & Save
                       <i className="ti ti-chevron-right ms-1" />
                     </button>
@@ -1342,7 +1416,10 @@ const handleServiceToggle = (serviceId) => {
     return (
       <div className="page-wrapper">
         <div className="content me-4 pb-0">
-          <div className="d-flex justify-content-center align-items-center" style={{ height: '50vh' }}>
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ height: "50vh" }}
+          >
             <div className="spinner-border text-primary" role="status">
               <span className="visually-hidden">Loading...</span>
             </div>
@@ -1356,7 +1433,10 @@ const handleServiceToggle = (serviceId) => {
     <div className="page-wrapper">
       <div className="content me-4 pb-0">
         <div className="mb-3">
-          <Link to="/admin-dashboard/all-reservation" className="d-inline-flex align-items-center fw-medium">
+          <Link
+            to="/admin-dashboard/all-reservation"
+            className="d-inline-flex align-items-center fw-medium"
+          >
             <i className="ti ti-arrow-narrow-left me-2" />
             Reservation
           </Link>
@@ -1369,6 +1449,17 @@ const handleServiceToggle = (serviceId) => {
           {currentStep === 3 && renderStep4()}
         </div>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

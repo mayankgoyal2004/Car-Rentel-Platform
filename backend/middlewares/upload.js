@@ -263,7 +263,7 @@ const carFileFilter = (req, file, cb) => {
 
 const carFilesUpload = multer({
   storage: carfiles,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 🚀 Allow up to 50MB
+  limits: { fileSize: 50 * 1024 * 1024 }, //  Allow up to 50MB
   fileFilter: carFileFilter,
 });
 

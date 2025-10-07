@@ -50,7 +50,7 @@ const AdminAddCars = () => {
     plateNumber: "",
     vinNumber: "",
     mainLocation: "",
-    otherLocations: [],
+    otherLocations: "",
     carFuel: "",
     odometer: "",
     carColor: "",
@@ -440,9 +440,10 @@ const AdminAddCars = () => {
       } else {
         toast.error(res.data.message || "Failed to upload documents");
       }
-    }  catch (err) {
+    } catch (err) {
       toast.error(
-        "Error uploading documents: " + (err.response?.data?.message || err.message)
+        "Error uploading documents: " +
+          (err.response?.data?.message || err.message)
       );
     }
   };
@@ -1884,7 +1885,10 @@ const AdminAddCars = () => {
 
                 {/* Navigation */}
                 <div className="d-flex justify-content-end gap-2 pt-3 text-light">
-                  <button className="btn btn-outline-light text-light " onClick={prevStep}>
+                  <button
+                    className="btn btn-outline-light text-light "
+                    onClick={prevStep}
+                  >
                     Back
                   </button>
                   <button className="btn btn-primary" onClick={saveCarFaqs}>

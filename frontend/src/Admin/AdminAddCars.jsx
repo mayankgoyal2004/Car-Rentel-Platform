@@ -257,15 +257,15 @@ const AdminAddCars = () => {
 
       if (res.data.success) {
         toast.success("Car basic info saved successfully!");
-        setCarId(res.data.car._id); 
+        setCarId(res.data.car._id);
         nextStep();
       } else {
         toast.error(res.data.message || "Failed to save car info");
       }
     } catch (err) {
-          toast.error(
-            "Error adding car: " + (err.response?.data?.message || err.message)
-          );
+      toast.error(
+        "Error adding car: " + (err.response?.data?.message || err.message)
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -727,14 +727,6 @@ const AdminAddCars = () => {
                                   Car Type{" "}
                                   <span className="text-danger">*</span>
                                 </label>
-                                <a
-                                  href="javascript:void(0);"
-                                  className="link-info mb-2"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_type"
-                                >
-                                  Add New
-                                </a>
                               </div>
                               <select
                                 name="carType"
@@ -757,14 +749,6 @@ const AdminAddCars = () => {
                                 <label className="form-label">
                                   Brand <span className="text-danger">*</span>
                                 </label>
-                                <a
-                                  href="javascript:void(0);"
-                                  className="link-info mb-2"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_brand"
-                                >
-                                  Add New
-                                </a>
                               </div>
                               <select
                                 name="carBrand"
@@ -787,14 +771,6 @@ const AdminAddCars = () => {
                                 <label className="form-label">
                                   Model <span className="text-danger">*</span>
                                 </label>
-                                <a
-                                  href="javascript:void(0);"
-                                  className="link-info mb-2"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#add_model"
-                                >
-                                  Add New
-                                </a>
                               </div>
                               <select
                                 name="carModel"
@@ -818,7 +794,6 @@ const AdminAddCars = () => {
                               </label>
                               <select
                                 name="category"
-                                
                                 value={formData.category}
                                 onChange={handleChange}
                                 className="select form-control"
@@ -1969,18 +1944,18 @@ const AdminAddCars = () => {
         </div>
       </div>
       <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
 
       {/* /Create Seasonal Pricing */}
       {/* Select Seasonal Pricing */}

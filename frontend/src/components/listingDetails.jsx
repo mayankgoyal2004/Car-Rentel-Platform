@@ -430,7 +430,7 @@ const ListingDetails = () => {
                       <i className="bx bx-car" />
                       <span>
                         Listed on:{" "}
-                        {new Date(carData.createdAt).toLocaleDateString()}
+                        {new Date(carData?.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -456,13 +456,13 @@ const ListingDetails = () => {
                   <div className="pro-info">
                     <div className="pro-badge">
                       <button
-                        onClick={() => handleWishlist(carData._id)}
+                        onClick={() => handleWishlist(carData?._id)}
                         className="btn btn-link p-0 border-0"
                       >
                         <Heart
                           size={20}
-                          color={isInWishlist(carData._id) ? "red" : "gray"}
-                          fill={isInWishlist(carData._id) ? "red" : "none"}
+                          color={isInWishlist(carData?._id) ? "red" : "gray"}
+                          fill={isInWishlist(carData?._id) ? "red" : "none"}
                         />
                       </button>
                     </div>
@@ -479,7 +479,7 @@ const ListingDetails = () => {
                   </div>
 
                   <div className="slider detail-bigimg">
-                    <img src={BASE_URL_IMG + carData.image} />
+                    <img src={BASE_URL_IMG + carData?.image} />
                   </div>
                 </div>
               </div>
@@ -490,13 +490,13 @@ const ListingDetails = () => {
                 </div>
                 <div className="lisiting-service">
                   <div className="row">
-                    {carData.extraService.map((service, index) => (
+                    {carData?.extraService?.map((service, index) => (
                       <div
                         key={index}
                         className="servicelist d-flex align-items-center col-xxl-3 col-xl-4 col-sm-6"
                       >
                         <div className="service-info">
-                          <p>{service.name}</p>
+                          <p>{service?.name}</p>
                         </div>
                       </div>
                     ))}
@@ -520,7 +520,7 @@ const ListingDetails = () => {
                 <div className="description-list">
                   <p>{displayedText}</p>
 
-                  {description.length > previewLength && (
+                  {description?.length > previewLength && (
                     <div className="read-more">
                       <button className="more-link" onClick={toggleDescription}>
                         {showFullDescription ? "Show Less" : "Show More"}
@@ -547,7 +547,7 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Body </span>
-                          <h6> {carData.carType.carType}</h6>
+                          <h6> {carData.carType?.carType}</h6>
                         </div>
                       </div>
                       <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
@@ -583,7 +583,7 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Fuel Type </span>
-                          <h6> {carData.carFuel.carFuel}</h6>
+                          <h6> {carData.carFuel?.carFuel}</h6>
                         </div>
                       </div>
                       <div className="featureslist d-flex align-items-center col-xl-3 col-md-4 col-sm-6">
@@ -595,7 +595,7 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Mileage </span>
-                          <h6>{carData.mileage}Km</h6>
+                          <h6>{carData?.mileage}Km</h6>
                         </div>
                       </div>
 
@@ -608,7 +608,7 @@ const ListingDetails = () => {
                         </div>
                         <div className="featues-info">
                           <span>Year</span>
-                          <h6>{new Date(carData.year).toLocaleDateString()}</h6>
+                          <h6>{new Date(carData?.year).toLocaleDateString()}</h6>
                         </div>
                       </div>
 
@@ -619,10 +619,10 @@ const ListingDetails = () => {
                             alt="Icon"
                           />
                         </div>
-                        {carData.vinNumber && (
+                        {carData?.vinNumber && (
                           <div className="featues-info">
                             <span>VIN </span>
-                            <h6> {carData.vinNumber}</h6>
+                            <h6> {carData?.vinNumber}</h6>
                           </div>
                         )}
                       </div>
@@ -636,7 +636,7 @@ const ListingDetails = () => {
 
                         <div className="featues-info">
                           <span>Doors</span>
-                          <h6>{carData.noOfDoors} </h6>
+                          <h6>{carData?.noOfDoors} </h6>
                         </div>
                       </div>
                     </div>
@@ -654,14 +654,14 @@ const ListingDetails = () => {
                     {[0, 1, 2].map((colIndex) => (
                       <div key={colIndex} className="col-md-4">
                         <ul>
-                          {carData.carFeatures
+                          {carData?.carFeatures
                             .slice(colIndex * 4, (colIndex + 1) * 4)
                             .map((featureObj, index) => (
                               <li key={index}>
                                 <span>
                                   <i className="bx bx-check-double" />
                                 </span>
-                                {featureObj.carFeature}
+                                {featureObj?.carFeature}
                               </li>
                             ))}
                         </ul>
@@ -687,15 +687,15 @@ const ListingDetails = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.entries(carData.pricing.prices).map(
+                      {Object?.entries(carData?.pricing?.prices).map(
                         ([name, price]) => (
                           <tr key={name}>
                             <td>
                               {name.charAt(0).toUpperCase() + name.slice(1)}
                             </td>
                             <td>${price}</td>
-                            <td>{carData.pricing.baseKilometers}</td>
-                            <td>${carData.pricing.extraKilometerPrice}</td>
+                            <td>{carData.pricing?.baseKilometers}</td>
+                            <td>${carData.pricing?.extraKilometerPrice}</td>
                           </tr>
                         )
                       )}
@@ -713,7 +713,7 @@ const ListingDetails = () => {
                 <div className="short-video">
                   <video
                     className="img-fluid"
-                    src={BASE_URL_IMG + carData.carVideo}
+                    src={BASE_URL_IMG + carData?.carVideo}
                     controls
                     width="100%"
                   />
@@ -726,8 +726,8 @@ const ListingDetails = () => {
                   <h4>FAQ’s</h4>
                 </div>
                 <div className="faq-info">
-                  {carData.faqs && carData.faqs.length > 0 ? (
-                    carData.faqs.map((item, index) => (
+                  {carData.faqs && carData.faqs?.length > 0 ? (
+                    carData.faqs?.map((item, index) => (
                       <div className="faq-card" key={index}>
                         <h4 className="faq-title">
                           <a
@@ -736,14 +736,14 @@ const ListingDetails = () => {
                             href={`#faq${index}`}
                             aria-expanded="false"
                           >
-                            {item.question}
+                            {item?.question}
                           </a>
                         </h4>
                         <div
                           id={`faq${index}`}
                           className="card-collapse collapse"
                         >
-                          <p>{item.answer}</p>
+                          <p>{item?.answer}</p>
                         </div>
                       </div>
                     ))

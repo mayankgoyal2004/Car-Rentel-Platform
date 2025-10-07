@@ -101,7 +101,7 @@ const BlogDetails = () => {
       >
         <div className="blogbanner-content">
           <span className="blog-hint">{blog.category?.categoryName}</span>
-          <h1>{blog.title}</h1>
+          <h1>{blog?.title}</h1>
           <ul className="entry-meta meta-item justify-content-center">
             <li>
               <div className="post-author">

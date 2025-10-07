@@ -284,9 +284,21 @@ const uploadCarFiles = async (req, res) => {
       return res.status(404).json({ success: false, message: "Car not found" });
     }
 
+    if (
+      !req.files ||
+      !req.files.documents ||
+      !req.files.policies ||
+      !req.files.videos
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "All file types are required: documents, policies, and videos.",
+      });
+    }
     if (req.files.documents) {
       req.files.documents.forEach((file) => {
-        car.carDocuments.push(file.path); // just store the path
+        car.carDocuments.push(file.path);
       });
     }
 
@@ -301,8 +313,6 @@ const uploadCarFiles = async (req, res) => {
         car.carVideo.push(file.path);
       });
     }
-
-    // Save videos
 
     await car.save();
 
@@ -962,12 +972,10 @@ const getAllCarsForSuperAdmin = async (req, res) => {
   }
 };
 
-// ✅ Get all approved cars (status = true) with search + pagination
 const getApprovedCarsAdminReservation = async (req, res) => {
   try {
     const search = req.query.search ? req.query.search.trim() : "";
 
-    // ✅ Only approved cars
     let filter = { admin: req.user.admin };
 
     // ✅ Search filter
@@ -978,7 +986,6 @@ const getApprovedCarsAdminReservation = async (req, res) => {
       ];
     }
 
-    // ✅ Query and populate
     const cars = await Car.find(filter)
       .populate([
         { path: "carBrand", select: "brandName" },
@@ -1209,7 +1216,6 @@ const toggleFeaturedBySuperAdmin = async (req, res) => {
 
 const getFeaturedCar = async (req, res) => {
   try {
-    // Step 1️⃣ - Match featured cars
     const cars = await Car.aggregate([
       {
         $match: {
@@ -1220,7 +1226,6 @@ const getFeaturedCar = async (req, res) => {
         },
       },
 
-      // Step 2️⃣ - Lookup reviews
       {
         $lookup: {
           from: "reviews",
@@ -1230,7 +1235,6 @@ const getFeaturedCar = async (req, res) => {
         },
       },
 
-      // Step 3️⃣ - Add avgRating and reviewCount fields
       {
         $addFields: {
           avgRating: { $ifNull: [{ $avg: "$reviews.carReview" }, 0] },
@@ -1238,11 +1242,9 @@ const getFeaturedCar = async (req, res) => {
         },
       },
 
-      // Step 4️⃣ - Sort and limit
       { $sort: { createdAt: -1 } },
       { $limit: 6 },
 
-      // Step 5️⃣ - Remove full reviews array for cleaner response
       { $project: { reviews: 0 } },
     ]);
 
@@ -1260,7 +1262,6 @@ const getFeaturedCar = async (req, res) => {
       { path: "mainLocation", select: "title" },
     ]);
 
-    // ✅ Success response
     res.status(200).json({
       success: true,
       data: populatedCars,

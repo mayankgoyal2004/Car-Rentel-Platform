@@ -8,11 +8,12 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const saltround = Number(process.env.BCRYPT_SALT_ROUNDS);
-const secretKey = "Protect@@@@";
-const emailSecret = "EmailVerifySecret@@@";
+const secretKey = process.env.JWT_SECRET;
+const emailSecret = process.env.EMAIL_SECRET;
 const otpGenerator = require("otp-generator");
 const RecaptchaSetting = require("../models/googleCaptchaModel");
 const smtpSetting = require("../models/SMTPModel");
+const CompanySetting = require("../models/CompanySettingModel");
 
 const generateVerificationToken = (user) => {
   const token = jwt.sign({ userId: user._id }, emailSecret, {
@@ -22,7 +23,7 @@ const generateVerificationToken = (user) => {
 };
 async function sendVerifyMail({ name, email, token }) {
   const SMTPSetting = await smtpSetting.findOne({});
-
+  const companySetting = await CompanySetting.findOne({});
   const transporter = nodemailer.createTransport({
     host: SMTPSetting.smtpHost,
     port: SMTPSetting.smtpPort,
@@ -38,7 +39,7 @@ async function sendVerifyMail({ name, email, token }) {
   const mailOptions = {
     from: SMTPSetting.fromEmail,
     to: email,
-    subject: "Email Verification Link - Dream rents",
+    subject: `Email Verification Link -${companySetting.organizationName}`,
     html: `
       <div style="font-family:sans-serif;text-align:center;">
         <p>Hello ${name},</p>
@@ -853,7 +854,6 @@ const registerAdmin = async (req, res) => {
         .status(409)
         .json({ success: false, message: "Image is Required" });
     }
-
 
     const imagePath = req.file.path.replace(/\\/g, "/");
 

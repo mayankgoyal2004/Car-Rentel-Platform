@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
-const secretKey = "Protect@@@@";
+require("dotenv").config();
+
+const secretKey = process.env.JWT_SECRET;
 
 const authUser = async (req, res, next) => {
   try {
@@ -46,7 +48,7 @@ const checkPermission = (module, action, superAdminOnly = false) => {
 
       const role = req.user.role;
 
-      if (!role.permissions ) {
+      if (!role.permissions) {
         return res
           .status(403)
           .json({ message: "No permissions assigned to role" });

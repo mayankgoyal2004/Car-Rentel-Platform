@@ -271,9 +271,9 @@ const Header = () => {
 
                   {/* Wishlist Link */}
                   <Link
-                    to="/user-wishlist"
+                    to="/user-dashboard/user-wishlist"
                     className={`dropdown-item d-flex align-items-center ${
-                      isActive("/user-wishlist") ? "active" : ""
+                      isActive("/user-dashboard/user-wishlist") ? "active" : ""
                     }`}
                   >
                     <i className="ti ti-heart me-2" />
@@ -282,9 +282,9 @@ const Header = () => {
 
                   {/* Messages Link */}
                   <Link
-                    to="/user-messages"
+                    to="/user-dashboard/user-message"
                     className={`dropdown-item d-flex align-items-center ${
-                      isActive("/user-messages") ? "active" : ""
+                      isActive("/user-dashboard/user-message") ? "active" : ""
                     }`}
                   >
                     <i className="ti ti-message me-2" />

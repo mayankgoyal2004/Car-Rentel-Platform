@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 const AdminAddCars = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [carId, setCarId] = useState(null); // Store the car ID after creation
+  const [carId, setCarId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [carFeatures, setCarFeatures] = useState([]);
@@ -16,7 +16,7 @@ const AdminAddCars = () => {
   const [carDocuments, setCarDocuments] = useState([]);
   const [carPolicies, setCarPolicies] = useState([]);
   const [carVideos, setCarVideos] = useState([]);
-  const [damages, setDamages] = useState([]); // Stores all damages
+  const [damages, setDamages] = useState([]);
   const [currentDamage, setCurrentDamage] = useState({
     location: "",
     type: "",
@@ -280,8 +280,9 @@ const AdminAddCars = () => {
         toast.error(res.data.message);
       }
     } catch (err) {
-      console.error(err);
-      toast.error("Error saving damages");
+      toast.error(
+        "Error saving damages: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 

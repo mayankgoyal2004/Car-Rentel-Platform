@@ -204,15 +204,18 @@ const AdminCars = () => {
               </CSVLink>
             </div>
 
-            <div className="mb-2">
-              <Link
-                to="/admin-dashboard/add-car"
-                className="btn btn-primary d-flex align-items-center"
-              >
-                <i className="ti ti-plus me-2" />
-                Add New Car
-              </Link>
-            </div>
+            {userType !==
+              1 &&(
+                <div className="mb-2">
+                  <Link
+                    to="/admin-dashboard/add-car"
+                    className="btn btn-primary d-flex align-items-center"
+                  >
+                    <i className="ti ti-plus me-2" />
+                    Add New Car
+                  </Link>
+                </div>
+              )}
           </div>
         </div>
 

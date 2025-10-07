@@ -145,7 +145,7 @@ const AdminDashboard = () => {
                 <a id="toggle_btn">
                   <i className="ti ti-menu-deep" />
                 </a>
-                <div className="add-dropdown">
+               {userType !==1 &&( <div className="add-dropdown">
                   <NavLink
                     to="add-reservation"
                     className="btn btn-dark d-inline-flex align-items-center"
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
                     <i className="ti ti-plus me-1" />
                     New Reservation
                   </NavLink>
-                </div>
+                </div>)}
               </div>
               <div className="d-flex align-items-center header-icons">
                 <div className="theme-item">
@@ -196,7 +196,7 @@ const AdminDashboard = () => {
                         </NavLink>
                       </li>
 
-                      <li>
+                     {userType !== 1 &&( <li>
                         <NavLink
                           to="all-reservation"
                           className="dropdown-item d-inline-flex align-items-center"
@@ -204,7 +204,7 @@ const AdminDashboard = () => {
                           <i className="ti ti-script-plus me-2" />
                           Reservation
                         </NavLink>
-                      </li>
+                      </li>)}
                     </ul>
                   </div>
                 </div>

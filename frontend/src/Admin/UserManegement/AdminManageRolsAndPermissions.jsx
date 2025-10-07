@@ -174,8 +174,10 @@ const AdminManageRolesAndPermissions = () => {
                     <td>{new Date(role.createdAt).toLocaleDateString()}</td>
                     <td>
                       <span
-                        className={`badge ${
-                          role.status ? "bg-success" : "bg-danger"
+                        className={`badge badge-md  ${
+                          role.status
+                            ? "badge-soft-success"
+                            : "badge-soft-danger"
                         }`}
                       >
                         {role.status ? "Active" : "Inactive"}

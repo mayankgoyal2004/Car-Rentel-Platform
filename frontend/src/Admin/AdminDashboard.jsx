@@ -546,7 +546,6 @@ const AdminDashboard = () => {
                         <NavLink to="admin-message">
                           <i className="ti ti-message" />
                           <span>Messages</span>
-                          <span className="count">5</span>
                         </NavLink>
                       </li>
                     </ul>

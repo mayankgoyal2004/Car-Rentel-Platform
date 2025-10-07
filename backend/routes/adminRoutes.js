@@ -307,7 +307,7 @@ route.post(
 );
 route.post(
   "/update-customer/:id",
-  checkPermission("Customer", "edit"),
+  checkPermission("admin", "assignPackage", true),
 
   upload.customerUpload.fields([
     { name: "image", maxCount: 1 }, // 1 profile image

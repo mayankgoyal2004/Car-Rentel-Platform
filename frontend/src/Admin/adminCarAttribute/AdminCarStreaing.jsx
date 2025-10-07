@@ -5,7 +5,6 @@ import apiService from "../../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 
-
 const AdminCarSteering = () => {
   const [carSteering, setCarSteering] = useState([]);
   const [newCarSteering, setnewCarSteering] = useState("");
@@ -177,7 +176,7 @@ const AdminCarSteering = () => {
                 </tr>
               </thead>
               <tbody>
-                 {loading ? (
+                {loading ? (
                   <tr>
                     <td colSpan="7" className="text-center py-4">
                       Loading...
@@ -190,65 +189,67 @@ const AdminCarSteering = () => {
                     </td>
                   </tr>
                 ) : (
-                carSteering.map((steering) => (
-                  <tr key={steering._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <h6 className="fw-medium">
-                        <a>{steering.carSteering}</a>
-                      </h6>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          steering.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {steering.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
+                  carSteering.map((steering) => (
+                    <tr key={steering._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <h6 className="fw-medium">
+                          <a>{steering.carSteering}</a>
+                        </h6>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md   ${
+                            steering.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
                         >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_steering"
-                              onClick={() => setEditCarSteering(steering)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_steering"
-                              onClick={() => setDeleteCarSteering(steering)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-              ))
+                          {steering.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_steering"
+                                onClick={() => setEditCarSteering(steering)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_steering"
+                                onClick={() => setDeleteCarSteering(steering)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -458,19 +459,19 @@ const AdminCarSteering = () => {
           </div>
         </div>
       </div>
-       <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
       {/* /Delete Steering */}
     </div>
   );

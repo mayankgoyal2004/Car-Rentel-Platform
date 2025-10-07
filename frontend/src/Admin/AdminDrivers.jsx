@@ -377,8 +377,10 @@ const AdminDrivers = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            driver.isActive ? "bg-success" : "bg-danger"
+                          className={`badge badge-md  ${
+                            driver.isActive
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {driver.isActive ? "Active" : "Inactive"}

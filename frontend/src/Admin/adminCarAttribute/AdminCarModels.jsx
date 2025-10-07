@@ -226,8 +226,10 @@ const AdminCarModels = () => {
 
                       <td>
                         <span
-                          className={`badge  ${
-                            model?.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            model?.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {model?.status ? "Active" : "Inactive"}

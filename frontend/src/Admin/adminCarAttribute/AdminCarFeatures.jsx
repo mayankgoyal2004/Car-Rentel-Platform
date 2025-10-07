@@ -203,8 +203,10 @@ const AdminCarFeatures = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            feature.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            feature.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {feature.status ? "Active" : "Inactive"}

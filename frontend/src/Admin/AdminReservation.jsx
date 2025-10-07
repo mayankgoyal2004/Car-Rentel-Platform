@@ -64,7 +64,7 @@ const AdminReservation = () => {
   };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // ✅ good
+    setCurrentPage(1);
   };
   const handlePageChange = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -305,8 +305,10 @@ const AdminReservation = () => {
                     </td>
                     <td>
                       <span
-                        className={`badge  ${
-                          reservation.status ? "bg-success" : "bg-danger"
+                        className={`badge badge-md   ${
+                          reservation.status
+                            ? "badge-soft-success"
+                            : "badge-soft-danger"
                         }`}
                       >
                         {reservation.status}

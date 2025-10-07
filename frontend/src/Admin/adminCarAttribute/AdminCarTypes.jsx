@@ -169,7 +169,7 @@ const AdminCarTypes = () => {
                 </tr>
               </thead>
               <tbody>
-                 {loading ? (
+                {loading ? (
                   <tr>
                     <td colSpan="7" className="text-center py-4">
                       Loading...
@@ -182,65 +182,68 @@ const AdminCarTypes = () => {
                     </td>
                   </tr>
                 ) : (
-                carType.map((type) => (
-                  <tr key={type._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <h6 className="fw-medium">
-                        <a>{type?.carType}</a>
-                      </h6>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          type?.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {type?.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
+                  carType.map((type) => (
+                    <tr key={type._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <h6 className="fw-medium">
+                          <a>{type?.carType}</a>
+                        </h6>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md   ${
+                            type?.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
                         >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_type"
-                              onClick={() => setEditCarType(type)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_type"
-                              onClick={() => setDeleteCarType(type)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-                      )))}
+                          {type?.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_type"
+                                onClick={() => setEditCarType(type)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_type"
+                                onClick={() => setDeleteCarType(type)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -451,19 +454,19 @@ const AdminCarTypes = () => {
         </div>
         {/* /Delete Type */}
       </div>
-       <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

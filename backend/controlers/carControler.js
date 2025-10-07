@@ -1170,7 +1170,6 @@ const getCayByIdAdmin = async (req, res) => {
 
 const getInRentalCars = async (req, res) => {
   try {
-    // 2️⃣ Find reservations with status 'pending'
     const getAllcarsInRental = await Car.find({
       admin: req.user.admin,
       inRent: true,

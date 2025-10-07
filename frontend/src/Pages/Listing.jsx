@@ -53,7 +53,7 @@ const Listing = () => {
         carTransmission: filters.transmission,
         carFuel: filters.fuelType,
         carColor: filters.color,
-       carType: filters.carType,
+       carType: filters.carType
       };
 
       // Remove empty filters

@@ -197,8 +197,10 @@ const AdminCarSeats = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            seat.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            seat.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {seat.status ? "Active" : "Inactive"}

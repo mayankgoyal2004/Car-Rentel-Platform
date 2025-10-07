@@ -197,8 +197,10 @@ const AdminCarFuel = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            fuel.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            fuel.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {fuel.status ? "Active" : "Inactive"}

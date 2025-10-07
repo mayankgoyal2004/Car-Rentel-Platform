@@ -205,7 +205,7 @@ const AdminBrands = () => {
                     </div>
                   </th>
                   <th>NAME</th>
-                 
+
                   <th>STATUS</th>
                   <th />
                 </tr>
@@ -233,10 +233,7 @@ const AdminBrands = () => {
                       </td>
                       <td>
                         <div className="d-flex align-items-center file-name-icon">
-                          <a
-                            
-                            className="avatar avatar-lg border"
-                          >
+                          <a className="avatar avatar-lg border">
                             <img
                               src={`${BASE_URL_IMG + brand.image}`}
                               className="img-fluid"
@@ -245,18 +242,18 @@ const AdminBrands = () => {
                           </a>
                           <div className="ms-2">
                             <h6 className="fw-medium">
-                              <a >
-                                {brand.brandName}
-                              </a>
+                              <a>{brand.brandName}</a>
                             </h6>
                           </div>
                         </div>
                       </td>
-                    
+
                       <td>
                         <span
-                          className={`badge  ${
-                            brand.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md    ${
+                            brand.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {brand.status ? "Active" : "Inactive"}

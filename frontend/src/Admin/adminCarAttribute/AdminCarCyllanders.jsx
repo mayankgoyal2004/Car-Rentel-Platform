@@ -203,8 +203,10 @@ const AdminCarCylinders = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            cylinder.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            cylinder.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {cylinder.status ? "Active" : "Inactive"}

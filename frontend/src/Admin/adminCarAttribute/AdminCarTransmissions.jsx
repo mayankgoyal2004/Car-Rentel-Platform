@@ -183,7 +183,7 @@ const AdminCarTransmissions = () => {
                 </tr>
               </thead>
               <tbody>
- {loading ? (
+                {loading ? (
                   <tr>
                     <td colSpan="7" className="text-center py-4">
                       Loading...
@@ -196,69 +196,71 @@ const AdminCarTransmissions = () => {
                     </td>
                   </tr>
                 ) : (
-                carTransmission.map((transmission) => (
-                  <tr key={transmission._id}>
-                    <td>
-                      <div className="form-check form-check-md">
-                        <input className="form-check-input" type="checkbox" />
-                      </div>
-                    </td>
-                    <td>
-                      <h6 className="fw-medium">
-                        <a>{transmission?.carTransmission}</a>
-                      </h6>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          transmission?.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {transmission?.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
+                  carTransmission.map((transmission) => (
+                    <tr key={transmission._id}>
+                      <td>
+                        <div className="form-check form-check-md">
+                          <input className="form-check-input" type="checkbox" />
+                        </div>
+                      </td>
+                      <td>
+                        <h6 className="fw-medium">
+                          <a>{transmission?.carTransmission}</a>
+                        </h6>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md   ${
+                            transmission?.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
                         >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_transmission"
-                              onClick={() =>
-                                setEditCarTransmission(transmission)
-                              }
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_transmission"
-                              onClick={() =>
-                                setDeleteCarTransmission(transmission)
-                              }
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
-                  </tr>
-              ))
+                          {transmission?.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_transmission"
+                                onClick={() =>
+                                  setEditCarTransmission(transmission)
+                                }
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_transmission"
+                                onClick={() =>
+                                  setDeleteCarTransmission(transmission)
+                                }
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -470,19 +472,19 @@ const AdminCarTransmissions = () => {
           </div>
         </div>
       </div>
-        <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
       {/* /Delete Car Transmission */}
     </div>
   );

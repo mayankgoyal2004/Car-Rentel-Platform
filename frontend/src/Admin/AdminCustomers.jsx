@@ -16,7 +16,7 @@ const AdminCustomers = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [deleteCustomer, setDeleteCustomer] = useState(null);
   const userData = useSelector((store) => store.user);
-  const userType = userData?.userType; //
+  const userType = userData?.userType; 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -296,16 +296,18 @@ const AdminCustomers = () => {
               </CSVLink>
             </div>
 
-           {userType !== 1 &&( <div className="mb-2">
-              <a
-                className="btn btn-primary d-flex align-items-center"
-                data-bs-toggle="modal"
-                data-bs-target="#add_client"
-              >
-                <i className="ti ti-plus me-2" />
-                Add New Client
-              </a>
-            </div>)}
+            {userType !== 1 && (
+              <div className="mb-2">
+                <a
+                  className="btn btn-primary d-flex align-items-center"
+                  data-bs-toggle="modal"
+                  data-bs-target="#add_client"
+                >
+                  <i className="ti ti-plus me-2" />
+                  Add New Client
+                </a>
+              </div>
+            )}
           </div>
         </div>
         {/* /Breadcrumb */}
@@ -434,17 +436,19 @@ const AdminCustomers = () => {
                               View Details
                             </Link>
                           </li>
-                          <li>
-                            <a
-                              className="dropdown-item rounded-1"
-                              onClick={() => handleEdit(customer)}
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_client"
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </a>
-                          </li>
+                          {userType === 1 && (
+                            <li>
+                              <a
+                                className="dropdown-item rounded-1"
+                                onClick={() => handleEdit(customer)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_client"
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </a>
+                            </li>
+                          )}
                           {userType === 1 && (
                             <li>
                               <a
@@ -1016,7 +1020,7 @@ const AdminCustomers = () => {
                 </div>
               </div>
             </div>
-         
+
             <div className="modal-footer">
               <div className="d-flex justify-content-between align-items-center w-100">
                 <div className="d-flex justify-content-center">

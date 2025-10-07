@@ -204,18 +204,17 @@ const AdminCars = () => {
               </CSVLink>
             </div>
 
-            {userType !==
-              1 &&(
-                <div className="mb-2">
-                  <Link
-                    to="/admin-dashboard/add-car"
-                    className="btn btn-primary d-flex align-items-center"
-                  >
-                    <i className="ti ti-plus me-2" />
-                    Add New Car
-                  </Link>
-                </div>
-              )}
+            {userType !== 1 && (
+              <div className="mb-2">
+                <Link
+                  to="/admin-dashboard/add-car"
+                  className="btn btn-primary d-flex align-items-center"
+                >
+                  <i className="ti ti-plus me-2" />
+                  Add New Car
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
@@ -348,8 +347,10 @@ const AdminCars = () => {
                     <td>
                       {userType === 1 ? (
                         <button
-                          className={`badge border-0 ${
-                            car.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md${
+                            car.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                           onClick={() =>
                             handleToggleStatus(car._id, car.status)
@@ -359,8 +360,10 @@ const AdminCars = () => {
                         </button>
                       ) : (
                         <span
-                          className={`badge ${
-                            car.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md ${
+                            car.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {car.status ? "Active" : "Inactive"}

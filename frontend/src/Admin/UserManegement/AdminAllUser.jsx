@@ -123,7 +123,7 @@ const AdminAllUser = () => {
 
       const res = await apiService.addUserByAdmin(userFormData);
       if (res.data.success) {
-toast.success("user deleted successfully!");
+        toast.success("user deleted successfully!");
         fetchUserData(search, currentPage);
         resetFormData();
       }
@@ -178,12 +178,13 @@ toast.success("user deleted successfully!");
         userFormData.append("image", formData.image);
       }
 
-   const res =   await apiService.updateUserByAdmin(userFormData);
-     if (res.data.success) {
-         toast.success("user updated successfully!");
-      fetchUserData(search, currentPage);
+      const res = await apiService.updateUserByAdmin(userFormData);
+      if (res.data.success) {
+        toast.success("user updated successfully!");
+        fetchUserData(search, currentPage);
 
-      document.getElementById("edit_user_close").click();}
+        document.getElementById("edit_user_close").click();
+      }
     } catch (err) {
       console.error("Error updating user:", err);
       alert(
@@ -195,19 +196,19 @@ toast.success("user deleted successfully!");
   // Delete user
   const handleDeleteUser = async () => {
     try {
-    const res =  await apiService.deleteUserByAdmin(selectedUser._id);
+      const res = await apiService.deleteUserByAdmin(selectedUser._id);
 
-if (res.data.success) {
- toast.success("user deleted successfully!");
-      fetchUserData(search, currentPage);
+      if (res.data.success) {
+        toast.success("user deleted successfully!");
+        fetchUserData(search, currentPage);
 
-      // Close modal
-      document.getElementById("delete_user_close").click();}
+        // Close modal
+        document.getElementById("delete_user_close").click();
+      }
     } catch (err) {
-          toast.error(
-            "Error deleting user: " +
-              (err.response?.data?.message || err.message)
-          );
+      toast.error(
+        "Error deleting user: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 
@@ -317,11 +318,13 @@ if (res.data.success) {
                       <td>{user.role?.name}</td>
                       <td>
                         <span
-                          className={`badge  ${
-                            user?.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            user?.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
-                          {user?.status ? "active" : "inactive"}
+                          {user?.status ? "Active" : "Inactive"}
                         </span>
                       </td>
                       <td>
@@ -811,7 +814,7 @@ if (res.data.success) {
       {/* /Edit User Modal */}
 
       {/* Delete Confirmation Modal */}
-     <div className="modal fade" id="delete_modal">
+      <div className="modal fade" id="delete_modal">
         <div className="modal-dialog modal-dialog-centered modal-sm">
           <div className="modal-content">
             <div className="modal-body text-center">
@@ -819,10 +822,7 @@ if (res.data.success) {
                 <i className="ti ti-trash-x fs-26" />
               </span>
               <h4 className="mb-1">Delete Customer</h4>
-              <p className="mb-3">
-                Are you sure you want to delete{" "}
-             
-              </p>
+              <p className="mb-3">Are you sure you want to delete </p>
               <div className="d-flex justify-content-center">
                 <a className="btn btn-light me-3" data-bs-dismiss="modal">
                   Cancel

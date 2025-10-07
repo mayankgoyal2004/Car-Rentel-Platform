@@ -201,8 +201,10 @@ const AdminCarColor = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            color.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md   ${
+                            color.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {color.status ? "Active" : "Inactive"}

@@ -295,6 +295,15 @@ const AdminRegister = () => {
           pauseOnHover
         />
       </div>
+        <footer className="log-footer">
+        <div className="container-fluid">
+          <div className="copyright">
+            <div className="copyright-text">
+              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

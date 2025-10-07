@@ -27,7 +27,6 @@ const updateCarPricing = async (req, res) => {
 
     let pricing;
     if (car.pricing) {
-      // Update existing pricing
       pricing = await Pricing.findByIdAndUpdate(
         car.pricing,
         {
@@ -41,7 +40,6 @@ const updateCarPricing = async (req, res) => {
         { new: true }
       );
     } else {
-      // Create new pricing
       pricing = new Pricing({
         prices,
         baseKilometers,
@@ -56,7 +54,6 @@ const updateCarPricing = async (req, res) => {
       await car.save();
     }
 
-    // Populate pricing to return complete data
     const populatedCar = await Car.findById(id).populate("pricing");
 
     res.status(200).json({

@@ -1120,15 +1120,15 @@ const getAllReservationSuperAdmin = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
-    const totalReservation = await Reservation.countDocuments(filter);
+    const totalReservations = await Reservation.countDocuments(filter);
 
     res.json({
       success: true,
       data: reservations,
       pagination: {
-        totalReservation,
+        totalReservations,
         currentPage: page,
-        totalPages: Math.ceil(totalReservation / limit),
+        totalPages: Math.ceil(totalReservations / limit),
       },
     });
   } catch (err) {

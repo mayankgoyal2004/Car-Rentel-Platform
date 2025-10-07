@@ -18,6 +18,7 @@ const AdminMain = () => {
   const [reservationPegination, setreservationPagination] = useState({});
   const [carPegination, setCarPegination] = useState({});
   const [ownerPegination, setOwnerPegination] = useState({});
+  const [driverPeginaton, setDriverPegination] = useState({});
   const [invoice, setInvoices] = useState([]);
 
   const userData = useSelector((store) => store.user);
@@ -169,6 +170,7 @@ const AdminMain = () => {
     try {
       const res = await apiService.getAllReservationAdmin();
       setReservations(res.data.data);
+      setreservationPagination(res.data.pagination);
     } catch (err) {
       console.error("Error fetching Reservations:", err);
     } finally {
@@ -176,11 +178,22 @@ const AdminMain = () => {
     }
   };
 
-  const fetchDriver = async () => {
+  const getAllDrivers = async () => {
     setLoading(true);
     try {
       const res = await apiService.getlastest5drivers();
       setDrivers(res.data.data || []);
+    } catch (err) {
+      console.error("Error fetching Driver:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const fetchDriver = async () => {
+    setLoading(true);
+    try {
+      const res = await apiService.getAllDriverAdmin();
+      setDriverPegination(res.data.pagination);
     } catch (err) {
       console.error("Error fetching Driver:", err);
     } finally {
@@ -193,6 +206,7 @@ const AdminMain = () => {
       fetchAllinRentalCars();
       fetchReservations();
       fetchDriver();
+      getAllDrivers();
       fetchNewlyAddedCar();
       fetchCustomers();
       fetchLatestInvoices();
@@ -233,18 +247,18 @@ const AdminMain = () => {
                 <div className="card-body">
                   <div className="row align-items-center row-gap-3">
                     <div className="col-sm-7">
-                      <h4 className="mb-1">{userData.userName}</h4>
+                      <h4 className="mb-1">{userData?.userName}</h4>
                       <p>400+ Budget Friendly Cars Available for the rents </p>
                       <div className="d-flex align-items-center flex-wrap gap-4 mb-3">
                         <div>
                           <p className="mb-1">Total No of Cars</p>
-                          <h3>{cars.length}</h3>
+                          <h3>{carPegination?.totalCar}</h3>
                         </div>
                         <div>
                           <p className="d-flex align-items-center mb-2">
                             <span className="line-icon bg-violet me-2" />
                             <span className="fw-semibold text-gray-9 me-1">
-                              {rentalCars.length}
+                              {rentalCars?.length}
                             </span>
                             In Rental
                           </p>
@@ -295,9 +309,7 @@ const AdminMain = () => {
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
                         <h5 className="mb-1">
-                          {userType === 1
-                            ? reservationPegination?.totalReservation
-                            : reservations.length}
+                          {reservationPegination?.totalReservations}
                         </h5>
                       </div>
                       <div id="reservation-chart" />
@@ -329,7 +341,7 @@ const AdminMain = () => {
                         <h5 className="mb-1">
                           {userType === 1
                             ? customerPegination?.totalcustomer
-                            : drivers.length}
+                            : driverPeginaton.totalDriver}
                         </h5>
                       </div>
                       <div id="earning-chart" />
@@ -356,11 +368,7 @@ const AdminMain = () => {
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                        <h5 className="mb-1">
-                          {userType === 1
-                            ? carPegination?.totalCars
-                            : cars.length}
-                        </h5>
+                        <h5 className="mb-1">{carPegination?.totalCar}</h5>
                       </div>
                       <div id="car-chart" />
                     </div>

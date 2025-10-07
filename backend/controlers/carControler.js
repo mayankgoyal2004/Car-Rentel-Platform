@@ -971,15 +971,15 @@ const getAllCarsForSuperAdmin = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const totalCars = await Car.countDocuments(filter);
+    const totalCar = await Car.countDocuments(filter);
 
     res.status(200).json({
       success: true,
       data: cars,
       pagination: {
-        totalCars,
+        totalCar,
         currentPage: page,
-        totalPages: Math.ceil(totalCars / limit),
+        totalPages: Math.ceil(totalCar / limit),
       },
     });
   } catch (err) {

@@ -129,7 +129,7 @@ const AdminInvoiceDetails = () => {
             <i className="ti ti-menu-2 me-2" />
             Invoice Details
           </h4>
-          <h4 className=" badge badge-success"> {invoice.status}</h4>
+          <h4 className=" badge badge-success"> {invoice?.status}</h4>
         </div>
 
         <div className="card car-invoice">
@@ -138,18 +138,18 @@ const AdminInvoiceDetails = () => {
             <div className="row justify-content-between align-items-center border-bottom mb-3">
               <div className="col-md-6">
                 <div className="mb-3">
-                  <h2 className="text-violet mb-3">#{invoice.invoiceNumber}</h2>
+                  <h2 className="text-violet mb-3">#{invoice?.invoiceNumber}</h2>
                   <p className="mb-1 fw-medium d-flex">
                     <span className="text-dark min-width-100 d-flex">
                       Created Date
                     </span>
-                    {new Date(invoice.fromDate).toLocaleDateString()}
+                    {new Date(invoice?.fromDate).toLocaleDateString()}
                   </p>
                   <p className="fw-medium d-flex">
                     <span className="text-dark min-width-100 d-flex">
                       Due Date
                     </span>
-                    {new Date(invoice.dueDate).toLocaleDateString()}
+                    {new Date(invoice?.dueDate).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -160,7 +160,7 @@ const AdminInvoiceDetails = () => {
                     className="invoice-logo img-fluid"
                     alt="logo"
                   />
-                  <p className="mb-2">{invoice.from.name}</p>
+                  <p className="mb-2">{invoice.from?.name}</p>
                   <h4 className=" badge badge-success"> {invoice.status}</h4>
                 </div>
               </div>
@@ -173,15 +173,15 @@ const AdminInvoiceDetails = () => {
                   <div className="card-body">
                     <h5 className="text-dark mb-3 fw-semibold">From</h5>
                     <div>
-                      <h6 className="mb-1">{invoice.from.name}</h6>
-                      <p className="mb-1">{invoice.admin.address}</p>
+                      <h6 className="mb-1">{invoice.from?.name}</h6>
+                      <p className="mb-1">{invoice.admin?.address}</p>
                       <p className="mb-1">
                         Contact:{" "}
                         <span className="text-dark">
-                          {invoice.admin.contact || "N/N"}
+                          {invoice.admin?.contact || "N/N"}
                         </span>
                       </p>
-                      <p>{invoice.admin.email}</p>
+                      <p>{invoice.admin?.email}</p>
                     </div>
                   </div>
                 </div>
@@ -191,7 +191,7 @@ const AdminInvoiceDetails = () => {
                   <div className="card-body">
                     <h5 className="text-dark mb-3 fw-semibold">To</h5>
                     <div>
-                      <h6 className="mb-1">{invoice.customer.name}</h6>
+                      <h6 className="mb-1">{invoice.customer?.name}</h6>
                       <p className="mb-1">
                         {invoice.customer?.address || "Address not specified"}
                       </p>
@@ -224,7 +224,7 @@ const AdminInvoiceDetails = () => {
                   </thead>
                   <tbody>
                     {invoice.items &&
-                      invoice.items.map((item, index) => (
+                      invoice.items?.map((item, index) => (
                         <tr key={index}>
                           <td>
                             <h6 className="fw-semibold">{item.description}</h6>
@@ -232,7 +232,7 @@ const AdminInvoiceDetails = () => {
                           <td className="text-gray-5 fw-medium text-end">
                             {item.description.includes("Rental")
                               ? "Car Rental"
-                              : item.description.includes("Service")
+                              : item.description?.includes("Service")
                               ? "Add-on"
                               : item.description.includes("Insurance")
                               ? "Insurance"
@@ -263,11 +263,11 @@ const AdminInvoiceDetails = () => {
                 <div className="py-4">
                   <div className="mb-3">
                     <h6 className="mb-1">Terms and Conditions</h6>
-                    <p>{invoice.terms}</p>
+                    <p>{invoice?.terms}</p>
                   </div>
                   <div className="mb-3">
                     <h6 className="mb-1">Notes</h6>
-                    <p>{invoice.notes}</p>
+                    <p>{invoice?.notes}</p>
                   </div>
                 </div>
               </div>
@@ -308,25 +308,25 @@ const AdminInvoiceDetails = () => {
                       <span className="text-dark min-width-150 d-flex">
                         Bank Name
                       </span>
-                      {bankAcount.bankName}
+                      {bankAcount?.bankName}
                     </p>
                     <p className="mb-2 d-flex">
                       <span className="text-dark min-width-150 d-flex">
                         Account Number
                       </span>
-                      {bankAcount.accountNumber}
+                      {bankAcount?.accountNumber}
                     </p>
                     <p className="mb-2 d-flex">
                       <span className="text-dark min-width-150 d-flex">
                         IFSC Code
                       </span>
-                      {bankAcount.ifsc}
+                      {bankAcount?.ifsc}
                     </p>
                     <p className="mb-0 d-flex">
                       <span className="text-dark min-width-150 d-flex">
                         Payment Reference
                       </span>
-                      {invoice.invoiceNumber}
+                      {invoice?.invoiceNumber}
                     </p>
                   </div>
                 </div>
@@ -340,7 +340,7 @@ const AdminInvoiceDetails = () => {
                   />
                 </div>
                 <div className="text-end mb-3">
-                  <h6 className="fs-14 fw-medium pe-3">{signature.name}</h6>
+                  <h6 className="fs-14 fw-medium pe-3">{signature?.name}</h6>
                   <p>Assistant Manager</p>
                 </div>
               </div>

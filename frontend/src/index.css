@@ -323,3 +323,7 @@ iframe[id^=":"] {
 .table-responsive {
   overflow: visible !important;   /* ✅ allows dropdown to render outside */
 }
+.table-responsive.table-overflow-hidden {
+  /* overflow: hidden !important; */
+  overflow-y: auto !important;
+}

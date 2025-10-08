@@ -149,7 +149,7 @@ const AdminInvoice = () => {
                           to={"/admin-dashboard/invoice-details/" + inv._id}
                           className="fs-12 fw-medium"
                         >
-                          #{inv.invoiceNumber}
+                          #{inv?.invoiceNumber}
                         </Link>
                       </td>
                       <td>
@@ -157,12 +157,12 @@ const AdminInvoice = () => {
                           <Link
                             to={
                               "/admin-dashboard/customer-details/" +
-                              inv.customer._id
+                              inv.customer?._id
                             }
                             className="avatar avatar-rounded me-2 flex-shrink-0"
                           >
                             <img
-                              src={BASE_URL_IMG + inv.customer.image}
+                              src={BASE_URL_IMG + inv.customer?.image}
                               alt="User Img"
                             />
                           </Link>
@@ -171,10 +171,10 @@ const AdminInvoice = () => {
                               <Link
                                 to={
                                   "/admin-dashboard/customer-details/" +
-                                  inv.customer._id
+                                  inv.customer?._id
                                 }
                               >
-                                {inv.customer.name}
+                                {inv.customer?.name}
                               </Link>
                             </h6>
                           </div>
@@ -182,32 +182,32 @@ const AdminInvoice = () => {
                       </td>
                       <td>
                         <a
-                          href={"mailto:" + inv.customer.email}
+                          href={"mailto:" + inv.customer?.email}
                           className="__cf_email__"
                           data-cfemail="c6a7a8a2b4a3b186a3bea7abb6aaa3e8a5a9ab"
                         >
-                          {inv.customer.email}
+                          {inv.customer?.email}
                         </a>
                       </td>
                       <td>
                         <div>
                           <p className="mb-0">
-                            {new Date(inv.fromDate).toDateString()}
+                            {new Date(inv?.fromDate).toDateString()}
                           </p>
                         </div>
                       </td>
                       <td>
                         <div>
                           <p className="mb-0">
-                            {new Date(inv.dueDate).toDateString()}
+                            {new Date(inv?.dueDate).toDateString()}
                           </p>
                         </div>
                       </td>
-                      <td>${inv.totalAmount.toFixed(2)}</td>
+                      <td>${inv.totalAmount?.toFixed(2)}</td>
                       <td>
                         <span className="badge badge-soft-success d-inline-flex align-items-center badge-sm">
                           <i className="ti ti-point-filled me-1" />
-                          {inv.status}
+                          {inv?.status}
                         </span>
                       </td>
                       <td>
@@ -224,7 +224,7 @@ const AdminInvoice = () => {
                             <li>
                               <Link
                                 to={
-                                  "/admin-dashboard/invoice-details/" + inv._id
+                                  "/admin-dashboard/invoice-details/" + inv?._id
                                 }
                                 className="dropdown-item rounded-1"
                               >
@@ -234,7 +234,7 @@ const AdminInvoice = () => {
                             </li>
                             <li>
                               <Link
-                                to={"/admin-dashboard/edit-invoice/" + inv._id}
+                                to={"/admin-dashboard/edit-invoice/" + inv?._id}
                                 className="dropdown-item rounded-1"
                               >
                                 <i className="ti ti-edit me-1" />

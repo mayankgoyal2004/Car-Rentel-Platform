@@ -533,7 +533,7 @@ const AddInvoice = () => {
                 </div>
                 <div>
                   <h5 className="mb-3">Rental Details</h5>
-                  <div className="table-responsive border border-gray br-10 mb-3">
+                  <div className="table-responsive border border-gray br-10 mb-3 over">
                     <table className="table">
                       <thead className="thead-dark">
                         <tr>
@@ -781,7 +781,7 @@ const AddInvoice = () => {
             </div>
             <div className="modal-body">
               {/* Custom Data Table */}
-              <div className="custom-datatable-filter table-responsive">
+              <div className="table-responsive table-overflow-hidden border border-gray br-10 mb-3">
                 <table className="table datatable">
                   <thead className="thead-light">
                     <tr>

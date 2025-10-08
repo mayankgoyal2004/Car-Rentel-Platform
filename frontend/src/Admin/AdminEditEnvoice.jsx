@@ -106,7 +106,6 @@ const AdminEditEnvoice = () => {
       const invoiceData = res.data.data;
       setInvoice(invoiceData);
 
-
       setInvoiceData({
         invoiceNumber: invoiceData.invoiceNumber || "",
         carId: invoiceData.car || "",
@@ -815,7 +814,7 @@ const AdminEditEnvoice = () => {
               </button>
             </div>
             <div className="modal-body">
-              <div className="custom-datatable-filter table-responsive">
+              <div className="custom-datatable-filter table-responsive table-overflow-hidden ">
                 <table className="table datatable">
                   <thead className="thead-light">
                     <tr>
@@ -830,7 +829,7 @@ const AdminEditEnvoice = () => {
                   <tbody>
                     {reservations.map((reservation) => (
                       <tr key={reservation._id}>
-                        <td>#{reservation.bookingId}</td>
+                        <td>{reservation.bookingId}</td>
                         <td>
                           <div className="d-flex align-items-center">
                             <div className="avatar me-2 flex-shrink-0">

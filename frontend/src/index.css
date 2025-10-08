@@ -316,14 +316,13 @@ iframe[id^=":"] {
     min-height: 450px !important;
   }
 }
-.custom-padding-1{
-  padding-top: 0px!important;
+.custom-padding-1 {
+  padding-top: 0px !important;
 }
 
 .table-responsive {
-  overflow: visible !important;   /* ✅ allows dropdown to render outside */
+  /* overflow: visible !important;   */
 }
 .table-responsive.table-overflow-hidden {
-  /* overflow: hidden !important; */
-  overflow-y: auto !important;
+  /*  overflow: hidden !important;  */
 }

@@ -184,6 +184,7 @@ const getAllBlog = async (req, res) => {
       .populate("category", "categoryName")
       .populate("tags", "TagName")
       .populate("createdBy", "userName email")
+      .populate("admin", "userName ")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -223,6 +224,7 @@ const getBlogAllBlogForSuperAdmin = async (req, res) => {
       .populate("category", "categoryName")
       .populate("tags", "TagName")
       .populate("createdBy", "userName email")
+      .populate("admin", "userName ")
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
@@ -367,7 +369,9 @@ const getLatestBlog = async (req, res) => {
   try {
     const blogs = await Blog.find({
       status: true,
-    }).populate("category", "categoryName").populate("admin", "userName email image")
+    })
+      .populate("category", "categoryName")
+      .populate("admin", "userName email image")
       .sort({ createdAt: -1 })
       .limit(3);
 
@@ -392,5 +396,5 @@ module.exports = {
   deleteblog,
   getBlogAllBlogForSuperAdmin,
   getsingleblogForAdmin,
-  getLatestBlog
+  getLatestBlog,
 };

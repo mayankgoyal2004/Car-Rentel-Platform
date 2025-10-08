@@ -30,7 +30,10 @@ const AdminBlogsCategories = () => {
           page,
         });
       } else {
-        res = await apiService.getAllBlogCategory({ search: searchQuery, page });
+        res = await apiService.getAllBlogCategory({
+          search: searchQuery,
+          page,
+        });
       }
       setCategories(res.data.data || []);
       setTotalPages(res.data.pagination?.totalPages || 1);
@@ -41,7 +44,9 @@ const AdminBlogsCategories = () => {
         setCurrentPage(res.data.pagination.currentPage);
       }
     } catch (err) {
-          toast.error(err.response?.data?.message || "Failed to fetch blog category");
+      toast.error(
+        err.response?.data?.message || "Failed to fetch blog category"
+      );
     } finally {
       setLoading(false);
     }
@@ -61,7 +66,7 @@ const AdminBlogsCategories = () => {
       });
 
       toast.success(res.data.message);
-      setNewCategory(""); 
+      setNewCategory("");
       fetchCategories();
     } catch (err) {
       if (err.response && err.response.data) {
@@ -172,7 +177,7 @@ const AdminBlogsCategories = () => {
           </div>
 
           {/* Table */}
-          <div className="custom-datatable-filter table-responsive">
+          <div className="custom-datatable-filter table-responsive table-overflow-hidden">
             <table className="table datatable">
               <thead className="thead-light">
                 <tr>
@@ -183,74 +188,74 @@ const AdminBlogsCategories = () => {
                 </tr>
               </thead>
               <tbody>
-                 {loading ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-4">
-                    Loading...
-                  </td>
-                </tr>
-              ) : categories.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-4">
-                    No categories found
-                  </td>
-                </tr>
-              ) : (
-                categories.map((category) => (
-                  <tr key={category._id}>
-                    <td>
-                      <a className="fw-medium">{category.categoryName}</a>
-                    </td>
-                    <td>
-                      <span className="text-gray-9">
-                        {new Date(category.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge  ${
-                          category.status ? "bg-success" : "bg-danger"
-                        }`}
-                      >
-                        {category.status ? "Published" : "Unpublish"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm "
-                          type="button"
-                          data-bs-toggle="dropdown"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_Category"
-                              onClick={() => setEditCategory(category)}
-                            >
-                              <i className="ti ti-edit me-1" /> Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_Category"
-                              onClick={() => setDeleteCategory(category)}
-                            >
-                              <i className="ti ti-trash me-1" /> Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                {loading ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-             ))
-              )}
+                ) : categories.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No categories found
+                    </td>
+                  </tr>
+                ) : (
+                  categories.map((category) => (
+                    <tr key={category._id}>
+                      <td>
+                        <a className="fw-medium">{category.categoryName}</a>
+                      </td>
+                      <td>
+                        <span className="text-gray-9">
+                          {new Date(category.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge  ${
+                            category.status ? "bg-success" : "bg-danger"
+                          }`}
+                        >
+                          {category.status ? "Published" : "Unpublish"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm "
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_Category"
+                                onClick={() => setEditCategory(category)}
+                              >
+                                <i className="ti ti-edit me-1" /> Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_Category"
+                                onClick={() => setDeleteCategory(category)}
+                              >
+                                <i className="ti ti-trash me-1" /> Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
 
@@ -420,7 +425,9 @@ const AdminBlogsCategories = () => {
                 <i className="ti ti-trash fs-26" />
               </span>
               <h4 className="mb-1">Delete Category</h4>
-              <p className="mb-3">Are you sure you want to delete this category?</p>
+              <p className="mb-3">
+                Are you sure you want to delete this category?
+              </p>
               <strong>{deleteCategory?.categoryName}</strong>
               <div className="d-flex justify-content-center">
                 <button

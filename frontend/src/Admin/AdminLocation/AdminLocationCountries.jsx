@@ -155,7 +155,7 @@ const AdminLocationCountries = () => {
           </div>
           {/* /Table Header */}
           {/* Custom Data Table */}
-          <div className="custom-datatable-filter table-responsive brandstable country-table">
+          <div className="custom-datatable-filter table-responsive brandstable country-table table-overflow-hidden ">
             <table className="table datatable">
               <thead className="thead-light">
                 <tr>

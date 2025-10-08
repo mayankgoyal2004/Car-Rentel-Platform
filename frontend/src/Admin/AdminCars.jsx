@@ -204,18 +204,17 @@ const AdminCars = () => {
               </CSVLink>
             </div>
 
-            {userType !==
-              1 &&(
-                <div className="mb-2">
-                  <Link
-                    to="/admin-dashboard/add-car"
-                    className="btn btn-primary d-flex align-items-center"
-                  >
-                    <i className="ti ti-plus me-2" />
-                    Add New Car
-                  </Link>
-                </div>
-              )}
+            {userType !== 1 && (
+              <div className="mb-2">
+                <Link
+                  to="/admin-dashboard/add-car"
+                  className="btn btn-primary d-flex align-items-center"
+                >
+                  <i className="ti ti-plus me-2" />
+                  Add New Car
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
@@ -242,7 +241,7 @@ const AdminCars = () => {
         {/* /Table Header */}
 
         {/* Custom Data Table */}
-        <div className="custom-datatable-filter table-responsive">
+        <div className="custom-datatable-filter table-responsive table-overflow-hidden">
           <table className="table datatable">
             <thead className="thead-light">
               <tr>
@@ -369,7 +368,7 @@ const AdminCars = () => {
                     </td>
 
                     <td>
-                      <div className="dropdown">
+                      <div className="dropdown ">
                         <button
                           className="btn btn-icon btn-sm"
                           type="button"

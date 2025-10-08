@@ -249,7 +249,7 @@ const BankAccountSetting = () => {
                   </div>
                   {/* /Table Header */}
                   {/* Custom Data Table */}
-                  <div className="custom-datatable-filter table-responsive brandstable country-table">
+                  <div className="custom-datatable-filter table-responsive table-overflow-hidden brandstable country-table">
                     <table className="table datatable">
                       <thead className="thead-light">
                         <tr>
@@ -268,8 +268,8 @@ const BankAccountSetting = () => {
                           <tr key={bank._id}>
                             <td>
                               <p className="text-gray-9 fw-semibold fs-14">
-                                {bank.accountHolderName}
-                                {bank.isDefault && (
+                                {bank?.accountHolderName}
+                                {bank?.isDefault && (
                                   <span className="ms-2 badge badge-soft-purple">
                                     Default
                                   </span>
@@ -277,34 +277,34 @@ const BankAccountSetting = () => {
                               </p>
                             </td>
                             <td>
-                              <p className="text-gray-9">{bank.bankName}</p>
+                              <p className="text-gray-9">{bank?.bankName}</p>
                             </td>
                             <td>
-                              <p className="text-gray-9">{bank.branch}</p>
+                              <p className="text-gray-9">{bank?.branch}</p>
                             </td>
                             <td>
                               <p className="text-gray-9">
-                                {bank.accountNumber}
+                                {bank?.accountNumber}
                               </p>
                             </td>
                             <td>
-                              <p className="text-gray-9">{bank.ifsc}</p>
+                              <p className="text-gray-9">{bank?.ifsc}</p>
                             </td>
                             <td>
                               <p className="text-gray-9">
-                                {new Date(bank.createdAt).toLocaleString()}
+                                {new Date(bank?.createdAt).toLocaleString()}
                               </p>
                             </td>
                             <td>
                               <span
                                 className={`badge ${
-                                  bank.status
+                                  bank?.status
                                     ? "badge-success-transparent"
                                     : "badge-danger-transparent"
                                 } d-inline-flex align-items-center badge-sm`}
                               >
                                 <i className="ti ti-point-filled me-1" />
-                                {bank.status ? "Active" : "Inactive"}
+                                {bank?.status ? "Active" : "Inactive"}
                               </span>
                             </td>
                             <td>
@@ -382,7 +382,7 @@ const BankAccountSetting = () => {
                     type="text"
                     required
                     className="form-control"
-                    value={newBankAccount.bankName}
+                    value={newBankAccount?.bankName}
                     onChange={(e) =>
                       setNewBankAccount({
                         ...newBankAccount,
@@ -398,7 +398,7 @@ const BankAccountSetting = () => {
                   <input
                     type="text"
                     className="form-control"
-                    value={newBankAccount.accountNumber}
+                    value={newBankAccount?.accountNumber}
                     onChange={(e) =>
                       setNewBankAccount({
                         ...newBankAccount,
@@ -415,7 +415,7 @@ const BankAccountSetting = () => {
                   <input
                     type="text"
                     className="form-control"
-                    value={newBankAccount.accountHolderName}
+                    value={newBankAccount?.accountHolderName}
                     onChange={(e) =>
                       setNewBankAccount({
                         ...newBankAccount,

@@ -146,7 +146,7 @@ const AdminEnquiries = () => {
         {/* /Table Header */}
 
         {/* Custom Data Table */}
-        <div className="custom-datatable-filter table-responsive">
+        <div className="custom-datatable-filter table-responsive table-overflow-hidden">
           <table className="table datatable quotations-table">
             <thead className="thead-light">
               <tr>

@@ -1,9 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
 import { useSelector } from "react-redux";
-import { useState } from "react";
-import { useEffect } from "react";
+import apiService, { BASE_URL_IMG } from "../../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -18,6 +16,7 @@ const AdminAllBlogs = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType;
 
+  // ✅ Fetch Blogs
   const fetchBlog = async (searchQuery = "", page = 1) => {
     setLoading(true);
     try {
@@ -31,8 +30,7 @@ const AdminAllBlogs = () => {
         res = await apiService.getAllBlog({ search: searchQuery, page });
       }
 
-      setBlogs(res.data.data);
-
+      setBlogs(res.data.data || []);
       setTotalPages(res.data.pagination?.totalPages || 1);
       setCurrentPage(res.data.pagination?.currentPage || 1);
     } catch (err) {
@@ -46,26 +44,30 @@ const AdminAllBlogs = () => {
     fetchBlog(search, 1);
   }, [search]);
 
+  // ✅ Delete Blog
   const handleDeleteBlog = async () => {
     if (!deleteId) return;
     try {
       const res = await apiService.deleteblog(deleteId);
       toast.success(res.data.message);
-
       setDeleteId(null);
-      fetchBlog();
+      fetchBlog(search, currentPage);
     } catch (err) {
-      if (err.response && err.response.data) {
-        toast.error(err.response.data.message);
-      } else {
-        toast.error("Something went wrong!");
-      }
+      toast.error(err.response?.data?.message || "Something went wrong!");
     }
   };
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    fetchBlog(search, page);
+  };
+
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
   };
+
   return (
     <div className="page-wrapper">
       <div className="content me-0 me-md-0 me-lg-4">
@@ -84,7 +86,7 @@ const AdminAllBlogs = () => {
               </ol>
             </nav>
           </div>
-          <div className="d-flex my-xl-auto right-content align-items-center flex-wrap ">
+          <div className="d-flex my-xl-auto right-content align-items-center flex-wrap">
             <div className="mb-2">
               {userType !== 1 && (
                 <Link
@@ -92,13 +94,15 @@ const AdminAllBlogs = () => {
                   className="btn btn-primary d-flex align-items-center"
                 >
                   <i className="ti ti-plus me-2" />
-                  Add Blogs
+                  Add Blog
                 </Link>
               )}
             </div>
           </div>
         </div>
         {/* /Breadcrumb */}
+
+        {/* Search */}
         <div className="d-flex align-items-center justify-content-between flex-wrap row-gap-3 mb-3">
           <div className="top-search me-2">
             <div className="top-search-group">
@@ -108,109 +112,156 @@ const AdminAllBlogs = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search"
+                placeholder="Search by title"
                 value={search}
                 onChange={handleSearchChange}
               />
             </div>
           </div>
         </div>
-        {/* Blogs */}
-        {loading ? (
-          <p>Loading blogs...</p>
-        ) : blogs.length === 0 ? (
-          <p>No blogs found.</p>
-        ) : (
-          <div className="row blogs-cover">
-            {blogs.map((blog) => (
-              <div className="col-lg-4 col-md-6" key={blog._id}>
-                <div className="card blog-item-1">
-                  <div className="card-body p-0">
-                    <div className="blog-img">
-                      <Link
-                        to={`/admin-dashboard/admin-blog-details/${blog._id}`}
+
+        {/* Table */}
+        <div className="custom-datatable-filter table-responsive table-overflow-hidden">
+          <table className="table datatable">
+            <thead className="thead-light">
+              <tr>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Created By</th>
+                <th>Created Date</th>
+                <th>Status</th>
+                <th className="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-4">
+                    Loading...
+                  </td>
+                </tr>
+              ) : blogs.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-4">
+                    No blogs found
+                  </td>
+                </tr>
+              ) : (
+                blogs.map((blog) => (
+                  <tr key={blog._id}>
+                    <td>
+                      <img
+                        src={`${BASE_URL_IMG}${blog.image}`}
+                        alt={blog.title}
+                        style={{
+                          width: "60px",
+                          height: "40px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                        }}
+                      />
+                    </td>
+                    <td className="fw-medium">{blog.title}</td>
+                    {userType !== 1 && (
+                      <td>{blog.createdBy?.userName || "N/A"}</td>
+                    )}
+                    {userType === 1 && <td>{blog.admin?.userName || "N/A"}</td>}
+                    <td>{new Date(blog.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      <span
+                        className={`badge badge-md  ${
+                          blog.status
+                            ? "badge-soft-success"
+                            : "badge-soft-danger"
+                        }`}
                       >
-                        <img
-                          src={
-                            blog.image
-                              ? `${BASE_URL_IMG}${blog.image}`
-                              : "/admin-assets/img/blog/default.jpg"
-                          }
-                          alt={blog.title}
-                        />
-                      </Link>
-                      <div className="edit-delete-btns d-flex align-items-center justify-content-between">
-                        <div className="d-flex align-items-center">
-                          {userType !== 1 && (
+                        {blog.status ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="text-end">
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-icon btn-sm"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          data-bs-display="static"
+                          aria-expanded="false"
+                        >
+                          <i className="ti ti-dots-vertical" />
+                        </button>
+                        <ul className="dropdown-menu dropdown-menu-end p-2">
+                          <li>
                             <Link
                               to={`/admin-dashboard/edit-blog/${blog._id}`}
-                              className="blog-edit me-2"
+                              className="dropdown-item rounded-1"
                             >
-                              <i className="ti ti-edit" />
+                              <i className="ti ti-edit me-1" /> Edit
                             </Link>
-                          )}
-                          <a
-                            className="blog-delete"
-                            data-bs-toggle="modal"
-                            data-bs-target="#delete_blogs"
-                            onClick={() => setDeleteId(blog._id)}
-                          >
-                            <i className="ti ti-trash" />
-                          </a>
-                        </div>
-                        {blog.category && (
-                          <span className="badge badge-info badge-md">
-                            {blog.category.categoryName}
-                          </span>
-                        )}
+                          </li>
+                          <li>
+                            <button
+                              className="dropdown-item rounded-1"
+                              data-bs-toggle="modal"
+                              data-bs-target="#delete_blogs"
+                              onClick={() => setDeleteId(blog._id)}
+                            >
+                              <i className="ti ti-trash me-1" /> Delete
+                            </button>
+                          </li>
+                        </ul>
                       </div>
-                    </div>
-                    <div className="blog-content">
-                      <div className="d-flex align-items-center justify-content-between mb-3">
-                        <div className="d-flex align-items-center">
-                          <img
-                            src="/admin-assets/img/customer/customer-01.jpg"
-                            alt="author"
-                            className="avatar avatar-sm rounded-circle me-1"
-                          />
-                          <span className="fs-16">
-                            {blog.createdBy?.userName}
-                          </span>
-                        </div>
-                        <span className="d-flex align-items-center fs-16">
-                          <i className="ti ti-calendar me-1" />
-                          {new Date(blog.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <h5>
-                        <Link
-                          to={`/admin-dashboard/admin-blog-details/${blog._id}`}
-                        >
-                          {blog.title}
-                        </Link>
-                      </h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            <div className="d-flex align-items-center justify-content-center">
-              {currentPage < totalPages && (
-                <button
-                  className="load-btn btn btn-light"
-                  onClick={() => {
-                    const nextPage = currentPage + 1;
-                    setCurrentPage(nextPage);
-                    fetchBlog(search, nextPage, true); // ✅ append instead of replace
-                  }}
-                >
-                  <i className="ti ti-loader me-1" /> Load More
-                </button>
+                    </td>
+                  </tr>
+                ))
               )}
-            </div>
-          </div>
-        )}
+            </tbody>
+          </table>
+
+          {/* Pagination */}
+          <nav aria-label="Page navigation" className="mt-3">
+            <ul className="pagination justify-content-center">
+              <li
+                className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                >
+                  Prev
+                </button>
+              </li>
+
+              {[...Array(totalPages)].map((_, idx) => (
+                <li
+                  key={idx}
+                  className={`page-item ${
+                    currentPage === idx + 1 ? "active" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => handlePageChange(idx + 1)}
+                  >
+                    {idx + 1}
+                  </button>
+                </li>
+              ))}
+
+              <li
+                className={`page-item ${
+                  currentPage === totalPages ? "disabled" : ""
+                }`}
+              >
+                <button
+                  className="page-link"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
 
       {/* Delete Blogs Modal */}
@@ -243,20 +294,18 @@ const AdminAllBlogs = () => {
           </div>
         </div>
       </div>
-      <div>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-        />
-      </div>
-      {/* /Delete Blogs */}
+
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

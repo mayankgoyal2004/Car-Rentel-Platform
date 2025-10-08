@@ -173,7 +173,7 @@ const AdminLocationStates = () => {
           {/* /Table Header */}
 
           {/* Custom Data Table */}
-          <div className="custom-datatable-filter table-responsive brandstable country-table">
+          <div className="custom-datatable-filter table-responsive table-overflow-hidden brandstable country-table">
             <table className="table datatable">
               <thead className="thead-light">
                 <tr>

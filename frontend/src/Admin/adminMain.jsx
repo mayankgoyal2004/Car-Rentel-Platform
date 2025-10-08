@@ -497,7 +497,7 @@ const AdminMain = () => {
                       View All
                     </Link>
                   </div>
-                  <div className="table-responsive">
+                  <div className="table-responsiv table-overflow-hiddene">
                     <table className="table custom-table1">
                       <tbody>
                         {loading ? (
@@ -566,7 +566,7 @@ const AdminMain = () => {
                       View All
                     </Link>
                   </div>
-                  <div className="table-responsive">
+                  <div className="table-responsive table-overflow-hidden">
                     <table className="table custom-table1">
                       <tbody>
                         {loading ? (
@@ -823,7 +823,7 @@ const AdminMain = () => {
                       View All
                     </Link>
                   </div>
-                  <div className="table-responsive">
+                  <div className="table-responsive table-overflow-hidden">
                     <table className="table custom-table1">
                       <tbody>
                         {loading ? (
@@ -890,7 +890,7 @@ const AdminMain = () => {
                       View All
                     </Link>
                   </div>
-                  <div className="custom-table table-responsive">
+                  <div className="custom-table table-responsive table-overflow-hidden">
                     <table className="table">
                       <thead>
                         <tr>

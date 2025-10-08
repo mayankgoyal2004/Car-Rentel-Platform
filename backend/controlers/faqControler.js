@@ -19,7 +19,9 @@ const addFaq = async (req, res) => {
     });
     await faq.save();
 
-    res.status(201).json({ success: true, faq });
+    res
+      .status(201)
+      .json({ message: "FAQ added successfully", success: true, faq });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -37,7 +39,13 @@ const updateFaq = async (req, res) => {
     );
 
     if (!faq)
-      return res.status(404).json({ success: false, message: "FAQ not found" });
+      return res
+        .status(404)
+        .json({
+          message: "FAQ updated successfully",
+          success: false,
+          message: "FAQ not found",
+        });
 
     res.json({ success: true, faq });
   } catch (error) {

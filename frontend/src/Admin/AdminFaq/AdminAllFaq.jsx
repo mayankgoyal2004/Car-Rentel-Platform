@@ -20,7 +20,6 @@ const AdminAllFaq = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType;
 
-  // ✅ Get All FAQs
   const getAllFaq = async (searchQuery = "", page = 1) => {
     if (userType === 1) {
       setLoading(true);
@@ -80,7 +79,6 @@ const AdminAllFaq = () => {
     }
   };
 
-  // ✅ Update FAQ
   const updateFaq = async () => {
     if (!editFaq || !editFaq.question?.trim()) return;
     try {
@@ -92,13 +90,14 @@ const AdminAllFaq = () => {
       });
       toast.success(res.data.message);
       setEditFaq(null);
+      document.querySelector("#edit_FAQ .btn-close")?.click();
+
       getAllFaq(search, currentPage);
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
   };
 
-  // ✅ Delete FAQ
   const deleteFaqHandler = async () => {
     if (!deleteFaq) return;
     try {

@@ -15,6 +15,7 @@ const AdminFaqCategories = () => {
   const [totalPages, setTotalPages] = useState(1);
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
+
   const getAllFaqCategory = async (searchQuery = "", page = 1) => {
     if (userType === 1) {
       try {
@@ -52,6 +53,8 @@ const AdminFaqCategories = () => {
 
       toast.success(res.data.message);
       setNewFaqCategory("");
+      document.querySelector("#add_Category .btn-close")?.click();
+
       getAllFaqCategory();
     } catch (err) {
       if (err.response && err.response.data) {
@@ -70,6 +73,8 @@ const AdminFaqCategories = () => {
       });
       toast.success(res.data.message);
       setEditFaqCategory(null);
+      document.querySelector("#edit_Category .btn-close")?.click();
+
       getAllFaqCategory();
     } catch (err) {
       if (err.response && err.response.data) {
@@ -86,6 +91,8 @@ const AdminFaqCategories = () => {
       toast.success(res.data.message);
 
       setDeleteCategory(null);
+      document.querySelector("#delete_Category .btn-close")?.click();
+
       getAllFaqCategory();
     } catch (err) {
       if (err.response && err.response.data) {

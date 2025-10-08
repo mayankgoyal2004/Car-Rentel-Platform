@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useSelector } from "react-redux";
@@ -20,6 +20,7 @@ const AdminTestimonials = () => {
     status: true,
   });
   const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType;
@@ -65,6 +66,11 @@ const AdminTestimonials = () => {
       status: true,
     });
     setImagePreview(null);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
     setSelectedTestimonial(null);
   };
 
@@ -415,6 +421,7 @@ const AdminTestimonials = () => {
                   type="file"
                   className="form-control mb-2"
                   onChange={handleFileChange}
+                  ref={fileInputRef}
                 />
                 {imagePreview && (
                   <img
@@ -544,19 +551,19 @@ const AdminTestimonials = () => {
           </div>
         </div>
       </div>
-        <div>
-              <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
-            </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
+      </div>
     </div>
   );
 };

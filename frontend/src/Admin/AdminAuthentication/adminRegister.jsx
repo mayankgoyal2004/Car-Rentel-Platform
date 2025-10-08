@@ -113,7 +113,7 @@ const AdminRegister = () => {
   };
 
   return (
-    <div className="main-wrapper">
+    <div className="main-wrapper  custom-padding-1">
       <div className="container-fuild">
         <div className="w-100 overflow-hidden position-relative flex-wrap d-block vh-100">
           <div className="row justify-content-center align-items-center vh-100 overflow-auto flex-wrap">

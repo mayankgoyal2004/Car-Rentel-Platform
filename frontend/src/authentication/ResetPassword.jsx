@@ -80,7 +80,7 @@ const ResetPassword = () => {
   }, []);
 
   return (
-    <div className="main-wrapper login-body">
+    <div className="main-wrapper login-body  custom-padding-1">
       {/* Header */}
       <header className="log-header">
         <Link to="/">

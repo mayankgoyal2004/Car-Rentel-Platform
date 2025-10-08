@@ -89,13 +89,9 @@ const BlogDetails = () => {
     <div className="main-wrapper">
       {/* Blog Banner */}
       <div
-        className="blogbanner"
+        className="blogbanner "
         style={{
           backgroundImage: `url(${BASE_URL_IMG + blog.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "300px",
-          width: "100%",
         }}
       >
         <div className="blogbanner-content">
@@ -125,8 +121,6 @@ const BlogDetails = () => {
         <div className="blog-description">
           <p>{blog?.description}</p>
         </div>
-
-       
 
         {/* Comments Section */}
         <div className="review-sec">

@@ -102,7 +102,7 @@ const Login = () => {
   };
 
   return (
-    <div className="main-wrapper login-body  top-0">
+    <div className="main-wrapper login-body  custom-padding-1">
       {/* Header */}
       <header className="log-header ">
         <Link to="/">

@@ -309,3 +309,13 @@ iframe[id^=":"] {
   }
 }
 
+@media (min-width: 991px) {
+  .blogbanner {
+    background-size: cover !important;
+    background-position: center !important;
+    min-height: 450px !important;
+  }
+}
+.custom-padding-1{
+  padding-top: 0px!important;
+}

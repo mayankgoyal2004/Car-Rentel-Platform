@@ -45,16 +45,19 @@
   border: none !important;
 }
 
-
-
+.main-wrapper,
 .banner-section,
 .banner-section-four,
 .banner-section.banner-slider {
-  padding-top: 70px; 
+  padding-top: 70px;
 }
 
 @media (max-width: 991.96px) {
-  .custom-header .main-menu-wrapper .main-nav .has-submenu.submenu-open > .submenu {
+  .custom-header
+    .main-menu-wrapper
+    .main-nav
+    .has-submenu.submenu-open
+    > .submenu {
     display: block !important; /* override the mobile "display:none" */
   }
 }

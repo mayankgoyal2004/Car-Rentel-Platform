@@ -121,7 +121,7 @@ const AdminCustomers = () => {
       userFormData.append("language", formData.language);
       userFormData.append("address", formData.address);
       userFormData.append("gender", formData.gender);
-      userFormData.append("dateOfBirth", formData.dateOfBirth.split("T")[0]);
+      userFormData.append("dateOfBirth", formData.dateOfBirth);
 
       if (formData.image) {
         userFormData.append("image", formData.image);
@@ -135,6 +135,8 @@ const AdminCustomers = () => {
 
       if (res.data.success) {
         toast.success("Customer added successfully!");
+        document.getElementById("add_client_close").click();
+
         fetchCustomers(search, currentPage);
         resetFormData();
       } else {
@@ -530,6 +532,7 @@ const AdminCustomers = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_client_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -602,13 +605,13 @@ const AdminCustomers = () => {
                     />
                   </div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-lg-4">
                   <div className="mb-3">
                     <label className="form-label">
                       Gender <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="select form-control"
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
@@ -661,13 +664,13 @@ const AdminCustomers = () => {
                     />
                   </div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-lg-4">
                   <div className="mb-3">
                     <label className="form-label">
                       Language <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="select form-control"
                       name="language"
                       value={formData.language}
                       onChange={handleInputChange}
@@ -872,13 +875,13 @@ const AdminCustomers = () => {
                     />
                   </div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-lg-4">
                   <div className="mb-3">
                     <label className="form-label">
                       Gender <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-select"
+                      className="select form-control"
                       name="gender"
                       value={formData?.gender}
                       onChange={handleInputChange}
@@ -931,13 +934,13 @@ const AdminCustomers = () => {
                     />
                   </div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-lg-4">
                   <div className="mb-3">
                     <label className="form-label">
                       Language <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="select form-control"
                       name="language"
                       value={formData?.language}
                       onChange={handleInputChange}

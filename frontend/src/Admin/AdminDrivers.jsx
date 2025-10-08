@@ -115,6 +115,8 @@ const AdminDrivers = () => {
       const res = await apiService.addDriver(userFormData);
       if (res.data.success) {
         toast.success("Driver added successfully!");
+        document.getElementById("add_driver_close").click();
+
         fetchDriver(search, currentPage);
         resetFormData();
       }
@@ -172,6 +174,7 @@ const AdminDrivers = () => {
       );
       if (res.data.success) {
         toast.success("Driver updated successfully!");
+        document.getElementById("close_edit_driver").click();
 
         fetchDriver(search, currentPage);
         resetFormData();
@@ -513,6 +516,7 @@ const AdminDrivers = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_driver_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -571,13 +575,13 @@ const AdminDrivers = () => {
                     />
                   </div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-lg-4">
                   <div className="mb-3">
                     <label className="form-label">
                       Gender <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="select form-control"
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
@@ -733,6 +737,7 @@ const AdminDrivers = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="close_edit_driver"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -808,13 +813,13 @@ const AdminDrivers = () => {
                     />
                   </div>
                 </div>
-                <div className="col-md-6">
+                <div className="col-lg-4 col-md-6">
                   <div className="mb-3">
                     <label className="form-label">
                       Gender <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="select"
+                      className="select form-control"
                       name="gender"
                       value={formData.gender}
                       onChange={handleInputChange}
@@ -891,7 +896,7 @@ const AdminDrivers = () => {
                       type="date"
                       className="form-control"
                       name="dateOfIssue"
-                      value={formData.dateOfIssue}
+                      value={formData.dateOfIssue.split("T")[0]}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -905,7 +910,7 @@ const AdminDrivers = () => {
                       type="date"
                       className="form-control"
                       name="validTill"
-                      value={formData.validTill}
+                      value={formData.validTill.split("T")[0]}
                       onChange={handleInputChange}
                     />
                   </div>

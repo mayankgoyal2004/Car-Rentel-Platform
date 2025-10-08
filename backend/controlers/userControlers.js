@@ -955,6 +955,45 @@ const updateAdmin = async (req, res) => {
       address,
       packageId,
     } = req.body;
+    if (!userName) {
+      return res.status(400).json({
+        success: false,
+        message: "userName is required",
+      });
+    }
+    if (!firstName) {
+      return res.status(400).json({
+        success: false,
+        message: "First Name is required",
+      });
+    }
+    if (!lastName) {
+      return res.status(400).json({
+        success: false,
+        message: "Last Name is required",
+      });
+    }
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    if (!contact) {
+      return res.status(400).json({
+        success: false,
+        message: "Contact is required",
+      });
+    }
+    if (!address) {
+      return res.status(400).json({
+        success: false,
+        message: "Address is required",
+      });
+    }
+
     const user = await User.findById(_id);
     if (!user) {
       return res.status(404).json({
@@ -962,7 +1001,20 @@ const updateAdmin = async (req, res) => {
         message: "user not found",
       });
     }
-    if (name) user.userName = name;
+    if (
+      !name &&
+      !firstName &&
+      !lastName &&
+      !userName &&
+      !email &&
+      !contact &&
+      !address &&
+      !password &&
+      !packageId
+    ) {
+      errors.push("No fields provided to update.");
+    }
+    if (name) user.userName = userName;
     if (email) user.email = email;
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;

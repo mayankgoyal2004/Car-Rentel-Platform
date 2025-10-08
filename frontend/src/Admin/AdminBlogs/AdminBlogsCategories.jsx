@@ -218,7 +218,7 @@ const AdminBlogsCategories = () => {
                     <td>
                       <div className="dropdown">
                         <button
-                          className="btn btn-icon btn-sm dropdown-toggle"
+                          className="btn btn-icon btn-sm "
                           type="button"
                           data-bs-toggle="dropdown"
                         >

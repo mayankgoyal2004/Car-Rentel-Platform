@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import Flatpickr from "react-flatpickr"; 
+import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/flatpickr.css";
 import "../assets/banner.css";
 import apiService from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 function BannerSection() {
   const [pickupCity, setPickupCity] = useState("");
@@ -25,11 +26,9 @@ function BannerSection() {
       const res = await apiService.getActiveLocationsSetting();
       if (res.data.success) {
         setLocationSetting(res.data.data);
-      } else {
-        console.error("Failed to fetch location settings:", res.data.message);
       }
-    } catch (error) {
-      console.error("Error fetching location settings:", error);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to fetch locations");
     }
   };
 
@@ -40,7 +39,7 @@ function BannerSection() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (!pickupCity || !dropCity || !pickupDate || !dropDate) {
-      alert("Please select pickup, drop, and dates!");
+      toast.error("Please select pickup, drop, and dates!");
       return;
     }
 
@@ -181,6 +180,19 @@ function BannerSection() {
             </div>
           </form>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </section>
   );

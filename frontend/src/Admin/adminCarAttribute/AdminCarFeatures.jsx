@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService from "../../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 
 const AdminCarFeatures = () => {
@@ -460,6 +460,19 @@ const AdminCarFeatures = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Car Feature */}
     </div>

@@ -203,7 +203,6 @@ const AdminAllUser = () => {
         fetchUserData(search, currentPage);
 
         // Close modal
-        document.getElementById("delete_user_close").click();
       }
     } catch (err) {
       toast.error(

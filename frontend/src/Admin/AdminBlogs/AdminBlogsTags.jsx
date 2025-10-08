@@ -218,9 +218,11 @@ const AdminBlogsTags = () => {
                       <td>
                         <div className="dropdown">
                           <button
-                            className="btn btn-icon btn-sm "
+                            className="btn btn-icon btn-sm"
                             type="button"
                             data-bs-toggle="dropdown"
+                            data-bs-display="static" 
+                            aria-expanded="false"
                           >
                             <i className="ti ti-dots-vertical" />
                           </button>

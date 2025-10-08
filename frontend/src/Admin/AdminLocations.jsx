@@ -136,6 +136,7 @@ const AdminLocations = () => {
       const res = await apiService.addLocation(userLocation);
       if (res.data.success) {
         toast.success("Location added successfully!");
+        document.getElementById("add_location_close").click();
 
         fetchAllLocation(search, currentPage);
         resetFormData();
@@ -425,14 +426,18 @@ const AdminLocations = () => {
                                     email: loc.email,
                                     contact: loc.contact,
                                     location: loc.location,
-                                    country_id: loc.country_id,
-                                    state_id: loc.state_id,
-                                    city_id: loc.city_id,
+                                    country_id: loc.country?._id,
+                                    state_id: loc.state._id || loc.state,
+                                    city_id: loc.city._id,
                                     pincode: loc.pincode,
                                     workingDays: loc.workingDays,
                                     image: null,
                                     status: loc.status,
                                   });
+                                  if (loc.country?._id)
+                                    getStateBycountry(loc.country._id);
+                                  if (loc.state?._id || loc.state)
+                                    getCityByState(loc.state._id || loc.state);
                                   setImagePreview(
                                     loc.image ? BASE_URL_IMG + loc.image : null
                                   );
@@ -521,6 +526,7 @@ const AdminLocations = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_location_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -833,8 +839,8 @@ const AdminLocations = () => {
           </div>
         </div>
       </div>
-      {/* /Add Driver */}
-      {/* Edit Driver */}
+      {/* /Add location */}
+      {/* Edit Location */}
       <div className="modal fade" id="edit_location">
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content">

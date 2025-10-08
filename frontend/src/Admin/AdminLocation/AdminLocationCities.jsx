@@ -45,7 +45,7 @@ const AdminLocationCities = () => {
       const res = await apiService.getAllActiveCountry();
       if (res.data.success) setCountries(res.data.data || []);
     } catch (err) {
-          toast.error(err.response?.data?.message || "Failed to fetch countries");
+      toast.error(err.response?.data?.message || "Failed to fetch countries");
     }
   };
   const getAllActiveState = async () => {
@@ -53,7 +53,7 @@ const AdminLocationCities = () => {
       const res = await apiService.getAllActiveState();
       if (res.data.success) setStates(res.data.data || []);
     } catch (err) {
-          toast.error(err.response?.data?.message || "Failed to fetch states");
+      toast.error(err.response?.data?.message || "Failed to fetch states");
     }
   };
   useEffect(() => {
@@ -83,7 +83,6 @@ const AdminLocationCities = () => {
       toast.success(res.data.message);
       setnewCity({ cityName: "", country: {}, state: {} });
       fetchAllCity();
-      document.getElementById("add_state_close")?.click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -108,7 +107,6 @@ const AdminLocationCities = () => {
       toast.success(res.data.message);
       setEditCity(null);
       fetchAllCity(search, currentPage);
-      document.getElementById("edit_state_close")?.click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -122,7 +120,6 @@ const AdminLocationCities = () => {
       toast.success(res.data.message);
       setDeleteCity(null);
       fetchAllCity(search, currentPage);
-      document.getElementById("delete_state_close")?.click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -230,7 +227,9 @@ const AdminLocationCities = () => {
                       </td>
                       <td>
                         <div className="d-flex align-items-center flag-image">
-                          <p className="text-gray-9">{c.country?.countryName}</p>
+                          <p className="text-gray-9">
+                            {c.country?.countryName}
+                          </p>
                         </div>
                       </td>
                       <td>

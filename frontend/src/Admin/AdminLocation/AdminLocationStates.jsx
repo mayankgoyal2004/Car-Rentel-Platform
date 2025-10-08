@@ -327,6 +327,7 @@ const AdminLocationStates = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_state_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -391,6 +392,7 @@ const AdminLocationStates = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_state_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

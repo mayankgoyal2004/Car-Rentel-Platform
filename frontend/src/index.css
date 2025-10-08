@@ -319,3 +319,7 @@ iframe[id^=":"] {
 .custom-padding-1{
   padding-top: 0px!important;
 }
+
+.table-responsive {
+  overflow: visible !important;   /* ✅ allows dropdown to render outside */
+}

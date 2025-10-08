@@ -47,7 +47,9 @@ const AdminLocationCountries = () => {
       });
 
       toast.success(res.data.message);
-      setnewCountry("");
+      document.getElementById("add_country_close")?.click();
+
+      setnewCountry({ countryName: "", countryCode: "" });
       getAllCountry();
     } catch (err) {
       if (err.response && err.response.data) {
@@ -83,7 +85,6 @@ const AdminLocationCountries = () => {
       toast.success(res.data.message);
       setDeleteCountry(null);
       getAllCountry(search, currentPage);
-      document.getElementById("delete_country_close").click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");
     }
@@ -166,84 +167,84 @@ const AdminLocationCountries = () => {
                 </tr>
               </thead>
               <tbody>
-                  {loading ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-4">
-                    Loading...
-                  </td>
-                </tr>
-              ) : countrys.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-4">
-                    No country found
-                  </td>
-                </tr>
-              ) : (
-                countrys.map((country) => (
+                {loading ? (
                   <tr>
-                    <td>
-                      <div className="d-flex align-items-center flag-image">
-                        <p className="text-gray-9">{country.countryName}</p>
-                      </div>
-                    </td>
-                    <td>{country.countryCode}</td>
-                    <td>
-                      <span className="text-gray-9">
-                        {" "}
-                        {new Date(country.createdAt).toLocaleDateString()}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`badge badge-md ${
-                          country.status
-                            ? "badge-soft-success"
-                            : "badge-soft-danger"
-                        }`}
-                      >
-                        {country.status ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-icon btn-sm"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                          aria-expanded="false"
-                        >
-                          <i className="ti ti-dots-vertical" />
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              href="javascript:void(0);"
-                              data-bs-toggle="modal"
-                              data-bs-target="#edit_country"
-                              onClick={() => seteditCountry(country)}
-                            >
-                              <i className="ti ti-edit me-1" />
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_country"
-                              onClick={() => setDeleteCountry(country)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
+                    <td colSpan="7" className="text-center py-4">
+                      Loading...
                     </td>
                   </tr>
-                 ))
-              )}
+                ) : countrys.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4">
+                      No country found
+                    </td>
+                  </tr>
+                ) : (
+                  countrys.map((country) => (
+                    <tr>
+                      <td>
+                        <div className="d-flex align-items-center flag-image">
+                          <p className="text-gray-9">{country.countryName}</p>
+                        </div>
+                      </td>
+                      <td>{country.countryCode}</td>
+                      <td>
+                        <span className="text-gray-9">
+                          {" "}
+                          {new Date(country.createdAt).toLocaleDateString()}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge badge-md ${
+                            country.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
+                          }`}
+                        >
+                          {country.status ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-icon btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
+                            <i className="ti ti-dots-vertical" />
+                          </button>
+                          <ul className="dropdown-menu dropdown-menu-end p-2">
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                href="javascript:void(0);"
+                                data-bs-toggle="modal"
+                                data-bs-target="#edit_country"
+                                onClick={() => seteditCountry(country)}
+                              >
+                                <i className="ti ti-edit me-1" />
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_country"
+                                onClick={() => setDeleteCountry(country)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -304,6 +305,7 @@ const AdminLocationCountries = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_country_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -347,7 +349,7 @@ const AdminLocationCountries = () => {
             <div className="modal-footer">
               <div className="d-flex justify-content-center">
                 <button
-                  className="btn btn-secondary"
+                  className="btn btn-light me-3"
                   data-bs-dismiss="modal"
                   id="add_country_close"
                 >

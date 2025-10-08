@@ -102,7 +102,7 @@ const Login = () => {
   };
 
   return (
-    <div className="main-wrapper login-body ">
+    <div className="main-wrapper login-body  top-0">
       {/* Header */}
       <header className="log-header ">
         <Link to="/">

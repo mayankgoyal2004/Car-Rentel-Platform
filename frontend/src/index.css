@@ -234,13 +234,10 @@ a.btn.btn-outline-light:hover {
   margin-right: auto;
 }
 
-
-
 /* ✅ Hide Google top bar completely */
 .goog-te-banner-frame.skiptranslate {
   display: none !important;
 }
-
 
 /* Hide Google Translate default widget */
 .goog-te-gadget {
@@ -296,7 +293,6 @@ iframe[id^=":"] {
   height: auto !important;
 }
 
-
 /* Hide mobile profile items on desktop */
 @media (min-width: 992px) {
   .mobile-profile-item,
@@ -312,3 +308,4 @@ iframe[id^=":"] {
     display: block !important;
   }
 }
+

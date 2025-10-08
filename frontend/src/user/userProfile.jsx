@@ -89,8 +89,6 @@ const UserProfile = () => {
       dispatch(addUser(res.data.user));
       fetchUser();
     } catch (err) {
-      console.error(err);
-      // Show backend error message if available
       const message =
         err.response?.data?.message ||
         "Error saving profile. Please try again.";

@@ -535,38 +535,60 @@ const updateUserDetails = async (req, res) => {
   try {
     const { _id } = req.user;
 
-    const updateData = {
-      userName: req.body.userName,
-      email: req.body.email,
-      contact: req.body.contact,
-    };
+    const {
+      userName,
+      email,
+      contact,
+      firstName,
+      lastName,
+      address,
+      country,
+      state,
+      city,
+      pincode,
+    } = req.body;
 
-    let imagePath = null;
+    if (
+      !userName ||
+      !email ||
+      !contact ||
+      !firstName ||
+      !lastName ||
+      !address ||
+      !country ||
+      !state ||
+      !city ||
+      !pincode
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Update user data
+    const updateData = { userName, email, contact };
+
     if (req.file) {
-      imagePath = req.file.path.replace(/\\/g, "/");
-      updateData.image = imagePath;
+      updateData.image = req.file.path.replace(/\\/g, "/");
     }
 
     const user = await User.findByIdAndUpdate(_id, updateData, { new: true });
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    const existingCustomer = await customer.findOne({ userId: _id });
-
+    // Update customer data
     const customerUpdateData = {
       userId: _id,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      contact: req.body.contact,
-      address: req.body.address,
-      country: req.body.country,
-      state: req.body.state,
-      city: req.body.city,
-      pincode: req.body.pincode,
+      firstName,
+      lastName,
+      email,
+      contact,
+      address,
+      country,
+      state,
+      city,
+      pincode,
     };
 
     if (req.file) {
-      customerUpdateData.image = imagePath;
+      customerUpdateData.image = req.file.path.replace(/\\/g, "/");
     }
 
     const Customer = await customer.findOneAndUpdate(

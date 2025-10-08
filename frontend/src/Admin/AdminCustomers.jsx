@@ -16,7 +16,7 @@ const AdminCustomers = () => {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [deleteCustomer, setDeleteCustomer] = useState(null);
   const userData = useSelector((store) => store.user);
-  const userType = userData?.userType; 
+  const userType = userData?.userType;
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -121,7 +121,7 @@ const AdminCustomers = () => {
       userFormData.append("language", formData.language);
       userFormData.append("address", formData.address);
       userFormData.append("gender", formData.gender);
-      userFormData.append("dateOfBirth", formData.dateOfBirth);
+      userFormData.append("dateOfBirth", formData.dateOfBirth.split("T")[0]);
 
       if (formData.image) {
         userFormData.append("image", formData.image);
@@ -237,9 +237,7 @@ const AdminCustomers = () => {
       ? new Date(customer.validTill).toLocaleDateString()
       : "",
   }));
-  const handleDeleteConfirm = (customer) => {
-    setDeleteCustomer(customer);
-  };
+
   const handleRemoveImage = () => {
     setFormData((prev) => ({ ...prev, image: null }));
     setImagePreview(null);
@@ -719,7 +717,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="validTill"
-                      value={formData.validTill}
+                      value={formData.validTill.split("T")[0]}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -869,7 +867,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="dateOfBirth"
-                      value={formData?.dateOfBirth}
+                      value={formData?.dateOfBirth.split("T")[0]}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -975,7 +973,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="dateOfIssue"
-                      value={formData?.dateOfIssue}
+                      value={formData?.dateOfIssue.split("T")[0]}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -989,7 +987,7 @@ const AdminCustomers = () => {
                       type="date"
                       className="form-control"
                       name="validTill"
-                      value={formData?.validTill}
+                      value={formData?.validTill.split("T")[0]}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -1022,23 +1020,21 @@ const AdminCustomers = () => {
             </div>
 
             <div className="modal-footer">
-              <div className="d-flex justify-content-between align-items-center w-100">
-                <div className="d-flex justify-content-center">
-                  <a
-                    className="btn btn-light me-3"
-                    data-bs-dismiss="modal"
-                    onClick={resetFormData}
-                  >
-                    Cancel
-                  </a>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleUpdateCustomer}
-                  >
-                    Save Changes
-                  </button>
-                </div>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3 "
+                  type="button"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateCustomer}
+                  type="button"
+                  className="btn btn-primary"
+                >
+                  Create New
+                </button>
               </div>
             </div>
           </div>

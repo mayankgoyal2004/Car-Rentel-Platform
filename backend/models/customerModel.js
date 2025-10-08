@@ -10,7 +10,7 @@ const customerschema = new mongoose.Schema(
     email: { type: String, default: null },
     contact: { type: Number, default: 0 },
     address: { type: String },
-    image: { type: String, default: null },
+    image: { type: String, default: "uploads/userImage/default.jpg" },
     file: {
       type: String,
     },

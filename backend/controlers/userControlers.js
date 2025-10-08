@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const mongoose = require("mongoose");
 
 const saltround = Number(process.env.BCRYPT_SALT_ROUNDS);
 const secretKey = process.env.JWT_SECRET;
@@ -640,6 +641,12 @@ const adduserByadmin = async (req, res) => {
       return res.status(400).json({ success: false, message: validator });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(role_id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role ",
+      });
+    }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res
@@ -692,6 +699,12 @@ const updateUserByadmin = async (req, res) => {
 
     if (validator) {
       return res.status(400).json({ success: false, message: validator });
+    }
+    if (!mongoose.Types.ObjectId.isValid(role_id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid role ",
+      });
     }
 
     const existingUser = await User.findOne({ email });

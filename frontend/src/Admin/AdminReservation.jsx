@@ -191,7 +191,7 @@ const AdminReservation = () => {
                 </tr>
               ) : (
                 reservations.map((reservation) => (
-                  <tr key={reservation._id}>
+                  <tr key={reservation?._id}>
                     <td>
                       <div className="form-check form-check-md">
                         <input className="form-check-input" type="checkbox" />
@@ -200,26 +200,26 @@ const AdminReservation = () => {
                     <td>
                       <div className="d-flex align-items-center">
                         <Link
-                          to={`/admin-dashboard/car-details/${reservation.car._id}`}
+                          to={`/admin-dashboard/car-details/${reservation.car?._id}`}
                           className="avatar me-2 flex-shrink-0"
                         >
                           <img
-                            src={BASE_URL_IMG + reservation.car.image}
-                            alt={reservation.car.carName}
+                            src={BASE_URL_IMG + reservation?.car.image}
+                            alt={reservation.car?.carName}
                           />
                         </Link>
                         <div>
                           <Link
-                            to={`/admin-dashboard/reservation-details/${reservation._id}`}
+                            to={`/admin-dashboard/reservation-details/${reservation?._id}`}
                             className="text-info d-block mb-1"
                           >
-                            {reservation.bookingId}
+                            {reservation?.bookingId}
                           </Link>
                           <h6 className="fs-14">
                             <Link
-                              to={`/admin-dashboard/car-details/${reservation.car._id}`}
+                              to={`/admin-dashboard/car-details/${reservation.car?._id}`}
                             >
-                              {reservation.car.carName}
+                              {reservation.car?.carName}
                             </Link>
                           </h6>
                         </div>
@@ -228,20 +228,20 @@ const AdminReservation = () => {
                     <td>
                       <div className="d-flex align-items-center">
                         <Link
-                          to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
+                          to={`/admin-dashboard/customer-details/${reservation.customer?._id}`}
                           className="avatar avatar-rounded me-2 flex-shrink-0"
                         >
                           <img
-                            src={BASE_URL_IMG + reservation.customer.image}
-                            alt={reservation.customer.name}
+                            src={BASE_URL_IMG + reservation?.customer?.image}
+                            alt={reservation.customer?.name}
                           />
                         </Link>
                         <div>
                           <h6 className="mb-1 fs-14">
                             <Link
-                              to={`/admin-dashboard/customer-details/${reservation.customer._id}`}
+                              to={`/admin-dashboard/customer-details/${reservation.customer?._id}`}
                             >
-                              {reservation.customer.name}
+                              {reservation.customer?.name}
                             </Link>
                           </h6>
                         </div>
@@ -251,14 +251,14 @@ const AdminReservation = () => {
                       <div className="d-flex align-items-center">
                         <div className="border rounded text-center flex-shrink-0 p-1 me-2">
                           <h5 className="mb-2 fs-16">
-                            {reservation.pickupDate
-                              ? new Date(reservation.pickupDate).getDate()
+                            {reservation?.pickupDate
+                              ? new Date(reservation?.pickupDate).getDate()
                               : ""}
                           </h5>
                           <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
-                            {reservation.pickupDate
+                            {reservation?.pickupDate
                               ? new Date(
-                                  reservation.pickupDate
+                                  reservation?.pickupDate
                                 ).toLocaleDateString("en-US", {
                                   month: "short",
                                   year: "numeric",
@@ -268,10 +268,10 @@ const AdminReservation = () => {
                         </div>
                         <div>
                           <p className="text-gray-9 mb-0">
-                            {reservation.pickupAddress}
+                            {reservation?.pickupAddress}
                           </p>
                           <span className="fs-13">
-                            {reservation.pickupTime}
+                            {reservation?.pickupTime}
                           </span>
                         </div>
                       </div>
@@ -280,14 +280,14 @@ const AdminReservation = () => {
                       <div className="d-flex align-items-center">
                         <div className="border rounded text-center flex-shrink-0 p-1 me-2">
                           <h5 className="mb-2 fs-16">
-                            {reservation.dropDate
-                              ? new Date(reservation.dropDate).getDate()
+                            {reservation?.dropDate
+                              ? new Date(reservation?.dropDate).getDate()
                               : ""}
                           </h5>
                           <span className="fw-medium fs-12 bg-light p-1 rounded-1 d-inline-block text-gray-9">
-                            {reservation.dropDate
+                            {reservation?.dropDate
                               ? new Date(
-                                  reservation.dropDate
+                                  reservation?.dropDate
                                 ).toLocaleDateString("en-US", {
                                   month: "short",
                                   year: "numeric",
@@ -297,21 +297,21 @@ const AdminReservation = () => {
                         </div>
                         <div>
                           <p className="text-gray-9 mb-0">
-                            {reservation.dropAddress}
+                            {reservation?.dropAddress}
                           </p>
-                          <span className="fs-13">{reservation.dropTime}</span>
+                          <span className="fs-13">{reservation?.dropTime}</span>
                         </div>
                       </div>
                     </td>
                     <td>
                       <span
                         className={`badge badge-md   ${
-                          reservation.status
+                          reservation?.status
                             ? "badge-soft-success"
                             : "badge-soft-danger"
                         }`}
                       >
-                        {reservation.status}
+                        {reservation?.status}
                       </span>
                     </td>
                     <td>
@@ -327,7 +327,7 @@ const AdminReservation = () => {
                         <ul className="dropdown-menu dropdown-menu-end p-2">
                           <li>
                             <Link
-                              to={`/admin-dashboard/reservation-details/${reservation._id}`}
+                              to={`/admin-dashboard/reservation-details/${reservation?._id}`}
                               className="dropdown-item rounded-1"
                             >
                               <i className="ti ti-eye me-1" />

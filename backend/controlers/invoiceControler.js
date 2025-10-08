@@ -24,6 +24,45 @@ const createInvoice = async (req, res) => {
       to,
       paymentMethod,
     } = req.body;
+
+    if (!terms) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Terms is required" });
+    }
+    if (!notes) {
+      return res
+        .status(400)
+        .json({ success: false, message: "notes is required" });
+    }
+    if (!reservationId) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Reservation is required" });
+    }
+
+    if (!issuedDate || isNaN(new Date(issuedDate))) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Valid issued date is required" });
+    }
+    if (!fromDate || isNaN(new Date(fromDate))) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Valid start date is required" });
+    }
+
+    if (!dueDate || isNaN(new Date(dueDate))) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Valid due date is required" });
+    }
+
+    if (!currency || typeof currency !== "string") {
+      return res
+        .status(400)
+        .json({ success: false, message: "Currency is required" });
+    }
     const reservation = await Reservation.findById(reservationId)
       .populate("car")
       .populate("customer")
@@ -106,6 +145,16 @@ const updateInvoice = async (req, res) => {
       paymentMethod,
     } = req.body;
 
+    if (!terms) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Terms is required" });
+    }
+    if (!notes) {
+      return res
+        .status(400)
+        .json({ success: false, message: "notes is required" });
+    }
     let reservation = null;
     if (reservationId) {
       reservation = await Reservation.findById(reservationId)

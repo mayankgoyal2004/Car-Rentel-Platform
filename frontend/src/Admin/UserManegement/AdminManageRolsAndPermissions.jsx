@@ -47,6 +47,7 @@ const AdminManageRolesAndPermissions = () => {
       const res = await apiService.addRole({ name: newRole.trim() });
       toast.success(res.data.message);
       setNewRole("");
+      document.getElementById("add_role_close").click();
       fetchRoles();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
@@ -64,6 +65,8 @@ const AdminManageRolesAndPermissions = () => {
       });
       toast.success(res.data.message);
       setEditRole(null);
+      document.getElementById("edit_role_close").click();
+
       fetchRoles();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
@@ -171,7 +174,7 @@ const AdminManageRolesAndPermissions = () => {
                 roles.map((role) => (
                   <tr key={role._id}>
                     <td>{role.name}</td>
-                    <td>{new Date(role.createdAt).toLocaleDateString()}</td>
+                    <td>{new Date(role?.createdAt).toLocaleDateString()}</td>
                     <td>
                       <span
                         className={`badge badge-md  ${
@@ -180,13 +183,13 @@ const AdminManageRolesAndPermissions = () => {
                             : "badge-soft-danger"
                         }`}
                       >
-                        {role.status ? "Active" : "Inactive"}
+                        {role?.status ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>
                       <div className="dropdown">
                         <button
-                          className="btn btn-icon btn-sm dropdown-toggle"
+                          className="btn btn-icon btn-sm "
                           type="button"
                           data-bs-toggle="dropdown"
                         >
@@ -206,7 +209,7 @@ const AdminManageRolesAndPermissions = () => {
                           <li>
                             <Link
                               className="dropdown-item rounded-1"
-                              to={`/admin-dashboard/admin-permissions/${role._id}`}
+                              to={`/admin-dashboard/admin-permissions/${role?._id}`}
                             >
                               <i className="ti ti-shield me-1" /> Permissions
                             </Link>
@@ -285,7 +288,11 @@ const AdminManageRolesAndPermissions = () => {
                 type="button"
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
-              />
+                aria-label="Close"
+                id="add_role_close"
+              >
+                <i className="ti ti-x fs-16" />
+              </button>
             </div>
             <div className="modal-body">
               <label className="form-label">
@@ -300,16 +307,22 @@ const AdminManageRolesAndPermissions = () => {
               />
             </div>
             <div className="modal-footer">
-              <button className="btn btn-light" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleCreateRole}
-                data-bs-dismiss="modal"
-              >
-                Create
-              </button>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3 "
+                  type="button"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateRole}
+                  type="button"
+                  className="btn btn-primary"
+                >
+                  Create New
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -325,7 +338,11 @@ const AdminManageRolesAndPermissions = () => {
                 type="button"
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
-              />
+                aria-label="Close"
+                id="edit_role_close"
+              >
+                <i className="ti ti-x fs-16" />
+              </button>
             </div>
             <div className="modal-body">
               <label className="form-label">
@@ -353,17 +370,22 @@ const AdminManageRolesAndPermissions = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-light" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleUpdateRole}
-                data-bs-dismiss="modal"
-                disabled={!editRole}
-              >
-                Save Changes
-              </button>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3 "
+                  type="button"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleUpdateRole}
+                  type="button"
+                  className="btn btn-primary"
+                >
+                  Create New
+                </button>
+              </div>
             </div>
           </div>
         </div>

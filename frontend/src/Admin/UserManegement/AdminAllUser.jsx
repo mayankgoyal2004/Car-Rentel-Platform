@@ -97,7 +97,7 @@ const AdminAllUser = () => {
       userName: "",
       email: "",
       contact: "",
-      role: "",
+      role_id: "",
       password: "",
       confirmPassword: "",
       image: null,
@@ -110,6 +110,28 @@ const AdminAllUser = () => {
   // Add new user
   const handleAddUser = async () => {
     try {
+      if (!formData.userName.trim()) {
+        return toast.error("Username is required!");
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        return toast.error("Enter a valid email address!");
+      }
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(formData.contact)) {
+        return toast.error("Enter a valid 10-digit phone number!");
+      }
+      if (!formData.password || formData.password.length < 6) {
+        return toast.error("Password must be at least 6 characters long!");
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        return toast.error("Passwords do not match!");
+      }
+
+      if (!formData.role_id) {
+        return toast.error("Please select a role!");
+      }
       const userFormData = new FormData();
       userFormData.append("name", formData.userName);
       userFormData.append("email", formData.email);
@@ -137,14 +159,14 @@ const AdminAllUser = () => {
   const handleEditClick = (user) => {
     setSelectedUser(user);
     setFormData({
-      userName: user.userName,
-      email: user.email,
-      contact: user.contact,
-      role_id: user.role_id,
+      userName: user?.userName,
+      email: user?.email,
+      contact: user?.contact,
+      role_id: user.role?._id,
       password: "",
       confirmPassword: "",
       image: null,
-      status: user.status,
+      status: user?.status,
     });
     setEditImage(null);
   };
@@ -186,10 +208,7 @@ const AdminAllUser = () => {
         document.getElementById("edit_user_close").click();
       }
     } catch (err) {
-      console.error("Error updating user:", err);
-      alert(
-        "Error updating user: " + (err.response?.data?.message || err.message)
-      );
+      toast.error(err.response?.data?.message || "Something went wrong!");
     }
   };
 
@@ -264,7 +283,7 @@ const AdminAllUser = () => {
                   className="form-control"
                   placeholder="Search"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(e) => setSearch(e.target?.value)}
                 />
               </div>
             </div>
@@ -297,7 +316,7 @@ const AdminAllUser = () => {
                           <img
                             src={
                               user.image
-                                ? BASE_URL_IMG + user.image
+                                ? BASE_URL_IMG + user?.image
                                 : "/admin-assets/img/profiles/avatar-20.jpg"
                             }
                             className="rounded-circle me-2"
@@ -562,7 +581,6 @@ const AdminAllUser = () => {
                         value={formData.password}
                         onChange={handleInputChange}
                       />
-                      <span className="ti toggle-passwords ti-eye-off" />
                     </div>
                   </div>
                 </div>
@@ -580,7 +598,6 @@ const AdminAllUser = () => {
                         value={formData.confirmPassword}
                         onChange={handleInputChange}
                       />
-                      <span className="ti toggle-passworda ti-eye-off" />
                     </div>
                   </div>
                 </div>

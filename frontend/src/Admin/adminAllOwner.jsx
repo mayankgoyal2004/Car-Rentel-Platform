@@ -163,8 +163,8 @@ const AdminOwners = () => {
                     </td>
                     <td>
                       <p
-                        className={`badge  ${
-                          own.status ? "bg-success" : "bg-danger"
+                        className={`badge badge-md  ${
+                          own.status ? "badge-soft-success" : "badge-soft-danger"
                         }`}
                       >
                         {own.status ? "Active" : "Inactive"}

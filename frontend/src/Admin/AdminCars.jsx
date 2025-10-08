@@ -347,8 +347,10 @@ const AdminCars = () => {
                     <td>
                       {userType === 1 ? (
                         <button
-                          className={`badge border-0 ${
-                            car.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md border-0 ${
+                            car.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                           onClick={() =>
                             handleToggleStatus(car._id, car.status)
@@ -358,8 +360,10 @@ const AdminCars = () => {
                         </button>
                       ) : (
                         <span
-                          className={`badge ${
-                            car.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md ${
+                            car.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {car.status ? "Active" : "Inactive"}

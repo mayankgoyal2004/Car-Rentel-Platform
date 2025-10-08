@@ -165,7 +165,9 @@ const AdminAllBlogs = () => {
                     {userType !== 1 && (
                       <td>{blog.createdBy?.userName || "N/A"}</td>
                     )}
-                    {userType === 1 && <td>{blog.admin?.userName || "N/A"}</td>}
+                    {userType === 1 && (
+                      <td>{blog.admin?.userName || "N/A"}</td>
+                    )}
                     <td>{new Date(blog.createdAt).toLocaleDateString()}</td>
                     <td>
                       <span

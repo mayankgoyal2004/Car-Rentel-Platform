@@ -208,8 +208,10 @@ const AdminBlogsTags = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            tag.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md  ${
+                            tag.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
                           {tag.status ? "Active" : "Inactive"}
@@ -221,7 +223,7 @@ const AdminBlogsTags = () => {
                             className="btn btn-icon btn-sm"
                             type="button"
                             data-bs-toggle="dropdown"
-                            data-bs-display="static" 
+                            data-bs-display="static"
                             aria-expanded="false"
                           >
                             <i className="ti ti-dots-vertical" />

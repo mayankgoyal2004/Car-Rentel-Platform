@@ -213,11 +213,13 @@ const AdminBlogsCategories = () => {
                       </td>
                       <td>
                         <span
-                          className={`badge  ${
-                            category.status ? "bg-success" : "bg-danger"
+                          className={`badge badge-md  ${
+                            category.status
+                              ? "badge-soft-success"
+                              : "badge-soft-danger"
                           }`}
                         >
-                          {category.status ? "Published" : "Unpublish"}
+                          {category.status ? "Active" : "Inactive"}
                         </span>
                       </td>
                       <td>

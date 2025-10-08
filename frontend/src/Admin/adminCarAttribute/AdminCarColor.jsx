@@ -49,6 +49,7 @@ const AdminCarColor = () => {
       });
       toast.success(res.data.message);
       setnewCarColor("");
+      document.getElementById("add_color_close")?.click();
       fetchAllCarColor();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car color");
@@ -68,6 +69,7 @@ const AdminCarColor = () => {
       });
       toast.success(res.data.message);
       setEditCarColor(null);
+      document.getElementById("edit_color_close")?.click();
       fetchAllCarColor(currentPage, search);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update car color");
@@ -311,6 +313,7 @@ const AdminCarColor = () => {
                 type="button"
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
+                id="add_color_close"
                 aria-label="Close"
               >
                 <i className="ti ti-x fs-16" />
@@ -363,6 +366,7 @@ const AdminCarColor = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_color_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

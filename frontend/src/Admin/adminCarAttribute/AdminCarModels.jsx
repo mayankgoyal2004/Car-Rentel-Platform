@@ -73,6 +73,8 @@ const AdminCarModels = () => {
       toast.success(res.data.message);
       setNewModelName("");
       setNewBrandId("");
+      document.getElementById("add_model_close")?.click();
+
       fetchAllCarModels();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car model");
@@ -94,6 +96,8 @@ const AdminCarModels = () => {
       toast.success(res.data.message);
       setEditModel(null);
       setEditBrandId("");
+      document.getElementById("edit_model_close")?.click();
+
       fetchAllCarModels(currentPage, search);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update car model");
@@ -340,6 +344,7 @@ const AdminCarModels = () => {
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="add_model_close"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>
@@ -409,6 +414,7 @@ const AdminCarModels = () => {
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="edit_model_close"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>

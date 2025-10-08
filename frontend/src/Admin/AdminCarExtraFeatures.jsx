@@ -415,7 +415,7 @@ const AdminCarExtraFeatures = () => {
                   Type <span className="text-danger">*</span>
                 </label>
                 <select
-                  className="select"
+                  className="select form-control"
                   value={newExtraFeatures.type}
                   onChange={(e) =>
                     setNewExtraFeatures({
@@ -539,7 +539,7 @@ const AdminCarExtraFeatures = () => {
                   Type <span className="text-danger">*</span>
                 </label>
                 <select
-                  className="select"
+                  className="select form-control"
                   value={editExtraFeatures?.type}
                   onChange={(e) =>
                     setEditExtraFeatures({

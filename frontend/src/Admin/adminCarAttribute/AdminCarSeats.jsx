@@ -49,6 +49,7 @@ const AdminCarSeats = () => {
       });
       toast.success(res.data.message);
       setnewCarSeats("");
+      document.getElementById("add_seat_close")?.click();
       fetchAllCarSeats();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car seat");
@@ -68,6 +69,7 @@ const AdminCarSeats = () => {
       });
       toast.success(res.data.message);
       setEditCarSeats(null);
+      document.getElementById("edit_seat_close")?.click();
       fetchAllCarSeats(currentPage, search);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update car seat");
@@ -95,7 +97,7 @@ const AdminCarSeats = () => {
   };
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setCurrentPage(1); // ✅ good
+    setCurrentPage(1); 
   };
 
   return (
@@ -307,6 +309,7 @@ const AdminCarSeats = () => {
                 type="button"
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
+                id="add_seat_close"
                 aria-label="Close"
               >
                 <i className="ti ti-x fs-16" />
@@ -359,6 +362,7 @@ const AdminCarSeats = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_seat_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

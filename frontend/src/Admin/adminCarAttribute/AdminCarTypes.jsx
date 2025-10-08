@@ -49,6 +49,8 @@ const AdminCarTypes = () => {
       });
       toast.success(res.data.message);
       setnewCarType("");
+      document.getElementById("add_type_close")?.click();
+
       fetchAllCarTypes();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car type");
@@ -67,6 +69,8 @@ const AdminCarTypes = () => {
         status: editCarType.status,
       });
       toast.success(res.data.message);
+      document.getElementById("edit_type_close")?.click();
+
       setEditCarType(null);
       fetchAllCarTypes(currentPage, search);
     } catch (err) {
@@ -307,6 +311,7 @@ const AdminCarTypes = () => {
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="add_type_close"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>
@@ -358,6 +363,7 @@ const AdminCarTypes = () => {
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="edit_type_close"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>

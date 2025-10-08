@@ -51,6 +51,7 @@ const AdminCarCylinders = () => {
       });
       toast.success(res.data.message);
       setnewCarCylinder("");
+      document.getElementById("add_cylinder_close")?.click();
       fetchAllCarCylinders();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car cylinder");
@@ -70,6 +71,7 @@ const AdminCarCylinders = () => {
       });
       toast.success(res.data.message);
       setEditCarCylinder(null);
+      document.getElementById("edit_cylinder_close")?.click();
       fetchAllCarCylinders(currentPage, search);
     } catch (err) {
       toast.error(
@@ -314,6 +316,7 @@ const AdminCarCylinders = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_cylinder_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -365,6 +368,7 @@ const AdminCarCylinders = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_cylinder_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

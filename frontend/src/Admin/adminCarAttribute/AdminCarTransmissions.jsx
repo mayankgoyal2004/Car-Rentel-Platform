@@ -51,6 +51,7 @@ const AdminCarTransmissions = () => {
       });
       toast.success(res.data.message);
       setnewCarTransmission("");
+      document.getElementById("add_transmission_close")?.click();
       fetchAllCarTransmissions();
     } catch (err) {
       toast.error(
@@ -75,6 +76,7 @@ const AdminCarTransmissions = () => {
       );
       toast.success(res.data.message);
       setEditCarTransmission(null);
+      document.getElementById("edit_transmission_close")?.click();
       fetchAllCarTransmissions(currentPage, search);
     } catch (err) {
       toast.error(
@@ -325,6 +327,7 @@ const AdminCarTransmissions = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_transmission_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -376,6 +379,7 @@ const AdminCarTransmissions = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_transmission_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

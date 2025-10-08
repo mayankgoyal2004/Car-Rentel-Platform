@@ -53,7 +53,10 @@ const AdminBrands = () => {
       toast.success(res.data.message);
       setNewBrandName("");
       setNewImage(null);
+      document.getElementById("add_brand_close")?.click();
+
       fetchAllBrands();
+      setPreviewImage(null);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add brand");
     }
@@ -75,6 +78,8 @@ const AdminBrands = () => {
       const res = await apiService.updateCarBrand(editBrand._id, formData);
       toast.success(res.data.message);
       setEditBrand(null);
+      document.getElementById("edit_brand_close")?.click();
+
       setEditImage(null);
       fetchAllBrands(currentPage, search);
     } catch (err) {
@@ -361,6 +366,7 @@ const AdminBrands = () => {
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="add_brand_close"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>
@@ -452,6 +458,7 @@ const AdminBrands = () => {
                   className="btn-close custom-btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
+                  id="edit_brand_close"
                 >
                   <i className="ti ti-x fs-16" />
                 </button>

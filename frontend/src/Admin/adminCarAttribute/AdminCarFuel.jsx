@@ -49,6 +49,7 @@ const AdminCarFuel = () => {
       });
       toast.success(res.data.message);
       setnewCarFuel("");
+      document.getElementById("add_fuel_close")?.click();
       fetchAllCarFuel();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car fuel");
@@ -68,6 +69,7 @@ const AdminCarFuel = () => {
       });
       toast.success(res.data.message);
       setEditCarFuel(null);
+      document.getElementById("edit_fuel_close")?.click();
       fetchAllCarFuel(currentPage, search);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update car fuel");
@@ -308,6 +310,7 @@ const AdminCarFuel = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_fuel_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -359,6 +362,7 @@ const AdminCarFuel = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_fuel_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

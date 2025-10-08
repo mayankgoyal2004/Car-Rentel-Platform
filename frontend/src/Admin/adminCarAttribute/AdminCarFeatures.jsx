@@ -51,6 +51,7 @@ const AdminCarFeatures = () => {
       });
       toast.success(res.data.message);
       setnewCarFeature("");
+      document.getElementById("add_car_feature_close")?.click();
       fetchAllCarFeatures();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car feature");
@@ -70,6 +71,7 @@ const AdminCarFeatures = () => {
       });
       toast.success(res.data.message);
       setEditCarFeature(null);
+      document.getElementById("close_edit_car_feature")?.click();
       fetchAllCarFeatures(currentPage, search);
     } catch (err) {
       toast.error(
@@ -314,6 +316,7 @@ const AdminCarFeatures = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_car_feature_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -365,6 +368,7 @@ const AdminCarFeatures = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="close_edit_car_feature"
               >
                 <i className="ti ti-x fs-16" />
               </button>

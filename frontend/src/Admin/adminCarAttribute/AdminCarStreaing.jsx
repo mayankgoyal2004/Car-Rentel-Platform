@@ -51,6 +51,7 @@ const AdminCarSteering = () => {
       });
       toast.success(res.data.message);
       setnewCarSteering("");
+      document.getElementById("add_steering_close")?.click();
       fetchAllCarSteering();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add car steering");
@@ -70,6 +71,7 @@ const AdminCarSteering = () => {
       });
       toast.success(res.data.message);
       setEditCarSteering(null);
+      document.getElementById("edit_steering_close")?.click();
       fetchAllCarSteering(currentPage, search);
     } catch (err) {
       toast.error(
@@ -314,6 +316,7 @@ const AdminCarSteering = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_steering_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -365,6 +368,7 @@ const AdminCarSteering = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_steering_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

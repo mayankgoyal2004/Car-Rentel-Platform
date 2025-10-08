@@ -341,7 +341,7 @@ const AdminMain = () => {
                         <h5 className="mb-1">
                           {userType === 1
                             ? customerPegination?.totalcustomer
-                            : driverPeginaton.totalDriver}
+                            : driverPeginaton?.totalDriver}
                         </h5>
                       </div>
                       <div id="earning-chart" />
@@ -453,7 +453,7 @@ const AdminMain = () => {
                         <div className="bg-light border p-2 br-5 flex-fill text-center">
                           <h6 className="fs-14 fw-semibold">Passengers</h6>
                           <span className="fs-13">
-                            {newlyCar.passengers || "N/A"}
+                            {newlyCar?.passengers || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -469,7 +469,7 @@ const AdminMain = () => {
                       </div>
                     </div>
                     <Link
-                      to={`/admin-dashboard/car-details/${newlyCar._id}`} // ✅ pass car id for details page
+                      to={`/admin-dashboard/car-details/${newlyCar?._id}`} 
                       className="btn btn-white d-flex align-items-center justify-content-center"
                     >
                       View Details
@@ -514,7 +514,7 @@ const AdminMain = () => {
                           </tr>
                         ) : (
                           customer.map((cus) => (
-                            <tr key={cus._id}>
+                            <tr key={cus?._id}>
                               <td>
                                 <div className="d-flex align-items-center">
                                   <Link
@@ -522,7 +522,7 @@ const AdminMain = () => {
                                     className="avatar flex-shrink-0"
                                   >
                                     <img
-                                      src={`${BASE_URL_IMG + cus.image}`}
+                                      src={`${BASE_URL_IMG + cus?.image}`}
                                       className="rounded-circle"
                                       alt="img"
                                     />
@@ -530,9 +530,9 @@ const AdminMain = () => {
                                   <div className="flex-grow-1 ms-2">
                                     <h6 className="fs-14 fw-semibold mb-1">
                                       <Link
-                                        to={`/admin-dashboard/customer-details/${cus._id}`}
+                                        to={`/admin-dashboard/customer-details/${cus?._id}`}
                                       >
-                                        {cus.name}
+                                        {cus?.name}
                                       </Link>
                                     </h6>
                                     <span className="badge badge-sm bg-secondary-transparent rounded-pill">
@@ -583,23 +583,23 @@ const AdminMain = () => {
                           </tr>
                         ) : (
                           latestReservation.map((res) => {
-                            const pickup = new Date(res.pickupDate);
-                            const drop = new Date(res.dropDate);
+                            const pickup = new Date(res?.pickupDate);
+                            const drop = new Date(res?.dropDate);
                             const duration = Math.ceil(
                               (drop - pickup) / (1000 * 60 * 60 * 24)
                             );
 
                             return (
-                              <tr key={res._id}>
+                              <tr key={res?._id}>
                                 <td>
                                   <div className="d-flex align-items-center">
                                     <Link
-                                      to={`/admin-dashboard/car-details/${res.car._id}`}
+                                      to={`/admin-dashboard/car-details/${res.car?._id}`}
                                       className="avatar flex-shrink-0"
                                     >
                                       <img
-                                        src={BASE_URL_IMG + res.car.image}
-                                        alt={res.car.carName}
+                                        src={BASE_URL_IMG + res?.car.image}
+                                        alt={res?.car?.carName}
                                         className="rounded"
                                       />
                                     </Link>
@@ -608,19 +608,19 @@ const AdminMain = () => {
                                         {duration}{" "}
                                         {duration > 1 ? "Days" : "Day"}
                                         <i className="ti ti-circle-filled text-primary fs-5 mx-1" />
-                                        {res.driverType === "self"
+                                        {res?.driverType === "self"
                                           ? "Self"
                                           : "With Driver"}
                                       </p>
                                       <h6 className="fs-14 fw-semibold mb-1">
                                         <Link
-                                          to={`/admin-dashboard/car-details/${res.car._id}`}
+                                          to={`/admin-dashboard/car-details/${res.car?._id}`}
                                         >
-                                          {res.car.carName}
+                                          {res.car?.carName}
                                         </Link>
                                       </h6>
                                       <span className="badge badge-sm bg-secondary-transparent rounded-pill">
-                                        {res.status}
+                                        {res?.status}
                                       </span>
                                     </div>
                                   </div>
@@ -628,18 +628,18 @@ const AdminMain = () => {
                                 <td>
                                   <div className="d-flex flex-column">
                                     <span className="fs-13 fw-semibold">
-                                      {res.pickupAddress}
+                                      {res?.pickupAddress}
                                     </span>
                                     <span className="fs-13 text-muted">
-                                      {pickup.toLocaleDateString()},{" "}
-                                      {res.pickupTime}
+                                      {pickup?.toLocaleDateString()},{" "}
+                                      {res?.pickupTime}
                                     </span>
                                     <span className="fs-13 fw-semibold mt-1">
-                                      {res.dropAddress}
+                                      {res?.dropAddress}
                                     </span>
                                     <span className="fs-13 text-muted">
-                                      {drop.toLocaleDateString()},{" "}
-                                      {res.dropTime}
+                                      {drop?.toLocaleDateString()},{" "}
+                                      {res?.dropTime}
                                     </span>
                                   </div>
                                 </td>
@@ -930,11 +930,11 @@ const AdminMain = () => {
                               <td>
                                 <div className="d-flex align-items-center">
                                   <Link
-                                    to={"customers-details/" + inv.customer._id}
+                                    to={"customers-details/" + inv.customer?._id}
                                     className="avatar flex-shrink-0"
                                   >
                                     <img
-                                      src={BASE_URL_IMG + inv.customer.image}
+                                      src={BASE_URL_IMG + inv.customer?.image}
                                       className="rounded-circle"
                                       alt="img"
                                     />
@@ -942,7 +942,7 @@ const AdminMain = () => {
                                   <div className="flex-grow-1 ms-2">
                                     <h6 className="fs-14 fw-semibold mb-1">
                                       <Link to="customers-details">
-                                        {inv.customer.name}{" "}
+                                        {inv.customer?.name}{" "}
                                       </Link>
                                     </h6>
                                   </div>
@@ -950,19 +950,19 @@ const AdminMain = () => {
                               </td>
                               <td>
                                 <a
-                                  href={`mailto:${inv.customer.email}`}
+                                  href={`mailto:${inv.customer?.email}`}
                                   className="__cf_email__"
                                 >
-                                  {inv.customer.email}
+                                  {inv.customer?.email}
                                 </a>
                               </td>
-                              <td>{new Date(inv.fromDate).toDateString()}</td>
-                              <td>{new Date(inv.dueDate).toDateString()}</td>
-                              <td>${inv.totalAmount}</td>
+                              <td>{new Date(inv?.fromDate).toDateString()}</td>
+                              <td>{new Date(inv?.dueDate).toDateString()}</td>
+                              <td>${inv?.totalAmount}</td>
                               <td>
                                 <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
                                   <i className="ti ti-circle-filled fs-6 me-2" />
-                                  {inv.status}
+                                  {inv?.status}
                                 </span>
                               </td>
                             </tr>

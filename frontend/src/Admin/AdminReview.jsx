@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import { useEffect } from "react";
 import { CSVLink } from "react-csv";
 
@@ -317,6 +317,19 @@ const AdminReview = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
       {/* /Delete Maintenance */}
     </div>

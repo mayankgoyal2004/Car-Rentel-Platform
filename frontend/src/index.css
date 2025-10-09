@@ -327,9 +327,6 @@ iframe[id^=":"] {
   /*  overflow: hidden !important;  */
 }
 
-
-
-
 /* 🔥 Completely remove today highlighting in Flatpickr */
 .flatpickr-day.today {
   background: none !important;
@@ -342,8 +339,18 @@ iframe[id^=":"] {
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange {
-  background: #FFA633 !important; /* use your theme color */
+  background: #ffa633 !important; /* use your theme color */
   color: #fff !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+
+
+.footer a {
+  color: #ccc !important;
+}
+
+.footer a:hover {
+  color: #ffa633 !important;
 }

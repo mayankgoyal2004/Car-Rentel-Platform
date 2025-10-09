@@ -21,7 +21,7 @@ const addExtraService = async (req, res) => {
     if (foundService) {
       return res.status(400).json({
         success: false,
-        error: "Service with this name already exists",
+        message: "Service with this name already exists",
       });
     }
 

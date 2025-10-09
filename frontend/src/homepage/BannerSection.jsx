@@ -156,7 +156,6 @@ function BannerSection() {
                   options={{
                     mode: "single",
 
-                    defaultDate: null,
                     enableTime: true,
                     dateFormat: "Y-m-d H:i",
                     minDate: "today", // disable past dates
@@ -178,14 +177,8 @@ function BannerSection() {
                   options={{
                     mode: "single",
                     enableTime: true,
-                    defaultDate: null,
                     dateFormat: "Y-m-d H:i",
                     minDate: pickupDate || "today",
-                    onReady: (selectedDates, dateStr, instance) => {
-                      const todayElem =
-                        instance.calendarContainer.querySelector(".today");
-                      if (todayElem) todayElem.classList.remove("today");
-                    }, // can't pick before pickup date
                   }}
                   placeholder="Select drop date"
                 />

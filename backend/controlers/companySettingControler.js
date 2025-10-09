@@ -14,7 +14,7 @@ const addCompanySetting = async (req, res) => {
       postalCode,
     } = req.body;
 
-    if (!organizationName || !ownerName || !email || !phone) {
+    if (!organizationName || !ownerName || !email || !phone || !addressLine) {
       return res
         .status(400)
         .json({ success: false, message: "Required fields missing" });

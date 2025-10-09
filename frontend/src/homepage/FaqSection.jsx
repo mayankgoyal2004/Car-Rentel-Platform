@@ -17,7 +17,7 @@ const FaqSection = () => {
   }, []);
 
   return (
-    <section className="faq-section-four pt-0">
+    <section className="faq-section-four pt-0 ">
       <div className="container">
         <div className="row">
           <div className="col-lg-8 mx-auto">

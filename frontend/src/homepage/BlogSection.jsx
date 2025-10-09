@@ -20,7 +20,7 @@ const BlogSection = () => {
     fetchLatestBlogs();
   }, []);
   return (
-    <section className="blog-section news-section pt-0">
+    <section className="blog-section news-section pt-0 pb-5">
       <div className="container">
         {/* Heading title*/}
         <div className="section-heading" data-aos="fade-down">

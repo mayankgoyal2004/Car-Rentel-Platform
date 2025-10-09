@@ -244,7 +244,7 @@ const CompanySetting = () => {
                           Profile Photo
                         </p>
                         <div className="d-flex align-items-center flex-wrap row-gap-3 mb-3">
-                          <div className="d-flex align-items-center justify-content-center avatar avatar-xxl me-3 flex-shrink-0 text-dark frames position-relative">
+                          <div className="d-flex align-items-center justify-content-center avatar avatar-xxl  me-3 flex-shrink-0 text-dark frames">
                             {imagePreview ? (
                               <img
                                 src={BASE_URL_IMG + imagePreview}
@@ -253,7 +253,9 @@ const CompanySetting = () => {
                                 style={{
                                   width: "100%",
                                   height: "100%",
-                                  objectFit: "cover",
+                                  objectFit: "contain", 
+                                
+                                  borderRadius: "50%",
                                 }}
                               />
                             ) : (

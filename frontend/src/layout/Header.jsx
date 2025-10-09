@@ -34,6 +34,12 @@ const Header = () => {
     setActivePath(location.pathname);
   }, [location.pathname]);
 
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    navigate("/", { replace: true });
+    window.history.replaceState(null, "", "/#");
+  };
+
   useEffect(() => {
     const mobileBtn = document.getElementById("mobile_btn");
     const menuClose = document.getElementById("menu_close");
@@ -88,7 +94,11 @@ const Header = () => {
                 <span />
               </span>
             </a>
-            <Link to="/" className="navbar-brand logo">
+            <Link
+              to="/#"
+              className="navbar-brand logo"
+              onClick={handleLogoClick}
+            >
               <img
                 src={BASE_URL_IMG + companySetting?.profilePhoto}
                 className="img-fluid white-logo"

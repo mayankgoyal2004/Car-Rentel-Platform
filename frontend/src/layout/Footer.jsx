@@ -52,21 +52,15 @@ const Footer = () => {
                         <Link to="/gallery">Gallery</Link>
                       </li>
                       <li>
-                        <Link
-                          to="/terms-and-condition"
-                        
-                        >
+                        <Link to="/terms-and-condition">
                           Terms and conditions
                         </Link>
                       </li>
                       <li>
-                        <Link to="/privacy-policy" >
-                          Privacy Policy
-                        </Link>
+                        <Link to="/privacy-policy">Privacy Policy</Link>
                       </li>
                     </ul>
                   </div>
-                
                 </div>
                 {/* <div className="col-lg-4 col-md-6">
              
@@ -92,12 +86,12 @@ const Footer = () => {
                   </div>
                 
                 </div> */}
-                <div className="col-lg-6 col-md-6">
+                <div className="col-lg-6 col-md-6 ">
                   {/* Footer Widget */}
                   <div className="footer-widget footer-menu">
-                    <h5 className="footer-title">Quick links</h5>
+                    <h5 className="footer-title ">Quick links</h5>
                     <ul>
-                      <li>
+                      <li className="text-light">
                         <Link to="/user-dashboard">My Account</Link>
                       </li>
                       <li>
@@ -148,12 +142,15 @@ const Footer = () => {
                 <div className="footer-social-widget">
                   <ul className="nav-social">
                     <li>
-                      <a href="#">
+                      <a
+                        href="https://www.facebook.com/vibranticksolutions/"
+                        target="_blank"
+                      >
                         <i className="fa-brands fa-facebook-f fa-facebook fi-icon" />
                       </a>
                     </li>
                     <li>
-                      <a href="#">
+                      <a href="https://x.com/vibrantick" target="_blank">
                         <i className="#" />
                       </a>
                     </li>
@@ -163,12 +160,15 @@ const Footer = () => {
                       </a>
                     </li> */}
                     <li>
-                      <a href="#">
+                      <a href="https://x.com/vibrantick" target="_blank">
                         <i className="fab fa-twitter fi-icon" />{" "}
                       </a>
                     </li>
                     <li>
-                      <a href="#">
+                      <a
+                        href="https://www.linkedin.com/company/vibrantick-infotech-solutions/?viewAsMember=true"
+                        target="_blank"
+                      >
                         <i className="fab fa-linkedin fi-icon" />
                       </a>
                     </li>
@@ -188,7 +188,10 @@ const Footer = () => {
             <div className="row align-items-center">
               <div className="col-md-6">
                 <div className="copyright-text">
-                  <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
+                  <p className="text-light">
+                    {" "}
+                    © 2025 Vibrantick Infotech Solutions. All Right reserved.
+                  </p>
                 </div>
               </div>
               <div className="col-md-6">

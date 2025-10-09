@@ -52,6 +52,10 @@ const AdminCarExtraFeatures = () => {
         type: "",
         description: "",
       });
+      if (res.data.success) {
+        document.getElementById("add_service_close")?.click();
+        fetchExtraFeatures(currentPage, search);
+      }
       fetchExtraFeatures();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add Extra Service");
@@ -355,6 +359,7 @@ const AdminCarExtraFeatures = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_service_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -382,7 +387,7 @@ const AdminCarExtraFeatures = () => {
                     Quantity <span className="text-danger">*</span>
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     value={newExtraFeatures.quantity}
                     onChange={(e) =>
@@ -398,7 +403,7 @@ const AdminCarExtraFeatures = () => {
                     Price <span className="text-danger">*</span>
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     value={newExtraFeatures.price}
                     onChange={(e) =>

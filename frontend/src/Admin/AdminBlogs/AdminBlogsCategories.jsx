@@ -66,6 +66,7 @@ const AdminBlogsCategories = () => {
       });
 
       toast.success(res.data.message);
+      document.getElementById("add_Category_close")?.click();
       setNewCategory("");
       fetchCategories();
     } catch (err) {
@@ -319,6 +320,8 @@ const AdminBlogsCategories = () => {
                 type="button"
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
+                id="add_Category_close"
+                aria-label="Close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -338,16 +341,22 @@ const AdminBlogsCategories = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-light" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleCreateCategory}
-                data-bs-dismiss="modal"
-              >
-                Create
-              </button>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3 "
+                  type="button"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateCategory}
+                  type="button"
+                  className="btn btn-primary"
+                >
+                  Create New
+                </button>
+              </div>
             </div>
           </div>
         </div>

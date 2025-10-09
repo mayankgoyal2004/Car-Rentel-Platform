@@ -59,8 +59,11 @@ const AdminBlogsTags = () => {
       const res = await apiService.addblogstag({ TagName: newTag.trim() });
 
       toast.success(res.data.message);
-      setNewTag("");
-      fetchTags();
+      if (res.data.success) {
+        setNewTag("");
+        document.getElementById("add_Category_close")?.click();
+        fetchTags();
+      }
     } catch (err) {
       if (err.response && err.response.data) {
         toast.error(err.response.data.message);
@@ -316,6 +319,8 @@ const AdminBlogsTags = () => {
                 type="button"
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
+                id="add_Category_close"
+                aria-label="Close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

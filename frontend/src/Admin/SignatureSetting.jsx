@@ -22,7 +22,11 @@ const SignatureSetting = () => {
       const res = await apiService.getAllSignature();
       setSignatures(res.data.data || []);
     } catch (err) {
-      toast.error("Failed to load signatures" + err.message);
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 

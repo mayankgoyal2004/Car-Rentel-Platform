@@ -123,6 +123,7 @@ const AdminLocationCities = () => {
       toast.success(res.data.message);
       setDeleteCity(null);
       fetchAllCity(search, currentPage);
+      document.getElementById("delete_city_close")?.click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -544,7 +545,8 @@ const AdminLocationCities = () => {
               <h4 className="mb-1">Delete City</h4>
               <p className="mb-3">Are you sure you want to delete City?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                <button className="btn btn-light me-3" data-bs-dismiss="modal"
+                id="delete_city_close">
                   Cancel
                 </button>
                 <button onClick={handleDeleteCity} className="btn btn-primary">

@@ -42,12 +42,16 @@ const InvoiceSetting = () => {
     formData.append("image", file);
 
     try {
-      const res = apiService.addInvoiceLogo(formData);
+      const res = await apiService.addInvoiceLogo(formData);
 
-      toast.success("Invoice logo saved successfully ");
-      setSavedLogo(res.data.data.logo);
-      setFile(null);
-      setPreview(null);
+      if (res.data.success) {
+        toast.success("Invoice logo saved successfully");
+        setSavedLogo(res.data.data.logo);
+        setFile(null);
+        setPreview(null);
+      } else {
+        toast.error(res.data.message || "Failed to save logo");
+      }
     } catch (err) {
       if (err.response && err.response.data) {
         toast.error(err.response.data.message);
@@ -56,6 +60,7 @@ const InvoiceSetting = () => {
       }
     }
   };
+
   return (
     <div className="page-wrapper">
       <div className="content me-0 pb-0 me-lg-4">
@@ -134,12 +139,12 @@ const InvoiceSetting = () => {
                       </li>
                     )}
                     <li>
-                                        <Link to="/admin-dashboard/language-setting">
-                                          <i className="ti ti-language me-2" />
-                  
-                                          <span> Language Settings</span>
-                                        </Link>
-                                      </li>
+                      <Link to="/admin-dashboard/language-setting">
+                        <i className="ti ti-language me-2" />
+
+                        <span> Language Settings</span>
+                      </Link>
+                    </li>
                     {userType === 1 && (
                       <li>
                         <a href="language-setting.html">

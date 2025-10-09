@@ -225,7 +225,7 @@ const AdminLocations = () => {
 
       if (res.data.success) {
         toast.success("Location deleted successfully!");
-
+document.getElementById("delete_location_close").click();
         fetchAllLocation(search, currentPage);
         resetFormData();
       }
@@ -1217,7 +1217,8 @@ const AdminLocations = () => {
               <h4 className="mb-1">Delete Location</h4>
               <p className="mb-3">Are you sure you want to delete location?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                <button className="btn btn-light me-3" data-bs-dismiss="modal"
+                id="delete_location_close">
                   Cancel
                 </button>
                 <button

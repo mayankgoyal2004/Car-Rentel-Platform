@@ -197,6 +197,7 @@ const AdminCustomers = () => {
       );
       if (res.data.success) {
         toast.success("Customer updated successfully!");
+        document.getElementById("close-modal").click();
         fetchCustomers(search, currentPage);
         resetFormData();
       }
@@ -785,6 +786,7 @@ const AdminCustomers = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="close-modal"
               >
                 <i className="ti ti-x fs-16" />
               </button>

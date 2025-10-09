@@ -143,7 +143,9 @@ const AdminCars = () => {
     try {
       const res = await apiService.deleteCar(deleteCar._id);
       toast.success(res.data.message);
+
       setDeleteCar(null);
+      document.getElementById("delete_car_close")?.click();
       fetchAllCars(currentPage, search);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to delete Car");
@@ -488,7 +490,11 @@ const AdminCars = () => {
               <h4 className="mb-1">Delete Car</h4>
               <p className="mb-3">Are you sure you want to delete Car?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_car_close"
+                >
                   Cancel
                 </button>
                 <button className="btn btn-primary" onClick={handleDeleteCar}>

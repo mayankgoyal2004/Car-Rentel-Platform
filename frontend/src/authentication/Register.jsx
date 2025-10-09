@@ -137,7 +137,7 @@ const Register = () => {
                 </Link>
                 <Link
                   to="/business-register"
-                  className="btn btn-outline-primary ms-2 border-0"
+                  className="btn business-register-btn ms-2"
                 >
                   Business Owner Register
                 </Link>

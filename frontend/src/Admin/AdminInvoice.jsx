@@ -40,6 +40,7 @@ const AdminInvoice = () => {
       const res = await apiService.deleteInvoice(deleteinvoceId);
       if (res.data.success) {
         toast.success("Invoice deleted successfully!");
+      document.getElementById("delete_invoice_close").click();
 
         fetchInvoce(search, currentPage);
         setDeleteInvoiceId(null);
@@ -320,7 +321,8 @@ const AdminInvoice = () => {
               <h4 className="mb-1">Delete Invoice</h4>
               <p className="mb-3">Are you sure you want to delete Invoice?</p>
               <div className="d-flex justify-content-center">
-                <a className="btn btn-light me-3" data-bs-dismiss="modal">
+                <a className="btn btn-light me-3" data-bs-dismiss="modal"
+                id="delete_invoice_close">
                   Cancel
                 </a>
                 <button

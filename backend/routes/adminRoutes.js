@@ -37,7 +37,6 @@ const role = require("../controlers/RoleControler");
 const testimonial = require("../controlers/testimonialController");
 const faqCategory = require("../controlers/faqCategoryControler");
 const faq = require("../controlers/faqControler");
-const checkSubscription = require("../middlewares/checkPermission");
 const reservation = require("../controlers/reservationControler");
 const contact = require("../controlers/contactUsControler");
 const invoice = require("../controlers/invoiceControler");

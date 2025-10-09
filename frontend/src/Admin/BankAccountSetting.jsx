@@ -22,7 +22,11 @@ const BankAccountSetting = () => {
       const res = await apiService.getAllBankAccount();
       setBankAccount(res.data.data);
     } catch (err) {
-      toast.error("Failed to load signatures"+err.message);
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 
@@ -55,7 +59,11 @@ const BankAccountSetting = () => {
       });
       fetchBankAccount();
     } catch (err) {
-      toast.error("Failed to add bank account"+err.message);
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 
@@ -82,7 +90,11 @@ const BankAccountSetting = () => {
       setEditingBankAccount(null);
       fetchBankAccount();
     } catch (err) {
-      toast.error("Failed to update bank account"+err.message);
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 
@@ -92,7 +104,11 @@ const BankAccountSetting = () => {
       toast.success("Bank account deleted successfully");
       fetchBankAccount();
     } catch (err) {
-      toast.error("Failed to delete bank account"+err.message);
+      if (err.response && err.response.data) {
+        toast.error(err.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
     }
   };
 
@@ -177,13 +193,13 @@ const BankAccountSetting = () => {
                         </Link>
                       </li>
                     )}
-                     <li>
-                                         <Link to="/admin-dashboard/language-setting">
-                                           <i className="ti ti-language me-2" />
-                   
-                                           <span> Language Settings</span>
-                                         </Link>
-                                       </li>
+                    <li>
+                      <Link to="/admin-dashboard/language-setting">
+                        <i className="ti ti-language me-2" />
+
+                        <span> Language Settings</span>
+                      </Link>
+                    </li>
                     {userType === 1 && (
                       <li>
                         <a href="language-setting.html">

@@ -45,12 +45,11 @@ const ReservationSchema = new mongoose.Schema(
     bookingType: {
       type: String,
       enum: ["daily", "weekly", "monthly", "yearly"],
-      required: true,
     },
-    pickupTime: { type: String, required: true },
-    dropTime: { type: String, required: true },
-    pickupDate: { type: Date, required: true },
-    dropDate: { type: Date, required: true },
+    pickupTime: { type: String },
+    dropTime: { type: String },
+    pickupDate: { type: Date },
+    dropDate: { type: Date },
 
     paymentStatus: {
       type: String,

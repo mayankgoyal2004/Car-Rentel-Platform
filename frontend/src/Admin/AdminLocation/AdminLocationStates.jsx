@@ -480,7 +480,8 @@ const AdminLocationStates = () => {
               <h4 className="mb-1">Delete State</h4>
               <p className="mb-3">Are you sure you want to delete State?</p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                <button className="btn btn-light me-3" data-bs-dismiss="modal"
+                id="delete_state_close">
                   Cancel
                 </button>
                 <button onClick={handleDeleteState} className="btn btn-primary">

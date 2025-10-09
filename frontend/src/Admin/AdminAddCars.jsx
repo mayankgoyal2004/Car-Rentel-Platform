@@ -1783,7 +1783,8 @@ const AdminAddCars = () => {
 
                 {/* Navigation */}
                 <div className="d-flex justify-content-end gap-2 pt-3 text-light">
-                  <button className="btn btn-outline-light" onClick={prevStep}>
+                  <button  className="btn btn-outline-light border wizard-prev me-2 text-light" onClick={prevStep}>
+                     <i className="ti ti-chevron-left me-1" />
                     Back
                   </button>
                   <button
@@ -1888,15 +1889,16 @@ const AdminAddCars = () => {
                 </div>
 
                 {/* Navigation */}
-                <div className="d-flex justify-content-end gap-2 pt-3 text-light">
+                <div className="d-flex justify-content-end gap-2 pt-3 ">
                   <button
-                    className="btn btn-outline-light text-light "
+                      className="btn btn-outline-light border wizard-prev me-2 text-light"
                     onClick={prevStep}
                   >
+                     <i className="ti ti-chevron-left me-1" />
                     Back
                   </button>
                   <button className="btn btn-primary" onClick={saveCarFaqs}>
-                    Save & Exit
+                   Next Step
                   </button>
                 </div>
               </fieldset>

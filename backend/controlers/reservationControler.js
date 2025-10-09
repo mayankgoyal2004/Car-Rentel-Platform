@@ -35,7 +35,7 @@ const addReservation = async (req, res) => {
       pricingDetails,
     } = req.body;
 
-    if (!car_id || !customer_id || !pickupDate || !dropDate || !bookingType) {
+    if (!car_id || !customer_id || pickupTime || dropTime || !pickupDate || !dropDate || !bookingType) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required fields" });

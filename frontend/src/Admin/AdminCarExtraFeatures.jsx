@@ -83,6 +83,7 @@ const AdminCarExtraFeatures = () => {
       toast.success(res.data.message);
       setEditExtraFeatures(null);
       fetchExtraFeatures(currentPage, search);
+      document.getElementById("edit_service_close")?.click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add Extra Service");
     }
@@ -483,6 +484,7 @@ const AdminCarExtraFeatures = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_service_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

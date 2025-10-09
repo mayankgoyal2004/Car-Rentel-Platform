@@ -84,6 +84,7 @@ const AdminLocationCountries = () => {
       const res = await apiService.deleteCountry(deleteCountry._id);
       toast.success(res.data.message);
       setDeleteCountry(null);
+      document.getElementById("delete_country_close").click();
       getAllCountry(search, currentPage);
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong");
@@ -457,11 +458,8 @@ const AdminLocationCountries = () => {
               <h4 className="mb-1">Delete Country</h4>
               <p className="mb-3">Are you sure you want to delete Country?</p>
               <div className="d-flex justify-content-center">
-                <a
-                  href="javascript:void(0);"
-                  className="btn btn-light me-3"
-                  data-bs-dismiss="modal"
-                >
+                <a className="btn btn-light me-3" data-bs-dismiss="modal"
+                id="delete_country_close">
                   Cancel
                 </a>
                 <button

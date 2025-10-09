@@ -49,6 +49,7 @@ const AdminReservation = () => {
       const res = await apiService.delteReservation(deleteReservation._id);
       if (res.data.success) {
         fetchReservations(search, currentPage);
+        document.getElementById("delete_reservation_close").click();
         setDeleteReservation(null);
         toast.success("Reservation deleted successfully!");
       } else {
@@ -426,7 +427,11 @@ const AdminReservation = () => {
                 Are you sure you want to delete Reservation?
               </p>
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_reservation_close"
+                >
                   Cancel
                 </button>
                 <button className="btn btn-primary" onClick={handleDelete}>

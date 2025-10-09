@@ -8,11 +8,12 @@ const MODULES = [
   "Car",
   "Blog",
   "Enquiries",
-  "Customers",
+  "Customer",
   "Driver",
   "Permissions",
   "Message",
-  "Settings",
+  "Setting",
+  "Invoice",
 ];
 
 const AdminPermissions = () => {

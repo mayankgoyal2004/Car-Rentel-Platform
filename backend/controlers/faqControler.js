@@ -39,15 +39,16 @@ const updateFaq = async (req, res) => {
     );
 
     if (!faq)
-      return res
-        .status(404)
-        .json({
-          message: "FAQ updated successfully",
-          success: false,
-          message: "FAQ not found",
-        });
-
-    res.json({ success: true, faq });
+      return res.status(404).json({
+        message: "FAQ updated successfully",
+        success: false,
+        message: "FAQ not found",
+      });
+    res.json({
+      success: true,
+      message: "FAQ updated successfully.",
+      faq,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

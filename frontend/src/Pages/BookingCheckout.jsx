@@ -516,6 +516,7 @@ const BookingCheckout = () => {
                                     name="pickupDate"
                                     className="form-control"
                                     value={formData?.pickupDate || ""}
+                                    min={new Date().toISOString().split("T")[0]}
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon"></span>
@@ -548,6 +549,7 @@ const BookingCheckout = () => {
                                     name="returnDate"
                                     className="form-control"
                                     value={formData?.returnDate || ""}
+                                    min={new Date().toISOString().split("T")[0]}
                                     onChange={handleInputChange}
                                   />
                                   <span className="input-cal-icon"></span>

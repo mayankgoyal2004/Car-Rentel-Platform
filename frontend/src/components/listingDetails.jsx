@@ -1036,6 +1036,7 @@ const ListingDetails = () => {
                                 type="date"
                                 name="pickupDate"
                                 value={reservation.pickupDate}
+                                min={new Date().toISOString().split("T")[0]}
                                 onChange={handleChange}
                                 className="form-control"
                               />
@@ -1055,6 +1056,7 @@ const ListingDetails = () => {
                                 type="date"
                                 name="returnDate"
                                 value={reservation.returnDate}
+                                min={new Date().toISOString().split("T")[0]}
                                 onChange={handleChange}
                                 className="form-control"
                               />

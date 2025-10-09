@@ -326,3 +326,24 @@ iframe[id^=":"] {
 .table-responsive.table-overflow-hidden {
   /*  overflow: hidden !important;  */
 }
+
+
+
+
+/* 🔥 Completely remove today highlighting in Flatpickr */
+.flatpickr-day.today {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+/* Keep the selected date highlight visible */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: #FFA633 !important; /* use your theme color */
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+}

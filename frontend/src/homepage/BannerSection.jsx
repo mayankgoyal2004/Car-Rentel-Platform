@@ -149,10 +149,18 @@ function BannerSection() {
               <div className="input-block">
                 <label>Pickup Date &amp; Time</label>
                 <Flatpickr
+                  key={pickupDate ? pickupDate.getTime() : "pickup"}
                   className="form-control"
                   value={pickupDate}
                   onChange={(date) => setPickupDate(date[0])}
-                  options={{ enableTime: true, dateFormat: "Y-m-d H:i" }}
+                  options={{
+                    mode: "single",
+
+                    defaultDate: null,
+                    enableTime: true,
+                    dateFormat: "Y-m-d H:i",
+                    minDate: "today", // disable past dates
+                  }}
                   placeholder="Select pickup date"
                 />
               </div>
@@ -163,10 +171,22 @@ function BannerSection() {
               <div className="input-block">
                 <label>Drop Date &amp; Time</label>
                 <Flatpickr
+                  key={dropDate ? dropDate.getTime() : "drop"}
                   className="form-control"
                   value={dropDate}
                   onChange={(date) => setDropDate(date[0])}
-                  options={{ enableTime: true, dateFormat: "Y-m-d H:i" }}
+                  options={{
+                    mode: "single",
+                    enableTime: true,
+                    defaultDate: null,
+                    dateFormat: "Y-m-d H:i",
+                    minDate: pickupDate || "today",
+                    onReady: (selectedDates, dateStr, instance) => {
+                      const todayElem =
+                        instance.calendarContainer.querySelector(".today");
+                      if (todayElem) todayElem.classList.remove("today");
+                    }, // can't pick before pickup date
+                  }}
                   placeholder="Select drop date"
                 />
               </div>

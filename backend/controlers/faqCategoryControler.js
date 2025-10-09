@@ -102,26 +102,38 @@ const getAllActiveFaqCategory = async (req, res) => {
 };
 
 const deleteFaqCategory = async (req, res) => {
-  var validation = "";
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  if (!id) {
-    res.json({
-      status: 409,
-      success: false,
-      message: "Id is Required",
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Id is required",
+      });
+    }
+
+    const category = await FaqCategory.findByIdAndDelete(id);
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found!",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "FAQ category deleted successfully",
     });
-  }
-
-  const category = await FaqCategory.findByIdAndDelete(id);
-  if (!category) {
-    res.json({
-      status: 409,
+  } catch (error) {
+    console.error("Delete FAQ category error:", error);
+    return res.status(500).json({
       success: false,
-      message: "category not Found!",
+      message: "Internal server error",
     });
   }
 };
+
 
 const updateFaqCategory = async (req, res) => {
   try {

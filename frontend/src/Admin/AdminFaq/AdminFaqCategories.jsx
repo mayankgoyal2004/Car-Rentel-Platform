@@ -52,10 +52,12 @@ const AdminFaqCategories = () => {
       });
 
       toast.success(res.data.message);
-      setNewFaqCategory("");
-      document.querySelector("#add_Category .btn-close")?.click();
+      if (res.data.success) {
+        setNewFaqCategory("");
+        document.querySelector("#add_Category .btn-close")?.click();
 
-      getAllFaqCategory();
+        getAllFaqCategory();
+      }
     } catch (err) {
       if (err.response && err.response.data) {
         toast.error(err.response.data.message);
@@ -91,15 +93,10 @@ const AdminFaqCategories = () => {
       toast.success(res.data.message);
 
       setDeleteCategory(null);
-      document.querySelector("#delete_Category .btn-close")?.click();
 
-      getAllFaqCategory();
+      getAllFaqCategory(search, currentPage);
     } catch (err) {
-      if (err.response && err.response.data) {
-        toast.error(err.response.data.message);
-      } else {
-        toast.error("Something went wrong!");
-      }
+      toast.error(err.response?.data?.message || "Something went wrong!");
     }
   };
   const handlePageChange = (page) => {
@@ -338,10 +335,18 @@ const AdminFaqCategories = () => {
             </div>
             <div className="modal-footer">
               <div className="d-flex justify-content-center">
-                <button className="btn btn-light me-3" data-bs-dismiss="modal">
+                <button
+                  className="btn btn-light me-3 "
+                  type="button"
+                  data-bs-dismiss="modal"
+                >
                   Cancel
                 </button>
-                <button className="btn btn-primary" onClick={addFaqCategory}>
+                <button
+                  onClick={addFaqCategory}
+                  type="button"
+                  className="btn btn-primary"
+                >
                   Create New
                 </button>
               </div>
@@ -442,7 +447,7 @@ const AdminFaqCategories = () => {
                 </button>
                 <button
                   onClick={deleteFaqCategory}
-                  href="javascript:void(0);"
+                  data-bs-dismiss="modal"
                   className="btn btn-primary"
                 >
                   Yes, Delete

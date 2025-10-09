@@ -53,7 +53,7 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Best Deal</h6>
                     <p>
-                      {companySetting.organizationName}offers a fleet of
+                      {companySetting?.organizationName}offers a fleet of
                       high-quality{" "}
                     </p>
                   </div>
@@ -69,7 +69,7 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Doorstep Delivery</h6>
                     <p>
-                      {companySetting.organizationName} offers a fleet of
+                      {companySetting?.organizationName} offers a fleet of
                       high-quality{" "}
                     </p>
                   </div>
@@ -85,7 +85,7 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Low Security Deposit</h6>
                     <p>
-                      {companySetting.organizationName} offers a fleet of
+                      {companySetting?.organizationName} offers a fleet of
                       high-quality{" "}
                     </p>
                   </div>
@@ -101,7 +101,7 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Latest Cars</h6>
                     <p>
-                      {companySetting.organizationName} offers a fleet of
+                      {companySetting?.organizationName} offers a fleet of
                       high-quality
                     </p>
                   </div>
@@ -117,7 +117,7 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Customer Support</h6>
                     <p>
-                      {companySetting.organizationName} offers a fleet of
+                      {companySetting?.organizationName} offers a fleet of
                       high-quality
                     </p>
                   </div>
@@ -133,7 +133,7 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">No Hidden Charges</h6>
                     <p>
-                      {companySetting.organizationName}offers a fleet of
+                      {companySetting?.organizationName}offers a fleet of
                       high-quality
                     </p>
                   </div>

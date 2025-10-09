@@ -979,9 +979,11 @@ const Listing = () => {
                             <div className="listing-img">
                               <Link to={`/listing-details/${car.permalink}`}>
                                 <img
-                                  src={BASE_URL_IMG + car?.image}
+                                  src={BASE_URL_IMG + car?.image ||
+                                        "N/A"}
                                   className="img-fluid"
-                                  alt={car?.carName}
+                                  alt={car?.carName ||
+                                        "N/A"}
                                 />
                               </Link>
                               <div className="fav-item justify-content-end">
@@ -1001,7 +1003,8 @@ const Listing = () => {
                                 </button>
                               </div>
                               <span className="featured-text">
-                                {car?.carBrand?.brandName}
+                                {car?.carBrand?.brandName ||
+                                        "N/A"}
                               </span>
                             </div>
                             <div className="listing-content">
@@ -1011,7 +1014,8 @@ const Listing = () => {
                                     <Link
                                       to={`/listing-details/${car?.permalink}`}
                                     >
-                                      {car?.carName}
+                                      {car?.carName ||
+                                        "N/A"}
                                     </Link>
                                   </h3>
                                   <div className="list-rating">
@@ -1019,7 +1023,7 @@ const Listing = () => {
                                       <i
                                         key={i}
                                         className={`fas fa-star ${
-                                          i < Math.floor(car.avgRating || 0)
+                                          i < Math.floor(car?.avgRating || 0)
                                             ? "filled"
                                             : ""
                                         }`}
@@ -1036,7 +1040,7 @@ const Listing = () => {
                                       src="/user-assets/img/icons/map-pin.svg"
                                       alt="location"
                                     />
-                                    {car?.distance}
+                                    {car?.distance || "N/A"}
                                   </span>
                                 </div>
                               </div>
@@ -1050,7 +1054,8 @@ const Listing = () => {
                                       />
                                     </span>
                                     <p>
-                                      {car?.carTransmission?.carTransmission}
+                                      {car?.carTransmission?.carTransmission ||
+                                        "N/A"}
                                     </p>
                                   </li>
                                   <li>
@@ -1060,7 +1065,8 @@ const Listing = () => {
                                         alt="Mileage"
                                       />
                                     </span>
-                                    <p>{car.mileage}</p>
+                                    <p>{car?.mileage||
+                                        "N/A"}</p>
                                   </li>
                                   <li>
                                     <span>
@@ -1091,7 +1097,8 @@ const Listing = () => {
                                     </span>
                                     <p>
                                       {car?.year
-                                        ? new Date(car.year).getFullYear()
+                                        ? new Date(car?.year||
+                                        "N/A").getFullYear()
                                         : "N/A"}
                                     </p>
                                   </li>
@@ -1125,7 +1132,7 @@ const Listing = () => {
                               </div>
                               <div className="listing-button">
                                 <Link
-                                  to={`/listing-details/${car.permalink}`}
+                                  to={`/listing-details/${car?.permalink}`}
                                   className="btn btn-order"
                                 >
                                   <span>
@@ -1135,7 +1142,7 @@ const Listing = () => {
                                 </Link>
                               </div>
                             </div>
-                            {car.isFeatured && (
+                            {car?.isFeatured && (
                               <div className="feature-text">
                                 <span className="bg-danger">Featured</span>
                               </div>

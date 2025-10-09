@@ -1414,11 +1414,14 @@ const ListingDetails = () => {
                 <div className="booking-header">
                   <div className="booking-img-wrap">
                     <div className="book-img">
-                      <img src={BASE_URL_IMG + carData.image} alt="img" />
+                      <img
+                        src={BASE_URL_IMG + carData.image || "N/A"}
+                        alt="img"
+                      />
                     </div>
                     <div className="book-info">
-                      <h6>{carData.carName}</h6>
-                      <p>Location : {carData.mainLocation.title}</p>
+                      <h6>{carData?.carName || "N/A"}</h6>
+                      <p>Location : {carData.mainLocation?.title}</p>
                     </div>
                   </div>
                 </div>

@@ -42,7 +42,6 @@ export const CarSection = () => {
         toast.error(res.data.message || "Failed to update wishlist");
       }
     } catch (err) {
-     
       if (err.response?.status === 403) {
         toast.error("Please login to add to wishlist");
         setTimeout(() => navigate("/login"), 3000);
@@ -172,9 +171,9 @@ export const CarSection = () => {
                       <li>
                         <img
                           src="/user-assets/img/icons/car-parts-05.svg"
-                          alt={car.year}
+                          alt={car?.year}
                         />
-                        <p>{new Date(car.year).getFullYear()}</p>
+                        <p>{new Date(car?.year).getFullYear()}</p>
                       </li>
                     </ul>
                   </div>

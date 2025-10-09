@@ -820,7 +820,7 @@ const AdminDashboard = () => {
           <div className="copyright">
             <div className="copyright-text">
               <p className="text-secondary">
-                © 2025 Vibrantick Inc All Rights Reserved.
+                © 2025 Vibrantick Infotech Solutions. All Right reserved.
               </p>
             </div>
           </div>

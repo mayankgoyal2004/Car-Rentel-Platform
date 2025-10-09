@@ -714,7 +714,7 @@ const ListingDetails = () => {
                 <div className="short-video">
                   <video
                     className="img-fluid"
-                    src={BASE_URL_IMG + carData?.carVideo}
+                    src={BASE_URL_IMG + carData?.carVideo[0]}
                     controls
                     width="100%"
                   />

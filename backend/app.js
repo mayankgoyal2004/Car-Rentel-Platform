@@ -77,7 +77,7 @@ connectDb()
   .then(() => {
     seeder.superAdmin();
     server.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
+      console.log(`Server running on ${process.env.CORS_ORIGIN}`);
     });
   })
   .catch((err) => {

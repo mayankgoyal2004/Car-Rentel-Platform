@@ -331,6 +331,10 @@ const AdminAddCars = () => {
     setCurrentFaq({ question: "", answer: "" });
   };
   const saveCarFaqs = async () => {
+     if (faqs.length === 0) {
+    toast.error("Please add at least one FAQ before saving.");
+    return;
+  }
     try {
       const res = await apiService.updateCarFaq(carId, { faqs }); // faqs is an array of {question, answer}
       if (res.data.success) {

@@ -113,10 +113,7 @@ const AdminCarDetails = () => {
                       <div className="d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div className="d-flex align-items-center">
                           <span className="avatar avatar-lg me-3">
-                            <img
-                              src="/admin-assets/img/car/car-01.jpg"
-                              alt="img"
-                            />
+                            <img src={BASE_URL_IMG + car.image} alt="img" />
                           </span>
                           <div>
                             <h6>{car?.carName}</h6>
@@ -331,7 +328,7 @@ const AdminCarDetails = () => {
                                 </span>
                                 <div>
                                   <a
-                                    href={BASE_URL_IMG + car?.carPolicies}
+                                    href={BASE_URL_IMG + car?.carPolicies[0]}
                                     target="/"
                                     className="fs-14 fw-medium"
                                   >
@@ -348,7 +345,7 @@ const AdminCarDetails = () => {
                                 </span>
                                 <div>
                                   <a
-                                    href={BASE_URL_IMG + car?.carDocuments}
+                                    href={BASE_URL_IMG + car?.carDocuments[0]}
                                     target="/"
                                     className="fs-14 fw-medium"
                                   >

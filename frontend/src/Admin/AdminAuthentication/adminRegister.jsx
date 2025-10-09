@@ -301,7 +301,7 @@ const AdminRegister = () => {
         <div className="container-fluid">
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
+              <p> © 2025 Vibrantick Infotech Solutions. All Right reserved.</p>
             </div>
           </div>
         </div>

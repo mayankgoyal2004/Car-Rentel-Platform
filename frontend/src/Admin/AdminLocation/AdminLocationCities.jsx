@@ -81,8 +81,10 @@ const AdminLocationCities = () => {
         state: newcity.state._id,
       });
       toast.success(res.data.message);
+
       setnewCity({ cityName: "", country: {}, state: {} });
       fetchAllCity();
+      document.getElementById("add_city_close")?.click();
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
     }
@@ -106,6 +108,7 @@ const AdminLocationCities = () => {
       });
       toast.success(res.data.message);
       setEditCity(null);
+      document.getElementById("edit_city_close")?.click();
       fetchAllCity(search, currentPage);
     } catch (err) {
       toast.error(err.response?.data?.message || "Something went wrong!");
@@ -348,6 +351,7 @@ const AdminLocationCities = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="add_city_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>
@@ -432,6 +436,7 @@ const AdminLocationCities = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
+                id="edit_city_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

@@ -38,9 +38,9 @@ const ResetPassword = () => {
       const res = await apiService.resetpassword(data);
       if (res.data.success) {
         toast.success(res.data.message);
-       setTimeout(() => {
+        setTimeout(() => {
           nav("/login");
-       },1000)
+        }, 1000);
       }
 
       setMessage({ type: "success", text: res.data.message });
@@ -199,7 +199,7 @@ const ResetPassword = () => {
           {/* Copyright */}
           <div className="copyright">
             <div className="copyright-text">
-              <p>© 2025 Vibrantick Inc All Rights Reserved.</p>
+              <p> © 2025 Vibrantick Infotech Solutions. All Right reserved.</p>
             </div>
           </div>
           {/* /Copyright */}

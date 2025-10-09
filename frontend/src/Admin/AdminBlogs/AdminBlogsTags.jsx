@@ -335,16 +335,22 @@ const AdminBlogsTags = () => {
               </div>
             </div>
             <div className="modal-footer">
-              <button className="btn btn-light" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={handleCreateTag}
-                data-bs-dismiss="modal"
-              >
-                Create
-              </button>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3 "
+                  type="button"
+                  data-bs-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateTag}
+                  type="button"
+                  className="btn btn-primary"
+                >
+                  Create New
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -432,12 +432,22 @@ const AdminTestimonials = () => {
                 )}
               </div>
               <div className="modal-footer">
-                <button className="btn btn-light" data-bs-dismiss="modal">
-                  Cancel
-                </button>
-                <button className="btn btn-primary" onClick={addTestimonial}>
-                  Save
-                </button>
+                <div className="d-flex justify-content-center">
+                  <button
+                    className="btn btn-light me-3 "
+                    type="button"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={addTestimonial}
+                    type="button"
+                    className="btn btn-primary"
+                  >
+                    Create New
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -513,12 +523,20 @@ const AdminTestimonials = () => {
                 </div>
               </div>
               <div className="modal-footer">
-                <button className="btn btn-light" data-bs-dismiss="modal">
-                  Cancel
-                </button>
-                <button className="btn btn-primary" onClick={updateTestimonial}>
-                  Update
-                </button>
+                <div className="d-flex justify-content-end w-100">
+                  <button
+                    className="btn btn-light me-3"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={updateTestimonial}
+                    className="btn btn-primary"
+                  >
+                    Save Changes
+                  </button>
+                </div>
               </div>
             </div>
           </div>

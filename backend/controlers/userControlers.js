@@ -35,7 +35,7 @@ async function sendVerifyMail({ name, email, token }) {
     },
   });
 
-  const verificationLink = `http://localhost:5173/verify-email?token=${token}`;
+  const verificationLink = `${process.env.CORS_ORIGIN}/verify-email?token=${token}`;
 
   const mailOptions = {
     from: SMTPSetting.fromEmail,
@@ -63,7 +63,6 @@ async function sendVerifyMail({ name, email, token }) {
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Verification email sent to:", email);
   } catch (error) {
     console.error("Error sending verification email:", error);
   }

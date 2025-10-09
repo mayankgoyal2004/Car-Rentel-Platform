@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 
+
 const LocationSetting = () => {
   const [countrys, setCountry] = useState([]);
   const [newCountry, setnewCountry] = useState({ countryName: "" });
@@ -39,9 +40,10 @@ const LocationSetting = () => {
       });
 
       toast.success(res.data.message);
-      document.getElementById("edit_location_close").click();
 
       setnewCountry({ countryName: "" });
+      document.getElementById("add_setting_close")?.click();
+
       getAllCountry();
     } catch (err) {
       if (err.response && err.response.data) {
@@ -174,13 +176,13 @@ const LocationSetting = () => {
                         </Link>
                       </li>
                     )}
-                     <li>
-                                         <Link to="/admin-dashboard/language-setting">
-                                           <i className="ti ti-language me-2" />
-                   
-                                           <span> Language Settings</span>
-                                         </Link>
-                                       </li>
+                    <li>
+                      <Link to="/admin-dashboard/language-setting">
+                        <i className="ti ti-language me-2" />
+
+                        <span> Language Settings</span>
+                      </Link>
+                    </li>
 
                     {userType !== 1 && (
                       <li>
@@ -334,7 +336,7 @@ const LocationSetting = () => {
                 className="btn-close custom-btn-close"
                 data-bs-dismiss="modal"
                 aria-label="Close"
-                id="add_signatures_close"
+                id="add_setting_close"
               >
                 <i className="ti ti-x fs-16" />
               </button>

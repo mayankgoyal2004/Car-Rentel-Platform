@@ -575,7 +575,7 @@ const AdminCarDetails = () => {
                                 <div className="d-flex flex-column gap-2">
                                   <p className="d-flex align-items-center mb-0">
                                     <i className="ti ti-square-check-filled text-success me-2" />
-                                    {service.name}{" "}
+                                    {service?.name}{" "}
                                   </p>
                                 </div>
                               </div>

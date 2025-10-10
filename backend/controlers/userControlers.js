@@ -549,7 +549,6 @@ const updateUserDetails = async (req, res) => {
     } = req.body;
 
     if (
-      !userName ||
       !email ||
       !contact ||
       !firstName ||

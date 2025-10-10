@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { toast } from "react-toastify";
-
+import { ToastContainer, toast } from "react-toastify";
 const AdminEditCar = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -2080,6 +2079,19 @@ const AdminEditCar = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

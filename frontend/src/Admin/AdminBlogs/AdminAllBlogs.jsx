@@ -161,13 +161,16 @@ const AdminAllBlogs = () => {
                         }}
                       />
                     </td>
-                    <td className="fw-medium">{blog.title}</td>
+                    <td className="fw-medium">
+                      <Link to={`/admin-dashboard/admin-blog-details/${blog._id}`}>
+                        {" "}
+                        {blog.title}
+                      </Link>
+                    </td>
                     {userType !== 1 && (
                       <td>{blog.createdBy?.userName || "N/A"}</td>
                     )}
-                    {userType === 1 && (
-                      <td>{blog.admin?.userName || "N/A"}</td>
-                    )}
+                    {userType === 1 && <td>{blog.admin?.userName || "N/A"}</td>}
                     <td>{new Date(blog.createdAt).toLocaleDateString()}</td>
                     <td>
                       <span

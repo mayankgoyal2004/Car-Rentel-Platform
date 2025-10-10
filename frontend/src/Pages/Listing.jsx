@@ -70,12 +70,9 @@ const Listing = () => {
 
       const res = await apiService.getAllcarHomePage(apiFilters);
       setCars(res.data.data || []);
-      setTotalPages(res.data.pagination?.totalPages || 1);
-      if (
-        res.data.pagination?.currentPage &&
-        res.data.pagination.currentPage !== currentPage
-      ) {
-        setCurrentPage(res.data.pagination.currentPage);
+      setTotalPages(res.data.totalPages || 1);
+      if (res.data.currentPage && res.data.currentPage !== currentPage) {
+        setCurrentPage(res.data.currentPage);
       }
     } catch (err) {
       console.error("Error fetching cars:", err);
@@ -271,7 +268,7 @@ const Listing = () => {
               <>
                 <li className="page-item">
                   <button
-                    className="page-link"
+                    className="page-link "
                     onClick={() => handlePageChange(1)}
                   >
                     1
@@ -979,11 +976,9 @@ const Listing = () => {
                             <div className="listing-img">
                               <Link to={`/listing-details/${car.permalink}`}>
                                 <img
-                                  src={BASE_URL_IMG + car?.image ||
-                                        "N/A"}
+                                  src={BASE_URL_IMG + car?.image || "N/A"}
                                   className="img-fluid"
-                                  alt={car?.carName ||
-                                        "N/A"}
+                                  alt={car?.carName || "N/A"}
                                 />
                               </Link>
                               <div className="fav-item justify-content-end">
@@ -1003,8 +998,7 @@ const Listing = () => {
                                 </button>
                               </div>
                               <span className="featured-text">
-                                {car?.carBrand?.brandName ||
-                                        "N/A"}
+                                {car?.carBrand?.brandName || "N/A"}
                               </span>
                             </div>
                             <div className="listing-content">
@@ -1014,8 +1008,7 @@ const Listing = () => {
                                     <Link
                                       to={`/listing-details/${car?.permalink}`}
                                     >
-                                      {car?.carName ||
-                                        "N/A"}
+                                      {car?.carName || "N/A"}
                                     </Link>
                                   </h3>
                                   <div className="list-rating">
@@ -1065,8 +1058,7 @@ const Listing = () => {
                                         alt="Mileage"
                                       />
                                     </span>
-                                    <p>{car?.mileage||
-                                        "N/A"}</p>
+                                    <p>{car?.mileage || "N/A"}</p>
                                   </li>
                                   <li>
                                     <span>
@@ -1097,8 +1089,9 @@ const Listing = () => {
                                     </span>
                                     <p>
                                       {car?.year
-                                        ? new Date(car?.year||
-                                        "N/A").getFullYear()
+                                        ? new Date(
+                                            car?.year || "N/A"
+                                          ).getFullYear()
                                         : "N/A"}
                                     </p>
                                   </li>

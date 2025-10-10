@@ -171,7 +171,7 @@ const AdminReservationDetails = () => {
 
   const handleCancel = async () => {
     if (!cancelReason.trim()) {
-      alert("Please enter cancellation reason");
+      toast.error("Please enter cancellation reason");
       return;
     }
     await apiService.cancelRideByAdmin(reservations._id, {

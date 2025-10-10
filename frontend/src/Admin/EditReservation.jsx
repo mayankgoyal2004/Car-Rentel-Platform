@@ -260,14 +260,14 @@ const AdminEditReservation = () => {
         toast.success("Reservation updated successfully!");
         navigate("/admin-dashboard/all-reservation");
       } else {
-        alert(
+        toast.error(
           "Failed to update reservation: " +
             (res.data.message || "Unknown error")
         );
       }
     } catch (err) {
       console.error("Reservation update error:", err);
-      alert(
+      toast.error(
         "Error updating reservation: " +
           (err.response?.data?.message || err.message)
       );

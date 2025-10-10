@@ -176,7 +176,7 @@ const AdminAllUser = () => {
     try {
       // Check if passwords match if they are provided
       if (formData.password && formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match");
+        toast.error("Passwords do not match");
         return;
       }
 

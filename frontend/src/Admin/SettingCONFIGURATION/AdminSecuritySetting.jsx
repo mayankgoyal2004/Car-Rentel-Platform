@@ -18,11 +18,11 @@ const AdminSecuritySetting = () => {
     e.preventDefault();
 
     if (!currentPassword || !newPassword || !confirmPassword) {
-      return alert("All fields are required!");
+      return toast.error("All fields are required!");
     }
 
     if (newPassword !== confirmPassword) {
-      return alert("New password and confirm password do not match!");
+      return toast.error("New password and confirm password do not match!");
     }
 
     setLoading(true);

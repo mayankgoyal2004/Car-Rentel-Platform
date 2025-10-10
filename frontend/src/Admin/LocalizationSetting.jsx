@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
+import { ToastContainer, toast } from "react-toastify";
 const LocalizationSetting = () => {
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType;
@@ -59,7 +59,7 @@ const LocalizationSetting = () => {
       combo.value = lang;
       combo.dispatchEvent(new Event("change"));
     } else {
-      alert("Language selector not ready yet, please wait a second.");
+      toast.error("Language selector not ready yet, please wait a second.");
     }
   };
 
@@ -222,6 +222,19 @@ const LocalizationSetting = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

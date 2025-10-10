@@ -83,7 +83,7 @@ const BookingAddOn = () => {
     const start = new Date(reservation.pickupDate);
     const end = new Date(reservation.returnDate);
     const diffTime = Math.abs(end - start);
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) ;
   };
 
   // Calculate rental rate

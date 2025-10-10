@@ -94,6 +94,7 @@ function BannerSection() {
                     src="/user-assets/img/banner/banner.png"
                     className="img-fluid"
                     alt="img"
+                    loading="lazy"
                   />
                 </div>
               </div>

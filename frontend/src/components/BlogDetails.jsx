@@ -103,6 +103,7 @@ const BlogDetails = () => {
                 <div className="post-author-img">
                   <img
                     src={BASE_URL_IMG + blog.admin?.image}
+                    loading="lazy"
                     alt={blog.admin?.userName}
                   />
                 </div>
@@ -132,6 +133,7 @@ const BlogDetails = () => {
                   <img
                     src={BASE_URL_IMG + c.createdBy?.image}
                     alt={c.createdBy?.email}
+                    loading="lazy"
                     style={{
                       width: "50px",
                       height: "50px",

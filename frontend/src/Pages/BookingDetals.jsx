@@ -7,6 +7,7 @@ const BookingDetals = () => {
   const navigate = useNavigate();
   const [reservation, setReservation] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
@@ -183,6 +184,7 @@ const BookingDetals = () => {
     try {
       // Update user details
       const updateData = {
+        userName: userData.userName,
         firstName: userData.firstName,
         lastName: userData.lastName,
         contact: userData.phone,
@@ -696,7 +698,6 @@ const BookingDetals = () => {
                                 <i className="fas fa-chevron-down" />
                               </h5>
                             </div>
-                           
                           </div>
                         </div>
                         <div

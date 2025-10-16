@@ -1,6 +1,7 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
+import { ToastContainer, toast } from "react-toastify";
 
 const BookingDetals = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const BookingDetals = () => {
   const [userData, setUserData] = useState({
     firstName: "",
     lastName: "",
-    userName: "",
+    userName: "",     
     phone: "",
     email: "",
     address: "",
@@ -177,7 +178,7 @@ const BookingDetals = () => {
     e.preventDefault();
 
     if (!termsAccepted) {
-      alert("Please accept the Terms & Conditions to continue.");
+      toast.error("Please accept the Terms & Conditions to continue.");
       return;
     }
 
@@ -202,7 +203,7 @@ const BookingDetals = () => {
       navigate(`/booking-payment/${id}`);
     } catch (error) {
       console.error("Error updating user details:", error);
-      alert("Failed to update user details. Please try again.");
+      toast.error("Failed to update user details. Please try again.");
     }
   };
 
@@ -853,6 +854,19 @@ const BookingDetals = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </div>
     </div>
   );

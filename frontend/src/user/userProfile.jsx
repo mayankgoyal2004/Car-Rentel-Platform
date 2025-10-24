@@ -120,6 +120,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Enter Your First Name"
               />
             </div>
             <div className="col-md-4">
@@ -129,6 +130,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                placeholder="Enter Your Last Name"
               />
             </div>
             <div className="col-md-4">
@@ -138,6 +140,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
+                placeholder="Enter Your User Name"
               />
             </div>
           </div>
@@ -151,6 +154,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                placeholder="Enter Your Phone Number"
               />
             </div>
             <div className="col-md-6">
@@ -160,6 +164,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter Your Email"
               />
             </div>
           </div>
@@ -171,6 +176,7 @@ const UserProfile = () => {
               className="form-control"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
+              placeholder="Enter Your Address"
             />
           </div>
           <div className="row mb-3">
@@ -181,6 +187,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
+                placeholder="Enter Your Country"
               />
             </div>
             <div className="col-md-6">
@@ -190,6 +197,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={state}
                 onChange={(e) => setState(e.target.value)}
+                placeholder="Enter Your State"
               />
             </div>
             <div className="col-md-6">
@@ -199,6 +207,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
+                placeholder="Enter Your City"
               />
             </div>
             <div className="col-md-6">
@@ -208,6 +217,7 @@ const UserProfile = () => {
                 className="form-control"
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
+                placeholder="Enter Your Pincode"
               />
             </div>
           </div>
@@ -228,17 +238,17 @@ const UserProfile = () => {
           </button>
         </form>
       </div>
-       <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-            />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

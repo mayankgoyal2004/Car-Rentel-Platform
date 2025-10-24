@@ -178,6 +178,7 @@ const AdminSecuritySetting = () => {
                       className="form-control"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="Enter old password"
                     />
                   </div>
                   <div className="mb-3">
@@ -189,6 +190,7 @@ const AdminSecuritySetting = () => {
                       className="form-control"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Enter new password"
                     />
                   </div>
                   <div className="mb-3">
@@ -200,6 +202,7 @@ const AdminSecuritySetting = () => {
                       className="form-control"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm new password"
                     />
                   </div>
                   <div className="d-flex justify-content-end">

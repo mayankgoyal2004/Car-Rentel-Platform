@@ -268,6 +268,7 @@ const AdminProfileSetting = () => {
                             className="form-control"
                             value={userName}
                             onChange={(e) => setUserName(e.target.value)}
+                            placeholder="Enter your user name"
                           />
                         </div>
                       </div>
@@ -283,6 +284,7 @@ const AdminProfileSetting = () => {
                             className="form-control"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
+                            placeholder="Enter your first name"
                           />
                         </div>
                       </div>
@@ -296,6 +298,7 @@ const AdminProfileSetting = () => {
                             className="form-control"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Enter your last name"
                           />
                         </div>
                       </div>
@@ -310,6 +313,7 @@ const AdminProfileSetting = () => {
                             className="form-control"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your email address"
                           />
                         </div>
                       </div>
@@ -324,6 +328,7 @@ const AdminProfileSetting = () => {
                             className="form-control"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
+                            placeholder="Enter your phone number"
                           />
                         </div>
                       </div>
@@ -338,6 +343,7 @@ const AdminProfileSetting = () => {
                           className="form-control"
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
+                          placeholder="Enter your Address"
                         />
                       </div>
                     </div>

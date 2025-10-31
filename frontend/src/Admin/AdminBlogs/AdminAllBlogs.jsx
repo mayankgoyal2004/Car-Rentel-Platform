@@ -195,14 +195,14 @@ const AdminAllBlogs = () => {
                           <i className="ti ti-dots-vertical" />
                         </button>
                         <ul className="dropdown-menu dropdown-menu-end p-2">
-                          <li>
+                         { userType !== 1 &&( <li>
                             <Link
                               to={`/admin-dashboard/edit-blog/${blog._id}`}
                               className="dropdown-item rounded-1"
                             >
                               <i className="ti ti-edit me-1" /> Edit
                             </Link>
-                          </li>
+                          </li>)}
                           <li>
                             <button
                               className="dropdown-item rounded-1"

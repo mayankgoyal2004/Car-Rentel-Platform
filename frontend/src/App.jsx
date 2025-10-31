@@ -126,6 +126,7 @@ import EmailSetting from "./Admin/EmailSetting";
 import LocationSetting from "./Admin/LocationSetting";
 import LocalizationSetting from "./Admin/LocalizationSetting";
 import ErrorPage from "../Error404Page";
+import AdminBin from "./Admin/AdminBin";
 
 function App() {
   return (
@@ -228,6 +229,7 @@ function App() {
               <Route path="all-drivers" element={<AdminDrivers />} />
               <Route path="all-locations" element={<AdminLocations />} />
               <Route path="all-cars" element={<AdminCars />} />
+              <Route path="bin" element={<AdminBin />} />
               <Route path="car-brands" element={<AdminBrands />} />
               <Route path="car-types" element={<AdminCarTypes />} />
               <Route path="car-models" element={<AdminCarModels />} />

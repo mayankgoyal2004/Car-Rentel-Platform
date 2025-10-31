@@ -6,13 +6,14 @@ import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 import { CSVLink } from "react-csv";
 
-const AdminCars = () => {
+const AdminBin = () => {
   const [cars, setCars] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [deleteCar, setDeleteCar] = useState(null);
+  const [bin, setBin] = useState(null);
 
   const userData = useSelector((store) => store.user);
   const userType = userData?.userType; //
@@ -20,18 +21,10 @@ const AdminCars = () => {
   const fetchAllCars = async (page = 1, searchQuery = "") => {
     setLoading(true);
     try {
-      let res;
-      if (userType === 1) {
-        res = await apiService.getAllCarsForSuperAdmin({
-          page,
-          search: searchQuery,
-        });
-      } else {
-        res = await apiService.getAllCarAdmin({
-          page,
-          search: searchQuery,
-        });
-      }
+      const res = await apiService.getBinCar({
+        page,
+        search: searchQuery,
+      });
 
       if (res.data.success) {
         const populatedCars = res.data.data.map((car) => ({
@@ -84,28 +77,6 @@ const AdminCars = () => {
     }
   };
 
-  const handleToggleFeatured = async (carId, currentFeatured) => {
-    try {
-      const res = await apiService.toogleCarFeatured(carId, {
-        isFeatured: !currentFeatured,
-      });
-
-      if (res.data.success) {
-        toast.success("Car featured status updated");
-
-        setCars((prevCars) =>
-          prevCars.map((c) =>
-            c._id === carId ? { ...c, isFeatured: !currentFeatured } : c
-          )
-        );
-      } else {
-        toast.error(res.data.message || "Failed to update featured status");
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Server error");
-    }
-  };
-
   const carCsvHeaders = [
     { label: "Car Name", key: "carName" },
     { label: "Car Model", key: "carModel" },
@@ -145,6 +116,19 @@ const AdminCars = () => {
       toast.success(res.data.message);
 
       setDeleteCar(null);
+      document.getElementById("delete_car_close")?.click();
+      fetchAllCars(currentPage, search);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete Car");
+    }
+  };
+  const handleMoveOutFromBin = async () => {
+    if (!bin) return;
+    try {
+      const res = await apiService.moveOutFromRecycleBin(bin._id);
+      toast.success(res.data.message);
+
+      setBin(null);
       document.getElementById("delete_car_close")?.click();
       fetchAllCars(currentPage, search);
     } catch (err) {
@@ -205,18 +189,6 @@ const AdminCars = () => {
                 Export CSV
               </CSVLink>
             </div>
-
-            {userType !== 1 && (
-              <div className="mb-2">
-                <Link
-                  to="/admin-dashboard/add-car"
-                  className="btn btn-primary d-flex align-items-center"
-                >
-                  <i className="ti ti-plus me-2" />
-                  Add New Car
-                </Link>
-              </div>
-            )}
           </div>
         </div>
 
@@ -319,25 +291,6 @@ const AdminCars = () => {
                       </p>
                     </td>
 
-                    {userType === 1 && (
-                      <td>
-                        <button
-                          className="btn border-0"
-                          onClick={() =>
-                            handleToggleFeatured(car._id, car.isFeatured)
-                          }
-                        >
-                          <i
-                            className={`ti ${
-                              car.isFeatured
-                                ? "ti-star-filled text-warning"
-                                : "ti-star"
-                            }`}
-                            style={{ fontSize: "18px" }}
-                          />
-                        </button>
-                      </td>
-                    )}
                     <td>
                       <h6 className="fs-14 fw-normal">
                         {new Date(car.createdAt).toLocaleDateString()}
@@ -423,7 +376,18 @@ const AdminCars = () => {
                               onClick={() => setDeleteCar(car)}
                             >
                               <i className="ti ti-trash me-1" />
-                              Move To Bin
+                              Delete
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              className="dropdown-item rounded-1"
+                              data-bs-toggle="modal"
+                              data-bs-target="#delete_car_bin"
+                              onClick={() => setBin(car)}
+                            >
+                              <i className="ti ti-trash me-1" />
+                              Move Out From Bin
                             </button>
                           </li>
                         </ul>
@@ -505,6 +469,36 @@ const AdminCars = () => {
           </div>
         </div>
       </div>
+      <div className="modal fade" id="delete_car_bin">
+        <div className="modal-dialog modal-dialog-centered modal-sm">
+          <div className="modal-content">
+            <div className="modal-body text-center">
+              <span className="avatar avatar-lg bg-transparent-danger rounded-circle text-danger mb-3">
+                <i className="ti ti-trash-x fs-26" />
+              </span>
+
+              <p className="mb-3">
+                Are you sure you want to move out from bin?
+              </p>
+              <div className="d-flex justify-content-center">
+                <button
+                  className="btn btn-light me-3"
+                  data-bs-dismiss="modal"
+                  id="delete_car_close"
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleMoveOutFromBin}
+                >
+                  Yes, Move Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div>
         {/* Your existing JSX */}
 
@@ -524,4 +518,4 @@ const AdminCars = () => {
   );
 };
 
-export default AdminCars;
+export default AdminBin;

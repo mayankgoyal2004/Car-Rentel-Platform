@@ -83,6 +83,7 @@ const CarSchema = new mongoose.Schema(
     isAvailable: { type: Boolean, default: true }, // admin toggle availability
     inRent: { type: Boolean, default: false }, // when car is rented
     isFeatured: { type: Boolean, default: false },
+    isDeleted:{type: Boolean, default: false},
     carVideo: [
       {
         type: String,

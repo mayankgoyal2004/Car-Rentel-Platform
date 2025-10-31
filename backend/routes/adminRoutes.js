@@ -789,6 +789,8 @@ route.post(
 );
 route.post("/update-cars/:id/pricing", pricing.updateCarPricing);
 route.delete("/delete-cars/:id", car.DeleteCar);
+route.post("/move-to-recycle-cars/:id", car.MoveTorecycleBin);
+route.post("/move-out-from-recycle-cars/:id", car.MoveOutFromRecycleBin);
 route.put("/cars/:id/pricing", pricing.editCarPricing);
 route.put("/update-car/:id/features", car.updateCarFeatures);
 route.put("/update-car/:id/extraService", car.updateCarExtraService);
@@ -803,7 +805,16 @@ route.post("/cars/:carId/description", car.saveCarDescription);
 // route.get("/get-car/:id/faq", carFaq.getCarFaqs);
 // route.delete("/delete-car/:id/faq", carFaq.deleteFaq);
 // route.put("/edit-car/:id/faq", carFaq.editFaq);
-route.get("/get-all-cars-super-admin", car.getAllCarsForSuperAdmin);
+route.get(
+  "/get-all-cars-super-admin",
+  checkPermission("admin", "assignPackage", true),
+  car.getAllCarsForSuperAdmin
+);
+route.get(
+  "/get-all-bin",
+  checkPermission("Car", "view"),
+  car.getAllCarsForAdminRecycleBin
+);
 route.post("/change-status-by-admin/:id", car.updateCarStatusByAdmin);
 route.post("/change-is-available-by-admin/:id", car.toggleAvailabilityByAdmin);
 route.get("/get-car-by-id/:id", car.getCarById);
@@ -828,6 +839,7 @@ route.get(
   checkPermission("Car", "view"),
   car.getAllCarsForSuperAdmin
 );
+
 route.get(
   "/get-newly-added-car-admin",
   checkPermission("Car", "view"),

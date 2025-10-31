@@ -923,6 +923,7 @@ class apiServices {
       { headers: getAuthHeaders() }
     );
   }
+
   getAllCarSuperAdmin({ search = "", page } = {}) {
     return axios.get(
       BASE_URL + `get-all-car-super-admin?search=${search}&page=${page}`,
@@ -936,6 +937,23 @@ class apiServices {
   }
   deleteCar(id) {
     return axios.delete(BASE_URL + `delete-cars/${id}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+    getBinCar({ search = "", page } = {}) {
+    return axios.get(BASE_URL + `get-all-bin?search=${search}&page=${page}`, {
+      headers: getAuthHeaders(),
+    });
+  }
+ moveToRecycleBin(id) {
+  return axios.post(
+    BASE_URL + `move-to-recycle-cars/${id}`,
+    {},
+    { headers: getAuthHeaders() }
+  );
+}
+  moveOutFromRecycleBin(id) {
+    return axios.post(BASE_URL + `move-out-from-recycle-cars/${id}`,{}, {
       headers: getAuthHeaders(),
     });
   }

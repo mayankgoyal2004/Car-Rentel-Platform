@@ -377,32 +377,7 @@ const toggleAvailabilityByAdmin = async (req, res) => {
 // };
 
 // PUT /cars/:id
-const updateCar = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const data = req.body;
 
-    const car = await Car.findById(id);
-
-    if (!car) {
-      return res.status(404).json({ message: "Car not found" });
-    }
-
-    const imagePath = req.files?.image
-      ? req.files.path.replace(/\\/g, "/")
-      : null;
-
-    data.image = imagePath;
-
-    await car.save(data);
-
-    res.status(200).json({ message: "Car updated successfully", car });
-  } catch (error) {
-    res
-      .status(400)
-      .json({ message: "Error updating car", error: error.message });
-  }
-};
 
 const getCar = async (req, res) => {
   try {
@@ -437,7 +412,12 @@ const getAllCars = async (req, res) => {
       limit = 10,
     } = req.query;
 
-    let filter = { status: true, isAvailable: true, inRent: false };
+    let filter = {
+      status: true,
+      isAvailable: true,
+      inRent: false,
+      isDeleted: false,
+    };
 
     if (search) {
       filter.$or = [
@@ -808,7 +788,7 @@ const getAllCarsForAdmin = async (req, res) => {
         message: "Id is required",
       });
     }
-    let filter = { admin: adminId };
+    let filter = { admin: adminId, isDeleted: false };
     if (search) {
       filter.carName = { $regex: search, $options: "i" };
     }
@@ -941,8 +921,7 @@ const getAllCarsForSuperAdmin = async (req, res) => {
     const search = req.query.search || "";
     let statusFilter = req.query.status; // true | false | undefined
 
-
-    let filter = {};
+    let filter = { isDeleted: false };
     if (search) {
       filter.carName = { $regex: search, $options: "i" };
     }
@@ -1169,6 +1148,7 @@ const getInRentalCars = async (req, res) => {
     const getAllcarsInRental = await Car.find({
       admin: req.user.admin,
       inRent: true,
+      isDeleted: false,
     });
 
     res.status(200).json({
@@ -1186,7 +1166,7 @@ const getInRentalCars = async (req, res) => {
 
 const getNewlyAddedCars = async (req, res) => {
   try {
-    const newCars = await Car.find({ admin: req.user.admin })
+    const newCars = await Car.find({ admin: req.user.admin, isDeleted: false })
       .populate([
         { path: "carBrand", select: "brandName" },
         { path: "carModel", select: "carModel" },
@@ -1236,6 +1216,7 @@ const getFeaturedCar = async (req, res) => {
           status: true,
           isAvailable: true,
           inRent: false,
+          isDeleted: false,
         },
       },
 
@@ -1302,6 +1283,88 @@ const DeleteCar = async (req, res) => {
       .json({ message: "Error deleting car", error: error.message });
   }
 };
+const MoveTorecycleBin = async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+    car.isDeleted = true;
+    await car.save();
+    res.status(200).json({ message: "Car Move to Recycle Bin successfully" });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "Error deleting car", error: error.message });
+  }
+};
+
+const MoveOutFromRecycleBin = async (req, res) => {
+  try {
+    const car = await Car.findById(req.params.id);
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+    car.isDeleted = false;
+    await car.save();
+    res.status(200).json({ message: "Car Move to Recycle Bin successfully" });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "Error deleting car", error: error.message });
+  }
+};
+const getAllCarsForAdminRecycleBin = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const adminId = req.user.admin;
+    const search = req.query.search || "";
+    if (!adminId) {
+      return res.status(400).json({
+        success: false,
+        status: 400,
+        message: "Id is required",
+      });
+    }
+    let filter = { admin: adminId, isDeleted: true };
+    if (search) {
+      filter.carName = { $regex: search, $options: "i" };
+    }
+    const populatedCars = await Car.find(filter)
+      .populate([
+        { path: "carType", select: "carType" },
+        { path: "carBrand", select: "brandName" },
+        { path: "carModel", select: "carModel" },
+        { path: "carFuel", select: "carFuel" },
+        { path: "carColor", select: "colorName" },
+        { path: "carTransmission", select: "carTransmission" },
+        { path: "otherLocations", select: "location" },
+        { path: "mainLocation", select: "location" },
+        { path: "pricing", select: "prices" },
+        { path: "admin", select: "userName email" },
+      ])
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const totalCar = await Car.countDocuments(filter);
+
+    res.json({
+      success: true,
+      data: populatedCars,
+      pagination: {
+        totalCar,
+        currentPage: page,
+        totalPages: Math.ceil(totalCar / limit),
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server Error", error: err.message });
+  }
+};
 
 module.exports = {
   addCar,
@@ -1312,6 +1375,7 @@ module.exports = {
   getCarById,
   uploadCarFiles,
   getAllCarsForAdmin,
+  getAllCarsForAdminRecycleBin,
   saveCarDamages,
   saveCarFaqs,
   getAllCarsForSuperAdmin,
@@ -1328,4 +1392,6 @@ module.exports = {
   getFeaturedCar,
   toggleAvailabilityByAdmin,
   DeleteCar,
+  MoveTorecycleBin,
+  MoveOutFromRecycleBin,
 };

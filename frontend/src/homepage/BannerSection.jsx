@@ -59,7 +59,7 @@ function BannerSection() {
           <div className="row align-items-center">
             <div className="col-lg-5" data-aos="fade-down">
               <div className="banner-content">
-                <h1>
+                <h1 className="demoFunction">
                   Explore our <span>Verified &amp; Professional</span> Cars
                 </h1>
                 <p>

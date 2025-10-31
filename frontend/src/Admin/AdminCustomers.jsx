@@ -276,7 +276,7 @@ const AdminCustomers = () => {
             <nav>
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
-                  <Link to="/admin-dash-board">Home</Link>
+                  <Link to="/admin-dashboard">Home</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
                   Customers

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { Link } from 'react-router-dom'
+import { Facebook } from "react-feather";
 
 
 const Team = () => {
@@ -48,7 +49,7 @@ const Team = () => {
                 <div className="footer-social-links m-0">
                   <ul className="nav">
                     <li>
-                      <a href="#"><i className="fa-brands fa-facebook-f fa-facebook fi-icon" /></a>
+                      <a href="#">  <Facebook   /></a>
                     </li>
                     <li>
                       <a href="#"><i className="fab fa-twitter fi-icon" /> </a>
@@ -72,7 +73,7 @@ const Team = () => {
                 <div className="footer-social-links m-0">
                   <ul className="nav">
                     <li>
-                      <a href="#"><i className="fa-brands fa-facebook-f fa-facebook fi-icon" /></a>
+                      <a href="#"><Facebook   /></a>
                     </li>
                     <li>
                       <a href="#"><i className="fab fa-twitter fi-icon" /> </a>
@@ -96,7 +97,7 @@ const Team = () => {
                 <div className="footer-social-links m-0">
                   <ul className="nav">
                     <li>
-                      <a href="#"><i className="fa-brands fa-facebook-f fa-facebook fi-icon" /></a>
+                      <a href="#"><Facebook   /></a>
                     </li>
                     <li>
                       <a href="#"><i className="fab fa-twitter fi-icon" /> </a>
@@ -120,7 +121,7 @@ const Team = () => {
                 <div className="footer-social-links m-0">
                   <ul className="nav">
                     <li>
-                      <a href="#"><i className="fa-brands fa-facebook-f fa-facebook fi-icon" /></a>
+                      <a href="#"><Facebook   /></a>
                     </li>
                     <li>
                       <a href="#"><i className="fab fa-twitter fi-icon" /> </a>
@@ -144,7 +145,7 @@ const Team = () => {
                 <div className="footer-social-links m-0">
                   <ul className="nav">
                     <li>
-                      <a href="#"><i className="fa-brands fa-facebook-f fa-facebook fi-icon" /></a>
+                      <a href="#"><Facebook   /></a>
                     </li>
                     <li>
                       <a href="#"><i className="fab fa-twitter fi-icon" /> </a>
@@ -168,7 +169,7 @@ const Team = () => {
                 <div className="footer-social-links m-0">
                   <ul className="nav">
                     <li>
-                      <a href="#"><i className="fa-brands fa-facebook-f fa-facebook fi-icon" /></a>
+                      <a href="#"><Facebook   /></a>
                     </li>
                     <li>
                       <a href="#"><i className="fab fa-twitter fi-icon" /> </a>

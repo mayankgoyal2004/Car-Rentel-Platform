@@ -7,6 +7,7 @@ import "flatpickr/dist/flatpickr.css";
 import "../assets/banner.css";
 import apiService from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
+import { Search } from "react-feather";
 
 function BannerSection() {
   const [pickupCity, setPickupCity] = useState("");
@@ -189,7 +190,8 @@ function BannerSection() {
             {/* Search Button */}
             <div className="search-btn">
               <button className="btn btn-primary" type="submit">
-                <i className="bx bx-search-alt" />
+               <Search size={18} />
+
               </button>
             </div>
           </form>

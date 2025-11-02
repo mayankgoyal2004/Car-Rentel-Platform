@@ -22,7 +22,7 @@ const FaqSection = () => {
         <div className="row">
           <div className="col-lg-8 mx-auto">
             <div className="section-heading heading-four">
-              <h2>Frequently asked questions</h2>
+              <h2 className="demoFunction">Frequently asked questions</h2>
               <p>Explore to learn more about how we can empower your business</p>
             </div>
             <div className="accordion faq-accordion" id="faqAccordion">

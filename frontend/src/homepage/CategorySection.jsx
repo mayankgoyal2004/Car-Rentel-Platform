@@ -55,7 +55,7 @@ const Category = () => {
           <div className="col-md-12">
             {/* Heading title*/}
             <div className="section-heading heading-four" data-aos="fade-down">
-              <h2>Featured Categories</h2>
+              <h2 className="demoFunction"> Featured Categories</h2>
               <p>
                 Know what you’re looking for? Browse our extensive selection of
                 cars

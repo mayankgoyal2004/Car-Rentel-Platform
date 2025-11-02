@@ -556,7 +556,7 @@ const updateUserDetails = async (req, res) => {
       !lastName ||
       !address ||
       !country ||
-      !state ||
+   
       !city ||
       !pincode
     ) {

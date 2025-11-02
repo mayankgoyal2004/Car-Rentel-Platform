@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import apiService, { BASE_URL_IMG } from '../../Apiservice/apiService';
+import { CheckSquare } from 'react-feather';
 
 const BookingSuccess = () => {
   const { id } = useParams();
@@ -254,7 +255,7 @@ const BookingSuccess = () => {
             <div className="booking-card">
               <div className="success-book">
                 <span className="success-icon">
-                  <i className="fa-solid fa-check-double" />
+<CheckSquare size={18} />
                 </span>
                 <h5>Thank you! Your Order has been Received</h5>
                 <h5 className="order-no">Order Number : <span>{reservation.bookingId }</span></h5>

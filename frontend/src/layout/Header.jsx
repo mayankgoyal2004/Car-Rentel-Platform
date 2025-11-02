@@ -5,6 +5,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { removeUser } from "../utils/userSlice";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { ToastContainer, toast } from "react-toastify";
+import {
+  X,
+  ChevronDown,
+  LogOut,
+  ArrowRight,
+  User,
+  Lock,
+  Heart,
+  MessageCircle,
+  RefreshCcw,
+} from "react-feather";
 
 const Header = () => {
   const [pageOpen, setPageOpen] = useState(false);
@@ -123,7 +134,7 @@ const Header = () => {
                 />
               </Link>
               <a id="menu_close" className="menu-close">
-                <i className="fas fa-times" />
+                <X size={22} />
               </a>
             </div>
 
@@ -154,7 +165,7 @@ const Header = () => {
                     setPageOpen(!pageOpen);
                   }}
                 >
-                  Pages <i className="fas fa-chevron-down" />
+                  Pages <ChevronDown size={18} />
                 </a>
                 <ul className="submenu">
                   <li className={isActive("/about-us") ? "active" : ""}>
@@ -221,7 +232,8 @@ const Header = () => {
                       onClick={handleLogout}
                       className="d-flex align-items-center"
                     >
-                      <i className="ti ti-logout me-2" />
+                     <LogOut size={18} className="me-2" />
+
                       <span>Logout</span>
                     </Link>
                   </li>
@@ -248,17 +260,17 @@ const Header = () => {
                     />
                   </span>
                   {/* <span className="ms-1">{user.userName}</span> */}
-                  <i className="fas fa-chevron-down ms-1" />
+                  <ChevronDown size={18} />
                 </a>
                 <div className="dropdown-menu p-2">
                   {/* Profile Header */}
                   <div className="profileset d-flex align-items-center mb-2">
                     <span className="user-img me-2">
-                      <img
+                      {/* <img
                         src={`${BASE_URL_IMG + user?.image}`}
                         alt="Profile"
                         className="img-fluid rounded-circle"
-                      />
+                      /> */}
                     </span>
                     <div>
                       <h6 className="fw-semibold mb-1">{user.userName}</h6>
@@ -275,7 +287,8 @@ const Header = () => {
                       isActive("/user-dashboard") ? "active" : ""
                     }`}
                   >
-                    <i className="ti ti-exchange me-2" />
+                 <RefreshCcw size={18} className="me-2" />
+
                     Dashboard
                   </Link>
 
@@ -286,7 +299,8 @@ const Header = () => {
                       isActive("/user-dashboard/user-wishlist") ? "active" : ""
                     }`}
                   >
-                    <i className="ti ti-heart me-2" />
+                 <Heart size={18} className="me-2" />
+
                     Wishlist
                   </Link>
 
@@ -297,7 +311,8 @@ const Header = () => {
                       isActive("/user-dashboard/user-message") ? "active" : ""
                     }`}
                   >
-                    <i className="ti ti-message me-2" />
+                  <MessageCircle size={18} className="me-2" />
+
                     Messages
                   </Link>
 
@@ -309,9 +324,9 @@ const Header = () => {
                     onClick={handleLogout}
                   >
                     <span>
-                      <i className="ti ti-logout me-2" /> Logout Account
+                      <LogOut size={18} className="me-2" /> Logout Account
                     </span>
-                    <i className="ti ti-chevron-right" />
+                    <ArrowRight size={18} />
                   </button>
                 </div>
               </li>
@@ -325,7 +340,8 @@ const Header = () => {
                       isActive("/login") ? "active" : ""
                     }`}
                   >
-                    <i className="bx bx-user me-1" />
+                   <User size={18} className="me-1" />
+
                     Sign In
                   </Link>
                 </li>
@@ -336,7 +352,8 @@ const Header = () => {
                       isActive("/register") ? "active" : ""
                     }`}
                   >
-                    <i className="bx bx-lock me-1" />
+                   <Lock size={18} className="me-1" />
+
                     Sign Up
                   </Link>
                 </li>

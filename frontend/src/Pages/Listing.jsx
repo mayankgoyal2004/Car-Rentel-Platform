@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
-import { Heart, Filter, Calendar, MapPin } from "react-feather";
+import { Heart, Filter, Calendar, MapPin, ChevronDown } from "react-feather";
 import { ToastContainer, toast } from "react-toastify";
 const Listing = () => {
   const [cars, setCars] = useState([]);
@@ -428,7 +428,7 @@ const Listing = () => {
                             }
                           />
                           <span>
-                            <i className="feather-calendar" />
+                           
                           </span>
                         </div>
                       </div>
@@ -457,7 +457,7 @@ const Listing = () => {
                             }
                           />
                           <span>
-                            <i className="feather-calendar" />
+                           
                           </span>
                         </div>
                       </div>
@@ -541,7 +541,7 @@ const Listing = () => {
                           >
                             Car Brand
                             <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
+                             <ChevronDown className="ms-2" />
                             </span>
                           </a>
                         </h6>
@@ -605,7 +605,7 @@ const Listing = () => {
                           >
                             Fuel Type
                             <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
+                               <ChevronDown className="ms-2" />
                             </span>
                           </a>
                         </h6>
@@ -660,7 +660,7 @@ const Listing = () => {
                           >
                             Transmission
                             <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
+                              <ChevronDown className="ms-2" />
                             </span>
                           </a>
                         </h6>
@@ -723,7 +723,7 @@ const Listing = () => {
                           >
                             Car Color
                             <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
+                              <ChevronDown className="ms-2" />
                             </span>
                           </a>
                         </h6>
@@ -784,7 +784,8 @@ const Listing = () => {
                           >
                             Car Type
                             <span className="float-end">
-                              <i className="fa-solid fa-chevron-down" />
+                             <ChevronDown className="ms-2" />
+
                             </span>
                           </a>
                         </h6>
@@ -977,6 +978,7 @@ const Listing = () => {
                               <Link to={`/listing-details/${car.permalink}`}>
                                 <img
                                   src={BASE_URL_IMG + car?.image || "N/A"}
+                                  loading="lazy"
                                   className="img-fluid"
                                   alt={car?.carName || "N/A"}
                                 />

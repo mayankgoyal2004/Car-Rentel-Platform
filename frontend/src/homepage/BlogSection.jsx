@@ -3,6 +3,7 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useEffect, useState } from "react";
+import { ArrowRight, Calendar } from "react-feather";
 const BlogSection = () => {
   const [blog, setBlogs] = useState([]);
   const fetchLatestBlogs = async () => {
@@ -24,7 +25,7 @@ const BlogSection = () => {
       <div className="container">
         {/* Heading title*/}
         <div className="section-heading" data-aos="fade-down">
-          <h2>News &amp; Insights For You</h2>
+          <h2 className="demoFunction">News &amp; Insights For You</h2>
           <p>This blog post provides valuable insights into the benefits</p>
         </div>
         {/* /Heading title */}
@@ -37,6 +38,7 @@ const BlogSection = () => {
                     <img
                       className="img-fluid"
                       src={BASE_URL_IMG + b.image}
+                      loading="lazy"
                       alt="Post Image"
                     />
                   </Link>
@@ -61,6 +63,7 @@ const BlogSection = () => {
                         <div className="post-author-img">
                           <img
                             src={BASE_URL_IMG + b.admin?.image}
+                            loading="lazy"
                             alt="author"
                           />
                         </div>
@@ -71,7 +74,8 @@ const BlogSection = () => {
                       </div>
                     </li>
                     <li className="date-icon">
-                      <i className="fa-solid fa-calendar-days" />{" "}
+                     <Calendar className="ms-2" />
+{" "}
                       <span>{new Date(b.createdAt).toDateString()}</span>
                     </li>
                   </ul>
@@ -90,7 +94,8 @@ const BlogSection = () => {
           >
             View all Blogs{" "}
             <span>
-              <i className="feather-arrow-right ms-2" />
+             <ArrowRight className="ms-2" />
+
             </span>
           </Link>
         </div>

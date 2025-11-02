@@ -28,7 +28,7 @@ const FeatureSection = () => {
           <div className="col-lg-6">
             <div className="feature-img">
               <div className="section-heading heading-four text-start">
-                <h2>Best Platform for Car Rental</h2>
+                <h2 className="demoFunction">Best Platform for Car Rental</h2>
                 <p>
                   Why do we choose relax rent bikes generally if we travel in a
                   un known cities with a bike in our hand we feel which is like

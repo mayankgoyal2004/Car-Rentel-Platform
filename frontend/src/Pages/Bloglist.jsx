@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import apiService, { BASE_URL_IMG } from "../../Apiservice/apiService";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Tag, ArrowRight, ArrowLeft } from "react-feather";
+import { Tag, ArrowRight, ArrowLeft, Calendar } from "react-feather";
 
 const Bloglist = () => {
   const [blogs, setBlogs] = useState([]);
@@ -145,6 +145,7 @@ const Bloglist = () => {
                               <img
                                 className="img-fluid height-100"
                                 src={BASE_URL_IMG + blog?.image}
+                                loading="lazy"
                                 alt={blog?.title}
                               />
                             </Link>
@@ -158,6 +159,7 @@ const Bloglist = () => {
                                       <img
                                         src={BASE_URL_IMG + blog?.admin?.image}
                                         alt={blog?.admin?.userName}
+                                        loading="lazy"
                                       />
                                     </div>
                                     <a>
@@ -167,7 +169,8 @@ const Bloglist = () => {
                                   </div>
                                 </li>
                                 <li className="date-icon ms-3">
-                                  <i className="fa-solid fa-calendar-days" />{" "}
+                                  <Calendar className="ms-2" />
+{" "}
                                   <span>
                                     {new Date(
                                       blog?.createdAt
@@ -248,7 +251,8 @@ const Bloglist = () => {
                             disabled={currentPage === totalPages}
                           >
                             Next
-                            <i className="fas fa-regular fa-arrow-right ms-2" />
+                           <ArrowRight className="ms-2" />
+
                           </button>
                         </li>
                       </ul>
@@ -321,6 +325,7 @@ const Bloglist = () => {
                             <img
                               className="img-fluid"
                               src={BASE_URL_IMG + blog.image}
+                              loading="lazy"
                               alt="Blog"
                             />
                           </Link>
@@ -332,7 +337,8 @@ const Bloglist = () => {
                             </Link>
                           </h5>
                           <div className="article-date">
-                            <i className="fa-solid fa-calendar-days" />
+                         <Calendar className="ms-2" />
+
                             <span>
                               {new Date(blog.createdAt).toDateString()}
                             </span>

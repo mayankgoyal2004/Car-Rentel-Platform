@@ -43,7 +43,7 @@ const PopularSection = () => {
       <div className="container">
         {/* Section Header */}
         <div className="section-heading heading-four" data-aos="fade-down">
-          <h2>Popular Cars On Recommendations</h2>
+          <h2 className="demoFunction">Popular Cars On Recommendations</h2>
           <p>Here are some versatile options that cater to different needs</p>
         </div>
         {/* /Section Header */}
@@ -59,6 +59,7 @@ const PopularSection = () => {
                   src={`${BASE_URL_IMG}${car?.image}`}
                   alt={car?.carModel?.carModel}
                   className="img-fluid"
+                  loading="lazy"
                 />
                 <div className="amount-icon">
                   <span className="day-amt">

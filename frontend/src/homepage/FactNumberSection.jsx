@@ -27,7 +27,7 @@ const FactNumberSection = () => {
       <div className="container">
         {/* Heading title*/}
         <div className="section-heading" data-aos="fade-down">
-          <h2 className="title text-white">Facts By The Numbers</h2>
+          <h2 className="title text-white demoFunction">Facts By The Numbers</h2>
           <p className="description">
             Here are some dreamsrent interesting facts presented by the numbers
           </p>

@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { CheckCircle } from "react-feather";
 const BestPricing = () => {
   useEffect(() => {
           AOS.init();
@@ -11,7 +12,7 @@ const BestPricing = () => {
   <div className="container">
     {/* Heading title*/}
     <div className="section-heading" data-aos="fade-down">
-      <h2>Transparent Pricing For you</h2>
+      <h2 className="demoFunction">Transparent Pricing For you</h2>
       <p>Choose a package that suits you</p>
     </div>
     {/* /Heading title */}
@@ -31,7 +32,7 @@ const BestPricing = () => {
           <div className="price-head">
             <h2>Save more with Good Plans</h2>	
             <p>Choose a plan and get onboard in Minutes, then get $100 with next payment</p>
-            <a href="javascript:void(0);"><i className="bx bx-right-arrow-alt" /></a>			
+            {/* <a href="javascript:void(0);"><CheckCircle className="ms-2" />		 */}
           </div>	
           <div className="price-body">
             <img className="img-fluid" src="/user-assets/img/price-plan.png" alt="Price Plan" />		
@@ -50,13 +51,13 @@ const BestPricing = () => {
           </div>	
           <div className="price-details">
             <ul>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>50% Downpayment</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Insurance not Included</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Doorstep delivery</li>
-              <li className="price-uncheck"><span><i className="fa-regular fa-circle-xmark" /></span>Safe &amp; Sanitized</li>
-              <li className="price-uncheck"><span><i className="fa-regular fa-circle-xmark" /></span>No Long term Commitment</li>
-              <li className="price-uncheck"><span><i className="fa-regular fa-circle-xmark" /></span>Refundable deposit has to pay</li>
-              <li className="price-uncheck"><span><i className="fa-regular fa-circle-xmark" /></span>No Flexible timing &amp; extension</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>50% Downpayment</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Insurance not Included</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Doorstep delivery</li>
+              <li className="price-uncheck"><span><CheckCircle className="ms-2" /></span>Safe &amp; Sanitized</li>
+              <li className="price-uncheck"><span><CheckCircle className="ms-2" /></span>No Long term Commitment</li>
+              <li className="price-uncheck"><span><CheckCircle className="ms-2" /></span>Refundable deposit has to pay</li>
+              <li className="price-uncheck"><span><CheckCircle className="ms-2" /></span>No Flexible timing &amp; extension</li>
             </ul>
             <Link to="/"  className="btn viewdetails-btn">Buy Package</Link>							
           </div>							
@@ -74,13 +75,13 @@ const BestPricing = () => {
           </div>		
           <div className="price-details">
             <ul>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>50% Downpayment</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Insurance not Included</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Doorstep delivery</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Safe &amp; Sanitized</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Long term Commitment 1 month</li>
-              <li className="price-uncheck"><span><i className="fa-regular fa-circle-xmark" /></span>Refundable deposit has to pay</li>
-              <li className="price-uncheck"><span><i className="fa-regular fa-circle-xmark" /></span>No Flexible timing &amp; extension</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>50% Downpayment</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Insurance not Included</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Doorstep delivery</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Safe &amp; Sanitized</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Long term Commitment 1 month</li>
+              <li className="price-uncheck"><span><CheckCircle className="ms-2" /></span>Refundable deposit has to pay</li>
+              <li className="price-uncheck"><span><CheckCircle className="ms-2" /></span>No Flexible timing &amp; extension</li>
             </ul>
             <Link to="/"  className="btn viewdetails-btn btn-popular">Buy Package</Link>							
           </div>							
@@ -98,13 +99,13 @@ const BestPricing = () => {
           </div>	
           <div className="price-details">
             <ul>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>50% Downpayment</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Insurance not Included</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Doorstep delivery</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Safe &amp; Sanitized</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>Long term Commitment 1 month</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>No Refundable deposit</li>
-              <li className="price-check"><span><i className="fa-regular fa-circle-check" /></span>No Flexible timing &amp; extension</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>50% Downpayment</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Insurance not Included</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Doorstep delivery</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Safe &amp; Sanitized</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>Long term Commitment 1 month</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>No Refundable deposit</li>
+              <li className="price-check"><span><CheckCircle className="ms-2" /></span>No Flexible timing &amp; extension</li>
             </ul>
             <Link to="/" className="btn viewdetails-btn">Buy Package</Link>						
           </div>							

@@ -72,7 +72,7 @@ export const CarSection = () => {
     <section className="car-section">
       <div className="container">
         <div className="section-heading heading-four">
-          <h2>Explore Most Popular Cars</h2>
+          <h2 className="demoFunction">Explore Most Popular Cars</h2>
           <p>Here's a list of some of the most popular cars globally</p>
         </div>
         <div className="row">

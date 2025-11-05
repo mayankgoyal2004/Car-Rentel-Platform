@@ -245,22 +245,26 @@ const CompanySetting = () => {
                         </p>
                         <div className="d-flex align-items-center flex-wrap row-gap-3 mb-3">
                           <div className="d-flex align-items-center justify-content-center avatar avatar-xxl  me-3 flex-shrink-0 text-dark frames">
-                            {imagePreview ? (
-                              <img
-                                src={BASE_URL_IMG + imagePreview}
-                                className="rounded-circle"
-                                alt="Company Logo"
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "contain", 
-                                
-                                  borderRadius: "50%",
-                                }}
-                              />
-                            ) : (
-                              <i className="ti ti-building text-gray-4 fs-24" />
-                            )}
+                           {imagePreview ? (
+  <img
+    src={
+      imagePreview.startsWith("blob:")
+        ? imagePreview
+        : BASE_URL_IMG + imagePreview
+    }
+    className="rounded-circle"
+    alt="Company Logo"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "contain",
+      borderRadius: "50%",
+    }}
+  />
+) : (
+  <i className="ti ti-building text-gray-4 fs-24" />
+)}
+
                             {imagePreview && (
                               <span
                                 className="avatar-badge avatar-badge-end bg-white p-1 cursor-pointer"

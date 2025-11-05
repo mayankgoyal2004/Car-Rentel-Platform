@@ -10471,10 +10471,11 @@ Version      : 1.0
 
 .section-heading.heading-four h2 {
   position: relative;
-  padding: 0 33px;
+  /* padding: 0 33px; */
   margin-bottom: 4px;
   display: inline-block;
 }
+
 .section-heading.heading-four h2::before, .section-heading.heading-four h2::after {
   content: "";
   position: absolute;

@@ -152,14 +152,14 @@ const AdminBin = () => {
         {/* Breadcrumb */}
         <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="my-auto mb-2">
-            <h4 className="mb-1">All Cars</h4>
+            <h4 className="mb-1">Recycle Bin</h4>
             <nav>
               <ol className="breadcrumb mb-0">
                 <li className="breadcrumb-item">
                   <Link to="/admin-dashboard">Home</Link>
                 </li>
                 <li className="breadcrumb-item active" aria-current="page">
-                  All Cars
+                  Recycle Bin
                 </li>
               </ol>
             </nav>
@@ -387,7 +387,7 @@ const AdminBin = () => {
                               onClick={() => setBin(car)}
                             >
                               <i className="ti ti-trash me-1" />
-                              Move Out From Bin
+                              Move From Bin
                             </button>
                           </li>
                         </ul>

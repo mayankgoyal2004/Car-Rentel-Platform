@@ -376,3 +376,11 @@ iframe[id^=":"] {
 .footer a:hover {
   color: #ffa633 !important;
 }
+
+
+
+
+.gradient-card-1 {
+ background-image: linear-gradient(to left bottom, #5a6068, #607177, #6a8280, #7c9184, #989f88)!important;
+ 
+}

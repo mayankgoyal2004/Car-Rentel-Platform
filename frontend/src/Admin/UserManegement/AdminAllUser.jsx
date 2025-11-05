@@ -328,7 +328,7 @@ const AdminAllUser = () => {
                                 "/admin-assets/img/profiles/avatar-20.jpg";
                             }}
                           />
-                          <h6 className="mb-0">{user?.userName}</h6>
+                           <h6 className="fw-medium">{user?.userName}</h6>
                         </div>
                       </td>
                       <td>{user?.contact}</td>

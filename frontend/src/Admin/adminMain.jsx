@@ -296,19 +296,21 @@ const AdminMain = () => {
                   userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
                 }`}
               >
-                <div className="card flex-fill">
+                <div className="card flex-fill gradient-card-1">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
                       <div className="d-flex align-items-center">
                         <span className="avatar avatar-sm bg-secondary-100 text-secondary me-2">
                           <i className="ti ti-calendar-time fs-14" />
                         </span>
-                        <p>Total Reservations</p>
+                        <Link to="all-reservation" className="text-white">
+                          Total Reservations
+                        </Link>
                       </div>
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                        <h5 className="mb-1">
+                        <h5 className="mb-1 text-white">
                           {reservationPegination?.totalReservations}
                         </h5>
                       </div>
@@ -324,21 +326,28 @@ const AdminMain = () => {
                   userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
                 }`}
               >
-                <div className="card flex-fill">
+                <div className="card flex-fill gradient-card-1 ">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
                       <div className="d-flex align-items-center">
                         <span className="avatar avatar-sm bg-orange-100 text-orange me-2">
                           <i className="ti ti-moneybag fs-14" />
                         </span>
-                        <p>
-                          {userType === 1 ? "Total Customers" : "Total Drivers"}
-                        </p>
+                        {userType !== 1 && (
+                          <Link to="all-drivers " className="text-white">
+                            Total Drivers
+                          </Link>
+                        )}
+                        {userType === 1 && (
+                          <Link to="all-customers" className="text-white">
+                            Total Customer
+                          </Link>
+                        )}
                       </div>
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                        <h5 className="mb-1">
+                        <h5 className="mb-1 text-white">
                           {userType === 1
                             ? customerPegination?.totalcustomer
                             : driverPeginaton?.totalDriver}
@@ -356,19 +365,23 @@ const AdminMain = () => {
                   userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
                 }`}
               >
-                <div className="card flex-fill">
+                <div className="card flex-fill gradient-card-1">
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
                       <div className="d-flex align-items-center">
                         <span className="avatar avatar-sm bg-violet-100 text-violet me-2">
                           <i className="ti ti-car fs-14" />
                         </span>
-                        <p>Total Cars</p>
+                        <Link to="all-cars" className="text-white">
+                          Total Cars
+                        </Link>
                       </div>
                     </div>
                     <div className="d-flex align-items-center justify-content-between gap-2">
                       <div className="py-2">
-                        <h5 className="mb-1">{carPegination?.totalCar}</h5>
+                        <h5 className="mb-1 text-white">
+                          {carPegination?.totalCar}
+                        </h5>
                       </div>
                       <div id="car-chart" />
                     </div>
@@ -381,19 +394,25 @@ const AdminMain = () => {
                     userType === 1 ? "col-md-3 d-flex" : "col-md-4 d-flex"
                   }`}
                 >
-                  <div className="card flex-fill">
+                  <div className="card flex-fill gradient-card-1">
+                    {" "}
+                    {/* 👈 Changed class here */}
                     <div className="card-body pb-1">
                       <div className="border-bottom mb-0 pb-2">
                         <div className="d-flex align-items-center">
                           <span className="avatar avatar-sm bg-violet-100 text-violet me-2">
                             <i className="ti ti-car fs-14" />
                           </span>
-                          <p>Total Owner</p>
+                          <Link to="all-owners " className="text-white">
+                            Total Owner
+                          </Link>
                         </div>
                       </div>
                       <div className="d-flex align-items-center justify-content-between gap-2">
                         <div className="py-2">
-                          <h5 className="mb-1">{ownerPegination?.totalUser}</h5>
+                          <h5 className="mb-1 text-white">
+                            {ownerPegination?.totalUser}
+                          </h5>
                         </div>
                         <div id="car-chart" />
                       </div>
@@ -469,7 +488,7 @@ const AdminMain = () => {
                       </div>
                     </div>
                     <Link
-                      to={`/admin-dashboard/car-details/${newlyCar?._id}`} 
+                      to={`/admin-dashboard/car-details/${newlyCar?._id}`}
                       className="btn btn-white d-flex align-items-center justify-content-center"
                     >
                       View Details
@@ -930,7 +949,9 @@ const AdminMain = () => {
                               <td>
                                 <div className="d-flex align-items-center">
                                   <Link
-                                    to={"customers-details/" + inv.customer?._id}
+                                    to={
+                                      "customers-details/" + inv.customer?._id
+                                    }
                                     className="avatar flex-shrink-0"
                                   >
                                     <img

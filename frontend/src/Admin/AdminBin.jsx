@@ -112,7 +112,7 @@ const AdminBin = () => {
   const handleDeleteCar = async () => {
     if (!deleteCar) return;
     try {
-      const res = await apiService.moveToRecycleBin(deleteCar._id);
+      const res = await apiService.deleteCar(deleteCar._id);
       toast.success(res.data.message);
 
       setDeleteCar(null);

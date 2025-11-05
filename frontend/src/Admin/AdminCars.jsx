@@ -138,10 +138,23 @@ const AdminCars = () => {
     createdAt: new Date(car.createdAt).toLocaleDateString(),
     views: car.views || 0,
   }));
-  const handleDeleteCar = async () => {
+  const handleBin = async () => {
     if (!deleteCar) return;
     try {
       const res = await apiService.moveToRecycleBin(deleteCar._id);
+      toast.success(res.data.message);
+
+      setDeleteCar(null);
+      document.getElementById("delete_car_close")?.click();
+      fetchAllCars(currentPage, search);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to delete Car");
+    }
+  };
+  const handleDeleteCar = async () => {
+    if (!deleteCar) return;
+    try {
+      const res = await apiService.deleteCar(deleteCar._id);
       toast.success(res.data.message);
 
       setDeleteCar(null);
@@ -415,17 +428,32 @@ const AdminCars = () => {
                               </Link>
                             </li>
                           )}
-                          <li>
-                            <button
-                              className="dropdown-item rounded-1"
-                              data-bs-toggle="modal"
-                              data-bs-target="#delete_car"
-                              onClick={() => setDeleteCar(car)}
-                            >
-                              <i className="ti ti-trash me-1" />
-                              Move To Bin
-                            </button>
-                          </li>
+                          {userType !== 1 && (
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_car"
+                                onClick={() => setDeleteCar(car)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Move To Bin
+                              </button>
+                            </li>
+                          )}
+                          {userType === 1 && (
+                            <li>
+                              <button
+                                className="dropdown-item rounded-1"
+                                data-bs-toggle="modal"
+                                data-bs-target="#delete_car"
+                                onClick={() => setDeleteCar(car)}
+                              >
+                                <i className="ti ti-trash me-1" />
+                                Delete
+                              </button>
+                            </li>
+                          )}
                         </ul>
                       </div>
                     </td>
@@ -497,9 +525,16 @@ const AdminCars = () => {
                 >
                   Cancel
                 </button>
-                <button className="btn btn-primary" onClick={handleDeleteCar}>
-                  Yes, Delete
-                </button>
+                {userType !== 1 && (
+                  <button className="btn btn-primary" onClick={handleBin}>
+                    Yes, Delete
+                  </button>
+                )}
+                {userType === 1 && (
+                  <button className="btn btn-primary" onClick={handleDeleteCar}>
+                    Yes, Delete
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -800,9 +800,11 @@ const AdminDashboard = () => {
                           <li>
                             <Link to="language-setting">Language Settings</Link>
                           </li>
-                          <li>
-                            <Link to="bin">Recycle Bin</Link>
-                          </li>
+                          {userType !== 1 && (
+                            <li>
+                              <Link to="bin">Recycle Bin</Link>
+                            </li>
+                          )}
                         </ul>
                       )}
                     </li>

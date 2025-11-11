@@ -776,20 +776,28 @@ route.get(
 //!! car controler
 route.post(
   "/add-car",
-  checkPermission("car", "create"),
+  checkPermission("Car", "create"),
   upload.carImageUpload.single("image"),
   car.addCar
 );
 
 route.post(
   "/edit-car-basics/:id",
-  checkPermission("car", "edit"),
+  checkPermission("Car", "edit"),
   upload.carImageUpload.single("image"),
   car.editBasicCar
 );
 route.post("/update-cars/:id/pricing", pricing.updateCarPricing);
-route.delete("/delete-cars/:id", car.DeleteCar);
-route.post("/move-to-recycle-cars/:id", car.MoveTorecycleBin);
+route.delete(
+  "/delete-cars/:id",
+  checkPermission("Car", "Delete"),
+  car.DeleteCar
+);
+route.post(
+  "/move-to-recycle-cars/:id",
+  checkPermission("Car", "Delete"),
+  car.MoveTorecycleBin
+);
 route.post("/move-out-from-recycle-cars/:id", car.MoveOutFromRecycleBin);
 route.put("/cars/:id/pricing", pricing.editCarPricing);
 route.put("/update-car/:id/features", car.updateCarFeatures);

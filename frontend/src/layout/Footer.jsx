@@ -146,7 +146,7 @@ const Footer = () => {
                         href="https://www.facebook.com/vibranticksolutions/"
                         target="_blank"
                       >
-                       <i class="fab fa-facebook-f fi-icon"></i>
+                       <i className="fab fa-facebook-f fi-icon"></i>
                       </a>
                     </li>
                     <li>

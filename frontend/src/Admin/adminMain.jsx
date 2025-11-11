@@ -140,12 +140,9 @@ const AdminMain = () => {
   };
 
   const gradientStyles = {
-    primaryGradient: {
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      color: "white",
-    },
+    primaryGradient: {},
     successGradient: {
-      background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+      background: "linear-gradient(135deg, #364756ff 0%, #00f2fe 100%)",
       color: "white",
     },
     warningGradient: {
@@ -325,7 +322,7 @@ const AdminMain = () => {
               >
                 <div
                   className="card flex-fill border-0 shadow-sm text-white"
-                  style={gradientStyles.primaryGradient}
+                  style={{ backgroundColor: "#FFA633" }}
                 >
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -358,7 +355,7 @@ const AdminMain = () => {
               >
                 <div
                   className="card flex-fill border-0 shadow-sm text-white"
-                  style={gradientStyles.warningGradient}
+                  style={{ backgroundColor: "black", color: "white" }}
                 >
                   <div className="card-body pb-1">
                     <div className="border-bottom border-white-20 mb-0 pb-2">
@@ -406,7 +403,7 @@ const AdminMain = () => {
               >
                 <div
                   className="card flex-fill border-0 shadow-sm text-white"
-                  style={gradientStyles.dangerGradient}
+                  style={{ backgroundColor: "#FFA633", color: "black" }}
                 >
                   <div className="card-body pb-1">
                     <div className="border-bottom mb-0 pb-2">
@@ -436,7 +433,7 @@ const AdminMain = () => {
                 >
                   <div
                     className="card flex-fill border-0 shadow-sm text-white"
-                    style={gradientStyles.purpleGradient}
+                    style={{ backgroundColor: "black", color: "white" }}
                   >
                     {" "}
                     {/* 👈 Changed class here */}
@@ -446,14 +443,14 @@ const AdminMain = () => {
                           <span className="avatar avatar-sm bg-violet-100 text-violet me-2">
                             <i className="ti ti-car fs-14" />
                           </span>
-                          <Link to="all-owners " className="">
+                          <Link to="all-owners " className="text-white">
                             Total Owner
                           </Link>
                         </div>
                       </div>
                       <div className="d-flex align-items-center justify-content-between gap-2">
                         <div className="py-2">
-                          <h5 className="mb-1 ">
+                          <h5 className="mb-1 text-white">
                             {ownerPegination?.totalUser}
                           </h5>
                         </div>
@@ -568,7 +565,7 @@ const AdminMain = () => {
                 {/* ✅ Full Gradient Header */}
                 <div
                   className="card-header border-0 text-white py-3"
-                  style={gradientStyles.primaryGradient}
+                  style={gradientStyles.darkGradient}
                 >
                   <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <h5 className="mb-0 text-white fw-bold">Customers</h5>
@@ -638,87 +635,98 @@ const AdminMain = () => {
           )}
           {/* customer */}
           {/* Recent Reservations */}
-         {userType !== 1 && (
-    <div className="col-xl-6 d-flex">
-      <div className="card flex-fill">
+          {userType !== 1 && (
+            <div className="col-xl-6 d-flex">
+              <div className="card flex-fill">
+                {/* ✅ Full Gradient Header */}
+                <div
+                  className="card-header border-0 text-white py-3"
+                  style={gradientStyles.darkGradient}
+                >
+                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <h5 className="mb-0 text-white fw-bold">
+                      Recent Reservations
+                    </h5>
+                    <Link
+                      to="all-reservation"
+                      className="text-white text-decoration-underline fw-medium"
+                    >
+                      View All
+                    </Link>
+                  </div>
+                </div>
 
-        {/* ✅ Full Gradient Header */}
-        <div
-          className="card-header border-0 text-white py-3"
-          style={gradientStyles.successGradient}
-        >
-          <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <h5 className="mb-0 text-white fw-bold">Recent Reservations</h5>
-            <Link
-              to="all-reservation"
-              className="text-white text-decoration-underline fw-medium"
-            >
-              View All
-            </Link>
-          </div>
-        </div>
+                <div className="card-body pb-1">
+                  <div className="table-responsive table-overflow-hidden">
+                    <table className="table custom-table1">
+                      <tbody>
+                        {loading ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : latestReservation.length === 0 ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              No Reservations found
+                            </td>
+                          </tr>
+                        ) : (
+                          latestReservation.map((res) => {
+                            const pickup = new Date(res?.pickupDate);
+                            const drop = new Date(res?.dropDate);
+                            const duration = Math.ceil(
+                              (drop - pickup) / (1000 * 60 * 60 * 24)
+                            );
 
-        <div className="card-body pb-1">
-          <div className="table-responsive table-overflow-hidden">
-            <table className="table custom-table1">
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">Loading...</td>
-                  </tr>
-                ) : latestReservation.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">No Reservations found</td>
-                  </tr>
-                ) : (
-                  latestReservation.map((res) => {
-                    const pickup = new Date(res?.pickupDate);
-                    const drop = new Date(res?.dropDate);
-                    const duration = Math.ceil((drop - pickup) / (1000 * 60 * 60 * 24));
-
-                    return (
-                      <tr key={res?._id}>
-                        <td>
-                          <div className="d-flex align-items-center">
-                            <Link
-                              to={`/admin-dashboard/car-details/${res.car?._id}`}
-                              className="avatar flex-shrink-0"
-                            >
-                              <img
-                                src={BASE_URL_IMG + res?.car.image}
-                                alt={res?.car?.carName}
-                                className="rounded"
-                              />
-                            </Link>
-                            <div className="flex-grow-1 ms-2">
-                              <p className="d-flex align-items-center fs-13 text-default mb-1">
-                                {duration} {duration > 1 ? "Days" : "Day"}
-                                <i className="ti ti-circle-filled text-primary fs-5 mx-1" />
-                                {res?.driverType === "self" ? "Self" : "With Driver"}
-                              </p>
-                              <h6 className="fs-14 fw-semibold mb-1">
-                                <Link to={`/admin-dashboard/car-details/${res.car?._id}`}>
-                                  {res.car?.carName}
-                                </Link>
-                              </h6>
-                              <span className="badge badge-sm bg-secondary-transparent rounded-pill">
-                                {res?.status}
-                              </span>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  )}
+                            return (
+                              <tr key={res?._id}>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <Link
+                                      to={`/admin-dashboard/car-details/${res.car?._id}`}
+                                      className="avatar flex-shrink-0"
+                                    >
+                                      <img
+                                        src={BASE_URL_IMG + res?.car.image}
+                                        alt={res?.car?.carName}
+                                        className="rounded"
+                                      />
+                                    </Link>
+                                    <div className="flex-grow-1 ms-2">
+                                      <p className="d-flex align-items-center fs-13 text-default mb-1">
+                                        {duration}{" "}
+                                        {duration > 1 ? "Days" : "Day"}
+                                        <i className="ti ti-circle-filled text-primary fs-5 mx-1" />
+                                        {res?.driverType === "self"
+                                          ? "Self"
+                                          : "With Driver"}
+                                      </p>
+                                      <h6 className="fs-14 fw-semibold mb-1">
+                                        <Link
+                                          to={`/admin-dashboard/car-details/${res.car?._id}`}
+                                        >
+                                          {res.car?.carName}
+                                        </Link>
+                                      </h6>
+                                      <span className="badge badge-sm bg-secondary-transparent rounded-pill">
+                                        {res?.status}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* /Recent Reservations */}
         </div>
@@ -876,177 +884,192 @@ const AdminMain = () => {
 
           {/* /Reservation Statistics */}
           {/* Drivers */}
-       {userType !== 1 && (
-  <div className="col-xl-4 d-flex">
-    <div className="card flex-fill">
+          {userType !== 1 && (
+            <div className="col-xl-4 d-flex">
+              <div className="card flex-fill">
+                {/* ✅ Full Gradient Header */}
+                <div
+                  className="card-header border-0 text-white py-3"
+                  style={gradientStyles.darkGradient} // <-- Change gradient if needed
+                >
+                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <h5 className="mb-0 text-white fw-bold">Drivers</h5>
+                    <Link
+                      to="all-drivers"
+                      className="text-white text-decoration-underline fw-medium"
+                    >
+                      View All
+                    </Link>
+                  </div>
+                </div>
 
-      {/* ✅ Full Gradient Header */}
-      <div
-        className="card-header border-0 text-white py-3"
-        style={gradientStyles.warningGradient} // <-- Change gradient if needed
-      >
-        <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <h5 className="mb-0 text-white fw-bold">Drivers</h5>
-          <Link
-            to="all-drivers"
-            className="text-white text-decoration-underline fw-medium"
-          >
-            View All
-          </Link>
-        </div>
-      </div>
-
-      <div className="card-body pb-1">
-        <div className="table-responsive table-overflow-hidden">
-          <table className="table custom-table1">
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-4">Loading...</td>
-                </tr>
-              ) : drivers.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="text-center py-4">No drivers found</td>
-                </tr>
-              ) : (
-                drivers.map((dr) => (
-                  <tr key={dr._id}>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <div className="avatar flex-shrink-0">
-                          <img
-                            src={BASE_URL_IMG + dr?.image}
-                            className="rounded-circle"
-                            alt="driver"
-                          />
-                        </div>
-                        <div className="flex-grow-1 ms-2">
-                          <h6 className="fs-14 fw-semibold mb-1">{dr.name}</h6>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-end">
-                      <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
-                        <i className="ti ti-circle-filled fs-6 me-2" />
-                        {dr.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-    </div>
-  </div>
-)}
+                <div className="card-body pb-1">
+                  <div className="table-responsive table-overflow-hidden">
+                    <table className="table custom-table1">
+                      <tbody>
+                        {loading ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : drivers.length === 0 ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              No drivers found
+                            </td>
+                          </tr>
+                        ) : (
+                          drivers.map((dr) => (
+                            <tr key={dr._id}>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <div className="avatar flex-shrink-0">
+                                    <img
+                                      src={BASE_URL_IMG + dr?.image}
+                                      className="rounded-circle"
+                                      alt="driver"
+                                    />
+                                  </div>
+                                  <div className="flex-grow-1 ms-2">
+                                    <h6 className="fs-14 fw-semibold mb-1">
+                                      {dr.name}
+                                    </h6>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="text-end">
+                                <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
+                                  <i className="ti ti-circle-filled fs-6 me-2" />
+                                  {dr.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* /Drivers */}
         </div>
         {userType !== 1 && (
-  <div className="row">
-    {/* Recent Invoices */}
-    <div className="col-md-12">
-      <div className="card">
+          <div className="row">
+            {/* Recent Invoices */}
+            <div className="col-md-12">
+              <div className="card">
+                {/* ✅ Full Gradient Header */}
+                <div
+                  className="card-header border-0 text-white py-3"
+                  style={gradientStyles.darkGradient} // change color if needed
+                >
+                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-1">
+                    <h5 className="mb-0 text-white fw-bold">Recent Invoices</h5>
+                    <Link
+                      to="/admin-dashboard/all-invoice"
+                      className="text-white text-decoration-underline fw-medium"
+                    >
+                      View All
+                    </Link>
+                  </div>
+                </div>
 
-        {/* ✅ Full Gradient Header */}
-        <div
-          className="card-header border-0 text-white py-3"
-          style={gradientStyles.primaryGradient} // change color if needed
-        >
-          <div className="d-flex align-items-center justify-content-between flex-wrap gap-1">
-            <h5 className="mb-0 text-white fw-bold">Recent Invoices</h5>
-            <Link
-              to="/admin-dashboard/all-invoice"
-              className="text-white text-decoration-underline fw-medium"
-            >
-              View All
-            </Link>
+                <div className="card-body">
+                  <div className="custom-table table-responsive table-overflow-hidden">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>INVOICE NO</th>
+                          <th>NAME</th>
+                          <th>EMAIL</th>
+                          <th>CREATED DATE</th>
+                          <th>DUE DATE</th>
+                          <th>INVOICE AMOUNT</th>
+                          <th>STATUS</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {loading ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              Loading...
+                            </td>
+                          </tr>
+                        ) : invoice.length === 0 ? (
+                          <tr>
+                            <td colSpan="7" className="text-center py-4">
+                              No Invoice found
+                            </td>
+                          </tr>
+                        ) : (
+                          invoice.map((inv) => (
+                            <tr key={inv._id}>
+                              <td>
+                                <Link
+                                  to={"invoice-details/" + inv._id}
+                                  className="fs-12 fw-medium"
+                                >
+                                  #{inv.invoiceNumber}
+                                </Link>
+                              </td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <Link
+                                    to={
+                                      "customers-details/" + inv.customer?._id
+                                    }
+                                    className="avatar flex-shrink-0"
+                                  >
+                                    <img
+                                      src={BASE_URL_IMG + inv.customer?.image}
+                                      className="rounded-circle"
+                                      alt="img"
+                                    />
+                                  </Link>
+                                  <div className="flex-grow-1 ms-2">
+                                    <h6 className="fs-14 fw-semibold mb-1">
+                                      <Link
+                                        to={
+                                          "customers-details/" +
+                                          inv.customer?._id
+                                        }
+                                      >
+                                        {inv.customer?.name}
+                                      </Link>
+                                    </h6>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
+                                <a href={`mailto:${inv.customer?.email}`}>
+                                  {inv.customer?.email}
+                                </a>
+                              </td>
+                              <td>{new Date(inv?.fromDate).toDateString()}</td>
+                              <td>{new Date(inv?.dueDate).toDateString()}</td>
+                              <td>${inv?.totalAmount}</td>
+                              <td>
+                                <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
+                                  <i className="ti ti-circle-filled fs-6 me-2" />
+                                  {inv?.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* /Recent Invoices */}
           </div>
-        </div>
-
-        <div className="card-body">
-          <div className="custom-table table-responsive table-overflow-hidden">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>INVOICE NO</th>
-                  <th>NAME</th>
-                  <th>EMAIL</th>
-                  <th>CREATED DATE</th>
-                  <th>DUE DATE</th>
-                  <th>INVOICE AMOUNT</th>
-                  <th>STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">Loading...</td>
-                  </tr>
-                ) : invoice.length === 0 ? (
-                  <tr>
-                    <td colSpan="7" className="text-center py-4">No Invoice found</td>
-                  </tr>
-                ) : (
-                  invoice.map((inv) => (
-                    <tr key={inv._id}>
-                      <td>
-                        <Link to={"invoice-details/" + inv._id} className="fs-12 fw-medium">
-                          #{inv.invoiceNumber}
-                        </Link>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          <Link
-                            to={"customers-details/" + inv.customer?._id}
-                            className="avatar flex-shrink-0"
-                          >
-                            <img
-                              src={BASE_URL_IMG + inv.customer?.image}
-                              className="rounded-circle"
-                              alt="img"
-                            />
-                          </Link>
-                          <div className="flex-grow-1 ms-2">
-                            <h6 className="fs-14 fw-semibold mb-1">
-                              <Link to={"customers-details/" + inv.customer?._id}>
-                                {inv.customer?.name}
-                              </Link>
-                            </h6>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <a href={`mailto:${inv.customer?.email}`}>
-                          {inv.customer?.email}
-                        </a>
-                      </td>
-                      <td>{new Date(inv?.fromDate).toDateString()}</td>
-                      <td>{new Date(inv?.dueDate).toDateString()}</td>
-                      <td>${inv?.totalAmount}</td>
-                      <td>
-                        <span className="badge badge-md bg-success-transparent d-inline-flex align-items-center">
-                          <i className="ti ti-circle-filled fs-6 me-2" />
-                          {inv?.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    {/* /Recent Invoices */}
-  </div>
-)}
-
+        )}
       </div>
       <div>
         <ToastContainer

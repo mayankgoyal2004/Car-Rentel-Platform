@@ -384,3 +384,51 @@ iframe[id^=":"] {
  background-image: linear-gradient(to left bottom, #5a6068, #607177, #6a8280, #7c9184, #989f88)!important;
  
 }
+
+
+
+
+/* Responsive Search Bar */
+.banner-search .form-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 15px 20px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.banner-search .search-btn {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.banner-search .search-btn button {
+  width: 100%;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-weight: 500;
+  padding: 10px 20px;
+}
+
+@media (max-width: 768px) {
+  .banner-search .form-block {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .banner-search .search-input,
+  .banner-search .search-btn {
+    width: 100%;
+  }
+}

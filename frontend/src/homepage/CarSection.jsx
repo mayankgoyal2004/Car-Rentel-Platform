@@ -53,7 +53,10 @@ export const CarSection = () => {
   };
 
   useEffect(() => {
-    getWishList();
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      getWishList();
+    }
   }, []);
 
   const isInWishlist = (carId) =>

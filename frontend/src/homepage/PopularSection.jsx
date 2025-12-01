@@ -39,11 +39,11 @@ const PopularSection = () => {
   };
 
   return (
-    <section className="popular-section-four pt-4 ">
+    <section className="car-section">
       <div className="container">
         {/* Section Header */}
-        <div className="section-heading heading-four" data-aos="fade-down">
-          <h2 className="demoFunction">Popular Cars On Recommendations</h2>
+        <div className="section-heading heading-four">
+          <h2>Popular Cars On Recommendation </h2>
           <p>Here are some versatile options that cater to different needs</p>
         </div>
         {/* /Section Header */}

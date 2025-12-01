@@ -48,6 +48,16 @@ const Register = () => {
     fetchgoogleCaptcha();
   }, []);
 
+  const checkAuth = () => {
+    if (sessionStorage.getItem("token")) {
+      navigate("/admin-dashboard");
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   // handle input
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

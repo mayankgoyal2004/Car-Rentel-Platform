@@ -27,7 +27,7 @@ const FactNumberSection = () => {
       <div className="container">
         {/* Heading title*/}
         <div className="section-heading" data-aos="fade-down">
-          <h2 className="title text-white demoFunction">Facts By The Numbers</h2>
+          <h2 className="title text-white">Facts By The Numbers</h2>
           <p className="description">
             Here are some dreamsrent interesting facts presented by the numbers
           </p>
@@ -46,7 +46,7 @@ const FactNumberSection = () => {
                   </div>
                   <div className="count-content">
                     <h4>
-                      <CountUp end={16} duration={2} enableScrollSpy/>
+                      <CountUp end={16} duration={2} enableScrollSpy />
                       K+
                     </h4>
                     <p>Happy Customers</p>
@@ -65,7 +65,7 @@ const FactNumberSection = () => {
                   </div>
                   <div className="count-content">
                     <h4>
-                      <CountUp end={2547} duration={2}enableScrollSpy />+
+                      <CountUp end={2547} duration={2} enableScrollSpy />+
                     </h4>
                     <p>Count of Cars</p>
                   </div>
@@ -79,11 +79,14 @@ const FactNumberSection = () => {
               <div className="count-group flex-fill">
                 <div className="customer-count d-flex align-items-center">
                   <div className="count-img">
-                    <img src="/user-assets/img/icons/bx-headphone.svg" alt="Icon" />
+                    <img
+                      src="/user-assets/img/icons/bx-headphone.svg"
+                      alt="Icon"
+                    />
                   </div>
                   <div className="count-content">
                     <h4>
-                      <CountUp end={625} duration={2} enableScrollSpy/>+
+                      <CountUp end={625} duration={2} enableScrollSpy />+
                     </h4>
                     <p>Car Center Solutions</p>
                   </div>
@@ -97,11 +100,14 @@ const FactNumberSection = () => {
               <div className="count-group flex-fill">
                 <div className="customer-count d-flex align-items-center">
                   <div className="count-img">
-                    <img src="/user-assets/img/icons/bx-history.svg" alt="Icon" />
+                    <img
+                      src="/user-assets/img/icons/bx-history.svg"
+                      alt="Icon"
+                    />
                   </div>
                   <div className="count-content">
                     <h4>
-                      <CountUp end={15000} duration={2} enableScrollSpy/>+
+                      <CountUp end={15000} duration={2} enableScrollSpy />+
                     </h4>
                     <p>Total Kilometer</p>
                   </div>

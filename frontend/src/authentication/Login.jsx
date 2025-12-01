@@ -49,6 +49,16 @@ const Login = () => {
     fetchgoogleCaptcha();
   }, []);
 
+  const checkAuth = () => {
+    if (sessionStorage.getItem("token")) {
+      navigate("/admin-dashboard");
+    }
+  };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();

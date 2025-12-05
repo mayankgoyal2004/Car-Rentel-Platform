@@ -432,3 +432,7 @@ iframe[id^=":"] {
     width: 100%;
   }
 }
+
+.car-slider {
+  overflow: hidden !important;
+}

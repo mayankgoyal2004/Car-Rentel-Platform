@@ -805,6 +805,11 @@ const AdminDashboard = () => {
                               <Link to="bin">Recycle Bin</Link>
                             </li>
                           )}
+                          {userType === 1 && (
+                            <li>
+                              <Link to="seo-setting">Seo Setting</Link>
+                            </li>
+                          )}
                         </ul>
                       )}
                     </li>

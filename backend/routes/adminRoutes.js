@@ -46,6 +46,8 @@ const companySetting = require("../controlers/companySettingControler");
 const recaptchaSetting = require("../controlers/googleCaptchaControler");
 const smtpSetting = require("../controlers/smtpSettingControler");
 
+const seoSetting = require("../controlers/seoControler");
+
 const route = express.Router();
 
 route.post("/register", userRoute.register);
@@ -59,6 +61,11 @@ route.post(
 );
 route.post("/verify-email", userRoute.verifyEmail);
 
+
+route.get(
+  "/get-seo-setting",
+  seoSetting.getSeoSetting
+);
 //!! get testimonial for public without authentication
 route.get("/get-all-testimonial-user", testimonial.getTestimonialsPublic);
 route.get("/get-all-testimonial-homepage", testimonial.getHomepageTestimonials);
@@ -1173,7 +1180,7 @@ route.post(
 );
 route.get(
   "/get-all-signature",
-  checkPermission("Setting", "edit"),
+  checkPermission("Setting", "view"),
   signature.getSignatures
 );
 route.get(
@@ -1201,7 +1208,7 @@ route.post(
 );
 route.get(
   "/get-all-bank-account",
-  checkPermission("Setting", "edit"),
+  checkPermission("Setting", "view"),
   bankAccount.getBankAccount
 );
 route.get("/get-all-active-bank-account", bankAccount.getActiveBankAccount);
@@ -1270,4 +1277,16 @@ route.delete(
   location.deleteLocationSetting
 );
 
+// seo setting
+route.post(
+  "/add-seo-setting",
+  checkPermission("admin", "assignPackage", true),
+  upload.companyImageUpload.single("image"),
+  seoSetting.addSeo
+);
+
+route.get(
+  "/get-seo-setting",
+  seoSetting.getSeoSetting
+);
 module.exports = route;

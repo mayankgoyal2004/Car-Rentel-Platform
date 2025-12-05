@@ -940,22 +940,26 @@ class apiServices {
       headers: getAuthHeaders(),
     });
   }
-    getBinCar({ search = "", page } = {}) {
+  getBinCar({ search = "", page } = {}) {
     return axios.get(BASE_URL + `get-all-bin?search=${search}&page=${page}`, {
       headers: getAuthHeaders(),
     });
   }
- moveToRecycleBin(id) {
-  return axios.post(
-    BASE_URL + `move-to-recycle-cars/${id}`,
-    {},
-    { headers: getAuthHeaders() }
-  );
-}
+  moveToRecycleBin(id) {
+    return axios.post(
+      BASE_URL + `move-to-recycle-cars/${id}`,
+      {},
+      { headers: getAuthHeaders() }
+    );
+  }
   moveOutFromRecycleBin(id) {
-    return axios.post(BASE_URL + `move-out-from-recycle-cars/${id}`,{}, {
-      headers: getAuthHeaders(),
-    });
+    return axios.post(
+      BASE_URL + `move-out-from-recycle-cars/${id}`,
+      {},
+      {
+        headers: getAuthHeaders(),
+      }
+    );
   }
   toolgeStatusByAdmin(id, data) {
     return axios.post(BASE_URL + `change-status-by-admin/${id}`, data, {
@@ -1499,6 +1503,17 @@ class apiServices {
     return axios.get(BASE_URL + `get-smtp-setting`, {
       headers: getAuthHeaders(),
     });
+  }
+
+  //!! smtp setting
+  updateSeoSetting(data) {
+    return axios.post(BASE_URL + `add-seo-setting`, data, {
+      headers: getAuthHeaders(),
+    });
+  }
+
+  getSeoSetting() {
+    return axios.get(BASE_URL + `get-seo-setting`);
   }
 }
 

@@ -19,7 +19,8 @@ import "../assets/css/owl.carousel.min.css";
 
 import "../assets/plugins/boxicons/css/boxicons.min.css";
 import "../assets/css/user-style.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import apiService from "../../Apiservice/apiService";
 
 const Master = () => {
   useEffect(() => {
@@ -66,6 +67,66 @@ const Master = () => {
       });
     });
   }, []);
+
+  const [seoData, setSeoData] = useState(null);
+
+  const fetchSeo = async () => {
+    try {
+      const res = await apiService.getSeoSetting();
+      if (res.data?.Seo) {
+        const d = res.data.Seo;
+        setSeoData({
+          title: d.metaTitle,
+          description: d.metaDescription,
+          keywords: Array.isArray(d.keywords)
+            ? d.keywords.join(", ")
+            : d.keywords,
+          ogImage: d.ogImage
+            ? `${import.meta.env.VITE_BACKEND_URL}/${d.ogImage}`
+            : "",
+        });
+      }
+    } catch (err) {
+      console.error("SEO load failed:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSeo();
+  }, []);
+
+  useEffect(() => {
+    if (!seoData) return;
+
+    document.title = seoData.metaTitle || "Car Rental";
+
+    const updateMeta = (name, content) => {
+      let tag = document.querySelector(`meta[name="${name}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+
+    updateMeta("description", seoData.description);
+    updateMeta("keywords", seoData.keywords);
+
+    const updateOG = (property, content) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("property", property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    };
+
+    updateOG("og:title", seoData.title);
+    updateOG("og:description", seoData.description);
+    if (seoData.ogImage) updateOG("og:image", seoData.ogImage);
+  }, [seoData]);
 
   return (
     <div>

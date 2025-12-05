@@ -10,10 +10,8 @@ import FactNumberSection from "./FactNumberSection";
 import PopularSection from "./PopularSection";
 
 const Main = () => {
- 
-
   return (
-    <div >
+    <div>
       <BannerSection />
       <CarSection />
       <Category />
@@ -25,9 +23,6 @@ const Main = () => {
       <BestPricing />
       <BlogSection />
       <Faq />
-
-
-      
     </div>
   );
 };

@@ -127,6 +127,7 @@ import LocationSetting from "./Admin/LocationSetting";
 import LocalizationSetting from "./Admin/LocalizationSetting";
 import ErrorPage from "../Error404Page";
 import AdminBin from "./Admin/AdminBin";
+import SeoSetting from "./Admin/SeoSetting";
 
 function App() {
   return (
@@ -302,6 +303,7 @@ function App() {
               <Route path="login-setting" element={<LoginSettingAdmin />} />
               <Route path="company-setting" element={<CompanySetting />} />
               <Route path="email-setting" element={<EmailSetting />} />
+              <Route path="seo-setting" element={<SeoSetting />} />
               <Route
                 path="bank-account-setting"
                 element={<BankAccountSetting />}

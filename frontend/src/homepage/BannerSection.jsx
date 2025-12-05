@@ -133,7 +133,7 @@ function BannerSection() {
               <div className="input-block">
                 <label>Drop Location</label>
                 <select
-                  className="form-select bg-transparent border-0"
+                  className="form-select  bg-transparent border-0"
                   value={dropCity}
                   onChange={(e) => setDropCity(e.target.value)}
                 >

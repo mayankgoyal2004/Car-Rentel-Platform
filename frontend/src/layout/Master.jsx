@@ -22,6 +22,74 @@ import "../assets/css/user-style.css";
 import { useEffect, useState } from "react";
 import apiService from "../../Apiservice/apiService";
 
+const loadTawkTo = () => {
+  // Prevent duplicate loading
+  if (window.Tawk_API) return;
+
+  const scriptId = "tawkto-script";
+  if (document.getElementById(scriptId)) return;
+
+  window.Tawk_API = window.Tawk_API || {};
+  window.Tawk_LoadStart = new Date();
+
+  const script = document.createElement("script");
+  script.id = scriptId;
+  script.async = true;
+
+  // 🔴 REPLACE WITH YOUR TAWK PROPERTY ID
+  script.src = import.meta.env.VITE_TAWK_TO_CHAT_API;
+
+  script.charset = "UTF-8";
+  script.setAttribute("crossorigin", "*");
+
+  document.body.appendChild(script);
+};
+
+const loadWhatsappWidget = (setting) => {
+  // Prevent duplicate widget
+  if (window.CreateWhatsappChatWidget) return;
+
+  const scriptId = "wati-whatsapp-script";
+  if (document.getElementById(scriptId)) return;
+
+  const script = document.createElement("script");
+  script.id = scriptId;
+  script.src =
+    "https://wati-integration-service.clare.ai/ShopifyWidget/shopifyWidget.js?86687";
+  script.async = true;
+
+  script.onload = () => {
+    if (!window.CreateWhatsappChatWidget) return;
+
+    window.CreateWhatsappChatWidget({
+      enabled: true,
+      chatButtonSetting: {
+        backgroundColor: "#2ACA45",
+        ctaText: "",
+        borderRadius: "25",
+        marginLeft: "20",
+        marginBottom: "30",
+        marginRight: "20",
+        position: "left",
+      },
+      brandSetting: {
+        brandName: "Car Rental",
+        brandSubTitle: "Typically replies within a day",
+        brandImg: setting?.favicon || "/admin/logo/fav-print.jpg",
+        welcomeText: "Hi there!\nHow can I help you?",
+        messageText: "Hello, I have a question about {{page_link}}",
+        backgroundColor: "#2ACA45",
+        ctaText: "Start Chat",
+        borderRadius: "25",
+        autoShow: false,
+        phoneNumber: "918699792040",
+      },
+    });
+  };
+
+  document.body.appendChild(script);
+};
+
 const Master = () => {
   useEffect(() => {
     const progressPath = document.querySelector(".progress-wrap path");
@@ -69,6 +137,18 @@ const Master = () => {
   }, []);
 
   const [seoData, setSeoData] = useState(null);
+  const [companySetting, setCompanySetting] = useState(null);
+
+  const fetchCompanySetting = async () => {
+    try {
+      const res = await apiService.getCompanySettings(); // adjust API name
+      if (res.data?.data) {
+        setCompanySetting(res.data.data);
+      }
+    } catch (err) {
+      console.error("Company setting load failed", err);
+    }
+  };
 
   const fetchSeo = async () => {
     try {
@@ -92,7 +172,20 @@ const Master = () => {
   };
 
   useEffect(() => {
+    fetchCompanySetting();
+  }, []);
+
+  useEffect(() => {
+    if (!companySetting) return;
+    loadWhatsappWidget(companySetting);
+  }, [companySetting]);
+
+  useEffect(() => {
     fetchSeo();
+  }, []);
+
+  useEffect(() => {
+    loadTawkTo();
   }, []);
 
   useEffect(() => {

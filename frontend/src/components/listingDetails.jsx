@@ -48,6 +48,7 @@ const ListingDetails = () => {
     message: "",
   });
   const [enquirySubmitting, setEnquirySubmitting] = useState(false);
+  const [isDetecting, setIsDetecting] = useState(null);
   const { id } = useParams();
   const fetchCar = async () => {
     setLoading(true);
@@ -73,9 +74,9 @@ const ListingDetails = () => {
         const averageRating =
           totalReviews > 0
             ? res.data.reviews.reduce(
-                (sum, review) => sum + review.carReview,
-                0
-              ) / totalReviews
+              (sum, review) => sum + review.carReview,
+              0
+            ) / totalReviews
             : 0;
 
         const breakdown = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
@@ -203,6 +204,69 @@ const ListingDetails = () => {
     });
   };
 
+  const handleDetectLocation = (field = "pickupAddress") => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsDetecting(field);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          const address = data.display_name || `${latitude}, ${longitude}`;
+
+          setReservation((prev) => ({
+            ...prev,
+            [field]: address,
+            ...(field === "pickupAddress" && prev.returnSameLocation
+              ? { dropAddress: address }
+              : {}),
+          }));
+          toast.success("Location detected!");
+        } catch (error) {
+          console.error("Error reverse geocoding:", error);
+          const coords = `${latitude}, ${longitude}`;
+          setReservation((prev) => ({
+            ...prev,
+            [field]: coords,
+            ...(field === "pickupAddress" && prev.returnSameLocation
+              ? { dropAddress: coords }
+              : {}),
+          }));
+          toast.success("Location detected (coordinates only)");
+        } finally {
+          setIsDetecting(null);
+        }
+      },
+      (error) => {
+        setIsDetecting(null);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error(
+              "Location access denied. Please enable it in settings."
+            );
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            toast.error("Location request timed out.");
+            break;
+          default:
+            toast.error("An unknown error occurred.");
+            break;
+        }
+      },
+      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+    );
+  };
+
   const validateEnquiryForm = () => {
     if (!enquiryForm.name.trim()) {
       toast.error("Name is required");
@@ -323,7 +387,7 @@ const ListingDetails = () => {
   const displayedText = showFullDescription
     ? description
     : description.slice(0, previewLength) +
-      (description.length > previewLength ? "..." : "");
+    (description.length > previewLength ? "..." : "");
 
   const renderStarRating = (rating) => {
     return [...Array(5)].map((_, i) => (
@@ -818,9 +882,8 @@ const ListingDetails = () => {
                                 }}
                               >
                                 <i
-                                  className={`fas fa-star ${
-                                    formData.carReview >= rating ? "filled" : ""
-                                  }`}
+                                  className={`fas fa-star ${formData.carReview >= rating ? "filled" : ""
+                                    }`}
                                 />
                               </button>
                             ))}
@@ -991,14 +1054,34 @@ const ListingDetails = () => {
                           <li className="column-group-main">
                             <div className="input-block">
                               <label>Pickup Location</label>
-                              <input
-                                type="text"
-                                name="pickupAddress"
-                                value={reservation.pickupAddress}
-                                onChange={handleChange}
-                                placeholder="Pickup address"
-                                className="form-control"
-                              />
+                              <div className="group-img">
+                                <div className="form-wrap">
+                                  <input
+                                    type="text"
+                                    name="pickupAddress"
+                                    value={reservation.pickupAddress}
+                                    onChange={handleChange}
+                                    placeholder="Pickup address"
+                                    className="form-control"
+                                  />
+                                  <span
+                                    className="form-icon"
+                                    onClick={() =>
+                                      handleDetectLocation("pickupAddress")
+                                    }
+                                    style={{
+                                      cursor: "pointer",
+                                      pointerEvents: "auto",
+                                    }}
+                                  >
+                                    {isDetecting === "pickupAddress" ? (
+                                      <i className="fa-solid fa-spinner fa-spin" />
+                                    ) : (
+                                      <MapPin />
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           </li>
                           <li className="column-group-main">
@@ -1018,15 +1101,35 @@ const ListingDetails = () => {
                           <li className="column-group-main">
                             <div className="input-block">
                               <label>Return Location</label>
-                              <input
-                                type="text"
-                                name="dropAddress"
-                                value={reservation.dropAddress}
-                                onChange={handleChange}
-                                placeholder="Return address"
-                                className="form-control"
-                                disabled={reservation.returnSameLocation}
-                              />
+                              <div className="group-img">
+                                <div className="form-wrap">
+                                  <input
+                                    type="text"
+                                    name="dropAddress"
+                                    value={reservation.dropAddress}
+                                    onChange={handleChange}
+                                    placeholder="Return address"
+                                    className="form-control"
+                                    disabled={reservation.returnSameLocation}
+                                  />
+                                  <span
+                                    className="form-icon"
+                                    onClick={() =>
+                                      handleDetectLocation("dropAddress")
+                                    }
+                                    style={{
+                                      cursor: "pointer",
+                                      pointerEvents: "auto",
+                                    }}
+                                  >
+                                    {isDetecting === "dropAddress" ? (
+                                      <i className="fa-solid fa-spinner fa-spin" />
+                                    ) : (
+                                      <MapPin />
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           </li>
                           <li className="column-group-main">
@@ -1308,11 +1411,10 @@ const ListingDetails = () => {
                     Message to owner
                   </Link>
                   <a
-                    href={`https://wa.me/${
-                      carData.admin?.contact
-                    }?text=${encodeURIComponent(
-                      "Hello, I am interested in your car!"
-                    )}`}
+                    href={`https://wa.me/${carData.admin?.contact
+                      }?text=${encodeURIComponent(
+                        "Hello, I am interested in your car!"
+                      )}`}
                     className="chat-link"
                     target="_blank"
                     rel="noopener noreferrer"

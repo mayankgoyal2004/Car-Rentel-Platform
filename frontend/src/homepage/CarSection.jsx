@@ -75,8 +75,11 @@ export const CarSection = () => {
     <section className="car-section">
       <div className="container">
         <div className="section-heading heading-four">
-          <h2 className="demoFunction">Explore Most Popular Cars</h2>
-          <p>Here's a list of some of the most popular cars globally</p>
+          <h2 className="demoFunction">Explore Our Most Popular Cars</h2>
+          <p>
+            Discover a curated list of the most loved and top-rated cars
+            worldwide.
+          </p>
         </div>
         <div className="row">
           {cars.slice(0, 6).map((car) => (

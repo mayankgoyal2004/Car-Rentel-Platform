@@ -25,8 +25,8 @@ const BlogSection = () => {
       <div className="container">
         {/* Heading title*/}
         <div className="section-heading" data-aos="fade-down">
-          <h2 className="demoFunction">News &amp; Insights For You</h2>
-          <p>This blog post provides valuable insights into the benefits</p>
+          <h2 className="demoFunction">Latest News & Expert Insights</h2>
+          <p>Stay informed with expert tips on choosing the right vehicle.</p>
         </div>
         {/* /Heading title */}
         <div className="row">
@@ -74,8 +74,7 @@ const BlogSection = () => {
                       </div>
                     </li>
                     <li className="date-icon">
-                     <Calendar className="ms-2" />
-{" "}
+                      <Calendar className="ms-2" />{" "}
                       <span>{new Date(b.createdAt).toDateString()}</span>
                     </li>
                   </ul>
@@ -94,8 +93,7 @@ const BlogSection = () => {
           >
             View all Blogs{" "}
             <span>
-             <ArrowRight className="ms-2" />
-
+              <ArrowRight className="ms-2" />
             </span>
           </Link>
         </div>

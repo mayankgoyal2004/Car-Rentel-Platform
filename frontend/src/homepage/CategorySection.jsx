@@ -57,8 +57,8 @@ const Category = () => {
             <div className="section-heading heading-four" data-aos="fade-down">
               <h2 className="demoFunction"> Featured Categories</h2>
               <p>
-                Know what you’re looking for? Browse our extensive selection of
-                cars
+                Looking for something specific? Explore our wide range of cars
+                that suit your style and needs.
               </p>
             </div>
             {/* /Heading title */}

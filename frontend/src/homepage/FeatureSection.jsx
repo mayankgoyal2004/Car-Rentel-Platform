@@ -30,9 +30,9 @@ const FeatureSection = () => {
               <div className="section-heading heading-four text-start">
                 <h2 className="demoFunction">Best Platform for Car Rental</h2>
                 <p>
-                  Why do we choose relax rent bikes generally if we travel in a
-                  un known cities with a bike in our hand we feel which is like
-                  a home town
+                  Travel with comfort and confidence. Rent a car anytime,
+                  anywhere, and enjoy the freedom of exploring every city just
+                  like your hometown.
                 </p>
               </div>
               <img
@@ -53,8 +53,8 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Best Deal</h6>
                     <p>
-                      {companySetting?.organizationName}offers a fleet of
-                      high-quality{" "}
+                      Get access to high-quality cars at the most competitive
+                      prices.
                     </p>
                   </div>
                 </div>
@@ -69,8 +69,8 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Doorstep Delivery</h6>
                     <p>
-                      {companySetting?.organizationName} offers a fleet of
-                      high-quality{" "}
+                      We deliver your car right to your location for maximum
+                      convenience.
                     </p>
                   </div>
                 </div>
@@ -85,8 +85,8 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Low Security Deposit</h6>
                     <p>
-                      {companySetting?.organizationName} offers a fleet of
-                      high-quality{" "}
+                      Affordable deposits so you can rent without financial
+                      stress.
                     </p>
                   </div>
                 </div>
@@ -101,8 +101,8 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Latest Cars</h6>
                     <p>
-                      {companySetting?.organizationName} offers a fleet of
-                      high-quality
+                      Choose from modern, well-maintained, and newly launched
+                      vehicles.
                     </p>
                   </div>
                 </div>
@@ -117,8 +117,8 @@ const FeatureSection = () => {
                   <div>
                     <h6 className="mb-1">Customer Support</h6>
                     <p>
-                      {companySetting?.organizationName} offers a fleet of
-                      high-quality
+                      Friendly 24/7 support to assist you whenever you need
+                      help.
                     </p>
                   </div>
                 </div>
@@ -132,10 +132,7 @@ const FeatureSection = () => {
                   </span>
                   <div>
                     <h6 className="mb-1">No Hidden Charges</h6>
-                    <p>
-                      {companySetting?.organizationName}offers a fleet of
-                      high-quality
-                    </p>
+                    <p>Transparent pricing with zero surprises.</p>
                   </div>
                 </div>
               </div>

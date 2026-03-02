@@ -46,10 +46,10 @@ function BannerSection() {
 
     navigate(
       `/listing?pickupLocation=${encodeURIComponent(
-        pickupCity
+        pickupCity,
       )}&dropLocation=${encodeURIComponent(
-        dropCity
-      )}&pickupDate=${pickupDate.toISOString()}&dropDate=${dropDate.toISOString()}`
+        dropCity,
+      )}&pickupDate=${pickupDate.toISOString()}&dropDate=${dropDate.toISOString()}`,
     );
   };
 
@@ -64,8 +64,9 @@ function BannerSection() {
                   Explore our <span>Verified &amp; Professional</span> Cars
                 </h1>
                 <p>
-                  Modern design sports cruisers for those who crave adventure
-                  &amp; grandeur Cars for relaxing with your loved ones.
+                  Modern sports cruisers for those who crave adventure and
+                  grandeur, crafted for thrilling drives and relaxing journeys
+                  with your loved ones.
                 </p>
                 <div className="view-all d-flex align-items-center gap-3 mt-3">
                   <button
@@ -190,8 +191,7 @@ function BannerSection() {
             {/* Search Button */}
             <div className="search-btn">
               <button className="btn btn-primary" type="submit">
-               <Search size={18} />
-
+                <Search size={18} />
               </button>
             </div>
           </form>

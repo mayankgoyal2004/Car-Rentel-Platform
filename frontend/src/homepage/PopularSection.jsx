@@ -44,7 +44,10 @@ const PopularSection = () => {
         {/* Section Header */}
         <div className="section-heading heading-four">
           <h2>Popular Cars On Recommendation </h2>
-          <p>Here are some versatile options that cater to different needs</p>
+          <p>
+            Explore our handpicked selection of versatile vehicles designed to
+            suit every travel need and budget.
+          </p>
         </div>
         {/* /Section Header */}
 

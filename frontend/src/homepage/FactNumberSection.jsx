@@ -27,9 +27,10 @@ const FactNumberSection = () => {
       <div className="container">
         {/* Heading title*/}
         <div className="section-heading" data-aos="fade-down">
-          <h2 className="title text-white">Facts By The Numbers</h2>
+          <h2 className="title text-white">Our Growth in Numbers</h2>
           <p className="description">
-            Here are some dreamsrent interesting facts presented by the numbers
+            Here’s a snapshot of Dream Rents’ journey and the milestones we’ve
+            achieved over the years.
           </p>
         </div>
         {/* /Heading title */}

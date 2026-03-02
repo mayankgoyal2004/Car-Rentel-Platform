@@ -43,7 +43,7 @@ const AdminTestimonials = () => {
         }
       } catch (err) {
         toast.error(
-          err.response?.data?.message || "Failed to fetch testimonials"
+          err.response?.data?.message || "Failed to fetch testimonials",
         );
       } finally {
         setLoading(false);
@@ -92,7 +92,7 @@ const AdminTestimonials = () => {
     } catch (err) {
       toast.error(
         "Error adding testimonial: " +
-          (err.response?.data?.message || err.message)
+          (err.response?.data?.message || err.message),
       );
     }
   };
@@ -112,7 +112,7 @@ const AdminTestimonials = () => {
 
       await apiService.updatetestimonial(
         selectedTestimonial._id,
-        userTestimonial
+        userTestimonial,
       );
       toast.success("Testimonial updated successfully");
       fetchAllTestimonials(search, currentPage);
@@ -121,7 +121,7 @@ const AdminTestimonials = () => {
     } catch (err) {
       toast.error(
         "Error updating Testimonial: " +
-          (err.response?.data?.message || err.message)
+          (err.response?.data?.message || err.message),
       );
     }
   };
@@ -138,7 +138,7 @@ const AdminTestimonials = () => {
     } catch (err) {
       toast.error(
         "Error deleting Testimonial: " +
-          (err.response?.data?.message || err.message)
+          (err.response?.data?.message || err.message),
       );
     }
   };
@@ -293,7 +293,7 @@ const AdminTestimonials = () => {
                                   status: item.status,
                                 });
                                 setImagePreview(
-                                  item.image ? BASE_URL_IMG + item.image : null
+                                  item.image ? BASE_URL_IMG + item.image : null,
                                 );
                               }}
                             >
@@ -389,7 +389,7 @@ const AdminTestimonials = () => {
                 <input
                   type="text"
                   className="form-control mb-2"
-                  placeholder="Customer"
+                  placeholder="Customer Name"
                   value={formData.customer}
                   onChange={(e) =>
                     setFormData({ ...formData, customer: e.target.value })
@@ -470,7 +470,7 @@ const AdminTestimonials = () => {
                 <input
                   type="text"
                   className="form-control mb-2"
-                  placeholder="Customer"
+                  placeholder="Customer Name"
                   value={formData.customer}
                   onChange={(e) =>
                     setFormData({ ...formData, customer: e.target.value })

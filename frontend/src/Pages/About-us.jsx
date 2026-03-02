@@ -70,18 +70,20 @@ const About = () => {
                   <h6>ABOUT OUR COMPANY</h6>
                   <h2>Best Solution For Cleaning Services</h2>
                   <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                    eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                    Ut enim minim veniam, quis nostrud exercitation ullamco
-                    laboris nisi esse cillum dolore eu fugiat nulla pariatur.
-                    Excepteur sint occaecat cupidatat non proident, sunt in
-                    culpa qui officia deserunt mollit anim id est laborum.
+                    At Dream Rents, we make car rentals simple, affordable, and
+                    hassle-free. Whether you're traveling for business, planning
+                    a family trip, or need a ride for everyday use, we offer a
+                    wide range of clean, reliable, and well-maintained vehicles
+                    to match your needs.
                   </p>
                   <p>
-                    Sed ut perspiciatis unde omnis iste natus error sit
-                    voluptatem accusantium doloremque laudantium, totam rem
-                    aperiam, eaque ipsa quae ab illo inventore veritatis et
-                    quasi architecto beatae vitae dicta sunt explicabo.
+                    With transparent pricing, doorstep delivery, low deposits,
+                    and zero hidden charges, we focus on delivering convenience
+                    and comfort at every step. Our goal is to give you the
+                    freedom to travel anywhere with confidence and ease. Backed
+                    by thousands of happy customers and a growing fleet of
+                    modern cars, Dream Rents is your trusted partner for every
+                    journey.
                   </p>
                   <div className="row">
                     <div className="col-md-6">
@@ -116,10 +118,7 @@ const About = () => {
             {/* Heading title*/}
             <div className="section-heading">
               <h2>How It Works</h2>
-              <p>
-                Lorem Ipsum has been the industry's standard dummy text ever
-                since the 1500s,
-              </p>
+              <p>Book. Unlock. Drive. It’s That Easy.</p>
             </div>
             {/* /Heading title */}
             <div className="services-work">
@@ -136,9 +135,10 @@ const About = () => {
                     <div className="services-content">
                       <h3>1. Choose Locations</h3>
                       <p>
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s,
+                        Select your pickup and drop-off location along with your
+                        preferred date and time. Browse through our wide range
+                        of available cars and choose the one that best fits your
+                        travel needs and budget.
                       </p>
                     </div>
                   </div>
@@ -155,9 +155,10 @@ const About = () => {
                     <div className="services-content">
                       <h3>2. Pick-Up Locations</h3>
                       <p>
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s,
+                        Check vehicle details, review transparent pricing, and
+                        complete your booking in just a few clicks. Enjoy low
+                        security deposits and zero hidden charges for complete
+                        peace of mind.
                       </p>
                     </div>
                   </div>
@@ -174,9 +175,10 @@ const About = () => {
                     <div className="services-content">
                       <h3>3. Book your Car</h3>
                       <p>
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem Ipsum has been the
-                        industry's standard dummy text ever since the 1500s,
+                        We deliver the car to your doorstep or make it ready at
+                        the selected location. Complete a quick verification
+                        process, collect the keys, and enjoy a smooth,
+                        hassle-free ride.
                       </p>
                     </div>
                   </div>
@@ -206,10 +208,10 @@ const About = () => {
             {/* Heading title*/}
             <div className="section-heading">
               <h2 className="title text-white">Facts By The Numbers</h2>
-              <p className="description text-white">
+              {/* <p className="description text-white">
                 Lorem Ipsum has been the industry's standard dummy text ever
                 since the 1500s,
-              </p>
+              </p> */}
             </div>
             {/* /Heading title */}
             <div className="counter-group">
@@ -305,8 +307,8 @@ const About = () => {
             <div className="section-heading">
               <h2>Why Choose Us</h2>
               <p>
-                Lorem Ipsum has been the industry's standard dummy text ever
-                since the 1500s,
+                Experience hassle-free car rentals with convenience, comfort,
+                and complete transparency.
               </p>
             </div>
             {/* /Heading title */}
@@ -324,9 +326,8 @@ const About = () => {
                       <div className="choose-content">
                         <h4>Easy &amp; Fast Booking</h4>
                         <p>
-                          Completely carinate e business testing process whereas
-                          fully researched customer service. Globally extensive
-                          content with quality.
+                          Book your car in minutes with our simple online
+                          process — quick, smooth, and stress-free.
                         </p>
                       </div>
                     </div>
@@ -344,9 +345,8 @@ const About = () => {
                       <div className="choose-content">
                         <h4>Many Pickup Location</h4>
                         <p>
-                          Enthusiastically magnetic initiatives with
-                          cross-platform sources. Dynamically target testing
-                          procedures through effective.
+                          Pick up and drop off your car at convenient locations
+                          across the city for maximum flexibility.
                         </p>
                       </div>
                     </div>
@@ -364,8 +364,8 @@ const About = () => {
                       <div className="choose-content">
                         <h4>Customer Satisfaction</h4>
                         <p>
-                          Globally user centric method interactive. Seamlessly
-                          revolutionize unique portals corporate collaboration.
+                          Clean cars, transparent pricing, and reliable support
+                          — your comfort is always our priority.
                         </p>
                       </div>
                     </div>

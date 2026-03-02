@@ -144,7 +144,8 @@ const AdminCustomers = () => {
       }
     } catch (err) {
       toast.error(
-        "Error adding customer: " + (err.response?.data?.message || err.message)
+        "Error adding customer: " +
+          (err.response?.data?.message || err.message),
       );
     }
   };
@@ -193,7 +194,7 @@ const AdminCustomers = () => {
 
       const res = await apiService.updateCustomer(
         selectedCustomer._id,
-        userFormData
+        userFormData,
       );
       if (res.data.success) {
         toast.success("Customer updated successfully!");
@@ -204,7 +205,7 @@ const AdminCustomers = () => {
     } catch (err) {
       toast.error(
         "Error updating customer: " +
-          (err.response?.data?.message || err.message)
+          (err.response?.data?.message || err.message),
       );
     }
   };
@@ -261,7 +262,7 @@ const AdminCustomers = () => {
     } catch (err) {
       toast.error(
         "Error deleting customer: " +
-          (err.response?.data?.message || err.message)
+          (err.response?.data?.message || err.message),
       );
     }
   };

@@ -4,6 +4,11 @@ const Driver = require("../models/DriverModel");
 const customer = require("../models/customerModel");
 const mongoose = require("mongoose");
 
+const validateFields = (fields, data) => {
+  const missing = fields.filter((field) => !data[field]);
+  return missing.length > 0 ? missing : null;
+};
+
 const addReservation = async (req, res) => {
   try {
     const {
@@ -35,10 +40,22 @@ const addReservation = async (req, res) => {
       pricingDetails,
     } = req.body;
 
-    if (!car_id || !customer_id || pickupTime || dropTime || !pickupDate || !dropDate || !bookingType) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing required fields" });
+    const requiredFields = [
+      "car_id",
+      "customer_id",
+      "pickupTime",
+      "dropTime",
+      "pickupDate",
+      "dropDate",
+      "bookingType",
+    ];
+    const missingFields = validateFields(requiredFields, req.body);
+
+    if (missingFields) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(", ")}`,
+      });
     }
 
     const car = await Car.findById(car_id);
@@ -284,7 +301,7 @@ const getAllReservationByCustomer = async (req, res) => {
     if (!_id) {
       return res
         .status(400)
-        .json({ success: false, message: " ID is required" });
+        .json({ success: false, message: "ID is required" });
     }
 
     const reservations = await Reservation.find({ createdBy: _id })
@@ -504,19 +521,22 @@ const addReservationStep1 = async (req, res) => {
 
     const { id } = req.params;
     // Validation
-    if (
-      !pickupAddress ||
-      !dropAddress ||
-      !pickupDate ||
-      !pickupTime ||
-      !returnDate ||
-      !returnTime ||
-      !priceRate ||
-      !rentType
-    ) {
+    const requiredFields = [
+      "pickupAddress",
+      "dropAddress",
+      "pickupDate",
+      "pickupTime",
+      "returnDate",
+      "returnTime",
+      "priceRate",
+      "rentType",
+    ];
+    const missingFields = validateFields(requiredFields, req.body);
+
+    if (missingFields) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided",
+        message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
 
@@ -593,19 +613,22 @@ const editReservationStep2 = async (req, res) => {
     } = req.body;
 
     // Validation
-    if (
-      !pickupAddress ||
-      !dropAddress ||
-      !pickupDate ||
-      !pickupTime ||
-      !returnDate ||
-      !returnTime ||
-      !priceRate ||
-      !rentalType
-    ) {
+    const requiredFields = [
+      "pickupAddress",
+      "dropAddress",
+      "pickupDate",
+      "pickupTime",
+      "returnDate",
+      "returnTime",
+      "priceRate",
+      "rentalType",
+    ];
+    const missingFields = validateFields(requiredFields, req.body);
+
+    if (missingFields) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be provided",
+        message: `Missing required fields: ${missingFields.join(", ")}`,
       });
     }
 
